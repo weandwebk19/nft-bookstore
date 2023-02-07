@@ -17,13 +17,16 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@shared": ["./src/components/shared"],
+      "@shared/*": ["./src/components/shared/*"],
       "@ui": ["./src/components/ui"],
       "@ui/*": ["./src/components/ui/*"],
       "@providers": ["./src/components/providers"],
       "@providers/*": ["./src/components/providers/*"],
       "@hooks": ["./src/components/hooks"],
       "@hooks/*": ["./src/components/hooks/*"],
-      "@_types/*": ["./src/types/*"]
+      "@_types/*": ["./src/types/*"],
+      "@styles/*": ["./src/styles/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
