@@ -1,7 +1,11 @@
+import { Box, Stack } from "@mui/material";
+
+import DisplayBox from "@ui/Home/DisplayBox";
+import Hero from "@ui/Home/Hero";
+import MainProduct from "@ui/Home/MainProduct";
 import Head from "next/head";
 
 import { DefaultLayout } from "@/layouts";
-import Hero from "@ui/Home/Hero";
 
 export default function Home() {
   return (
@@ -13,7 +17,28 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Hero />
+        <Stack spacing={8}>
+          <Box sx={{ height: "70vh" }}>
+            <Hero />
+          </Box>
+          <Box>
+            <MainProduct />
+          </Box>
+          <Box sx={{ height: "30vh" }}>
+            <Box
+              sx={{
+                height: "inherit",
+                backgroundColor: "DarkSeaGreen",
+                position: "absolute",
+                left: 0,
+                width: "100vw"
+              }}
+            />
+          </Box>
+          <Box>
+            <DisplayBox />
+          </Box>
+        </Stack>
       </main>
     </>
   );

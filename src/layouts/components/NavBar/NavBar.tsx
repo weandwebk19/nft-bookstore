@@ -295,7 +295,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
             >
               <Box
                 component="img"
-                src={images.logo.src}
+                src={images.logo}
                 alt="NFT Bookstore"
                 sx={{
                   width: "36px"
@@ -325,7 +325,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
             </Box>
             <Box
               component="img"
-              src={images.horizontalLogo.src}
+              src={images.horizontalLogo}
               alt="NFT Bookstore"
               sx={{
                 height: "20px",
