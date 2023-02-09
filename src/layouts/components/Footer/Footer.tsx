@@ -175,7 +175,7 @@ const Footer = () => {
                                         fontSize: "24px",
                                         lineHeight: "30px",
                                         fontWeight: 400,
-                                        marginBottom: "16px",
+                                        marginBottom: "8px",
                                     }}
                                 >
                                     {item.content}
@@ -197,7 +197,7 @@ const Footer = () => {
                                                 <ListItem
                                                     sx={{
                                                         cursor: "pointer",
-                                                        padding: "8px 0px",
+                                                        padding: "0px",
                                                         "&:hover": {
                                                             opacity: 0.7,
                                                         }
