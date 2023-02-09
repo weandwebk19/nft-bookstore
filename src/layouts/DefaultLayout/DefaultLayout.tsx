@@ -14,7 +14,7 @@ const DefaultLayout = ({ children, onThemeChange }: DefaultLayoutProps) => {
       <Container>
         <Box className="content">{children}</Box>
       </Container>
-      <Footer onThemeChange={onThemeChange} />
+      <Footer />
     </>
   );
 };
