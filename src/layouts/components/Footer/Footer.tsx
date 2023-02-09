@@ -131,6 +131,7 @@ const Footer = () => {
                                 lineHeight: "30px",
                                 fontWeight: 400,
                                 marginBottom: "36px",
+                                userSelect: "text"
                             }}
                             className={styles.footer__description}
                         >
@@ -142,6 +143,7 @@ const Footer = () => {
                                 fontSize: "16px",
                                 lineHeight: "20px",
                                 fontWeight: 400,
+                                userSelect: "text"
                             }}>
                             The first and biggest digital bookstore for NFT books in the world. Purchase, sell, and find unique digital books.
                         </Typography>
@@ -176,6 +178,7 @@ const Footer = () => {
                                         lineHeight: "30px",
                                         fontWeight: 400,
                                         marginBottom: "8px",
+                                        userSelect: "text"
                                     }}
                                 >
                                     {item.content}
