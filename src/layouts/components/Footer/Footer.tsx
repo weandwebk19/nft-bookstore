@@ -98,6 +98,7 @@ const Footer = () => {
                     marginTop: "24px",
                     padding: "64px 32px 32px",
                 }}
+                className={styles.footer__wrapper}
             >
                 <Grid
                     item
@@ -119,8 +120,9 @@ const Footer = () => {
                             alt="NFT Bookstore"
                             sx={{
                                 width: "60px",
-                                marginBottom: "24px"
+                                marginBottom: "36px"
                             }}
+                            className={styles.footer__name}
                         />
                         <Typography
                             variant="h5"
@@ -128,8 +130,9 @@ const Footer = () => {
                                 fontSize: "24px",
                                 lineHeight: "30px",
                                 fontWeight: 400,
-                                marginBottom: "24px",
+                                marginBottom: "36px",
                             }}
+                            className={styles.footer__description}
                         >
                             NFT Bookstore
                         </Typography>
