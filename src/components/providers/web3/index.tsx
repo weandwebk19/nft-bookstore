@@ -39,7 +39,7 @@ const removeGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
 const Web3Context = createContext<Web3State>(createDefaultState());
 
 type Web3ProviderProps = {
-  children: ReactElement;
+  children: any;
 };
 
 const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
