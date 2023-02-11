@@ -3,7 +3,7 @@ export type ListItemType = "button" | "dropdown" | "divider";
 export type ListItemProps = {
   type: ListItemType;
   icon?: JSX.Element | string;
-  content: string;
+  content?: string;
   onClick?: (a: any) => void;
   disabled?: boolean;
   subList: ListDropdownItemProps[];

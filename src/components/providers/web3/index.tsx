@@ -51,7 +51,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
         const provider = new ethers.providers.Web3Provider(
           window.ethereum as any
         );
-        const contract = await loadContract("NftMarket", provider);
+        const contract = await loadContract("NftBookStore", provider);
 
         const signer = provider.getSigner();
         const signedContract = contract.connect(signer);

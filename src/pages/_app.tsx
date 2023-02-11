@@ -4,6 +4,7 @@ import "@styles/GlobalStyles/GlobalStyles.scss";
 import type { AppProps } from "next/app";
 import { useState } from "react";
 import { CssBaseline } from "@mui/material";
+import { Web3Provider } from "@/components/providers";
 
 type PageLayoutProps = {
   onThemeChange: (theme: string) => void;
@@ -34,15 +35,17 @@ export default function App({ Component, pageProps }: ComponentWithPageLayout) {
   };
 
   return (
-    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
-      <CssBaseline />
-      {Component.PageLayout ? (
-        <Component.PageLayout onThemeChange={handleThemeChange}>
+    <Web3Provider>
+      <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+        <CssBaseline />
+        {Component.PageLayout ? (
+          <Component.PageLayout onThemeChange={handleThemeChange}>
+            <Component {...pageProps} />
+          </Component.PageLayout>
+        ) : (
           <Component {...pageProps} />
-        </Component.PageLayout>
-      ) : (
-        <Component {...pageProps} />
-      )}
-    </ThemeProvider>
+        )}
+      </ThemeProvider>
+    </Web3Provider>
   );
 }
