@@ -1,6 +1,6 @@
 import { Box, Container } from "@mui/material";
 
-import { NavBar } from "../components";
+import { Footer, NavBar } from "../components";
 
 interface DefaultLayoutProps {
   children: React.ReactNode;
@@ -14,6 +14,7 @@ const DefaultLayout = ({ children, onThemeChange }: DefaultLayoutProps) => {
       <Container>
         <Box className="content">{children}</Box>
       </Container>
+      <Footer />
     </>
   );
 };

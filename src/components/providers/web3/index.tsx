@@ -1,28 +1,47 @@
 import {
-  createContext,
   FunctionComponent,
   ReactElement,
+  createContext,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
+
+import { MetaMaskInpageProvider } from "@metamask/providers";
+import axios from "axios";
+import { ethers } from "ethers";
+
 import {
+  Web3State,
   createDefaultState,
   createWeb3State,
-  loadContract,
-  Web3State,
+  loadContract
 } from "./utils";
-import { ethers } from "ethers";
-import { MetaMaskInpageProvider } from "@metamask/providers";
 
 const pageReload = () => {
   window.location.reload();
 };
 
 const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
-  const isLocked = !(await ethereum._metamask.isUnlocked());
-  if (isLocked) {
-    pageReload();
+  try {
+    // console.log("ethereum._metamask", ethereum);
+
+    //create new account
+    let response = await axios
+      .post("/api/account/create", {
+        address: ethereum.selectedAddress,
+        username: "Anonymous"
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+
+    const isLocked = !(await ethereum._metamask.isUnlocked());
+    if (isLocked) {
+      pageReload();
+    }
+  } catch (error) {
+    console.log("An error occurred while deleting ", error);
   }
 };
 
@@ -39,7 +58,7 @@ const removeGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
 const Web3Context = createContext<Web3State>(createDefaultState());
 
 type Web3ProviderProps = {
-  children: ReactElement;
+  children: any;
 };
 
 const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
@@ -51,7 +70,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
         const provider = new ethers.providers.Web3Provider(
           window.ethereum as any
         );
-        const contract = await loadContract("NftBookStore", provider);
+        const contract = await loadContract("BookStore", provider);
 
         const signer = provider.getSigner();
         const signedContract = contract.connect(signer);
@@ -62,15 +81,15 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
             ethereum: window.ethereum,
             provider,
             contract,
-            isLoading: false,
+            isLoading: false
           })
         );
       } catch (e: any) {
-        console.error("Please, install web3 wallet");
+        console.error(e);
         setWeb3Api((api) =>
           createWeb3State({
             ...(api as any),
-            isLoading: false,
+            isLoading: false
           })
         );
       }

@@ -46,7 +46,7 @@ export const createWeb3State = ({
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID;
 
 export const loadContract = async (
-  name: string, // NftMarket
+  name: string, // BookStore
   provider: providers.Web3Provider
 ): Promise<Contract> => {
   if (!NETWORK_ID) {

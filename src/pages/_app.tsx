@@ -1,10 +1,11 @@
+import "@/styles/globals.css";
+import type { AppProps } from "next/app";
+import { Web3Provider } from "@providers";
 import { ThemeProvider } from "@mui/material/styles";
 import { darkTheme, lightTheme } from "@styles/theme";
 import "@styles/GlobalStyles/GlobalStyles.scss";
-import type { AppProps } from "next/app";
 import { useState } from "react";
 import { CssBaseline } from "@mui/material";
-import { Web3Provider } from "@/components/providers";
 
 type PageLayoutProps = {
   onThemeChange: (theme: string) => void;
