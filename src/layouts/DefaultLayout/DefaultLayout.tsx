@@ -9,12 +9,12 @@ interface DefaultLayoutProps {
 
 const DefaultLayout = ({ children, onThemeChange }: DefaultLayoutProps) => {
   return (
-    <>
+    <Box>
       <NavBar onThemeChange={onThemeChange} />
-      <Container>
+      <Container maxWidth="xl">
         <Box className="content">{children}</Box>
       </Container>
-    </>
+    </Box>
   );
 };
 

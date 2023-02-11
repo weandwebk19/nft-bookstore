@@ -1,19 +1,21 @@
 import {
-  createContext,
   FunctionComponent,
   ReactElement,
+  createContext,
   useContext,
   useEffect,
-  useState,
+  useState
 } from "react";
+
+import { MetaMaskInpageProvider } from "@metamask/providers";
+import { ethers } from "ethers";
+
 import {
+  Web3State,
   createDefaultState,
   createWeb3State,
-  loadContract,
-  Web3State,
+  loadContract
 } from "./utils";
-import { ethers } from "ethers";
-import { MetaMaskInpageProvider } from "@metamask/providers";
 
 const pageReload = () => {
   window.location.reload();
@@ -62,7 +64,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
             ethereum: window.ethereum,
             provider,
             contract,
-            isLoading: false,
+            isLoading: false
           })
         );
       } catch (e: any) {
@@ -70,7 +72,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
         setWeb3Api((api) =>
           createWeb3State({
             ...(api as any),
-            isLoading: false,
+            isLoading: false
           })
         );
       }

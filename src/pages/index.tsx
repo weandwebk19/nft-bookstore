@@ -5,6 +5,7 @@ import Hero from "@ui/Home/Hero";
 import MainProduct from "@ui/Home/MainProduct";
 import Head from "next/head";
 
+import images from "@/assets/images";
 import { DefaultLayout } from "@/layouts";
 
 export default function Home() {
@@ -18,24 +19,35 @@ export default function Home() {
       </Head>
       <main>
         <Stack spacing={8}>
-          <Box sx={{ height: "70vh" }}>
+          <Box component="section" sx={{ height: "70vh" }}>
             <Hero />
           </Box>
-          <Box>
+          <Box component="section">
             <MainProduct />
           </Box>
-          <Box sx={{ height: "30vh" }}>
+
+          {/* Just for you */}
+          <Box component="section" sx={{ height: "30vh" }}>
             <Box
+              className="thumbnail"
               sx={{
                 height: "inherit",
-                backgroundColor: "DarkSeaGreen",
                 position: "absolute",
                 left: 0,
-                width: "100vw"
+                width: "100vw",
+                overflow: "hidden"
               }}
-            />
+            >
+              <Box
+                component="img"
+                src={images.gradient1}
+                alt=""
+                className="portrait"
+              />
+            </Box>
           </Box>
-          <Box>
+
+          <Box component="section">
             <DisplayBox />
           </Box>
         </Stack>

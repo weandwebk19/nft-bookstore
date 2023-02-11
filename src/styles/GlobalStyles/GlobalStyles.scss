@@ -143,7 +143,63 @@ body {
   transition: 0.3s cubic-bezier(0.4, 0.4, 0, 1);
   overflow-x: hidden;
   // Hide scrollbar
+  // &::-webkit-scrollbar {
+  //   display: none;
+  // }
+}
+
+.hide-scrollbar {
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+.scroll-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+
+section {
+  scroll-snap-align: start;
+}
+
+.text-limit {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+
+  &.text-limit--1 {
+    -webkit-line-clamp: 1; /* number of lines to show */
+    line-clamp: 1;
+  }
+
+  &.text-limit--2 {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  &.text-limit--5 {
+    -webkit-line-clamp: 5;
+    line-clamp: 1;
+  }
+}
+
+.thumbnail {
+  overflow: hidden;
+  img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 100%;
+    width: auto;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    &.portrait {
+      width: 100%;
+      height: auto;
+    }
   }
 }
