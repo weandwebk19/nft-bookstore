@@ -6,46 +6,34 @@ import {
   Box,
   Button,
   Container,
-  Divider,
-  Grid,
   IconButton,
-  Link,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Menu,
   Stack,
   Toolbar,
-  Tooltip,
-  Typography,
+  Tooltip
 } from "@mui/material";
 
-import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
-import CollectionsBookmarkOutlinedIcon from "@mui/icons-material/CollectionsBookmarkOutlined";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import LanguageIcon from "@mui/icons-material/Language";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
-import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
-import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
-import PropTypes from "prop-types";
-import images from "@/assets/images";
-import { Dialog } from "@/components/shared/Dialog";
+import { ListItemProps } from "@_types/list";
 import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
 import { StyledButton } from "@styles/components/Button";
-import { ListItemProps } from "@_types/list";
+import PropTypes from "prop-types";
+
+import images from "@/assets/images";
+import { useAccount } from "@/components/hooks/web3";
+
+import { AccountMenu } from "../AccountMenu";
+import { WalletBar } from "../WalletBar";
 
 interface EventTarget {
   addEventListener(
@@ -81,45 +69,7 @@ interface NavBarProps {
 }
 
 const NavBar = ({ onThemeChange }: NavBarProps) => {
-  const accountItems = [
-    {
-      icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
-      content: "My Profile",
-      onClick: () => {
-        console.log("My Profile");
-      },
-    },
-    {
-      icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
-      content: "Favorites",
-      onClick: () => {
-        console.log("Favorites");
-      },
-    },
-    {
-      icon: <VisibilityOutlinedIcon color="primary" fontSize="small" />,
-      content: "Watchlist",
-      onClick: () => {
-        console.log("Watchlist");
-      },
-    },
-    {
-      icon: (
-        <CollectionsBookmarkOutlinedIcon color="primary" fontSize="small" />
-      ),
-      content: "My Collections",
-      onClick: () => {
-        console.log("Collection");
-      },
-    },
-    {
-      icon: <LogoutOutlinedIcon color="primary" fontSize="small" />,
-      content: "Disconnect",
-      onClick: () => {
-        console.log("Disconnect");
-      },
-    },
-  ];
+  const { account } = useAccount();
 
   const [anchorAccountMenu, setAnchorAccountMenu] = useState<Element | null>(
     null
@@ -136,12 +86,12 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
 
   const [openLanguage, setOpenLanguage] = useState({
     currentState: "English",
-    isOpen: true,
+    isOpen: true
   });
 
   const [openMode, setOpenMode] = useState({
     currentState: "Light",
-    isOpen: true,
+    isOpen: true
   });
 
   const handleHomeClick = () => {};
@@ -196,7 +146,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
   const handleLanguageClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setOpenLanguage({
       ...openLanguage,
-      currentState: e.currentTarget.innerText.slice(3),
+      currentState: e.currentTarget.innerText.slice(3)
     });
   };
 
@@ -206,18 +156,9 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
     const currentTheme = e.currentTarget.innerText;
     setOpenMode({
       ...openMode,
-      currentState: currentTheme,
+      currentState: currentTheme
     });
   };
-
-  // const handleModeClick = (mode) => {
-  //   console.log(mode);
-  //   onThemeChange(mode);
-  //   setOpenMode({
-  //     ...openMode,
-  //     currentState: capitalize(mode)
-  //   });
-  // }
 
   const settings: ListItemProps[] = [
     {
@@ -228,12 +169,12 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
         console.log("Guide");
       },
       disabled: true,
-      subList: [],
+      subList: []
     },
     {
       type: "divider",
       content: "",
-      subList: [],
+      subList: []
     },
     {
       type: "dropdown",
@@ -249,7 +190,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
             handleModeClick(e);
           },
           subList: [],
-          selected: openMode,
+          selected: openMode
         },
         {
           type: "button",
@@ -259,9 +200,9 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
             handleModeClick(e);
           },
           subList: [],
-          selected: openMode,
-        },
-      ],
+          selected: openMode
+        }
+      ]
     },
     {
       type: "dropdown",
@@ -276,7 +217,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
             handleLanguageClick(e);
           },
           selected: openLanguage,
-          subList: [],
+          subList: []
         },
         {
           type: "button",
@@ -286,56 +227,91 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
             handleLanguageClick(e);
           },
           selected: openLanguage,
-          subList: [],
-        },
-      ],
-    },
+          subList: []
+        }
+      ]
+    }
   ];
 
   const pages = ["About Us", "Contact"];
   const navItems: ListItemProps[] = [
-    {
-      type: "button",
-      icon: <Avatar alt="Remy Sharp" src="" />,
-      content: "0xE6e8...fAf2",
-      onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-        handleAccountMenuClick(e);
-      },
-      disabled: false,
-      subList: [],
-    },
+    account.data
+      ? {
+          type: "button",
+          icon: <Avatar alt="Remy Sharp" src="" />,
+          content: account.data,
+          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+            handleAccountMenuClick(e);
+          },
+          disabled: false,
+          subList: []
+        }
+      : {
+          type: "divider",
+          subList: []
+        },
+    account.data
+      ? {
+          type: "button",
+          icon: <ShoppingBagOutlinedIcon color="primary" />,
+          content: "Shopping Bag",
+          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
+          disabled: false,
+          subList: []
+        }
+      : {
+          type: "divider",
+          subList: []
+        },
     ...pages.map((page: string) => ({
       type: "button" as const,
       icon: "",
       content: page,
       onClick: () => handleNavMenuItemClick(page),
       disabled: false,
-      subList: [],
+      subList: []
     })),
-    ...settings,
+    ...settings
   ];
 
   return (
     <nav>
       <StyledAppBar className="noise">
         <Container maxWidth="lg">
-          <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
+          <Toolbar
+            disableGutters
+            sx={{
+              justifyContent: "space-between"
+            }}
+          >
             <Button
               onClick={handleHomeClick}
-              sx={{ display: { xs: "none", md: "block" } }}
+              sx={{
+                display: {
+                  xs: "none",
+                  md: "block"
+                }
+              }}
             >
               <Box
                 component="img"
-                src={images.logo.src}
+                src={images.logo}
                 alt="NFT Bookstore"
                 sx={{
-                  width: "36px",
+                  width: "36px"
                 }}
               />
             </Button>
 
             {/* Tablet */}
-            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+            <Box
+              sx={{
+                display: {
+                  xs: "flex",
+                  md: "none"
+                }
+              }}
+            >
               <IconButton
                 size="large"
                 color="inherit"
@@ -349,183 +325,69 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
             </Box>
             <Box
               component="img"
-              src={images.horizontalLogo.src}
+              src={images.horizontalLogo}
               alt="NFT Bookstore"
               sx={{
                 height: "20px",
-                display: { xs: "flex", md: "none" },
+                display: {
+                  xs: "flex",
+                  md: "none"
+                }
               }}
             />
 
             {/* PC */}
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: {
+                  xs: "none",
+                  md: "flex"
+                }
+              }}
+            >
               {pages.map((page) => (
                 <Button
                   key={page}
                   onClick={() => handleNavMenuItemClick(page)}
-                  sx={{ mr: 2 }}
+                  sx={{
+                    mr: 2
+                  }}
                 >
                   {page}
                 </Button>
               ))}
-              <StyledButton
-                customVariant="primary"
-                onClick={() => handleCollectionsClick()}
-              >
-                collections
-              </StyledButton>
+              {account.data && (
+                <StyledButton
+                  customVariant="primary"
+                  onClick={() => handleCollectionsClick()}
+                >
+                  collections
+                </StyledButton>
+              )}
             </Box>
 
             <Stack direction="row" alignItems="center" sx={{ flexGrow: 0 }}>
-              <Stack
-                direction="row"
-                alignItems="center"
-                sx={{ display: { xs: "none", md: "flex" } }}
-              >
-                <Typography variant="subtitle1">0xE6e8...fAf2</Typography>
-                <Tooltip title="Account menu">
-                  <IconButton onClick={handleAccountMenuClick}>
-                    <Avatar alt="Remy Sharp" src="" />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-              <Dialog
-                title="Account"
+              <WalletBar
+                isInstalled={account.isInstalled}
+                isLoading={account.isLoading}
+                connect={account.connect}
+                account={account.data}
+              />
+              <AccountMenu
+                account={account.data}
                 open={openAccountMenu}
                 onClose={handleAccountMenuClose}
-              >
-                <Grid container spacing={3} columns={{ xs: 4, sm: 4, md: 12 }}>
-                  <Grid item xs={4} md={6}>
-                    <Stack
-                      sx={{ flexGrow: 1 }}
-                      justifyContent="space-between"
-                      height="100%"
-                      spacing={3}
-                    >
-                      <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        sx={{
-                          border: "1px solid ",
-                          borderRadius: "5px",
-                          padding: 3,
-                        }}
-                      >
-                        <Stack
-                          alignItems="center"
-                          sx={{ flexDirection: { xs: "column", md: "row" } }}
-                        >
-                          <Avatar
-                            alt="Tho Le"
-                            src="TL"
-                            sx={{ width: 56, height: 56, mr: { xs: 0, md: 2 } }}
-                          />
-                          <Stack
-                            sx={{ textAlign: { xs: "center", md: "start" } }}
-                          >
-                            <Typography variant="subtitle2">
-                              User name
-                            </Typography>
-                            <Typography>Tho Le</Typography>
-                          </Stack>
-                        </Stack>
-                        <Divider
-                          orientation="vertical"
-                          variant="middle"
-                          flexItem
-                        />
-                        <Box>
-                          <Stack
-                            alignItems="center"
-                            sx={{ flexDirection: { xs: "column", md: "row" } }}
-                          >
-                            <Avatar
-                              alt="Tho Le"
-                              src="TL"
-                              sx={{
-                                width: 56,
-                                height: 56,
-                                mr: { xs: 0, md: 2 },
-                              }}
-                            />
-                            <Stack
-                              sx={{ textAlign: { xs: "center", md: "start" } }}
-                            >
-                              <Typography variant="subtitle2">
-                                Wallet
-                              </Typography>
-                              <Typography>Metamask</Typography>
-                            </Stack>
-                          </Stack>
-                        </Box>
-                      </Stack>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Stack direction="row" alignItems="center">
-                          <Avatar sx={{ mr: 1 }} />
-                          <Link href="#" underline="hover">
-                            0xE6e8
-                            <Box
-                              component="span"
-                              sx={{ display: { xs: "none", md: "inline" } }}
-                            >
-                              dsfdsfdsxfqer6451652
-                            </Box>
-                            <Box
-                              component="span"
-                              sx={{ display: { xs: "inline", md: "none" } }}
-                            >
-                              ...
-                            </Box>
-                            8fAf2
-                          </Link>
-                        </Stack>
-                        <Tooltip title="Copy address">
-                          <IconButton>
-                            <ContentCopyIcon color="primary" fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                      <StyledButton customVariant="secondary">
-                        <OpenInNewOutlinedIcon
-                          color="primary"
-                          fontSize="small"
-                          sx={{ mr: 1 }}
-                        />
-                        <Typography>Etherscan</Typography>
-                      </StyledButton>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={4} md={6}>
-                    <List
-                      sx={{
-                        border: "1px solid ",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      {accountItems.map((item, i) => (
-                        <Box key={item.content}>
-                          <ListItem disablePadding onClick={item.onClick}>
-                            <ListItemButton>
-                              <ListItemIcon>{item?.icon}</ListItemIcon>
-                              <ListItemText>{item?.content}</ListItemText>
-                            </ListItemButton>
-                          </ListItem>
-                          {(i === 0 || i === accountItems.length - 2) && (
-                            <Divider />
-                          )}
-                        </Box>
-                      ))}
-                    </List>
-                  </Grid>
-                </Grid>
-              </Dialog>
-              <Tooltip title="Shopping bag">
-                <IconButton>
-                  <Badge badgeContent={3} color="secondary">
-                    <ShoppingBagOutlinedIcon color="primary" />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
+              />
+              {account.data && (
+                <Tooltip title="Shopping bag">
+                  <IconButton>
+                    <Badge badgeContent={3} color="secondary">
+                      <ShoppingBagOutlinedIcon color="primary" />
+                    </Badge>
+                  </IconButton>
+                </Tooltip>
+              )}
               {/* <Tooltip title="Toggle theme">
                 <IconButton
                   onClick={onThemeChange}
@@ -545,7 +407,10 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 <IconButton
                   onClick={handleSettingsMenuClick}
                   sx={{
-                    display: { xs: "none", md: "flex" },
+                    display: {
+                      xs: "none",
+                      md: "flex"
+                    }
                   }}
                 >
                   <SettingsOutlinedIcon color="primary" />
@@ -567,7 +432,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                       width: 32,
                       height: 32,
                       ml: -0.5,
-                      mr: 1,
+                      mr: 1
                     },
                     "&:before": {
                       content: '""',
@@ -579,12 +444,18 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                       height: 10,
                       bgcolor: "background.paper",
                       transform: "translateY(-50%) rotate(45deg)",
-                      zIndex: 0,
-                    },
-                  },
+                      zIndex: 0
+                    }
+                  }
                 }}
-                transformOrigin={{ horizontal: "right", vertical: "top" }}
-                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                transformOrigin={{
+                  horizontal: "right",
+                  vertical: "top"
+                }}
+                anchorOrigin={{
+                  horizontal: "right",
+                  vertical: "bottom"
+                }}
               >
                 <CustomList items={settings} />
               </Menu>
@@ -597,11 +468,11 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
 };
 
 NavBar.propTypes = {
-  onThemeChange: PropTypes.func,
+  onThemeChange: PropTypes.func
 };
 
 NavBar.defaultProps = {
-  onThemeChange: () => {},
+  onThemeChange: () => {}
 };
 
 export default NavBar;
