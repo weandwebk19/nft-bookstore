@@ -36,15 +36,17 @@ export default function App({ Component, pageProps }: ComponentWithPageLayout) {
   };
 
   return (
-    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
-      <CssBaseline />
-      {Component.PageLayout ? (
-        <Component.PageLayout onThemeChange={handleThemeChange}>
+    <Web3Provider>
+      <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+        <CssBaseline />
+        {Component.PageLayout ? (
+          <Component.PageLayout onThemeChange={handleThemeChange}>
+            <Component {...pageProps} />
+          </Component.PageLayout>
+        ) : (
           <Component {...pageProps} />
-        </Component.PageLayout>
-      ) : (
-        <Component {...pageProps} />
-      )}
-    </ThemeProvider>
+        )}
+      </ThemeProvider>
+    </Web3Provider>
   );
 }
