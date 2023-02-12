@@ -8,6 +8,7 @@ import { darkTheme, lightTheme } from "@styles/theme";
 import type { AppProps } from "next/app";
 
 import { Web3Provider } from "@/components/providers";
+import { Loading } from "@/components/shared/Loading";
 
 type PageLayoutProps = {
   onThemeChange: (theme: string) => void;
@@ -21,6 +22,7 @@ type ComponentWithPageLayout = AppProps & {
 };
 
 export default function App({ Component, pageProps }: ComponentWithPageLayout) {
+  // theming
   const [theme, setTheme] = useState("light");
 
   const handleThemeChange = (theme: string) => {
@@ -41,13 +43,14 @@ export default function App({ Component, pageProps }: ComponentWithPageLayout) {
     <Web3Provider>
       <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
         <CssBaseline />
-        {Component.PageLayout ? (
+        {/* {Component.PageLayout ? (
           <Component.PageLayout onThemeChange={handleThemeChange}>
             <Component {...pageProps} />
           </Component.PageLayout>
         ) : (
           <Component {...pageProps} />
-        )}
+        )} */}
+        <Loading />
       </ThemeProvider>
     </Web3Provider>
   );
