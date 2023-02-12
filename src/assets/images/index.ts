@@ -10,7 +10,8 @@ const images = {
   product1: require("@/assets/images/product1.jpg").default.src,
   product2: require("@/assets/images/product2.jpg").default.src,
   product3: require("@/assets/images/product3.jpg").default.src,
-  gradient1: require("@/assets/images/gradient1.jpg").default.src
+  gradient1: require("@/assets/images/gradient1.jpg").default.src,
+  loading: require("@/assets/images/loading.gif").default.src
 };
 
 export default images;

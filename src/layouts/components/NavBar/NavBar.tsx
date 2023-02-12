@@ -27,6 +27,7 @@ import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
 import { StyledButton } from "@styles/components/Button";
+import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 
 import images from "@/assets/images";
@@ -69,6 +70,7 @@ interface NavBarProps {
 }
 
 const NavBar = ({ onThemeChange }: NavBarProps) => {
+  const router = useRouter();
   const { account } = useAccount();
 
   const [anchorAccountMenu, setAnchorAccountMenu] = useState<Element | null>(
@@ -94,11 +96,17 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
     isOpen: true
   });
 
-  const handleHomeClick = () => {};
+  const handleHomeClick = () => {
+    router.push("/");
+  };
 
-  const handleAboutClick = () => {};
+  const handleAboutClick = () => {
+    router.push("about");
+  };
 
-  const handleContactClick = () => {};
+  const handleContactClick = () => {
+    router.push("contact");
+  };
 
   const handleCollectionsClick = () => {};
 
@@ -379,15 +387,6 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 open={openAccountMenu}
                 onClose={handleAccountMenuClose}
               />
-              {account.data && (
-                <Tooltip title="Shopping bag">
-                  <IconButton>
-                    <Badge badgeContent={3} color="secondary">
-                      <ShoppingBagOutlinedIcon color="primary" />
-                    </Badge>
-                  </IconButton>
-                </Tooltip>
-              )}
               {/* <Tooltip title="Toggle theme">
                 <IconButton
                   onClick={onThemeChange}
