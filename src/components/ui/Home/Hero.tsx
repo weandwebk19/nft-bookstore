@@ -14,6 +14,7 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import styles from "@styles/Hero.module.scss";
 
 import images from "@/assets/images";
+import { StackedLogo } from "@/components/shared/Logo";
 import { StyledButton } from "@/styles/components/Button";
 
 const Hero = () => {
@@ -28,7 +29,7 @@ const Hero = () => {
         >
           <Stack>
             <Box component="img" src={images.stackedLogo} width={385} mb={3} />
-
+            {/* <StackedLogo /> */}
             <Typography variant="body1">
               We wants to change the way people read
             </Typography>

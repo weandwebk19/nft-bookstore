@@ -10,7 +10,8 @@ import {
   Menu,
   Stack,
   Toolbar,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 
 import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -32,6 +33,7 @@ import PropTypes from "prop-types";
 
 import images from "@/assets/images";
 import { useAccount } from "@/components/hooks/web3";
+import { HorizontalLogo, Logo } from "@/components/shared/Logo";
 
 import { AccountMenu } from "../AccountMenu";
 import { WalletBar } from "../WalletBar";
@@ -301,14 +303,15 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 }
               }}
             >
-              <Box
+              {/* <Box
                 component="img"
                 src={images.logo}
                 alt="NFT Bookstore"
                 sx={{
                   width: "36px"
                 }}
-              />
+              /> */}
+              <Logo />
             </Button>
 
             {/* Tablet */}
@@ -331,7 +334,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 <CustomList items={navItems} />
               </Drawer>
             </Box>
-            <Box
+            {/* <Box
               component="img"
               src={images.horizontalLogo}
               alt="NFT Bookstore"
@@ -342,7 +345,19 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                   md: "none"
                 }
               }}
-            />
+            /> */}
+            <Typography
+              variant="h6"
+              sx={{
+                height: "20px",
+                display: {
+                  xs: "flex",
+                  md: "none"
+                }
+              }}
+            >
+              NFT Bookstore
+            </Typography>
 
             {/* PC */}
             <Box

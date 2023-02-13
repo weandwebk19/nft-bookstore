@@ -14,6 +14,7 @@ import styles from "@styles/Footer.module.scss";
 import Link from "next/link";
 
 import images from "@/assets/images";
+import { Logo } from "@/components/shared/Logo";
 
 const StyledTypography = styled(Typography)(({}) => ({
   "&:hover": {
@@ -109,31 +110,13 @@ const Footer = () => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
               padding: "24px"
             }}
           >
-            <Box
-              component="img"
-              src={images.logo.src}
-              alt="NFT Bookstore"
-              sx={{
-                width: "60px",
-                marginBottom: "36px"
-              }}
-              className={styles.footer__name}
-            />
-            <Typography
-              variant="h5"
-              sx={{
-                fontSize: "24px",
-                lineHeight: "30px",
-                fontWeight: 400,
-                marginBottom: "36px",
-                userSelect: "text"
-              }}
-              className={styles.footer__description}
-            >
+            <Link href="/">
+              <Logo fill="#e1ddc4" size={64} />
+            </Link>
+            <Typography variant="h5" className={styles.footer__description}>
               NFT Bookstore
             </Typography>
             <Typography
