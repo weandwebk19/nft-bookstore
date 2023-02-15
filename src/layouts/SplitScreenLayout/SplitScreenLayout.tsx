@@ -8,12 +8,15 @@ import { useRouter } from "next/router";
 
 import { Footer, NavBar } from "../components";
 
-interface DefaultLayoutProps {
+interface SplitScreenLayoutProps {
   children: React.ReactNode;
   onThemeChange: (theme: string) => void;
 }
 
-const DefaultLayout = ({ children, onThemeChange }: DefaultLayoutProps) => {
+const SplitScreenLayout = ({
+  children,
+  onThemeChange
+}: SplitScreenLayoutProps) => {
   const router = useRouter();
   const nodeRef = useRef(null);
 
@@ -66,7 +69,7 @@ const DefaultLayout = ({ children, onThemeChange }: DefaultLayoutProps) => {
           unmountOnExit
         >
           <Box ref={nodeRef} sx={{ minHeight: "100vh" }}>
-            <Container maxWidth="xl">
+            <Container maxWidth={false}>
               <Box className="content">{children}</Box>
             </Container>
           </Box>
@@ -78,4 +81,4 @@ const DefaultLayout = ({ children, onThemeChange }: DefaultLayoutProps) => {
   );
 };
 
-export default DefaultLayout;
+export default SplitScreenLayout;

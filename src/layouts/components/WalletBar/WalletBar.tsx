@@ -17,13 +17,15 @@ interface WalletBarProps {
   isLoading: boolean;
   account?: string;
   connect(...args: unknown[]): unknown;
+  disconnect(...args: unknown[]): unknown;
 }
 
 const WalletBar = ({
   isInstalled,
   isLoading,
   connect,
-  account
+  account,
+  disconnect
 }: WalletBarProps) => {
   const [anchorAccountMenu, setAnchorAccountMenu] = useState<Element | null>(
     null
@@ -64,6 +66,9 @@ const WalletBar = ({
           account={account}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
+          disconnect={() => {
+            disconnect();
+          }}
         />
         <Tooltip title="Shopping bag">
           <IconButton>

@@ -7,8 +7,8 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: "transparent",
   padding: `0 ${theme.spacing(2)}`,
   position: "fixed",
-  boxShadow: "none",
-  backdropFilter: "blur(8px)",
+  boxShadow: `0 0 3px ${theme.palette.background.paper}`,
+  backdropFilter: "blur(8px)"
 }));
 
 export default StyledAppBar;
