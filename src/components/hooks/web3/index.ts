@@ -1,5 +1,4 @@
-import { useHooks } from "@providers/web3"
-
+import { useHooks } from "@providers/web3";
 
 export const useAccount = () => {
   const hooks = useHooks();
@@ -7,8 +6,8 @@ export const useAccount = () => {
 
   return {
     account: swrRes
-  }
-}
+  };
+};
 
 export const useNetwork = () => {
   const hooks = useHooks();
@@ -16,8 +15,8 @@ export const useNetwork = () => {
 
   return {
     network: swrRes
-  }
-}
+  };
+};
 
 export const useListedNfts = () => {
   const hooks = useHooks();
@@ -25,8 +24,8 @@ export const useListedNfts = () => {
 
   return {
     nfts: swrRes
-  }
-}
+  };
+};
 
 export const useOwnedNfts = () => {
   const hooks = useHooks();
@@ -34,5 +33,5 @@ export const useOwnedNfts = () => {
 
   return {
     nfts: swrRes
-  }
-}
+  };
+};

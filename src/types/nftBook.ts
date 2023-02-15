@@ -1,11 +1,57 @@
-export type BookItemProps = {
-  bookCover: string;
-  type: string;
-  star?: number;
-  title: string;
-  author: string;
-  onClick: () => void;
+export type PricingHistory = {
+  highest: number;
+  lowest: number;
+  lastest: number;
+  average: number;
 };
+
+export type TransferHistory = {
+  event: string;
+  price: number;
+  from: string;
+  to: string;
+  date: Date;
+};
+
+export type NftBookStats = "views" | "stars" | "registered" | "owners";
+
+export type NftBookAttribute = {
+  statType: NftBookStats;
+  value: number;
+};
+
+export type NftBookDetails = {
+  contractAddress: string;
+  desc: string;
+  bookId: string;
+  pages: number;
+  language: string[];
+  genres: (keyof typeof BookGenres)[];
+  editionVersion: number;
+  maxSupply: number;
+  registered: number;
+  openDate: Date;
+  endDate: Date;
+};
+
+export type NftBookMeta = {
+  title: string;
+  file: string;
+  bookCover: string;
+  attributes: NftBookAttribute[];
+};
+
+export type NftBookCore = {
+  tokenId: number | string;
+  price: number;
+  author: string;
+  isListed: boolean;
+};
+
+export type NftBook = {
+  meta: NftBookMeta;
+  details?: NftBookDetails;
+} & NftBookCore;
 
 export enum BookGenres {
   "Art & photography",

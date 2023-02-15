@@ -3,17 +3,15 @@ import { Box, Stack, Typography } from "@mui/material";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import StarIcon from "@mui/icons-material/Star";
 
-import { BookItemProps } from "@_types/bookItem";
 import styles from "@styles/BookItem.module.scss";
 
-const BookItem = ({
-  bookCover,
-  type,
-  star,
-  title,
-  author,
-  onClick
-}: BookItemProps) => {
+import { NftBook } from "@/types/nftBook";
+
+type BookItemProps = {
+  onClick: () => void;
+} & NftBook;
+
+const BookItem = ({ meta, author, onClick }: BookItemProps) => {
   return (
     <Stack
       className={styles["book-item"]}
@@ -33,7 +31,7 @@ const BookItem = ({
             position: "absolute",
             borderRadius: "16px",
             backgroundSize: "cover",
-            backgroundImage: `url(${bookCover})`,
+            backgroundImage: `url(${meta.bookCover})`,
             backgroundRepeat: "no-repeat"
           }
         }
@@ -42,8 +40,8 @@ const BookItem = ({
       <Box
         component="img"
         className={styles["book-item__book-cover"]}
-        src={bookCover}
-        alt={title}
+        src={meta.bookCover}
+        alt={meta.title}
       />
       <Stack
         direction="row"
@@ -53,16 +51,25 @@ const BookItem = ({
       >
         <Stack direction="row">
           <InsertDriveFileIcon fontSize="small" color="disabled" />
-          <Typography variant="caption">{type}</Typography>
+          <Typography variant="caption">{meta.file}</Typography>
         </Stack>
 
-        <Stack direction="row">
-          <StarIcon fontSize="small" color="disabled" />
-          <Typography variant="caption">{star}</Typography>
-        </Stack>
+        {meta.attributes?.map((stat, i) => {
+          switch (stat.statType) {
+            case "stars":
+              return (
+                <Stack key={i} direction="row">
+                  <StarIcon fontSize="small" color="disabled" />
+                  <Typography variant="caption">{`${stat.value} ${stat.statType}`}</Typography>
+                </Stack>
+              );
+            default:
+              return "";
+          }
+        })}
       </Stack>
       <Typography className="text-limit text-limit--2" variant="h6">
-        {title}
+        {meta.title}
       </Typography>
       <Typography className="text-limit text-limit--1" variant="body2">
         {author}

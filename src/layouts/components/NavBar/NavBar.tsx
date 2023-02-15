@@ -103,11 +103,11 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
   };
 
   const handleAboutClick = () => {
-    router.push("about");
+    router.push("/about");
   };
 
   const handleContactClick = () => {
-    router.push("contact");
+    router.push("/contact");
   };
 
   const handleCollectionsClick = () => {};
@@ -396,11 +396,13 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 isLoading={account.isLoading}
                 connect={account.connect}
                 account={account.data}
+                disconnect={account.disconnect}
               />
               <AccountMenu
                 account={account.data}
                 open={openAccountMenu}
                 onClose={handleAccountMenuClose}
+                disconnect={account.disconnect}
               />
               {/* <Tooltip title="Toggle theme">
                 <IconButton

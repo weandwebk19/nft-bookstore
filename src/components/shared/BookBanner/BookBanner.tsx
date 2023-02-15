@@ -4,43 +4,57 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
-import { BookGenres, BookItemProps } from "@_types/bookItem";
 import styles from "@styles/BookBanner.module.scss";
 
-type BookStatistics = {
-  view: number;
-  register?: number | 0;
-  owners?: number | 0;
-};
+import {
+  NftBook,
+  NftBookAttribute,
+  NftBookCore,
+  NftBookDetails,
+  NftBookMeta
+} from "@/types/nftBook";
+
+// type NftBookDetailsForBanner = {
+//   desc: NftBookDetails["desc"];
+//   genres: NftBookDetails["genres"];
+//   openDate: NftBookDetails["openDate"];
+//   endDate: NftBookDetails["endDate"];
+// };
+
+// type BookBannerProps = {
+//   onClick: () => void;
+// } & NftBookMeta &
+//   NftBookDetailsForBanner &
+//   NftBookCore;
 
 type BookBannerProps = {
-  statistics: any[] | [];
-  desc: string;
-  price?: string | number;
-  countdown?: string;
-  isOpen?: boolean;
-  genres: string[];
-} & BookItemProps;
+  onClick: () => void;
+} & NftBook;
 
 const BookBanner = ({
-  bookCover,
-  title,
+  // bookCover,
+  // title,
+  // file,
+  // attributes,
+  // desc,
+  // genres,
+  // openDate,
+  // endDate,
+  meta,
+  details,
   author,
-  type,
-  statistics,
-  desc,
-  genres,
-  countdown,
-  isOpen,
+  isListed,
   onClick
 }: BookBannerProps) => {
+  const countDown = "7D:06:25:45";
+
   return (
     <Box sx={{ cursor: "pointer" }} onClick={onClick}>
       <Grid
         className={styles["book-banner"]}
         sx={{
           backgroundSize: "cover",
-          backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(${bookCover})`,
+          backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(${meta.bookCover})`,
           backgroundRepeat: "no-repeat"
         }}
         container
@@ -49,19 +63,19 @@ const BookBanner = ({
         <Grid item xs={4} sm={4} md={7}>
           <Box sx={{ display: "inline-block", mb: 3 }}>
             <Typography variant="h2" className={styles["book-banner__title"]}>
-              {title}
+              {meta.title}
             </Typography>
           </Box>
           <Typography variant="h5">{author}</Typography>
           <Stack direction="row" spacing={2} my={2}>
             <Stack direction="row" spacing={1}>
               <InsertDriveFileOutlinedIcon />
-              <Typography>{type}</Typography>
+              <Typography>{meta.file}</Typography>
             </Stack>
-            {statistics?.map((stat, i) => (
+            {meta.attributes?.map((stat, i) => (
               <Stack key={i} direction="row" spacing={1}>
                 {(() => {
-                  switch (stat.content) {
+                  switch (stat.statType) {
                     case "views":
                       return <VisibilityOutlinedIcon />;
                     case "registered":
@@ -71,12 +85,12 @@ const BookBanner = ({
                   }
                 })()}
                 <Typography>{stat.value}</Typography>
-                <Typography>{stat.content}</Typography>
+                <Typography>{stat.statType}</Typography>
               </Stack>
             ))}
           </Stack>
           <Typography paragraph className="text-limit text-limit--5">
-            {desc}
+            {details?.desc}
           </Typography>
           <Typography>
             <b>
@@ -84,7 +98,7 @@ const BookBanner = ({
             </b>
           </Typography>
           <Stack>
-            {genres?.slice(0, 3).map((genre) => (
+            {details?.genres.slice(0, 3).map((genre) => (
               <Typography key={genre}>{genre}</Typography>
             ))}
           </Stack>
@@ -102,16 +116,16 @@ const BookBanner = ({
         >
           <Stack spacing={3} alignItems="end">
             <Typography variant="h2" sx={{ pt: 1 }}>
-              {countdown}
+              {countDown}
             </Typography>
-            {countdown && <Typography>Register closing soon</Typography>}
+            {countDown && <Typography>Register closing soon</Typography>}
           </Stack>
           <Box sx={{ display: "flex", flexDirection: "row-reverse" }}>
             <Typography
               sx={{ textAlign: "end" }}
               className={styles["book-banner__open"]}
             >
-              {isOpen ? "Openning" : "Closed"}
+              {isListed ? "Openning" : "Closed"}
             </Typography>
           </Box>
         </Grid>
