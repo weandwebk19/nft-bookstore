@@ -1447,7 +1447,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.11",
-  "updatedAt": "2023-02-11T10:41:23.155Z",
+  "updatedAt": "2023-02-16T07:48:13.071Z",
   "devdoc": {
     "details": "ERC1155 token with storage based token URI management. Inspired by the ERC721URIStorage extension _Available since v4.6._",
     "kind": "dev",
