@@ -1,90 +1,73 @@
 pragma solidity >=0.4.22 <0.9.0;
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract BookStore is ERC1155URIStorage {
+contract BookStore is ERC1155 {
   using Counters for Counters.Counter;
 
-  struct BookVersion {
-    uint256 price;
+  struct NFTBook {
+    uint256 tokenId;
     address author;
     uint256 quantity;
   }
 
-  event BookVersionCreated (
-    uint256 tokenId,
-    uint256 price,
-    address author,
-    uint256 quantity
-  );
+  enum StatusUsedBook{ LISTED, UNLISTED, RENTING, RENTED }
+
+  struct UsedBook {
+    uint256 tokenId;
+    uint256 amount;
+    StatusUsedBook status;
+    uint256 price;
+    uint256 startTime;
+    uint256 endTime;
+  }
 
   uint public listingPrice = 0.025 ether;
-  Counters.Counter private _listedItems;
-  Counters.Counter private _bookVersionIds;
+  Counters.Counter private _listedBooks;
+  Counters.Counter private _tokenIds;
 
-  mapping(uint256 => BookVersion) private _idToBookVersion;
-  mapping(string => bool) private _usedTokenURIs;
+  mapping (uint => NFTBook) _idToNftBook;
+  mapping (uint => UsedBook) _idToUsedBook;
+  mapping (uint => mapping (uint => address)) private _ownedUsedBooks;
+  mapping (uint => UsedBook[]) private _usedBooks;
 
   constructor() ERC1155("https://example.com/api/{id}.json") {
   }
 
-  function getBookVersion(uint _bookVersionId) public view returns (BookVersion memory) {
-    return _idToBookVersion[_bookVersionId];
+  function _updateOwner(uint tokenId, uint usedBookId, address owner) private {
+    _ownedUsedBooks[tokenId][usedBookId] = owner;
   }
 
-  function bookVersionPrice(uint256 _bookVersionId) public view returns(uint256) {
-  return _idToBookVersion[_bookVersionId].price;
-  }
-
-  function bookVersionAuthor(uint256 _bookVersionId) public view returns(address) {
-    return _idToBookVersion[_bookVersionId].author;
-  }
-
-  function bookVersionQuantity(uint256 _bookVersionId) public view returns(uint256) {
-    return _idToBookVersion[_bookVersionId].quantity;
-  }
-
-  function listedItemsCount() public view returns (uint) {
-    return _listedItems.current();
-  }
-
-  function tokenURIExists(string memory tokenURI) public view returns (bool) {
-    return _usedTokenURIs[tokenURI] == true;
-  }
-
-  function publish(string memory tokenURI, uint256 _price, uint256 _quantity)  public payable returns (uint) {
-    require(!tokenURIExists(tokenURI), "Token URI already exists");
+  function createBook(uint256 price, uint256 quantity)  public payable returns (uint) {
     require(msg.value == listingPrice, "Price must be equal to listing price");
 
-    _bookVersionIds.increment();
-    _listedItems.increment();
+    _tokenIds.increment();
+    _listedBooks.increment();
 
-    uint newTokenId = _bookVersionIds.current();
+    uint newTokenId = _tokenIds.current();
 
-    _mint(msg.sender, newTokenId, _quantity, "");
+    _mint(msg.sender, newTokenId, quantity, "");
 
-    _idToBookVersion[newTokenId] = BookVersion(_price, msg.sender, _quantity);
-
-    _setURI(newTokenId, tokenURI);
-    _createBookVersion(newTokenId, _price, _quantity);
-    _usedTokenURIs[tokenURI] = true;
+    _idToNftBook[newTokenId] = NFTBook(newTokenId, msg.sender, quantity);
+    _idToUsedBook[newTokenId] = UsedBook(newTokenId, quantity, StatusUsedBook.UNLISTED, price, 0, 0 );
+    
+    // Assign author is owner of all created books
+    for (uint i = 0; i < quantity; i++) {
+      _updateOwner(newTokenId, i, msg.sender);
+    }
 
     return newTokenId;
   }
 
-  function _createBookVersion(
-    uint tokenId,
-    uint price,
-    uint256 quantity
-  ) private {
-    require(price > 0, "Price must be at least 1 wei");
+  function buyBooks(uint256 tokenId, uint256 quantity) {
+    const buyer = msg.sender;
+    uint price = _idToUsedBook[tokenId].price;
+    // address owner = ERC1155.ownerOf(tokenId);
 
-    _idToBookVersion[tokenId] = BookVersion(
-      price,
-      msg.sender,
-      quantity
-    );
+    // require(msg.sender != owner, "You already own this NFT");
+    require(msg.value == price, "Please submit the asking price");
 
-    emit BookVersionCreated(tokenId, price, msg.sender, quantity);
+    safeTransferFrom(owner, buyer, tokenId, quantity);
+    payable(owner).transfer(msg.value);
   }
 }
