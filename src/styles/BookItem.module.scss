@@ -1,6 +1,7 @@
 .book-item {
   cursor: pointer;
   transition: 0.3s cubic-bezier(0.4, 0.4, 0, 1);
+  height: 100%;
 
   &__book-cover {
     border-radius: 0 10px 10px 0;
