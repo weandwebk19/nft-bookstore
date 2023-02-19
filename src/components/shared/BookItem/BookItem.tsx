@@ -42,6 +42,7 @@ const BookItem = ({ meta, author, onClick }: BookItemProps) => {
         className={styles["book-item__book-cover"]}
         src={meta.bookCover}
         alt={meta.title}
+        sx={{ height: "240px" }}
       />
       <Stack
         direction="row"

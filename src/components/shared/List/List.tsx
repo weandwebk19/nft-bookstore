@@ -53,7 +53,7 @@ const List = ({ items, size }: ListProps) => {
                       }
                       disabled={item?.disabled}
                     >
-                      <ListItemIcon>{item?.icon}</ListItemIcon>
+                      {item?.icon && <ListItemIcon>{item?.icon}</ListItemIcon>}
                       <ListItemText>{item?.content}</ListItemText>
                       {(() => {
                         if (item?.type === "dropdown") {

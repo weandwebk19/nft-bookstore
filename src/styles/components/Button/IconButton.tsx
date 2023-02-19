@@ -1,10 +1,10 @@
-import { Button } from "@mui/material";
+import { IconButton } from "@mui/material";
 
 import { styled } from "@mui/system";
 
 type customVariant = "primary" | "secondary";
 
-const StyledButton = styled(Button, {
+const StyledIconButton = styled(IconButton, {
   shouldForwardProp: (prop) => prop !== "width" && prop !== "customVariant"
 })<{ width?: string | number; customVariant: customVariant }>(
   ({ theme, customVariant = "primary", width }) => ({
@@ -32,4 +32,4 @@ const StyledButton = styled(Button, {
   })
 );
 
-export default StyledButton;
+export default StyledIconButton;

@@ -42,7 +42,6 @@ const AccountMenu = ({
   onClose,
   disconnect
 }: AccountMenuProps) => {
-  console.log(disconnect);
   const accountItems = [
     {
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,

@@ -44,19 +44,19 @@ export default function App({ Component, pageProps }: ComponentWithPageLayout) {
   };
 
   // loading
-  const loaderRef = useRef<HTMLDivElement>(null);
+  // const loaderRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    let ctx = gsap.context(() => {
-      gsap.to(loaderRef!.current, {
-        x: "100%",
-        ease: "expo",
-        delay: 1
-      });
-    }, app);
+  // useLayoutEffect(() => {
+  //   let ctx = gsap.context(() => {
+  //     gsap.to(loaderRef!.current, {
+  //       x: "100%",
+  //       ease: "expo",
+  //       delay: 1
+  //     });
+  //   }, app);
 
-    return () => ctx.revert();
-  }, []);
+  //   return () => ctx.revert();
+  // }, []);
 
   return (
     <Box ref={app}>

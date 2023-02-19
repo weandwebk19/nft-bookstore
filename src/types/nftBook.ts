@@ -13,6 +13,16 @@ export type TransferHistory = {
   date: Date;
 };
 
+export type Ratings = {
+  star1: number;
+  star2: number;
+  star3: number;
+  star4: number;
+  star5: number;
+  average: number;
+  total: number;
+};
+
 export type NftBookStats = "views" | "stars" | "registered" | "owners";
 
 export type NftBookAttribute = {

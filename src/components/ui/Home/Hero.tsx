@@ -28,7 +28,12 @@ const Hero = () => {
           alignItems="center"
         >
           <Stack>
-            <Box component="img" src={images.stackedLogo} width={385} mb={3} />
+            <Box
+              component="img"
+              src={images.stackedLogo}
+              mb={3}
+              sx={{ maxWidth: "385px" }}
+            />
             {/* <StackedLogo /> */}
             <Typography variant="body1">
               We wants to change the way people read

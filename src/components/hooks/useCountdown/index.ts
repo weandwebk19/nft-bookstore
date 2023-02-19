@@ -1,38 +1,43 @@
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-// type useCountdownHookProps = {
-//   startDate: Date;
-//   endDate: Date;
-// };
+type useCountdownHookProps = {
+  startDate: Date;
+  endDate: Date;
+};
 
-// const useCountdown: () => number[] = (startDate, endDate) => {
-//   const countDownDate = new Date(endDate).getTime();
+const useCountdown = (endDate: string | Date | number) => {
+  const countDownDate = new Date(endDate).getTime();
 
-//   const [countDown, setCountDown] = useState(
-//     countDownDate - new Date().getTime()
-//   );
+  const [countDown, setCountDown] = useState(
+    countDownDate - new Date().getTime()
+  );
 
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       setCountDown(countDownDate - new Date().getTime());
-//     }, 1000);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCountDown(countDownDate - new Date().getTime());
+    }, 1000);
 
-//     return () => clearInterval(interval);
-//   }, [countDownDate]);
+    return () => clearInterval(interval);
+  }, [countDownDate]);
 
-//   return getReturnValues(countDown);
-// };
+  return getReturnValues(countDown);
+};
 
-// const getReturnValues = (countDown) => {
-//   // calculate time left
-//   const days = Math.floor(countDown / (1000 * 60 * 60 * 24));
-//   const hours = Math.floor(
-//     (countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-//   );
-//   const minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
-//   const seconds = Math.floor((countDown % (1000 * 60)) / 1000);
+const getReturnValues = (countDown: number) => {
+  // calculate time left
+  let days = Math.floor(countDown / (1000 * 60 * 60 * 24));
+  let hours = Math.floor(
+    (countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  );
+  let minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
+  let seconds = Math.floor((countDown % (1000 * 60)) / 1000);
 
-//   return [days, hours, minutes, seconds];
-// };
+  if (days < 0) days = 0;
+  if (hours < 0) hours = 0;
+  if (minutes < 0) minutes = 0;
+  if (seconds < 0) seconds = 0;
 
-// export { useCountdown };
+  return [days, hours, minutes, seconds];
+};
+
+export { useCountdown };

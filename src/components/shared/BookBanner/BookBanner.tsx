@@ -67,7 +67,7 @@ const BookBanner = ({
             </Typography>
           </Box>
           <Typography variant="h5">{author}</Typography>
-          <Stack direction="row" spacing={2} my={2}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} my={2}>
             <Stack direction="row" spacing={1}>
               <InsertDriveFileOutlinedIcon />
               <Typography>{meta.file}</Typography>
