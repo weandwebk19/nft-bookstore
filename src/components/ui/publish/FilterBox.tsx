@@ -11,6 +11,7 @@ import { BookGenres } from "@/types/nftBook";
 import FilterItem from "./FilterItem";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTreeItemProps, StyledTreeItemRoot } from "@/styles/components/TreeView/StyledTreeView";
+import styles from "@styles/FilterBox.module.scss";
 
 const schema = yup
   .object({
@@ -118,7 +119,13 @@ const FilterBox = () => {
   };
 
   return (
-    <Stack direction="column" divider={<Divider orientation="horizontal" />} spacing={3} sx={{ marginTop: 4 }}>
+    <Stack
+      direction="column"
+      divider={<Divider orientation="horizontal" />}
+      spacing={3}
+      sx={{ marginTop: 4 }}
+      className={styles["filter-box"]}
+    >
       <FilterItem title="Genres">
         <Box>
           <TreeView
@@ -170,6 +177,7 @@ const FilterBox = () => {
                   display: "flex",
                   alignItems: "center",
                 }}
+                className={styles["filter-rating"]}
               >
                 <Rating
                   id="author"
@@ -183,7 +191,7 @@ const FilterBox = () => {
                   size="medium"
                 />
                 {getValues("rating") && (
-                  <Box sx={{ ml: 2 }}>{labels[getValues("rating") ? getValues("rating") : 0]}</Box>
+                  <Box>{labels[getValues("rating") ? getValues("rating") : 0]}</Box>
                 )}
               </Box>
             );
