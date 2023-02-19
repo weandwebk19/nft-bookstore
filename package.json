@@ -16,9 +16,11 @@
     "@fortawesome/free-regular-svg-icons": "^6.3.0",
     "@fortawesome/free-solid-svg-icons": "^6.3.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@hookform/resolvers": "^2.9.11",
     "@metamask/providers": "^10.2.1",
     "@mui/icons-material": "^5.11.0",
-    "@mui/material": "^5.11.7",
+    "@mui/lab": "^5.0.0-alpha.120",
+    "@mui/material": "^5.11.9",
     "@next/font": "13.1.6",
     "@openzeppelin/contracts": "^4.8.1",
     "@types/node": "18.11.19",
@@ -33,12 +35,14 @@
     "next": "13.1.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.43.1",
     "react-toastify": "^9.1.1",
     "react-transition-group": "^4.4.5",
     "sass": "^1.58.0",
     "styled-components": "^5.3.6",
     "swr": "^2.0.3",
-    "typescript": "4.9.5"
+    "typescript": "4.9.5",
+    "yup": "^1.0.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
