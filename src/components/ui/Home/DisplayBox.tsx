@@ -269,8 +269,8 @@ const DisplayBox = () => {
 
   return (
     <Box>
-      <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
-        <Grid item xs={4} sm={8} md={9}>
+      <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
+        <Grid item xs={4} sm={8} md={12} lg={18}>
           <Stack spacing={3}>
             {/* Book Banner */}
             <BookBanner
@@ -301,9 +301,16 @@ const DisplayBox = () => {
                 </>
               }
             >
-              <Grid container spacing={3}>
+              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
                 {bookList.map((book) => (
-                  <Grid item key={book.tokenId}>
+                  <Grid
+                    item
+                    key={book.tokenId}
+                    xs={4}
+                    sm={4}
+                    md={4}
+                    lg={6}
+                  >
                     <BookItem
                       tokenId={book.tokenId}
                       price={book.price}
@@ -327,9 +334,16 @@ const DisplayBox = () => {
                 </>
               }
             >
-              <Grid container spacing={3}>
+              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
                 {bookList.map((book) => (
-                  <Grid item key={book.tokenId}>
+                  <Grid
+                    item
+                    key={book.tokenId}
+                    xs={4}
+                    sm={4}
+                    md={4}
+                    lg={6}
+                  >
                     <BookItem
                       tokenId={book.tokenId}
                       price={book.price}
@@ -346,7 +360,7 @@ const DisplayBox = () => {
             </ContentPaper>
           </Stack>
         </Grid>
-        <Grid item xs={4} sm={8} md={3}>
+        <Grid item xs={4} sm={8} md={12} lg={6}>
           <Stack spacing={3}>
             <ContentPaper title="Community">
               <Stack direction="row" spacing={2}>

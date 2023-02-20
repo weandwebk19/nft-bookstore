@@ -289,7 +289,7 @@ const DisplayBox = () => {
                 </>
               }
             >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }} >
+              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
                 {bookList.map((book) => (
                   <Grid
                     item
