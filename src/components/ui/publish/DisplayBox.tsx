@@ -296,7 +296,7 @@ const DisplayBox = () => {
                     key={book.tokenId}
                     xs={4}
                     sm={4}
-                    md={4}
+                    md={3}
                     lg={6}
                   >
                     <BookItem
