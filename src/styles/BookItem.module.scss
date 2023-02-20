@@ -1,0 +1,27 @@
+.book-item {
+  cursor: pointer;
+  transition: 0.3s cubic-bezier(0.4, 0.4, 0, 1);
+  height: 100%;
+
+  &__book-cover {
+    border-radius: 0 10px 10px 0;
+  }
+
+  // &:hover {
+  //   scale: 0.97;
+  // }
+  // &::before {
+  //   inset: 0px;
+  //   filter: blur(12px);
+  //   margin: -4px;
+  //   content: "";
+  //   display: block;
+  //   opacity: 0.6;
+  //   z-index: -1;
+  //   position: absolute;
+  //   border-radius: 16px;
+  //   background-size: cover;
+  //   background-image: url(https://www.designformusic.com/wp-content/uploads/2016/04/orion-trailer-music-album-cover-design.jpg);
+  //   background-repeat: no-repeat;
+  // }
+}

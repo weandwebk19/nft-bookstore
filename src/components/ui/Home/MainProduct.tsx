@@ -40,7 +40,7 @@ const MainProduct = () => {
             />
             <CardContent sx={{ height: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
-                Publish
+                Publishing
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Millions of readers are eagerly anticipating your books right

@@ -10,7 +10,8 @@ import {
   Menu,
   Stack,
   Toolbar,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 
 import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -27,10 +28,12 @@ import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
 import { StyledButton } from "@styles/components/Button";
+import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 
 import images from "@/assets/images";
 import { useAccount } from "@/components/hooks/web3";
+import { HorizontalLogo, Logo } from "@/components/shared/Logo";
 
 import { AccountMenu } from "../AccountMenu";
 import { WalletBar } from "../WalletBar";
@@ -69,6 +72,7 @@ interface NavBarProps {
 }
 
 const NavBar = ({ onThemeChange }: NavBarProps) => {
+  const router = useRouter();
   const { account } = useAccount();
 
   const [anchorAccountMenu, setAnchorAccountMenu] = useState<Element | null>(
@@ -94,11 +98,17 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
     isOpen: true
   });
 
-  const handleHomeClick = () => {};
+  const handleHomeClick = () => {
+    router.push("/");
+  };
 
-  const handleAboutClick = () => {};
+  const handleAboutClick = () => {
+    router.push("/about");
+  };
 
-  const handleContactClick = () => {};
+  const handleContactClick = () => {
+    router.push("/contact");
+  };
 
   const handleCollectionsClick = () => {};
 
@@ -293,14 +303,15 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 }
               }}
             >
-              <Box
+              {/* <Box
                 component="img"
                 src={images.logo}
                 alt="NFT Bookstore"
                 sx={{
                   width: "36px"
                 }}
-              />
+              /> */}
+              <Logo />
             </Button>
 
             {/* Tablet */}
@@ -323,7 +334,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 <CustomList items={navItems} />
               </Drawer>
             </Box>
-            <Box
+            {/* <Box
               component="img"
               src={images.horizontalLogo}
               alt="NFT Bookstore"
@@ -334,7 +345,19 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                   md: "none"
                 }
               }}
-            />
+            /> */}
+            <Typography
+              variant="h6"
+              sx={{
+                height: "20px",
+                display: {
+                  xs: "flex",
+                  md: "none"
+                }
+              }}
+            >
+              NFT Bookstore
+            </Typography>
 
             {/* PC */}
             <Box
@@ -373,21 +396,14 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 isLoading={account.isLoading}
                 connect={account.connect}
                 account={account.data}
+                disconnect={account.disconnect}
               />
               <AccountMenu
                 account={account.data}
                 open={openAccountMenu}
                 onClose={handleAccountMenuClose}
+                disconnect={account.disconnect}
               />
-              {account.data && (
-                <Tooltip title="Shopping bag">
-                  <IconButton>
-                    <Badge badgeContent={3} color="secondary">
-                      <ShoppingBagOutlinedIcon color="primary" />
-                    </Badge>
-                  </IconButton>
-                </Tooltip>
-              )}
               {/* <Tooltip title="Toggle theme">
                 <IconButton
                   onClick={onThemeChange}
