@@ -18,20 +18,20 @@ export const useNetwork = () => {
   };
 };
 
-export const useListedNfts = () => {
-  const hooks = useHooks();
-  const swrRes = hooks.useListedNfts();
+// export const useListedNfts = () => {
+//   const hooks = useHooks();
+//   const swrRes = hooks.useListedNfts();
 
-  return {
-    nfts: swrRes
-  };
-};
+//   return {
+//     nfts: swrRes
+//   };
+// };
 
-export const useOwnedNfts = () => {
-  const hooks = useHooks();
-  const swrRes = hooks.useOwnedNfts();
+// export const useOwnedNfts = () => {
+//   const hooks = useHooks();
+//   const swrRes = hooks.useOwnedNfts();
 
-  return {
-    nfts: swrRes
-  };
-};
+//   return {
+//     nfts: swrRes
+//   };
+// };

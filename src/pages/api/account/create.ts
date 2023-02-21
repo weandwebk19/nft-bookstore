@@ -14,7 +14,7 @@ export default async function handler(
 ) {
   try {
     const client = await clientPromise;
-    const db = client.db("accounts");
+    const db = client.db("NftBookStore");
     const { address, username } = req.body;
 
     // Check if the address is exists
