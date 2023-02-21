@@ -42,39 +42,64 @@ const BookItem = ({ meta, author, onClick }: BookItemProps) => {
         className={styles["book-item__book-cover"]}
         src={meta.bookCover}
         alt={meta.title}
-        sx={{ height: "240px" }}
+        sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
       />
-      <Stack
-        direction="row"
-        spacing={1}
-        alignItems="center"
-        className="book-item__chips"
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column"
+        }}
       >
-        <Stack direction="row">
-          <InsertDriveFileIcon fontSize="small" color="disabled" />
-          <Typography variant="caption">{meta.file}</Typography>
-        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          className="book-item__chips"
+          sx={{ flexShrink: 0, marginBottom: "auto" }}
+        >
+          <Stack direction="row">
+            <InsertDriveFileIcon fontSize="small" color="disabled" />
+            <Typography variant="caption">{meta.file}</Typography>
+          </Stack>
 
-        {meta.attributes?.map((stat, i) => {
-          switch (stat.statType) {
-            case "stars":
-              return (
-                <Stack key={i} direction="row">
-                  <StarIcon fontSize="small" color="disabled" />
-                  <Typography variant="caption">{`${stat.value} ${stat.statType}`}</Typography>
-                </Stack>
-              );
-            default:
-              return "";
-          }
-        })}
-      </Stack>
-      <Typography className="text-limit text-limit--2" variant="h6">
-        {meta.title}
-      </Typography>
-      <Typography className="text-limit text-limit--1" variant="body2">
-        {author}
-      </Typography>
+          {meta.attributes?.map((stat, i) => {
+            switch (stat.statType) {
+              case "stars":
+                return (
+                  <Stack key={i} direction="row">
+                    <StarIcon fontSize="small" color="disabled" />
+                    <Typography variant="caption">{`${stat.value} ${stat.statType}`}</Typography>
+                  </Stack>
+                );
+              default:
+                return "";
+            }
+          })}
+        </Stack>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
+          <Typography
+            className="text-limit text-limit--2"
+            variant="h6"
+            sx={{ flex: 1 }}
+          >
+            {meta.title}
+          </Typography>
+          <Typography
+            className="text-limit text-limit--1"
+            variant="body2"
+            sx={{ flexShrink: 0, marginTop: "auto" }}
+          >
+            {author}
+          </Typography>
+        </Box>
+      </Box>
     </Stack>
   );
 };

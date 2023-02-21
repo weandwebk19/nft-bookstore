@@ -67,7 +67,12 @@ const BookBanner = ({
             </Typography>
           </Box>
           <Typography variant="h5">{author}</Typography>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} my={2}>
+          <Stack
+            direction="row"
+            spacing={2}
+            my={2}
+            className={styles["book-banner__meta"]}
+          >
             <Stack direction="row" spacing={1}>
               <InsertDriveFileOutlinedIcon />
               <Typography>{meta.file}</Typography>
@@ -115,7 +120,11 @@ const BookBanner = ({
           }}
         >
           <Stack spacing={3} alignItems="end">
-            <Typography variant="h2" sx={{ pt: 1 }}>
+            <Typography
+              variant="h2"
+              sx={{ pt: 1 }}
+              className={styles["book-banner__countdown"]}
+            >
               {countDown}
             </Typography>
             {countDown && <Typography>Register closing soon</Typography>}

@@ -1,23 +1,11 @@
-import { Box, Grid, Paper, Stack } from "@mui/material";
 
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
-import {
-  faFacebook,
-  faInstagram,
-  faLinkedinIn,
-  faTelegram,
-  faTwitter
-} from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Box, Grid, Stack } from "@mui/material";
 import { BookBanner } from "@shared/BookBanner";
 import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
-
 import images from "@/assets/images";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
-
-config.autoAddCss = false;
+import FilterBox from './FilterBox';
 
 const DisplayBox = () => {
   const topBook = {
@@ -297,7 +285,7 @@ const DisplayBox = () => {
               isPaginate={true}
               title={
                 <>
-                  Reader <i>also</i> enjoy
+                  Publishing books
                 </>
               }
             >
@@ -326,53 +314,13 @@ const DisplayBox = () => {
               </Grid>
             </ContentPaper>
 
-            <ContentPaper
-              isPaginate={true}
-              title={
-                <>
-                  <i>Highly</i> recommended
-                </>
-              }
-            >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-                {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </ContentPaper>
           </Stack>
         </Grid>
         <Grid item xs={4} sm={8} md={12} lg={6}>
           <Stack spacing={3}>
-            <ContentPaper title="Community">
-              <Stack direction="row" spacing={2}>
-                <FontAwesomeIcon icon={faFacebook} />
-                <FontAwesomeIcon icon={faTwitter} />
-                <FontAwesomeIcon icon={faLinkedinIn} />
-                <FontAwesomeIcon icon={faInstagram} />
-                <FontAwesomeIcon icon={faTelegram} />
-              </Stack>
+            <ContentPaper title="Filter">
+              <FilterBox />
             </ContentPaper>
-            <Paper sx={{ height: "30vh" }} />
-            <Paper sx={{ height: "110vh" }} />
           </Stack>
         </Grid>
       </Grid>

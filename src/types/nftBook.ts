@@ -170,3 +170,4 @@ export enum BookGenres {
   "Religion - Spirituality",
   "Blockchain"
 }
+

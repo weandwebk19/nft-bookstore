@@ -1,0 +1,13 @@
+.filter-box {
+    .filter-rating {
+        gap: 16px;
+    }
+}
+
+@media (max-width: 1199.99px) {
+    .filter-box {
+        .filter-rating {
+            gap: 32px;
+        }
+    }
+}
