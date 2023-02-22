@@ -7,6 +7,7 @@ import {
   Stack,
   Typography
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import CodeOutlinedIcon from "@mui/icons-material/CodeOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
@@ -16,8 +17,11 @@ import styles from "@styles/Hero.module.scss";
 import images from "@/assets/images";
 import { StackedLogo } from "@/components/shared/Logo";
 import { StyledButton } from "@/styles/components/Button";
+import cssFilter from "@/utils/cssFilter";
 
 const Hero = () => {
+  const theme = useTheme();
+
   return (
     <Box className={styles.hero}>
       <Container>
@@ -32,9 +36,11 @@ const Hero = () => {
               component="img"
               src={images.stackedLogo}
               mb={3}
-              sx={{ maxWidth: "385px" }}
+              sx={{
+                maxWidth: "385px",
+                filter: cssFilter(`${theme.palette.primary.main}`)
+              }}
             />
-            {/* <StackedLogo /> */}
             <Typography variant="body1">
               We wants to change the way people read
             </Typography>
@@ -58,7 +64,12 @@ const Hero = () => {
               </StyledButton>
             </Stack>
           </Stack>
-          <Box component="img" src="" />
+          <Box>
+            <Box component="img" src={images.heroImg} />
+            <figcaption>
+              Second Hand Stories by David Carmack Lewis, 2003.
+            </figcaption>
+          </Box>
         </Grid>
       </Container>
     </Box>

@@ -5,14 +5,18 @@ import {
   Grid,
   Typography
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import { StyledCard, StyledCardMedia } from "@styles/components/Card";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
+import cssFilter from "@/utils/cssFilter";
 
 const MainProduct = () => {
   const router = useRouter();
+  const theme = useTheme();
+
   return (
     <Box>
       <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
@@ -23,7 +27,8 @@ const MainProduct = () => {
           sx={{
             position: "absolute",
             maxWidth: "385px",
-            transform: "translateX(-50%) translateY(-40%)"
+            transform: "translateX(-50%) translateY(-40%)",
+            filter: cssFilter(`${theme.palette.primary.main}`)
           }}
         />
       </Box>

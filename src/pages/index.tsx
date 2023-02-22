@@ -10,7 +10,7 @@ import { DefaultLayout } from "@/layouts";
 
 export default function Home() {
   return (
-    <>
+    <Box>
       <Head>
         <title>NFT Bookstore</title>
         <meta name="description" content="The world's first NFT Bookstore" />
@@ -19,7 +19,7 @@ export default function Home() {
       </Head>
       <main>
         <Stack spacing={8}>
-          <Box component="section" sx={{ height: "70vh" }}>
+          <Box component="section" sx={{ height: "100vh" }}>
             <Hero />
           </Box>
           <Box component="section">
@@ -52,6 +52,6 @@ export default function Home() {
           </Box>
         </Stack>
       </main>
-    </>
+    </Box>
   );
 }
