@@ -65,11 +65,21 @@ contract BookStore is ERC1155URIStorage, Ownable {
       uint tokenId = ids[0];
       _addTokenToOwnerEnumeration(to, tokenId);
     }
+
+    // Buy books
+    if (from != address(0) && to != address(0) && to != from) {
+      uint tokenId = ids[0];
+      _addTokenToOwnerEnumeration(to, tokenId);
+      if (getBalanceOfBook(tokenId, from) == 0) {
+        _removeTokenFromOwnerEnumeration(from, tokenId);
+      }
+    }
+
   }
 
-  function getBalanceOfBook(uint256 tokenId) public view returns (uint256) {
-    require(isOwnerOfToken(tokenId), "You do not have a this token");
-    return balanceOf(msg.sender, tokenId);
+  function getBalanceOfBook(uint256 tokenId, address owner) public view returns (uint256) {
+    require(isOwnerOfToken(tokenId, owner), "You do not have a this token");
+    return balanceOf(owner, tokenId);
   }
 
   function _addTokenToOwnerEnumeration(address owner, uint tokenId) private {
@@ -132,10 +142,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
     emit ListedBookCreated(tokenId, seller, price, amount);
   }
 
-  function isOwnerOfToken(uint tokenId) public view returns(bool) {
-    uint total = numberOfOwnedToken[msg.sender];
+  function isOwnerOfToken(uint tokenId, address owner) public view returns(bool) {
+    uint total = numberOfOwnedToken[owner];
     for (uint i = 0; i < total; i++) {
-      if (_ownedTokens[msg.sender][i] == tokenId) {
+      if (_ownedTokens[owner][i] == tokenId) {
         return true;
       }
     }
@@ -158,7 +168,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   // return false: You don't have enough books to sell
   function checkQuantityToSell(uint256 quantity, uint256 tokenId) public view returns(bool) {
-    return quantity <= getBalanceOfBook(tokenId) && quantity > 0;
+    return quantity <= getBalanceOfBook(tokenId, msg.sender) && quantity > 0;
   }
 
   // return i > 0: listed book on sale
@@ -179,7 +189,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getQuantityOfListedBook(uint256 tokenId) public view returns(uint256) {
-    require(isOwnerOfToken(tokenId),
+    require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
     uint256 quantity = 0;
 
@@ -194,9 +204,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function sellBooks(uint256 tokenId, uint price, uint256 amount) public payable {
-    require(isOwnerOfToken(tokenId),
+    require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getQuantityOfListedBook(tokenId) + amount <= getBalanceOfBook(tokenId) &&
+    require(getQuantityOfListedBook(tokenId) + amount <= getBalanceOfBook(tokenId, msg.sender) &&
            amount > 0,
           "You don't have enough books to sell");
     require(msg.value == listingPrice,
@@ -238,10 +248,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
 
-  function removeListedBookFromSale(uint256 tokenId, uint price, uint256 amount) public {
-    require(isOwnerOfToken(tokenId),
+  function decreaseListedBookFromSale(uint256 tokenId, uint price, uint256 amount, address seller) public {
+    require(isOwnerOfToken(tokenId, seller),
           "You are not the owner of this token");
-    int idListedBook = getIdListedBookOnSale(tokenId, price, msg.sender);
+    int idListedBook = getIdListedBookOnSale(tokenId, price, seller);
     require(idListedBook != -1,
           "Your book are not on sale");
     require(amount > 0,
@@ -270,19 +280,18 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return books;
   }
 
-  // function buyBooks(uint256 tokenId, uint price, uint256 amount, address seller) public payable {
-  //   int idListedBook = getIdListedBookOnSale(tokenId, price, seller);
-  //   ListedBook memory listedBook = getListedBook(uint256(idListedBook));
-  //   require(msg.sender != listedBook.seller, "You can't buy your own books on sale");
-  //   require(msg.value == amount * price, "Please submit the asking price");
-  //   require(amount <= listedBook.amount && amount > 0, "Amount is invalid");
+  function buyBooks(uint256 tokenId, uint price, uint256 amount, address seller) public payable {
+    int idListedBook = getIdListedBookOnSale(tokenId, price, seller);
+    ListedBook memory listedBook = getListedBook(uint256(idListedBook));
+    require(msg.sender != listedBook.seller, "You can't buy your own books on sale");
+    require(msg.value == amount * price, "Please submit the asking price");
+    require(amount <= listedBook.amount && amount > 0, "Amount is invalid");
 
-  //   uint256 totalPrice = amount * price;
-  //   removeListedBookFromSale(tokenId, price, amount);
-  //   _safeTransferFrom(msg.sender, seller, tokenId, amount, "");
+    uint256 totalPrice = amount * price;
+    decreaseListedBookFromSale(tokenId, price, amount, seller);
+    _safeTransferFrom(seller, msg.sender, tokenId, amount, "");
+    payable(seller).transfer(totalPrice);
 
-  // }
-
-
+  }
 
 }

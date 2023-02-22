@@ -22,7 +22,7 @@ contract("BookStore", (accounts) => {
     });
 
     it("owner of the first token should be address[0]", async () => {
-      const checkOwnerOfToken = await _contract.isOwnerOfToken(1, {from: accounts[0]});
+      const checkOwnerOfToken = await _contract.isOwnerOfToken(1, accounts[0], {from: accounts[0]});
       assert(checkOwnerOfToken, "Owner of token is not matching address[0]");
     })
 
@@ -64,7 +64,7 @@ contract("BookStore", (accounts) => {
     })
 
     it("accounts[0] is the owner of this NFT book", async () => {
-      const check = await _contract.isOwnerOfToken(1, { from: accounts[0]});
+      const check = await _contract.isOwnerOfToken(1, accounts[0], { from: accounts[0]});
       assert(check, "accounts[0] does not have this token ID");
     })
 
@@ -119,7 +119,8 @@ contract("BookStore", (accounts) => {
 
     it("should have two books in owner book's list", async () => {
       const ownedNFTBooks = await _contract.getOwnedNFTBooks({from: accounts[0]});
-      assert.equal(ownedNFTBooks.length, 2, "The number of books in possession of the book is not valid");
+      assert.equal(ownedNFTBooks.length, 2, 
+                  "The number of books in possession of the book is not valid");
     })
 
     it("should have one listed items", async () => {
@@ -133,16 +134,51 @@ contract("BookStore", (accounts) => {
 
     const _nftPrice = Number(ethers.utils.parseUnits("0.3", "ether")).toString();
     before(async () => {
-      await _contract.removeListedBookFromSale(1, _nftPrice,  20,  {
+      await _contract.decreaseListedBookFromSale(1, _nftPrice,  20,  accounts[0], {
         from: accounts[0]
       })
     });
 
-    it("should don't have listed items", async () => {
+    it("should have correct amount", async () => {
       const listedBook =  await _contract.getListedBook(0);
       assert.equal(listedBook.amount, 80, "Invalid length of Nfts");
     })
 
+  })
+
+  describe("Buy books", () => {
+
+    const _nftPrice = Number(ethers.utils.parseUnits("0.3", "ether")).toString();
+    const total = Number(ethers.utils.parseUnits("9", "ether")).toString();
+    before(async () => {
+      await _contract.buyBooks(1, _nftPrice,  30, accounts[0], {
+        from: accounts[1],
+        value: total
+      })
+    });
+
+    it("should change the owner", async () => {
+      const ownedNFTBooks = await _contract.getOwnedNFTBooks({
+        from: accounts[1]
+      });
+      assert.equal(ownedNFTBooks.length, 1, "Set owner of book is wrong");
+    })
+
+    it("should have correct amount", async () => {
+      const listedBook =  await _contract.getListedBook(0);
+      assert.equal(listedBook.amount, 50, "Invalid of amount");
+    })
+    
+    it("should remove books on sale when buy all books", async () => {
+      const total = Number(ethers.utils.parseUnits("15", "ether")).toString();
+      await _contract.buyBooks(1, _nftPrice,  50, accounts[0], {
+        from: accounts[1],
+        value: total
+      })
+
+      const listedNfts = await _contract.getAllBooksOnSale();
+      assert.equal(listedNfts.length, 0, "Invalid length of Nfts");
+    })
   })
 
 });
