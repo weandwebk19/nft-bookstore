@@ -8,14 +8,14 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  List as MUIList,
+  List as MUIList
 } from "@mui/material";
 
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import PropTypes from "prop-types";
 import { ListProps } from "@_types/list";
+import PropTypes from "prop-types";
 
 const List = ({ items, size }: ListProps) => {
   const haveSubListItems = items!.filter((item) => item!.type === "dropdown");
@@ -38,7 +38,7 @@ const List = ({ items, size }: ListProps) => {
   return (
     <MUIList sx={{ minWidth: `${size}px` }}>
       {items!.map((item, index) => (
-        <Box key={item?.content}>
+        <Box key={`${item?.content} ${index}`}>
           {(() => {
             if (item.type !== "divider") {
               return (
@@ -53,7 +53,7 @@ const List = ({ items, size }: ListProps) => {
                       }
                       disabled={item?.disabled}
                     >
-                      <ListItemIcon>{item?.icon}</ListItemIcon>
+                      {item?.icon && <ListItemIcon>{item?.icon}</ListItemIcon>}
                       <ListItemText>{item?.content}</ListItemText>
                       {(() => {
                         if (item?.type === "dropdown") {
@@ -96,12 +96,12 @@ const List = ({ items, size }: ListProps) => {
 
 List.propTypes = {
   items: PropTypes.array,
-  size: PropTypes.number,
+  size: PropTypes.number
 };
 
 List.defaultProps = {
   items: [],
-  size: 300,
+  size: 300
 };
 
 export default List;

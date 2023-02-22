@@ -7,10 +7,12 @@ import {
 } from "@mui/material";
 
 import { StyledCard, StyledCardMedia } from "@styles/components/Card";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 
 const MainProduct = () => {
+  const router = useRouter();
   return (
     <Box>
       <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
@@ -20,6 +22,7 @@ const MainProduct = () => {
           src={images.decoLine}
           sx={{
             position: "absolute",
+            maxWidth: "385px",
             transform: "translateX(-50%) translateY(-40%)"
           }}
         />
@@ -31,7 +34,11 @@ const MainProduct = () => {
         alignItems="center"
       >
         <StyledCard customVariant="dome" sx={{ m: 2, height: "100%" }}>
-          <CardActionArea>
+          <CardActionArea
+            onClick={() => {
+              router.push("publish");
+            }}
+          >
             <StyledCardMedia
               component="img"
               height="300"
@@ -40,7 +47,7 @@ const MainProduct = () => {
             />
             <CardContent sx={{ height: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
-                Publish
+                Publishing
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Millions of readers are eagerly anticipating your books right

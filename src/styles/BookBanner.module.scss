@@ -1,0 +1,53 @@
+@import "./GlobalStyles/variables";
+
+.book-banner {
+  color: $white;
+  border-radius: 5px;
+  background-color: $white;
+  outline: 1px solid $white;
+  padding: 24px;
+
+  &__book-cover {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__title {
+    background-color: rgba(248, 239, 231, 0.03);
+    backdrop-filter: blur(10px);
+    border-radius: 10em;
+    outline: 1px solid $white;
+    padding: 8px 32px;
+  }
+
+  &__open {
+    background-color: rgba(248, 239, 231, 0.03);
+    backdrop-filter: blur(10px);
+    border-radius: 10em;
+    outline: 1px solid #38ac42;
+    padding: 4px 16px;
+  }
+}
+
+@media (max-width: 599.99px) {
+  .book-banner {
+
+    &__title {
+      font-size: 48px;
+    }
+
+    &__meta {
+      flex-wrap: wrap;
+      gap: 12px
+    }
+
+    &__countdown {
+      padding-top: 32px;
+      font-size: 48px;
+    }
+
+    &__open {
+      margin-top: 6px;
+    }
+  }
+}

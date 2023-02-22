@@ -12,7 +12,7 @@ import {
   ListItemText,
   Stack,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
@@ -23,39 +23,46 @@ import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
-import PropTypes from "prop-types";
 import { Dialog } from "@shared/Dialog";
 import { StyledButton } from "@styles/components/Button";
+import PropTypes from "prop-types";
+
 import { truncate } from "@/utils/truncate";
 
 interface AccountMenuProps {
   account?: string;
   open: boolean;
   onClose(...args: unknown[]): unknown;
+  disconnect(...args: unknown[]): unknown;
 }
 
-const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
+const AccountMenu = ({
+  account,
+  open,
+  onClose,
+  disconnect
+}: AccountMenuProps) => {
   const accountItems = [
     {
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
       content: "My Profile",
       onClick: () => {
         console.log("My Profile");
-      },
+      }
     },
     {
       icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
       content: "Favorites",
       onClick: () => {
         console.log("Favorites");
-      },
+      }
     },
     {
       icon: <VisibilityOutlinedIcon color="primary" fontSize="small" />,
       content: "Watchlist",
       onClick: () => {
         console.log("Watchlist");
-      },
+      }
     },
     {
       icon: (
@@ -64,15 +71,15 @@ const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
       content: "My Collections",
       onClick: () => {
         console.log("Collection");
-      },
+      }
     },
     {
       icon: <LogoutOutlinedIcon color="primary" fontSize="small" />,
       content: "Disconnect",
       onClick: () => {
-        console.log("Disconnect");
-      },
-    },
+        disconnect();
+      }
+    }
   ];
 
   return (
@@ -91,13 +98,13 @@ const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
               sx={{
                 border: "1px solid ",
                 borderRadius: "5px",
-                padding: 3,
+                padding: 3
               }}
             >
               <Stack
                 alignItems="center"
                 sx={{
-                  flexDirection: { xs: "column", md: "row" },
+                  flexDirection: { xs: "column", md: "row" }
                 }}
               >
                 <Avatar
@@ -106,12 +113,12 @@ const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
                   sx={{
                     width: 56,
                     height: 56,
-                    mr: { xs: 0, md: 2 },
+                    mr: { xs: 0, md: 2 }
                   }}
                 />
                 <Stack
                   sx={{
-                    textAlign: { xs: "center", md: "start" },
+                    textAlign: { xs: "center", md: "start" }
                   }}
                 >
                   <Typography variant="subtitle2">User name</Typography>
@@ -123,7 +130,7 @@ const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
                 <Stack
                   alignItems="center"
                   sx={{
-                    flexDirection: { xs: "column", md: "row" },
+                    flexDirection: { xs: "column", md: "row" }
                   }}
                 >
                   <Avatar
@@ -132,12 +139,12 @@ const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
                     sx={{
                       width: 56,
                       height: 56,
-                      mr: { xs: 0, md: 2 },
+                      mr: { xs: 0, md: 2 }
                     }}
                   />
                   <Stack
                     sx={{
-                      textAlign: { xs: "center", md: "start" },
+                      textAlign: { xs: "center", md: "start" }
                     }}
                   >
                     <Typography variant="subtitle2">Wallet</Typography>
@@ -173,7 +180,7 @@ const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
           <List
             sx={{
               border: "1px solid ",
-              borderRadius: "5px",
+              borderRadius: "5px"
             }}
           >
             {accountItems.map((item, i) => (
@@ -197,12 +204,12 @@ const AccountMenu = ({ account, open, onClose }: AccountMenuProps) => {
 AccountMenu.propTypes = {
   account: PropTypes.string,
   open: PropTypes.bool,
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
 };
 
 AccountMenu.defaultProps = {
   account: "",
-  open: false,
+  open: false
 };
 
 export default AccountMenu;

@@ -4,11 +4,11 @@ import { styled } from "@mui/system";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   color: `${theme.palette.primary.main}`,
-  backgroundColor: "transparent",
+  backgroundColor: `${theme.palette.background.appbar}`,
   padding: `0 ${theme.spacing(2)}`,
   position: "fixed",
-  boxShadow: "none",
-  backdropFilter: "blur(8px)",
+  boxShadow: `0 0 3px ${theme.palette.background.paper}`,
+  backdropFilter: "blur(8px)"
 }));
 
 export default StyledAppBar;
