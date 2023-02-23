@@ -15,6 +15,7 @@ import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
 
 import images from "@/assets/images";
+import { BookList } from "@/components/shared/BookList";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
 config.autoAddCss = false;
@@ -301,29 +302,7 @@ const DisplayBox = () => {
                 </>
               }
             >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-                {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
+              <BookList bookList={bookList} onClick={handleBookClick} />
             </ContentPaper>
 
             <ContentPaper
@@ -334,29 +313,7 @@ const DisplayBox = () => {
                 </>
               }
             >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-                {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
+              <BookList bookList={bookList} onClick={handleBookClick} />
             </ContentPaper>
           </Stack>
         </Grid>
