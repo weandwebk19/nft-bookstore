@@ -10,6 +10,7 @@ import {
   TextField,
   Typography
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -22,6 +23,7 @@ import styles from "@styles/FilterBox.module.scss";
 import * as yup from "yup";
 
 import { StyledButton } from "@/styles/components/Button";
+import { StyledRating } from "@/styles/components/Rating";
 import {
   StyledTreeItemProps,
   StyledTreeItemRoot
@@ -116,6 +118,7 @@ function getLabelText(value: number) {
 }
 
 const FilterBar = () => {
+  const theme = useTheme();
   const {
     handleSubmit,
     formState: { errors },
