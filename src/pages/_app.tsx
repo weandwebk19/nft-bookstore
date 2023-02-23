@@ -1,22 +1,18 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 import { Box, CssBaseline } from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
 
 import "@styles/GlobalStyles/GlobalStyles.scss";
-import { darkTheme, lightTheme } from "@styles/theme";
 import { AnimatePresence, motion } from "framer-motion";
-import gsap from "gsap";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 
 import { Web3Provider } from "@/components/providers";
 import { Loading } from "@/components/shared/Loading";
-import { PageTransition } from "@/components/shared/PageTransition";
+import { MyThemeContextProvider } from "@/contexts/ThemeContext";
 import { DefaultLayout } from "@/layouts";
 
 type PageLayoutProps = {
-  onThemeChange: (theme: string) => void;
   children: React.ReactNode;
 };
 
@@ -29,44 +25,11 @@ type ComponentWithPageLayout = AppProps & {
 export default function App({ Component, pageProps }: ComponentWithPageLayout) {
   const router = useRouter();
   const app = useRef();
-  // theming
-  const [theme, setTheme] = useState("light");
-
-  const handleThemeChange = (theme: string) => {
-    switch (theme) {
-      case "light":
-        setTheme("light");
-        break;
-      case "dark":
-        setTheme("dark");
-        break;
-      default:
-        setTheme("light");
-        break;
-    }
-  };
-
-  // loading
-  // const loaderRef = useRef<HTMLDivElement>(null);
-
-  // useLayoutEffect(() => {
-  //   let ctx = gsap.context(() => {
-  //     gsap.to(loaderRef!.current, {
-  //       x: "100%",
-  //       ease: "expo",
-  //       delay: 1
-  //     });
-  //   }, app);
-
-  //   return () => ctx.revert();
-  // }, []);
 
   return (
     <Box ref={app}>
-      {/* <PageTransition ref={loaderRef} /> */}
-
       <Web3Provider>
-        <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+        <MyThemeContextProvider>
           <CssBaseline />
           <AnimatePresence mode="wait">
             <motion.div
@@ -93,17 +56,17 @@ export default function App({ Component, pageProps }: ComponentWithPageLayout) {
               <Loading />
 
               {Component.PageLayout ? (
-                <Component.PageLayout onThemeChange={handleThemeChange}>
+                <Component.PageLayout>
                   <Component {...pageProps} />
                 </Component.PageLayout>
               ) : (
-                <DefaultLayout onThemeChange={handleThemeChange}>
+                <DefaultLayout>
                   <Component {...pageProps} />
                 </DefaultLayout>
               )}
             </motion.div>
           </AnimatePresence>
-        </ThemeProvider>
+        </MyThemeContextProvider>
       </Web3Provider>
     </Box>
   );

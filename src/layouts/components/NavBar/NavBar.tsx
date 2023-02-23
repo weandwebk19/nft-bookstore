@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import {
   Avatar,
-  Badge,
   Box,
   Button,
   Container,
@@ -10,8 +9,7 @@ import {
   Menu,
   Stack,
   Toolbar,
-  Tooltip,
-  Typography
+  Tooltip
 } from "@mui/material";
 
 import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -30,10 +28,10 @@ import { StyledAppBar } from "@styles/components/AppBar";
 import { StyledButton } from "@styles/components/Button";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
-import PropTypes from "prop-types";
 
 import { useAccount } from "@/components/hooks/web3";
-import { HorizontalLogo, Logo } from "@/components/shared/Logo";
+import { Logo } from "@/components/shared/Logo";
+import { useMyTheme, useSetMyThemeContext } from "@/contexts/ThemeContext";
 import { truncate } from "@/utils/truncate";
 
 import { AccountMenu } from "../AccountMenu";
@@ -68,11 +66,11 @@ interface SyntheticEvent {
   type: string;
 }
 
-interface NavBarProps {
-  onThemeChange: (theme: string) => void;
-}
+const NavBar = () => {
+  const [clientTheme, setClientTheme] = useMyTheme();
 
-const NavBar = ({ onThemeChange }: NavBarProps) => {
+  const setStoredTheme = useSetMyThemeContext();
+
   const router = useRouter();
   const { account } = useAccount();
   const [address, setAddress] = useState("");
@@ -105,7 +103,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
   });
 
   const [openMode, setOpenMode] = useState({
-    currentState: "Light",
+    currentState: clientTheme,
     isOpen: true
   });
 
@@ -172,12 +170,12 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
   };
 
   const handleModeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    onThemeChange(e.currentTarget.innerText.toLowerCase());
     const currentTheme = e.currentTarget.innerText;
     setOpenMode({
       ...openMode,
       currentState: currentTheme
     });
+    setStoredTheme(currentTheme.toLowerCase());
   };
 
   const handleCreateMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -563,14 +561,6 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
       </Box>
     </motion.div>
   );
-};
-
-NavBar.propTypes = {
-  onThemeChange: PropTypes.func
-};
-
-NavBar.defaultProps = {
-  onThemeChange: () => {}
 };
 
 export default NavBar;

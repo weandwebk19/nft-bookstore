@@ -4,16 +4,12 @@ import { Footer, NavBar } from "../components";
 
 interface SplitScreenLayoutProps {
   children: React.ReactNode;
-  onThemeChange: (theme: string) => void;
 }
 
-const SplitScreenLayout = ({
-  children,
-  onThemeChange
-}: SplitScreenLayoutProps) => {
+const SplitScreenLayout = ({ children }: SplitScreenLayoutProps) => {
   return (
     <>
-      <NavBar onThemeChange={onThemeChange} />
+      <NavBar />
       <Box sx={{ minHeight: "100vh" }}>
         <Container maxWidth={false}>
           <Box className="content">{children}</Box>

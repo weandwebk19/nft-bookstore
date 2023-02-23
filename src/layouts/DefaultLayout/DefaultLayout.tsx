@@ -4,13 +4,12 @@ import { Footer, NavBar } from "../components";
 
 interface DefaultLayoutProps {
   children: React.ReactNode;
-  onThemeChange: (theme: string) => void;
 }
 
-const DefaultLayout = ({ children, onThemeChange }: DefaultLayoutProps) => {
+const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   return (
     <>
-      <NavBar onThemeChange={onThemeChange} />
+      <NavBar />
       <Box sx={{ minHeight: "100vh" }}>
         <Container maxWidth="xl">
           <Box className="content">{children}</Box>
