@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import {
   Avatar,
-  Badge,
   Box,
   Button,
   Container,
@@ -10,8 +9,7 @@ import {
   Menu,
   Stack,
   Toolbar,
-  Tooltip,
-  Typography
+  Tooltip
 } from "@mui/material";
 
 import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -28,11 +26,12 @@ import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
 import { StyledButton } from "@styles/components/Button";
+import { motion } from "framer-motion";
 import { useRouter } from "next/router";
-import PropTypes from "prop-types";
 
 import { useAccount } from "@/components/hooks/web3";
-import { HorizontalLogo, Logo } from "@/components/shared/Logo";
+import { Logo } from "@/components/shared/Logo";
+import { useMyTheme, useSetMyThemeContext } from "@/contexts/ThemeContext";
 import { truncate } from "@/utils/truncate";
 
 import { AccountMenu } from "../AccountMenu";
@@ -67,11 +66,11 @@ interface SyntheticEvent {
   type: string;
 }
 
-interface NavBarProps {
-  onThemeChange: (theme: string) => void;
-}
+const NavBar = () => {
+  const [clientTheme, setClientTheme] = useMyTheme();
 
-const NavBar = ({ onThemeChange }: NavBarProps) => {
+  const setStoredTheme = useSetMyThemeContext();
+
   const router = useRouter();
   const { account } = useAccount();
   const [address, setAddress] = useState("");
@@ -104,7 +103,7 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
   });
 
   const [openMode, setOpenMode] = useState({
-    currentState: "Light",
+    currentState: clientTheme,
     isOpen: true
   });
 
@@ -171,12 +170,12 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
   };
 
   const handleModeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    onThemeChange(e.currentTarget.innerText.toLowerCase());
     const currentTheme = e.currentTarget.innerText;
     setOpenMode({
       ...openMode,
       currentState: currentTheme
     });
+    setStoredTheme(currentTheme.toLowerCase());
   };
 
   const handleCreateMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -329,27 +328,36 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
   ];
 
   return (
-    <nav>
-      <StyledAppBar
-      // className="noise"
-      >
-        <Container maxWidth="lg">
-          <Toolbar
-            disableGutters
-            sx={{
-              justifyContent: "space-between"
-            }}
-          >
-            <Button
-              onClick={handleHomeClick}
+    <motion.div
+      initial={{
+        y: 25,
+        opacity: 0
+      }}
+      animate={{
+        y: 0,
+        opacity: 1
+      }}
+      transition={{ duration: 0.75 }}
+    >
+      <Box component="nav">
+        <StyledAppBar>
+          <Container maxWidth="lg">
+            <Toolbar
+              disableGutters
               sx={{
-                display: {
-                  xs: "none",
-                  md: "block"
-                }
+                justifyContent: "space-between"
               }}
             >
-              {/* <Box
+              <Button
+                onClick={handleHomeClick}
+                sx={{
+                  display: {
+                    xs: "none",
+                    md: "block"
+                  }
+                }}
+              >
+                {/* <Box
                 component="img"
                 src={images.logo}
                 alt="NFT Bookstore"
@@ -357,124 +365,124 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                   width: "36px"
                 }}
               /> */}
-              <Logo />
-            </Button>
+                <Logo />
+              </Button>
 
-            {/* Tablet */}
-            <Box
-              sx={{
-                display: {
-                  xs: "flex",
-                  md: "none"
-                }
-              }}
-            >
-              <IconButton
-                size="large"
-                color="inherit"
-                onClick={handleNavMenuClick}
+              {/* Tablet */}
+              <Box
+                sx={{
+                  display: {
+                    xs: "flex",
+                    md: "none"
+                  }
+                }}
               >
-                <MenuIcon color="primary" />
-              </IconButton>
-              <Drawer open={openNavMenu} onClose={handleNavMenuClose}>
-                <CustomList items={navItems} />
-              </Drawer>
-            </Box>
-
-            {/* PC */}
-            <Box
-              sx={{
-                flexGrow: 1,
-                display: {
-                  xs: "none",
-                  sm: "none",
-                  md: "flex"
-                }
-              }}
-            >
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={() => handleNavMenuItemClick(page)}
-                  sx={{
-                    mr: 2
-                  }}
+                <IconButton
+                  size="large"
+                  color="inherit"
+                  onClick={handleNavMenuClick}
                 >
-                  {page}
-                </Button>
-              ))}
-              {account.data && (
-                <>
-                  <Tooltip title="Create listing/rental">
-                    <StyledButton
-                      customVariant="primary"
-                      onClick={(e) => handleCreateMenuClick(e)}
-                    >
-                      Create
-                    </StyledButton>
-                  </Tooltip>
-                  <Menu
-                    anchorEl={anchorCreateMenu}
-                    id="create-menu"
-                    open={openCreateMenu}
-                    onClose={handleCreateMenuClose}
-                    // onClick={handleSettingsMenuClose}
-                    PaperProps={{
-                      elevation: 0,
-                      sx: {
-                        overflow: "visible",
-                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                        mt: 1.5,
-                        "& .MuiAvatar-root": {
-                          width: 32,
-                          height: 32,
-                          ml: -0.5,
-                          mr: 1
-                        },
-                        "&:before": {
-                          content: '""',
-                          display: "block",
-                          position: "absolute",
-                          top: 0,
-                          left: 14,
-                          width: 10,
-                          height: 10,
-                          bgcolor: "background.paper",
-                          transform: "translateY(-50%) rotate(45deg)",
-                          zIndex: 0
-                        }
-                      }
-                    }}
-                    transformOrigin={{
-                      horizontal: "left",
-                      vertical: "top"
-                    }}
-                    anchorOrigin={{
-                      horizontal: "left",
-                      vertical: "bottom"
+                  <MenuIcon color="primary" />
+                </IconButton>
+                <Drawer open={openNavMenu} onClose={handleNavMenuClose}>
+                  <CustomList items={navItems} />
+                </Drawer>
+              </Box>
+
+              {/* PC */}
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: {
+                    xs: "none",
+                    sm: "none",
+                    md: "flex"
+                  }
+                }}
+              >
+                {pages.map((page) => (
+                  <Button
+                    key={page}
+                    onClick={() => handleNavMenuItemClick(page)}
+                    sx={{
+                      mr: 2
                     }}
                   >
-                    <CustomList items={createList} />
-                  </Menu>
-                </>
-              )}
-            </Box>
+                    {page}
+                  </Button>
+                ))}
+                {account.data && (
+                  <>
+                    <Tooltip title="Create listing/rental">
+                      <StyledButton
+                        customVariant="primary"
+                        onClick={(e) => handleCreateMenuClick(e)}
+                      >
+                        Create
+                      </StyledButton>
+                    </Tooltip>
+                    <Menu
+                      anchorEl={anchorCreateMenu}
+                      id="create-menu"
+                      open={openCreateMenu}
+                      onClose={handleCreateMenuClose}
+                      // onClick={handleSettingsMenuClose}
+                      PaperProps={{
+                        elevation: 0,
+                        sx: {
+                          overflow: "visible",
+                          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                          mt: 1.5,
+                          "& .MuiAvatar-root": {
+                            width: 32,
+                            height: 32,
+                            ml: -0.5,
+                            mr: 1
+                          },
+                          "&:before": {
+                            content: '""',
+                            display: "block",
+                            position: "absolute",
+                            top: 0,
+                            left: 14,
+                            width: 10,
+                            height: 10,
+                            bgcolor: "background.paper",
+                            transform: "translateY(-50%) rotate(45deg)",
+                            zIndex: 0
+                          }
+                        }
+                      }}
+                      transformOrigin={{
+                        horizontal: "left",
+                        vertical: "top"
+                      }}
+                      anchorOrigin={{
+                        horizontal: "left",
+                        vertical: "bottom"
+                      }}
+                    >
+                      <CustomList items={createList} />
+                    </Menu>
+                  </>
+                )}
+              </Box>
 
-            <Stack direction="row" alignItems="center" sx={{ flexGrow: 0 }}>
-              <WalletBar
-                isInstalled={account.isInstalled}
-                isLoading={account.isLoading}
-                connect={account.connect}
-                account={account.data}
-                disconnect={account.disconnect}
-              />
-              <AccountMenu
-                account={account.data}
-                open={openAccountMenu}
-                onClose={handleAccountMenuClose}
-                disconnect={account.disconnect}
-              />
-              {/* <Tooltip title="Toggle theme">
+              <Stack direction="row" alignItems="center" sx={{ flexGrow: 0 }}>
+                <WalletBar
+                  isInstalled={account.isInstalled}
+                  isLoading={account.isLoading}
+                  connect={account.connect}
+                  account={account.data}
+                  disconnect={account.disconnect}
+                />
+                <AccountMenu
+                  account={account.data}
+                  open={openAccountMenu}
+                  onClose={handleAccountMenuClose}
+                  disconnect={account.disconnect}
+                />
+                {/* <Tooltip title="Toggle theme">
                 <IconButton
                   onClick={onThemeChange}
                   sx={{
@@ -490,76 +498,69 @@ const NavBar = ({ onThemeChange }: NavBarProps) => {
                 </IconButton>
               </Tooltip> */}
 
-              <Tooltip title="App settings">
-                <IconButton
-                  onClick={handleSettingsMenuClick}
-                  sx={{
-                    display: {
-                      xs: "none",
-                      md: "flex"
+                <Tooltip title="App settings">
+                  <IconButton
+                    onClick={handleSettingsMenuClick}
+                    sx={{
+                      display: {
+                        xs: "none",
+                        md: "flex"
+                      }
+                    }}
+                  >
+                    <SettingsOutlinedIcon color="primary" />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  anchorEl={anchorSettingsMenu}
+                  id="settings-menu"
+                  open={openSettingsMenu}
+                  onClose={handleSettingsMenuClose}
+                  // onClick={handleSettingsMenuClose}
+                  PaperProps={{
+                    elevation: 0,
+                    sx: {
+                      overflow: "visible",
+                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                      mt: 1.5,
+                      "& .MuiAvatar-root": {
+                        width: 32,
+                        height: 32,
+                        ml: -0.5,
+                        mr: 1
+                      },
+                      "&:before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: "background.paper",
+                        transform: "translateY(-50%) rotate(45deg)",
+                        zIndex: 0
+                      }
                     }
                   }}
+                  transformOrigin={{
+                    horizontal: "right",
+                    vertical: "top"
+                  }}
+                  anchorOrigin={{
+                    horizontal: "right",
+                    vertical: "bottom"
+                  }}
                 >
-                  <SettingsOutlinedIcon color="primary" />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                anchorEl={anchorSettingsMenu}
-                id="settings-menu"
-                open={openSettingsMenu}
-                onClose={handleSettingsMenuClose}
-                // onClick={handleSettingsMenuClose}
-                PaperProps={{
-                  elevation: 0,
-                  sx: {
-                    overflow: "visible",
-                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                    mt: 1.5,
-                    "& .MuiAvatar-root": {
-                      width: 32,
-                      height: 32,
-                      ml: -0.5,
-                      mr: 1
-                    },
-                    "&:before": {
-                      content: '""',
-                      display: "block",
-                      position: "absolute",
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: "background.paper",
-                      transform: "translateY(-50%) rotate(45deg)",
-                      zIndex: 0
-                    }
-                  }
-                }}
-                transformOrigin={{
-                  horizontal: "right",
-                  vertical: "top"
-                }}
-                anchorOrigin={{
-                  horizontal: "right",
-                  vertical: "bottom"
-                }}
-              >
-                <CustomList items={settings} />
-              </Menu>
-            </Stack>
-          </Toolbar>
-        </Container>
-      </StyledAppBar>
-    </nav>
+                  <CustomList items={settings} />
+                </Menu>
+              </Stack>
+            </Toolbar>
+          </Container>
+        </StyledAppBar>
+      </Box>
+    </motion.div>
   );
-};
-
-NavBar.propTypes = {
-  onThemeChange: PropTypes.func
-};
-
-NavBar.defaultProps = {
-  onThemeChange: () => {}
 };
 
 export default NavBar;

@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BookBanner } from "@shared/BookBanner";
 import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
@@ -20,6 +21,7 @@ import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 config.autoAddCss = false;
 
 const DisplayBox = () => {
+  const router = useRouter();
   const topBook = {
     tokenId: "0",
     price: 0.5,
@@ -264,7 +266,7 @@ const DisplayBox = () => {
   ];
 
   const handleBookClick = (tokenId: number | string) => {
-    alert(tokenId);
+    router.push(`/publish/${tokenId}`);
   };
 
   return (
@@ -301,16 +303,13 @@ const DisplayBox = () => {
                 </>
               }
             >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
+              <Grid
+                container
+                spacing={3}
+                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+              >
                 {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
+                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={4}>
                     <BookItem
                       tokenId={book.tokenId}
                       price={book.price}
@@ -334,16 +333,13 @@ const DisplayBox = () => {
                 </>
               }
             >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
+              <Grid
+                container
+                spacing={3}
+                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+              >
                 {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
+                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={4}>
                     <BookItem
                       tokenId={book.tokenId}
                       price={book.price}

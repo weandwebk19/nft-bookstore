@@ -74,8 +74,8 @@ const List = ({ items, size }: ListProps) => {
                         sx={{ pl: 4 }}
                         onClick={itemInSubList?.onClick}
                         selected={
-                          itemInSubList?.content ===
-                            itemInSubList?.selected?.currentState &&
+                          itemInSubList?.content?.toLowerCase() ===
+                            itemInSubList?.selected?.currentState.toLowerCase() &&
                           itemInSubList?.selected.isOpen
                         }
                       >

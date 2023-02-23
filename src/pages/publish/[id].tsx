@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import {
   Box,
@@ -20,9 +20,30 @@ import { BookTicket } from "@/components/shared/BookTicket";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 gsap.registerPlugin(ScrollTrigger);
 
 const BookDetail = () => {
+  const bookDetailsRef = useRef(null);
+  const tl = useRef<any>();
+
+  useIsomorphicLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      tl.current = gsap.timeline().from(bookDetailsRef.current, {
+        duration: 1,
+        delay: 1,
+        opacity: 0,
+        y: 100
+      });
+    });
+
+    return () => {
+      ctx.revert(); // animation cleanup!
+    };
+  }, []);
+
   const bookDetails = {
     tokenId: "0",
     price: 0.5,
@@ -319,7 +340,7 @@ const BookDetail = () => {
   }, []);
 
   return (
-    <>
+    <Stack>
       <Grid
         container
         spacing={{ xs: 2, md: 3 }}
@@ -362,44 +383,24 @@ const BookDetail = () => {
                   objectFit: "cover"
                 }}
               />
-              {/* <Box
-                sx={{
-                  position: "relative",
-                  width: "80%",
-                  height: "80%",
-                  transform: "translateX(-5%)"
-                }}
-              >
-                <Book3D
-                  bookCover={bookDetails.meta.bookCover}
-                  width="100%"
-                  height="100%"
-                />
-              </Box> */}
             </Box>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              sx={{
-                backgroundColor: "red"
-              }}
-            ></Stack>
-            <Box ref={bookDetailRef}></Box>
           </Box>
         </Grid>
         <Grid item xs={4} sm={8} md={7}>
           <Stack pt={8}>
-            <BookDetails
-              meta={bookDetails.meta}
-              details={bookDetails.details}
-              tokenId={bookDetails.tokenId}
-              author={bookDetails.author}
-              price={bookDetails.price}
-              isListed={bookDetails.isListed}
-              onClick={() => {
-                alert(bookDetails.meta.title);
-              }}
-            />
+            <Box ref={bookDetailsRef}>
+              <BookDetails
+                meta={bookDetails.meta}
+                details={bookDetails.details}
+                tokenId={bookDetails.tokenId}
+                author={bookDetails.author}
+                price={bookDetails.price}
+                isListed={bookDetails.isListed}
+                onClick={() => {
+                  alert(bookDetails.meta.title);
+                }}
+              />
+            </Box>
 
             <Divider sx={{ my: 6 }} />
 
@@ -456,7 +457,7 @@ const BookDetail = () => {
           </Stack>
         </Grid>
       </Grid>
-    </>
+    </Stack>
   );
 };
 
