@@ -1,11 +1,12 @@
-
 import { Box, Grid, Stack } from "@mui/material";
+
 import { BookBanner } from "@shared/BookBanner";
 import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
+
 import images from "@/assets/images";
+import { FilterBar } from "@/components/shared/FilterBar";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
-import FilterBox from './FilterBox';
 
 const DisplayBox = () => {
   const topBook = {
@@ -281,24 +282,14 @@ const DisplayBox = () => {
               }}
             />
 
-            <ContentPaper
-              isPaginate={true}
-              title={
-                <>
-                  Publishing books
-                </>
-              }
-            >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
+            <ContentPaper isPaginate={true} title={<>Publishing books</>}>
+              <Grid
+                container
+                spacing={3}
+                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+              >
                 {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
+                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
                     <BookItem
                       tokenId={book.tokenId}
                       price={book.price}
@@ -313,13 +304,12 @@ const DisplayBox = () => {
                 ))}
               </Grid>
             </ContentPaper>
-
           </Stack>
         </Grid>
         <Grid item xs={4} sm={8} md={12} lg={6}>
           <Stack spacing={3}>
             <ContentPaper title="Filter">
-              <FilterBox />
+              <FilterBar />
             </ContentPaper>
           </Stack>
         </Grid>
