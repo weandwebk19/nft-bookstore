@@ -3,7 +3,6 @@ import { Controller, useForm } from "react-hook-form";
 
 import {
   Box,
-  Grid,
   IconButton,
   InputAdornment,
   Stack,
@@ -26,6 +25,7 @@ import * as yup from "yup";
 
 import images from "@/assets/images";
 import { FormGroup } from "@/components/shared/FormGroup";
+import ProfileGroup from "@/components/ui/profile/ProfileGroup";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTextArea } from "@/styles/components/TextField";
 
@@ -111,13 +111,10 @@ const Profile = () => {
           </Box>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Stack spacing={6}>
-              <Box>
-                <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>
-                  Upload your photo
-                </Typography>
+              <ProfileGroup title="Upload your photo">
                 <Stack
                   direction={{ xs: "column", sm: "column", md: "row" }}
-                  spacing={{ xs: 4, sm: 4, md: 4, lg: 6 }}
+                  spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
                   className={styles["profile__avatar"]}
                 >
                   <Box
@@ -125,7 +122,7 @@ const Profile = () => {
                     src={images.product1}
                     sx={{
                       width: "100%",
-                      maxWidth: "300px",
+                      maxWidth: "400px",
                       aspectRatio: "1 / 1",
                       borderRadius: "100rem",
                       objectFit: "cover",
@@ -141,11 +138,8 @@ const Profile = () => {
                     </StyledButton>
                   </Stack>
                 </Stack>
-              </Box>
-              <Box>
-                <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>
-                  User information
-                </Typography>
+              </ProfileGroup>
+              <ProfileGroup title="User information">
                 <Stack direction="column" spacing={3}>
                   <Stack
                     direction={{ xs: "column", md: "row" }}
@@ -231,11 +225,8 @@ const Profile = () => {
                     />
                   </FormGroup>
                 </Stack>
-              </Box>
-              <Box>
-                <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>
-                  Social link
-                </Typography>
+              </ProfileGroup>
+              <ProfileGroup title="Social link">
                 <Stack direction="column" spacing={3}>
                   <FormGroup label="Website">
                     <Controller
@@ -422,7 +413,7 @@ const Profile = () => {
                     </FormGroup>
                   </Stack>
                 </Stack>
-              </Box>
+              </ProfileGroup>
               <Stack
                 direction="row"
                 spacing={2}

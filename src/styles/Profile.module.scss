@@ -4,6 +4,10 @@
     .profile__formGroup-half {
         width: 100%;
     }
+
+    .profile__group__title {
+        margin-bottom: 48px;
+    }
 }
 
 @media (min-width: 600px) and (max-width: 899.99px) {
@@ -14,8 +18,13 @@
 
 @media (min-width: 900px) and (max-width: 1199.99px) {
     .profile__container {
+
         .profile__formGroup-half {
             width: 50%;
+        }
+
+        .profile__group__title {
+            margin-bottom: 48px;
         }
     }
 }
