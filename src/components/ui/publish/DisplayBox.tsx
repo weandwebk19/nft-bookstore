@@ -3,6 +3,7 @@ import { Box, Grid, Stack } from "@mui/material";
 import { BookBanner } from "@shared/BookBanner";
 import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
@@ -10,6 +11,7 @@ import { FilterBar } from "@/components/shared/FilterBar";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
 const DisplayBox = () => {
+  const router = useRouter();
   const topBook = {
     tokenId: "0",
     price: 0.5,
@@ -254,7 +256,7 @@ const DisplayBox = () => {
   ];
 
   const handleBookClick = (tokenId: number | string) => {
-    alert(tokenId);
+    router.push(`/publish/${tokenId}`);
   };
 
   return (

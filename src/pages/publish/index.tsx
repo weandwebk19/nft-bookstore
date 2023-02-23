@@ -1,12 +1,10 @@
 import { Box, Stack } from "@mui/material";
 
 import Head from "next/head";
-import { useRouter } from "next/router";
 
 import DisplayBox from "@/components/ui/publish/DisplayBox";
 
 const Publish = () => {
-  const router = useRouter();
   return (
     <>
       <Head>

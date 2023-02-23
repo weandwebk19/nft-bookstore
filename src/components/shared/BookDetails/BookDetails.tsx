@@ -16,7 +16,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import Link from "next/link";
 
-import { useCountdown } from "@/components/hooks/useCountdown";
+import { useCountdown } from "@/components/hooks/common/useCountdown";
 import { StyledButton } from "@/styles/components/Button";
 import { NftBook } from "@/types/nftBook";
 

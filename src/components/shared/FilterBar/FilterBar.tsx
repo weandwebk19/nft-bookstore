@@ -103,7 +103,8 @@ function StyledTreeItem(props: StyledTreeItemProps) {
 }
 
 const labels: { [index: string | number]: string } = {
-  1: "from 1 stars",
+  0: "all ratings",
+  1: "from 1 star",
   2: "from 2 stars",
   3: "from 3 stars",
   4: "from 4 stars",
@@ -126,7 +127,7 @@ const FilterBar = () => {
       genre: "",
       name: "",
       author: "",
-      rating: 1,
+      rating: 3,
       language: "",
       priceStarting: 0,
       priceEnding: 10000
@@ -172,8 +173,8 @@ const FilterBar = () => {
                 nodeId={genres}
                 labelText={genres}
                 labelIcon={Label}
-                color="#3c8039"
-                bgColor="#e6f4ea"
+                color={`${theme.palette.success.main}`}
+                bgColor={`${theme.palette.background.default}`}
               />
             ))}
           </TreeView>
@@ -209,13 +210,17 @@ const FilterBar = () => {
                 }}
                 className={styles["filter-rating"]}
               >
-                <Rating
-                  id="author"
+                <StyledRating
+                  id="rating"
                   {...field}
                   precision={1}
                   getLabelText={getLabelText}
-                  onChange={(event, newValue: any) => {
-                    setValue("rating", newValue, { shouldValidate: true });
+                  onChange={(_, newValue: any) => {
+                    if (newValue === null) {
+                      setValue("rating", 0, { shouldValidate: true });
+                    } else {
+                      setValue("rating", newValue, { shouldValidate: true });
+                    }
                   }}
                   emptyIcon={
                     <StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />
