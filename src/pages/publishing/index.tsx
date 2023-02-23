@@ -2,7 +2,7 @@ import { Box, Stack } from "@mui/material";
 
 import Head from "next/head";
 
-import DisplayBox from "@/components/ui/publish/DisplayBox";
+import DisplayBox from "@/components/ui/publishing/DisplayBox";
 
 const Publish = () => {
   return (

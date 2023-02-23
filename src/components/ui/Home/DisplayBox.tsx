@@ -266,7 +266,7 @@ const DisplayBox = () => {
   ];
 
   const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publish/${tokenId}`);
+    router.push(`/publishing/${tokenId}`);
   };
 
   return (

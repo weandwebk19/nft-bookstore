@@ -30,6 +30,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
 import { useAccount } from "@/components/hooks/web3";
+import { DropdownMenu } from "@/components/shared/DropdownMenu";
 import { Logo } from "@/components/shared/Logo";
 import { useMyTheme, useSetMyThemeContext } from "@/contexts/ThemeContext";
 import { truncate } from "@/utils/truncate";
@@ -84,8 +85,9 @@ const NavBar = () => {
   );
   const openAccountMenu = Boolean(anchorAccountMenu);
 
-  const [anchorNavMenu, setAnchorNavMenu] = useState<Element | null>(null);
-  const openNavMenu = Boolean(anchorNavMenu);
+  const [anchorBookStoreMenu, setAnchorBookStoreMenu] =
+    useState<Element | null>(null);
+  const openBookStoreMenu = Boolean(anchorBookStoreMenu);
 
   const [anchorSettingsMenu, setAnchorSettingsMenu] = useState<Element | null>(
     null
@@ -107,6 +109,9 @@ const NavBar = () => {
     isOpen: true
   });
 
+  const [anchorNavMenu, setAnchorNavMenu] = useState<Element | null>(null);
+  const openNavMenu = Boolean(anchorNavMenu);
+
   const handleHomeClick = () => {
     router.push("/");
   };
@@ -119,8 +124,6 @@ const NavBar = () => {
     router.push("/contact");
   };
 
-  const handleCollectionsClick = () => {};
-
   const handleNavMenuItemClick = (key: string) => {
     switch (key) {
       case "About Us":
@@ -129,7 +132,6 @@ const NavBar = () => {
       case "Contact":
         handleContactClick();
         break;
-
       default:
         setAnchorNavMenu(null);
         break;
@@ -192,6 +194,26 @@ const NavBar = () => {
 
   const handleCreateRentalClick = () => {
     alert("Create Rental");
+  };
+
+  const handleBookStoreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorBookStoreMenu(e.currentTarget);
+  };
+
+  const handleBookStoreMenuClose = () => {
+    setAnchorBookStoreMenu(null);
+  };
+
+  const handlePublishingClick = () => {
+    router.push("/publishing");
+  };
+
+  const handleTradeInClick = () => {
+    router.push("/trade-in");
+  };
+
+  const handleBorrowClick = () => {
+    router.push("/borrow");
   };
 
   const settings: ListItemProps[] = [
@@ -267,7 +289,7 @@ const NavBar = () => {
     }
   ];
 
-  const pages = ["About Us", "Contact", "Collections"];
+  const pages = ["About Us", "Contact"];
   const navItems: ListItemProps[] = [
     account.data
       ? {
@@ -305,6 +327,35 @@ const NavBar = () => {
       disabled: false,
       subList: []
     })),
+    {
+      type: "dropdown" as const,
+      icon: "",
+      content: "Book store",
+      onClick: (e) => handleBookStoreClick(e),
+      disabled: false,
+      subList: [
+        {
+          type: "button",
+          icon: "EN",
+          content: "English",
+          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+            handleLanguageClick(e);
+          },
+          selected: openLanguage,
+          subList: []
+        },
+        {
+          type: "button",
+          icon: "VI",
+          content: "Tiếng Việt",
+          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+            handleLanguageClick(e);
+          },
+          selected: openLanguage,
+          subList: []
+        }
+      ]
+    },
     ...settings
   ];
 
@@ -322,6 +373,33 @@ const NavBar = () => {
       icon: null,
       content: "Create Rental",
       onClick: () => handleCreateRentalClick(),
+      disabled: false,
+      subList: []
+    }
+  ];
+
+  const bookStoreList: ListItemProps[] = [
+    {
+      type: "button",
+      icon: null,
+      content: "Publishing",
+      onClick: () => handlePublishingClick(),
+      disabled: false,
+      subList: []
+    },
+    {
+      type: "button",
+      icon: null,
+      content: "Trade-in",
+      onClick: () => handleTradeInClick(),
+      disabled: false,
+      subList: []
+    },
+    {
+      type: "button",
+      icon: null,
+      content: "Borrow",
+      onClick: () => handleBorrowClick(),
       disabled: false,
       subList: []
     }
@@ -411,60 +489,24 @@ const NavBar = () => {
                     {page}
                   </Button>
                 ))}
+                <Box sx={{ mr: 2 }}>
+                  <DropdownMenu
+                    tooltipTitle="Marketplace"
+                    buttonVariant="outlined"
+                    buttonName="Book store"
+                    items={bookStoreList}
+                  />
+                </Box>
+
                 {account.data && (
-                  <>
-                    <Tooltip title="Create listing/rental">
-                      <StyledButton
-                        customVariant="primary"
-                        onClick={(e) => handleCreateMenuClick(e)}
-                      >
-                        Create
-                      </StyledButton>
-                    </Tooltip>
-                    <Menu
-                      anchorEl={anchorCreateMenu}
-                      id="create-menu"
-                      open={openCreateMenu}
-                      onClose={handleCreateMenuClose}
-                      // onClick={handleSettingsMenuClose}
-                      PaperProps={{
-                        elevation: 0,
-                        sx: {
-                          overflow: "visible",
-                          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                          mt: 1.5,
-                          "& .MuiAvatar-root": {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1
-                          },
-                          "&:before": {
-                            content: '""',
-                            display: "block",
-                            position: "absolute",
-                            top: 0,
-                            left: 14,
-                            width: 10,
-                            height: 10,
-                            bgcolor: "background.paper",
-                            transform: "translateY(-50%) rotate(45deg)",
-                            zIndex: 0
-                          }
-                        }
-                      }}
-                      transformOrigin={{
-                        horizontal: "left",
-                        vertical: "top"
-                      }}
-                      anchorOrigin={{
-                        horizontal: "left",
-                        vertical: "bottom"
-                      }}
-                    >
-                      <CustomList items={createList} />
-                    </Menu>
-                  </>
+                  <Box sx={{ mr: 2 }}>
+                    <DropdownMenu
+                      tooltipTitle="Open Listing/Renting"
+                      buttonVariant="contained"
+                      buttonName="Create"
+                      items={createList}
+                    />
+                  </Box>
                 )}
               </Box>
 
