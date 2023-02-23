@@ -73,7 +73,7 @@ const MainProduct = () => {
               <Typography variant="body2" color="text.secondary">
                 Increase your knowledge by reading books and earn money by
                 participating in the NFT Bookstore market. Do you want to learn
-                more? Join NFTBooks right now!
+                more? Join NFT Bookstore right now!
               </Typography>
             </CardContent>
             <CardMedia

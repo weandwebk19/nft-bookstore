@@ -85,19 +85,10 @@ const NavBar = () => {
   );
   const openAccountMenu = Boolean(anchorAccountMenu);
 
-  const [anchorBookStoreMenu, setAnchorBookStoreMenu] =
-    useState<Element | null>(null);
-  const openBookStoreMenu = Boolean(anchorBookStoreMenu);
-
   const [anchorSettingsMenu, setAnchorSettingsMenu] = useState<Element | null>(
     null
   );
   const openSettingsMenu = Boolean(anchorSettingsMenu);
-
-  const [anchorCreateMenu, setAnchorCreateMenu] = useState<Element | null>(
-    null
-  );
-  const openCreateMenu = Boolean(anchorCreateMenu);
 
   const [openLanguage, setOpenLanguage] = useState({
     currentState: "English",
@@ -180,28 +171,12 @@ const NavBar = () => {
     setStoredTheme(currentTheme.toLowerCase());
   };
 
-  const handleCreateMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorCreateMenu(e.currentTarget);
-  };
-
-  const handleCreateMenuClose = () => {
-    setAnchorCreateMenu(null);
-  };
-
   const handleCreateListingClick = () => {
     alert("Create Listing");
   };
 
   const handleCreateRentalClick = () => {
     alert("Create Rental");
-  };
-
-  const handleBookStoreClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorBookStoreMenu(e.currentTarget);
-  };
-
-  const handleBookStoreMenuClose = () => {
-    setAnchorBookStoreMenu(null);
   };
 
   const handlePublishingClick = () => {
@@ -290,6 +265,34 @@ const NavBar = () => {
   ];
 
   const pages = ["About Us", "Contact"];
+
+  const bookStoreList: ListItemProps[] = [
+    {
+      type: "button",
+      icon: null,
+      content: "Publishing",
+      onClick: () => handlePublishingClick(),
+      disabled: false,
+      subList: []
+    },
+    {
+      type: "button",
+      icon: null,
+      content: "Trade-in",
+      onClick: () => handleTradeInClick(),
+      disabled: false,
+      subList: []
+    },
+    {
+      type: "button",
+      icon: null,
+      content: "Borrow",
+      onClick: () => handleBorrowClick(),
+      disabled: false,
+      subList: []
+    }
+  ];
+
   const navItems: ListItemProps[] = [
     account.data
       ? {
@@ -319,6 +322,11 @@ const NavBar = () => {
           type: "divider",
           subList: []
         },
+    {
+      type: "divider",
+      content: "",
+      subList: []
+    },
     ...pages.map((page: string) => ({
       type: "button" as const,
       icon: "",
@@ -328,33 +336,15 @@ const NavBar = () => {
       subList: []
     })),
     {
-      type: "dropdown" as const,
-      icon: "",
-      content: "Book store",
-      onClick: (e) => handleBookStoreClick(e),
-      disabled: false,
-      subList: [
-        {
-          type: "button",
-          icon: "EN",
-          content: "English",
-          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-            handleLanguageClick(e);
-          },
-          selected: openLanguage,
-          subList: []
-        },
-        {
-          type: "button",
-          icon: "VI",
-          content: "Tiếng Việt",
-          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-            handleLanguageClick(e);
-          },
-          selected: openLanguage,
-          subList: []
-        }
-      ]
+      type: "divider",
+      content: "",
+      subList: []
+    },
+    ...bookStoreList,
+    {
+      type: "divider",
+      content: "",
+      subList: []
     },
     ...settings
   ];
@@ -373,33 +363,6 @@ const NavBar = () => {
       icon: null,
       content: "Create Rental",
       onClick: () => handleCreateRentalClick(),
-      disabled: false,
-      subList: []
-    }
-  ];
-
-  const bookStoreList: ListItemProps[] = [
-    {
-      type: "button",
-      icon: null,
-      content: "Publishing",
-      onClick: () => handlePublishingClick(),
-      disabled: false,
-      subList: []
-    },
-    {
-      type: "button",
-      icon: null,
-      content: "Trade-in",
-      onClick: () => handleTradeInClick(),
-      disabled: false,
-      subList: []
-    },
-    {
-      type: "button",
-      icon: null,
-      content: "Borrow",
-      onClick: () => handleBorrowClick(),
       disabled: false,
       subList: []
     }
