@@ -4,7 +4,6 @@ const { ethers } = require("ethers");
 
 contract("BookStore", (accounts) => {
   let _contract = null;
-  // let _bookVersionPrice = ethers.utils.parseEther("0.3").toString();
   let balance = 100;
   let _listingPrice = ethers.utils.parseEther("0.025").toString();
 
@@ -70,8 +69,8 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have one listed items", async () => {
-      const listedNfts = await _contract.getAllBooksOnSale();
-      assert.equal(listedNfts.length, 1, "Invalid length of Nfts");
+      const listedBooks = await _contract.getAllBooksOnSale();
+      assert.equal(listedBooks.length, 1, "Invalid length of Nfts");
     });
   });
 
@@ -92,13 +91,13 @@ contract("BookStore", (accounts) => {
     // });
 
     it("should have one listed items", async () => {
-      const listedNfts = await _contract.getAllBooksOnSale();
-      assert.equal(listedNfts.length, 1, "Invalid length of Nfts");
+      const listedBooks = await _contract.getAllBooksOnSale();
+      assert.equal(listedBooks.length, 1, "Invalid length of Nfts");
     });
 
     it("should have correct new amount", async () => {
-      const listedNfts = await _contract.getAllBooksOnSale();
-      const amount = listedNfts[0].amount;
+      const listedBooks = await _contract.getAllBooksOnSale();
+      const amount = listedBooks[0].amount;
       assert.equal(amount, 100, "Invalid length of Nfts");
     });
   });
@@ -124,25 +123,16 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have one listed items", async () => {
-      const listedNfts = await _contract.getAllBooksOnSale();
-      assert.equal(listedNfts.length, 1, "Invalid length of Nfts");
+      const listedBooks = await _contract.getAllBooksOnSale();
+      assert.equal(listedBooks.length, 1, "Invalid length of Nfts");
     });
   });
 
   describe("Remove listed book", () => {
-    const _nftPrice = Number(
-      ethers.utils.parseUnits("0.3", "ether")
-    ).toString();
     before(async () => {
-      await _contract.decreaseListedBookFromSale(
-        1,
-        _nftPrice,
-        20,
-        accounts[0],
-        {
-          from: accounts[0]
-        }
-      );
+      await _contract.decreaseListedBookFromSale(1, 20, accounts[0], {
+        from: accounts[0]
+      });
     });
 
     it("should have correct amount", async () => {
@@ -152,12 +142,9 @@ contract("BookStore", (accounts) => {
   });
 
   describe("Buy books", () => {
-    const _nftPrice = Number(
-      ethers.utils.parseUnits("0.3", "ether")
-    ).toString();
     const total = Number(ethers.utils.parseUnits("9", "ether")).toString();
     before(async () => {
-      await _contract.buyBooks(1, _nftPrice, 30, accounts[0], {
+      await _contract.buyBooks(1, accounts[0], 30, {
         from: accounts[1],
         value: total
       });
@@ -177,13 +164,43 @@ contract("BookStore", (accounts) => {
 
     it("should remove books on sale when buy all books", async () => {
       const total = Number(ethers.utils.parseUnits("15", "ether")).toString();
-      await _contract.buyBooks(1, _nftPrice, 50, accounts[0], {
+      await _contract.buyBooks(1, accounts[0], 50, {
         from: accounts[1],
         value: total
       });
 
-      const listedNfts = await _contract.getAllBooksOnSale();
-      assert.equal(listedNfts.length, 0, "Invalid length of Nfts");
+      const listedBooks = await _contract.getAllBooksOnSale();
+      assert.equal(listedBooks.length, 0, "Invalid length of Nfts");
+    });
+  });
+
+  describe("List books on sale", () => {
+    before(async () => {
+      const _nftPrice = Number(
+        ethers.utils.parseUnits("0.3", "ether")
+      ).toString();
+      await _contract.sellBooks(1, _nftPrice, 10, {
+        from: accounts[0],
+        value: _listingPrice
+      });
+      await _contract.sellBooks(2, _nftPrice, 10, {
+        from: accounts[0],
+        value: _listingPrice
+      });
+    });
+
+    it("should have two listed books", async () => {
+      const listedBooks = await _contract.getAllBooksOnSale();
+
+      assert.equal(listedBooks.length, 2, "Invalid length of ListedBooks");
+    });
+
+    it("should set new listing price", async () => {
+      const newListingPrice = ethers.utils.parseEther("0.03").toString();
+      await _contract.setListingPrice(newListingPrice, { from: accounts[0] });
+      const listingPrice = await _contract.listingPrice();
+
+      assert.equal(listingPrice.toString(), newListingPrice, "Invalid Price");
     });
   });
 });
