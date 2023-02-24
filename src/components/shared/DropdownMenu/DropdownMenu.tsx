@@ -7,6 +7,8 @@ import MenuItem from "@mui/material/MenuItem";
 
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
+import { useRouter } from "next/router";
+
 import { StyledMenu } from "@/styles/components/Menu";
 import { ListItemProps } from "@/types/list";
 
@@ -23,6 +25,8 @@ export default function DropdownMenu({
   buttonName,
   items
 }: DropdownMenuProps) {
+  const { pathname } = useRouter();
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -58,7 +62,13 @@ export default function DropdownMenu({
         onClose={handleClose}
       >
         {items.map((item) => (
-          <MenuItem key={item.content} onClick={item.onClick}>
+          <MenuItem
+            key={item.content}
+            onClick={item.onClick}
+            className={
+              pathname === item?.href ? "active-link active-link--drawer" : ""
+            }
+          >
             {item.icon && item.icon}
             {item.content}
           </MenuItem>

@@ -30,6 +30,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
 import { useAccount } from "@/components/hooks/web3";
+import { ActiveLink } from "@/components/shared/ActiveLink";
 import { DropdownMenu } from "@/components/shared/DropdownMenu";
 import { Logo } from "@/components/shared/Logo";
 import { useMyTheme, useSetMyThemeContext } from "@/contexts/ThemeContext";
@@ -264,11 +265,15 @@ const NavBar = () => {
     }
   ];
 
-  const pages = ["About Us", "Contact"];
+  const pages = [
+    { name: "About Us", href: "/about", current: false },
+    { name: "Contact", href: "/contact", current: false }
+  ];
 
   const bookStoreList: ListItemProps[] = [
     {
-      type: "button",
+      type: "link",
+      href: "/publishing",
       icon: null,
       content: "Publishing",
       onClick: () => handlePublishingClick(),
@@ -276,7 +281,8 @@ const NavBar = () => {
       subList: []
     },
     {
-      type: "button",
+      type: "link",
+      href: "/trade-in",
       icon: null,
       content: "Trade-in",
       onClick: () => handleTradeInClick(),
@@ -284,7 +290,8 @@ const NavBar = () => {
       subList: []
     },
     {
-      type: "button",
+      type: "link",
+      href: "/borrow",
       icon: null,
       content: "Borrow",
       onClick: () => handleBorrowClick(),
@@ -327,11 +334,12 @@ const NavBar = () => {
       content: "",
       subList: []
     },
-    ...pages.map((page: string) => ({
-      type: "button" as const,
+    ...pages.map((page: any) => ({
+      type: "link" as const,
+      href: page.href,
       icon: "",
-      content: page,
-      onClick: () => handleNavMenuItemClick(page),
+      content: page.name,
+      onClick: () => handleNavMenuItemClick(page.name),
       disabled: false,
       subList: []
     })),
@@ -442,15 +450,16 @@ const NavBar = () => {
                 }}
               >
                 {pages.map((page) => (
-                  <Button
-                    key={page}
-                    onClick={() => handleNavMenuItemClick(page)}
-                    sx={{
-                      mr: 2
-                    }}
-                  >
-                    {page}
-                  </Button>
+                  <ActiveLink key={page.name} href={page.href}>
+                    <Button
+                      onClick={() => handleNavMenuItemClick(page.name)}
+                      sx={{
+                        mr: 2
+                      }}
+                    >
+                      {page.name}
+                    </Button>
+                  </ActiveLink>
                 ))}
                 <Box sx={{ mr: 2 }}>
                   <DropdownMenu
