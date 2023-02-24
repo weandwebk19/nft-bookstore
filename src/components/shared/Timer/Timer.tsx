@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { Stack, Typography } from "@mui/material";
 
 type TimerProps = {

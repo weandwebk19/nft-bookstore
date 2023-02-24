@@ -1,4 +1,4 @@
-export type ListItemType = "button" | "dropdown" | "divider";
+export type ListItemType = "button" | "link" | "dropdown" | "divider";
 
 export type ListItemProps = {
   type: ListItemType;
@@ -8,6 +8,7 @@ export type ListItemProps = {
   disabled?: boolean;
   subList: ListDropdownItemProps[];
   isOpen?: boolean;
+  href?: string;
 };
 
 export type ListDropdownItemProps = {

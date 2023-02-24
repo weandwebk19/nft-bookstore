@@ -30,6 +30,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
 import { useAccount } from "@/components/hooks/web3";
+import { ActiveLink } from "@/components/shared/ActiveLink";
+import { DropdownMenu } from "@/components/shared/DropdownMenu";
 import { Logo } from "@/components/shared/Logo";
 import { useMyTheme, useSetMyThemeContext } from "@/contexts/ThemeContext";
 import { truncate } from "@/utils/truncate";
@@ -84,18 +86,10 @@ const NavBar = () => {
   );
   const openAccountMenu = Boolean(anchorAccountMenu);
 
-  const [anchorNavMenu, setAnchorNavMenu] = useState<Element | null>(null);
-  const openNavMenu = Boolean(anchorNavMenu);
-
   const [anchorSettingsMenu, setAnchorSettingsMenu] = useState<Element | null>(
     null
   );
   const openSettingsMenu = Boolean(anchorSettingsMenu);
-
-  const [anchorCreateMenu, setAnchorCreateMenu] = useState<Element | null>(
-    null
-  );
-  const openCreateMenu = Boolean(anchorCreateMenu);
 
   const [openLanguage, setOpenLanguage] = useState({
     currentState: "English",
@@ -106,6 +100,9 @@ const NavBar = () => {
     currentState: clientTheme,
     isOpen: true
   });
+
+  const [anchorNavMenu, setAnchorNavMenu] = useState<Element | null>(null);
+  const openNavMenu = Boolean(anchorNavMenu);
 
   const handleHomeClick = () => {
     router.push("/");
@@ -119,8 +116,6 @@ const NavBar = () => {
     router.push("/contact");
   };
 
-  const handleCollectionsClick = () => {};
-
   const handleNavMenuItemClick = (key: string) => {
     switch (key) {
       case "About Us":
@@ -129,7 +124,6 @@ const NavBar = () => {
       case "Contact":
         handleContactClick();
         break;
-
       default:
         setAnchorNavMenu(null);
         break;
@@ -178,20 +172,24 @@ const NavBar = () => {
     setStoredTheme(currentTheme.toLowerCase());
   };
 
-  const handleCreateMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorCreateMenu(e.currentTarget);
-  };
-
-  const handleCreateMenuClose = () => {
-    setAnchorCreateMenu(null);
-  };
-
   const handleCreateListingClick = () => {
     alert("Create Listing");
   };
 
   const handleCreateRentalClick = () => {
     alert("Create Rental");
+  };
+
+  const handlePublishingClick = () => {
+    router.push("/publishing");
+  };
+
+  const handleTradeInClick = () => {
+    router.push("/trade-in");
+  };
+
+  const handleBorrowClick = () => {
+    router.push("/borrow");
   };
 
   const settings: ListItemProps[] = [
@@ -267,7 +265,41 @@ const NavBar = () => {
     }
   ];
 
-  const pages = ["About Us", "Contact", "Collections"];
+  const pages = [
+    { name: "About Us", href: "/about", current: false },
+    { name: "Contact", href: "/contact", current: false }
+  ];
+
+  const bookStoreList: ListItemProps[] = [
+    {
+      type: "link",
+      href: "/publishing",
+      icon: null,
+      content: "Publishing",
+      onClick: () => handlePublishingClick(),
+      disabled: false,
+      subList: []
+    },
+    {
+      type: "link",
+      href: "/trade-in",
+      icon: null,
+      content: "Trade-in",
+      onClick: () => handleTradeInClick(),
+      disabled: false,
+      subList: []
+    },
+    {
+      type: "link",
+      href: "/borrow",
+      icon: null,
+      content: "Borrow",
+      onClick: () => handleBorrowClick(),
+      disabled: false,
+      subList: []
+    }
+  ];
+
   const navItems: ListItemProps[] = [
     account.data
       ? {
@@ -297,14 +329,31 @@ const NavBar = () => {
           type: "divider",
           subList: []
         },
-    ...pages.map((page: string) => ({
-      type: "button" as const,
+    {
+      type: "divider",
+      content: "",
+      subList: []
+    },
+    ...pages.map((page: any) => ({
+      type: "link" as const,
+      href: page.href,
       icon: "",
-      content: page,
-      onClick: () => handleNavMenuItemClick(page),
+      content: page.name,
+      onClick: () => handleNavMenuItemClick(page.name),
       disabled: false,
       subList: []
     })),
+    {
+      type: "divider",
+      content: "",
+      subList: []
+    },
+    ...bookStoreList,
+    {
+      type: "divider",
+      content: "",
+      subList: []
+    },
     ...settings
   ];
 
@@ -401,70 +450,35 @@ const NavBar = () => {
                 }}
               >
                 {pages.map((page) => (
-                  <Button
-                    key={page}
-                    onClick={() => handleNavMenuItemClick(page)}
-                    sx={{
-                      mr: 2
-                    }}
-                  >
-                    {page}
-                  </Button>
-                ))}
-                {account.data && (
-                  <>
-                    <Tooltip title="Create listing/rental">
-                      <StyledButton
-                        customVariant="primary"
-                        onClick={(e) => handleCreateMenuClick(e)}
-                      >
-                        Create
-                      </StyledButton>
-                    </Tooltip>
-                    <Menu
-                      anchorEl={anchorCreateMenu}
-                      id="create-menu"
-                      open={openCreateMenu}
-                      onClose={handleCreateMenuClose}
-                      // onClick={handleSettingsMenuClose}
-                      PaperProps={{
-                        elevation: 0,
-                        sx: {
-                          overflow: "visible",
-                          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                          mt: 1.5,
-                          "& .MuiAvatar-root": {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1
-                          },
-                          "&:before": {
-                            content: '""',
-                            display: "block",
-                            position: "absolute",
-                            top: 0,
-                            left: 14,
-                            width: 10,
-                            height: 10,
-                            bgcolor: "background.paper",
-                            transform: "translateY(-50%) rotate(45deg)",
-                            zIndex: 0
-                          }
-                        }
-                      }}
-                      transformOrigin={{
-                        horizontal: "left",
-                        vertical: "top"
-                      }}
-                      anchorOrigin={{
-                        horizontal: "left",
-                        vertical: "bottom"
+                  <ActiveLink key={page.name} href={page.href}>
+                    <Button
+                      onClick={() => handleNavMenuItemClick(page.name)}
+                      sx={{
+                        mr: 2
                       }}
                     >
-                      <CustomList items={createList} />
-                    </Menu>
-                  </>
+                      {page.name}
+                    </Button>
+                  </ActiveLink>
+                ))}
+                <Box sx={{ mr: 2 }}>
+                  <DropdownMenu
+                    tooltipTitle="Marketplace"
+                    buttonVariant="outlined"
+                    buttonName="Book store"
+                    items={bookStoreList}
+                  />
+                </Box>
+
+                {account.data && (
+                  <Box sx={{ mr: 2 }}>
+                    <DropdownMenu
+                      tooltipTitle="Open Listing/Renting"
+                      buttonVariant="contained"
+                      buttonName="Create"
+                      items={createList}
+                    />
+                  </Box>
                 )}
               </Box>
 

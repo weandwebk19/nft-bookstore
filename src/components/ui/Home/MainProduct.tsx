@@ -2,6 +2,7 @@ import {
   Box,
   CardActionArea,
   CardContent,
+  CardMedia,
   Grid,
   Typography
 } from "@mui/material";
@@ -20,7 +21,7 @@ const MainProduct = () => {
   return (
     <Box>
       <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
-        <Typography variant="h2">Our product</Typography>
+        <Typography variant="h2">Our products</Typography>
         <Box
           component="img"
           src={images.decoLine}
@@ -41,10 +42,10 @@ const MainProduct = () => {
         <StyledCard customVariant="dome" sx={{ m: 2, height: "100%" }}>
           <CardActionArea
             onClick={() => {
-              router.push("publish");
+              router.push("/publishing");
             }}
           >
-            <StyledCardMedia
+            <CardMedia
               component="img"
               height="300"
               image={images.product1}
@@ -57,8 +58,8 @@ const MainProduct = () => {
               <Typography variant="body2" color="text.secondary">
                 Millions of readers are eagerly anticipating your books right
                 now. What exactly are you waiting for? Join NFT Bookstore today
-                and start connecting with readers all over the world. Let's get
-                your books published.
+                and start connecting with readers all over the world. Let&apos;s
+                get your books published.
               </Typography>
             </CardContent>
           </CardActionArea>
@@ -72,10 +73,10 @@ const MainProduct = () => {
               <Typography variant="body2" color="text.secondary">
                 Increase your knowledge by reading books and earn money by
                 participating in the NFT Bookstore market. Do you want to learn
-                more? Join NFTBooks right now!
+                more? Join NFT Bookstore right now!
               </Typography>
             </CardContent>
-            <StyledCardMedia
+            <CardMedia
               component="img"
               height="300"
               image={images.product2}
@@ -85,7 +86,7 @@ const MainProduct = () => {
         </StyledCard>
         <StyledCard customVariant="dome" sx={{ m: 2 }}>
           <CardActionArea>
-            <StyledCardMedia
+            <CardMedia
               component="img"
               height="300"
               image={images.product3}

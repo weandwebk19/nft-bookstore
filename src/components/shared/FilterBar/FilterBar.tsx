@@ -230,11 +230,7 @@ const FilterBar = () => {
                   }
                   size="medium"
                 />
-                {getValues("rating") && (
-                  <Box>
-                    {labels[getValues("rating") ? getValues("rating") : 0]}
-                  </Box>
-                )}
+                <Box>{labels[getValues("rating")]}</Box>
               </Box>
             );
           }}
