@@ -50,10 +50,16 @@ contract BookStore is ERC1155URIStorage, Ownable {
   mapping(address => mapping(uint => uint)) private _ownedTokens;
   mapping(address => uint) private _totalOwnedToken;
 
-  PrimaryKeyListedBook[] private _allListedBook;
+  mapping(uint => PrimaryKeyListedBook) private _allListedBook;
+  mapping (uint => mapping (address => uint)) _keyToIndexAllListedBooks; // Key is tokenId and seller
   Counters.Counter private _listedBooks;
 
   constructor() ERC1155("https://example.com/api/{id}.json") {}
+
+  function setListingPrice(uint newPrice) external onlyOwner {
+    require(newPrice > 0, "Price must be at least 1 wei");
+    listingPrice = newPrice;
+  }
 
   function _beforeTokenTransfer(
         address operator,
@@ -76,17 +82,19 @@ contract BookStore is ERC1155URIStorage, Ownable {
     if (from != address(0) && to != address(0) && to != from) {
       uint tokenId = ids[0];
       _addTokenToOwnerEnumeration(to, tokenId);
-      if (getBalanceOfBook(tokenId, from) == 0) {
+      if (ERC1155.balanceOf(from, tokenId) == 0) {
         _removeTokenFromOwnerEnumeration(from, tokenId);
       }
     }
 
   }
 
-  function getBalanceOfBook(uint256 tokenId, address owner) public view returns (uint256) {
-    // require(isOwnerOfToken(tokenId, owner), "You do not own this token");
-    return ERC1155.balanceOf(owner, tokenId);
-  }
+  // Not necessary
+
+  // function getBalanceOfBook(uint256 tokenId, address owner) public view returns (uint256) {
+  //   require(isOwnerOfToken(tokenId, owner), "You do not own this token");
+  //   return ERC1155.balanceOf(owner, tokenId);
+  // }
 
   function _addTokenToOwnerEnumeration(address owner, uint tokenId) private {
     uint length = _totalOwnedToken[owner];
@@ -148,7 +156,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function _createListedBook(uint tokenId, address seller, uint256 price, uint amount) private {
     _keyToListedBook[tokenId][seller] = ListedBook(tokenId, seller, price, amount);
     // _allListedBook[_listedBooks.current()] = ListedBook(tokenId, seller, price, amount);
-    _allListedBook.push(PrimaryKeyListedBook(tokenId, seller));
+    _allListedBook[_listedBooks.current()] = PrimaryKeyListedBook(tokenId, seller);
+    _keyToIndexAllListedBooks[tokenId][seller] = _listedBooks.current();
     _listedBooks.increment();
     emit ListedBookCreated(tokenId, seller, price, amount);
   }
@@ -248,23 +257,15 @@ contract BookStore is ERC1155URIStorage, Ownable {
     }
   }
 
-  // function getListedBook(uint256 id) public view returns(ListedBook memory) {
-  //   require(id >= 0 && id < _listedBooks.current(), "Invalid id of Listed book");
-  //   return _allListedBook[id];
-  // }
-
   function removeItemFromAllListedBooks(PrimaryKeyListedBook memory value) public {
-    for (uint i = 0; i < _allListedBook.length; i++) {
-        if (_allListedBook[i].tokenId == value.tokenId 
-            && _allListedBook[i].seller == value.seller) {
-            _allListedBook[i] = _allListedBook[_allListedBook.length - 1];
-            _allListedBook.pop();
-            break;
-        }
-    }
-}
+    uint index = _keyToIndexAllListedBooks[value.tokenId][value.seller];
+    uint length = _listedBooks.current();
+    _allListedBook[index] = _allListedBook[length - 1];
+    delete _allListedBook[length - 1];
+    _listedBooks.decrement();
+  }
 
-  function decreaseListedBookFromSale(uint256 tokenId, uint price, uint256 amount, address seller) public {
+  function decreaseListedBookFromSale(uint256 tokenId, uint256 amount, address seller) public {
     require(isOwnerOfToken(tokenId, seller),
           "You are not the owner of this token");
     require(amount > 0,
@@ -284,7 +285,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
       // ListedBook memory lastListedBook = getListedBook(uint256(lastIndexListedBook));
       // _allListedBook[uint256(idListedBook)] = lastListedBook;
       removeItemFromAllListedBooks(PrimaryKeyListedBook(tokenId, seller));
-      _listedBooks.decrement();
       delete _keyToListedBook[tokenId][seller];
     }
   }
@@ -304,16 +304,16 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return books;
   }
 
-  function buyBooks(uint256 tokenId, uint price, uint256 amount, address seller) public payable {
+  function buyBooks(uint256 tokenId, address seller, uint256 amount) public payable {
     // int idListedBook = getIdListedBookOnSale(tokenId, price, seller);
     // ListedBook memory listedBook = getListedBook(uint256(idListedBook));
     ListedBook memory listedBook = _keyToListedBook[tokenId][seller];
     require(msg.sender != listedBook.seller, "You can't buy your own books on sale");
-    require(msg.value == amount * price, "Please submit the asking price");
+    require(msg.value == amount * listedBook.price, "Please submit the asking price");
     require(amount <= listedBook.amount && amount > 0, "Amount is invalid");
 
-    uint256 totalPrice = amount * price;
-    decreaseListedBookFromSale(tokenId, price, amount, seller);
+    uint256 totalPrice = amount * listedBook.price;
+    decreaseListedBookFromSale(tokenId, amount, seller);
     _safeTransferFrom(seller, msg.sender, tokenId, amount, "");
     payable(seller).transfer(totalPrice);
   }
