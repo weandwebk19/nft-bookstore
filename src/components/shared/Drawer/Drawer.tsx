@@ -17,13 +17,13 @@ const Drawer = ({
   anchor,
   open,
   onClose,
-  selfClose,
+  selfClose
 }: DrawerProps) => {
   const [direction, setDirection] = useState({
     top: false,
     left: false,
     bottom: false,
-    right: false,
+    right: false
   });
 
   const handleClose = (anchor: any, isOpen: boolean) => () => {
@@ -36,7 +36,12 @@ const Drawer = ({
   };
 
   return (
-    <MUIDrawer anchor={anchor} open={open} onClose={handleClose(anchor, false)}>
+    <MUIDrawer
+      anchor={anchor}
+      open={open}
+      onClose={handleClose(anchor, false)}
+      disableScrollLock={true}
+    >
       {selfClose ? (
         <Box onClick={handleClose(anchor, false)}>{children}</Box>
       ) : (
@@ -51,12 +56,12 @@ Drawer.propTypes = {
   anchor: PropTypes.string,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  selfClose: PropTypes.bool,
+  selfClose: PropTypes.bool
 };
 
 Drawer.defaultProps = {
   anchor: "left",
-  selfClose: false,
+  selfClose: false
 };
 
 export default Drawer;

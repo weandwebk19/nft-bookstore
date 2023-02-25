@@ -546,6 +546,7 @@ const NavBar = () => {
                   open={openSettingsMenu}
                   onClose={handleSettingsMenuClose}
                   // onClick={handleSettingsMenuClose}
+                  disableScrollLock={true}
                   PaperProps={{
                     elevation: 0,
                     sx: {

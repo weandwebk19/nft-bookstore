@@ -55,6 +55,7 @@ export type NftBookCore = {
   tokenId: number | string;
   author: string;
   balance: number;
+  isListed: boolean;
 };
 
 export type ListedBookCore = {

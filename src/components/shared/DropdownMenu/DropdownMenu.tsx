@@ -60,6 +60,7 @@ export default function DropdownMenu({
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        disableScrollLock={true}
       >
         {items.map((item) => (
           <MenuItem
