@@ -18,14 +18,14 @@ export const useNetwork = () => {
   };
 };
 
-// export const useListedNfts = () => {
-//   const hooks = useHooks();
-//   const swrRes = hooks.useListedNfts();
+export const useListedBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useListedBooks();
 
-//   return {
-//     nfts: swrRes
-//   };
-// };
+  return {
+    nftBooks: swrRes
+  };
+};
 
 // export const useOwnedNfts = () => {
 //   const hooks = useHooks();

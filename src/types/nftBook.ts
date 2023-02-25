@@ -53,15 +53,22 @@ export type NftBookMeta = {
 
 export type NftBookCore = {
   tokenId: number | string;
-  price: number;
   author: string;
-  isListed: boolean;
+  balance: number;
+};
+
+export type ListedBookCore = {
+  tokenId: number | string;
+  seller: string;
+  price: number;
+  amount: number;
 };
 
 export type NftBook = {
   meta: NftBookMeta;
   details?: NftBookDetails;
-} & NftBookCore;
+} & NftBookCore &
+  ListedBookCore;
 
 export enum BookGenres {
   "Art & photography",
@@ -170,4 +177,3 @@ export enum BookGenres {
   "Religion - Spirituality",
   "Blockchain"
 }
-

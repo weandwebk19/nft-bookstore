@@ -1,13 +1,24 @@
+import { FunctionComponent } from "react";
 
 import { Box, Grid, Stack } from "@mui/material";
+
+import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
-import images from "@/assets/images";
-import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
-import FilterBox from './FilterBox';
 
-const DisplayBox = () => {
+import images from "@/assets/images";
+import {
+  BookGenres,
+  NftBook,
+  NftBookAttribute,
+  NftBookDetails,
+  NftBookMeta
+} from "@/types/nftBook";
+
+import FilterBox from "./FilterBox";
+
+const DisplayBox: FunctionComponent = () => {
   const topBook = {
     tokenId: "0",
     price: 0.5,
@@ -251,6 +262,8 @@ const DisplayBox = () => {
     }
   ];
 
+  const { nftBooks } = useListedBooks();
+
   const handleBookClick = (tokenId: number | string) => {
     alert(tokenId);
   };
@@ -275,22 +288,37 @@ const DisplayBox = () => {
               tokenId={topBook.tokenId}
               author={topBook.author}
               price={topBook.price}
-              isListed={topBook.isListed}
               onClick={() => {
                 alert(topBook.meta.title);
               }}
+              balance={0}
+              seller={""}
+              amount={0}
             />
 
-            <ContentPaper
-              isPaginate={true}
-              title={
-                <>
-                  Publishing books
-                </>
-              }
-            >
-              <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-                {bookList.map((book) => (
+            <ContentPaper isPaginate={true} title={<>Publishing books</>}>
+              <Grid
+                container
+                spacing={3}
+                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+              >
+                {nftBooks.data?.map((book: NftBook) => (
+                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
+                    <BookItem
+                      tokenId={book.tokenId}
+                      balance={book.balance}
+                      price={book.price}
+                      meta={book.meta}
+                      author={book.author}
+                      seller={book.seller}
+                      amount={book.amount}
+                      onClick={() => {
+                        handleBookClick(book.tokenId);
+                      }}
+                    />
+                  </Grid>
+                ))}
+                {/* {bookList.map((book) => (
                   <Grid
                     item
                     key={book.tokenId}
@@ -310,10 +338,9 @@ const DisplayBox = () => {
                       }}
                     />
                   </Grid>
-                ))}
+                ))} */}
               </Grid>
             </ContentPaper>
-
           </Stack>
         </Grid>
         <Grid item xs={4} sm={8} md={12} lg={6}>
