@@ -1,60 +1,11 @@
-import { FunctionComponent } from "react";
-
-import { Box, Grid, Stack } from "@mui/material";
-
-import { useListedBooks } from "@hooks/web3";
-import { BookBanner } from "@shared/BookBanner";
-import { BookItem } from "@shared/BookItem";
-import { ContentPaper } from "@shared/ContentPaper";
-import { useRouter } from "next/router";
+import { Box } from "@mui/material";
 
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
-import { FilterBar } from "@/components/shared/FilterBar";
+import { ContentPaper } from "@/components/shared/ContentPaper";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
-const DisplayBox: FunctionComponent = () => {
-  const router = useRouter();
-  const topBook = {
-    tokenId: "0",
-    price: 0.5,
-    author: "Markus Zusak",
-    isListed: true,
-    meta: {
-      title: "The Book Thief",
-      file: "epub",
-      bookCover: images.mockupBookCover2,
-      attributes: [
-        {
-          value: 1.161,
-          statType: "views"
-        },
-        {
-          value: 918,
-          statType: "registered"
-        }
-      ] as NftBookAttribute[]
-    },
-    details: {
-      contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
-      desc: "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
-
-      bookId: "645146126",
-      pages: 205,
-      language: ["English", "Vietnamese"],
-      genres: [
-        BookGenres[BookGenres["Action & Adventure"]],
-        BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
-        BookGenres[BookGenres["Mystery - Horror"]]
-      ] as NftBookDetails["genres"],
-      editionVersion: 1,
-      maxSupply: 100,
-      registered: 25,
-      openDate: new Date("06/15/2023"),
-      endDate: new Date("07/30/2023")
-    }
-  };
-
+const OwnedBooks = () => {
   const bookList = [
     {
       tokenId: "0",
@@ -258,97 +209,17 @@ const DisplayBox: FunctionComponent = () => {
     }
   ];
 
-  const { nftBooks } = useListedBooks();
-
-  const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+  const handleBookClick = () => {
+    console.log("Not implemented yet");
   };
 
   return (
-    <Box>
-      <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-        <Grid item xs={4} sm={8} md={12} lg={18}>
-          <Stack spacing={3}>
-            {/* Book Banner */}
-            <BookBanner
-              // bookCover={topBook.meta.bookCover}
-              // title={topBook.meta.title}
-              // file={topBook.meta.file}
-              // attributes={topBook.meta.attributes}
-              // desc={topBook.details.desc}
-              // genres={topBook.details.genres}
-              // openDate={topBook.details.openDate}
-              // endDate={topBook.details.endDate}
-              meta={topBook.meta}
-              details={topBook.details}
-              tokenId={topBook.tokenId}
-              author={topBook.author}
-              price={topBook.price}
-              onClick={() => {
-                alert(topBook.meta.title);
-              }}
-              balance={0}
-              seller={""}
-              amount={0}
-            />
-
-            <ContentPaper isPaginate={true} title={<>Publishing books</>}>
-              <Grid
-                container
-                spacing={3}
-                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
-              >
-                {nftBooks.data?.map((book: NftBook) => (
-                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
-                    <BookItem
-                      tokenId={book.tokenId}
-                      balance={book.balance}
-                      price={book.price}
-                      meta={book.meta}
-                      author={book.author}
-                      seller={book.seller}
-                      amount={book.amount}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))}
-                {/* {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))} */}
-              </Grid>
-            </ContentPaper>
-          </Stack>
-        </Grid>
-        <Grid item xs={4} sm={8} md={12} lg={6}>
-          <Stack spacing={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
-          </Stack>
-        </Grid>
-      </Grid>
+    <Box sx={{ pt: 12 }}>
+      <ContentPaper title="Owned books">
+        <BookList bookList={bookList} onClick={handleBookClick} />
+      </ContentPaper>
     </Box>
   );
 };
 
-export default DisplayBox;
+export default OwnedBooks;

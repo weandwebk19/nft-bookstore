@@ -172,6 +172,10 @@ const NavBar = () => {
     setStoredTheme(currentTheme.toLowerCase());
   };
 
+  const handlePublishABookClick = () => {
+    router.push("/author/publishing");
+  };
+
   const handleCreateListingClick = () => {
     alert("Create Listing");
   };
@@ -361,10 +365,20 @@ const NavBar = () => {
     {
       type: "button",
       icon: null,
+      content: "Publish a Book",
+      onClick: () => handlePublishABookClick(),
+      disabled: false,
+      subList: [],
+      href: "/author/publishing"
+    },
+    {
+      type: "button",
+      icon: null,
       content: "Create Listing",
       onClick: () => handleCreateListingClick(),
       disabled: false,
-      subList: []
+      subList: [],
+      href: "/account/create-listing"
     },
     {
       type: "button",
@@ -372,7 +386,8 @@ const NavBar = () => {
       content: "Create Rental",
       onClick: () => handleCreateRentalClick(),
       disabled: false,
-      subList: []
+      subList: [],
+      href: "/account/create-rental"
     }
   ];
 

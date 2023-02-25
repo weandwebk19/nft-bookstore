@@ -7,6 +7,7 @@ import {
   useState
 } from "react";
 
+import { BookStoreContract } from "@_types/BookStoreContract";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -80,7 +81,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
           createWeb3State({
             ethereum: window.ethereum,
             provider,
-            contract,
+            contract: signedContract as unknown as BookStoreContract,
             isLoading: false
           })
         );
