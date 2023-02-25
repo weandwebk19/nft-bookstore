@@ -140,7 +140,7 @@ export enum BookGenres {
   "Psychology",
   "Professions",
   "Atlases - Encyclopedia",
-  "🌐 Science - Technology",
+  "Science - Technology",
   "Astronomy & Space Science",
   "Environment",
   "Agriculture & Forestry",
@@ -170,4 +170,3 @@ export enum BookGenres {
   "Religion - Spirituality",
   "Blockchain"
 }
-

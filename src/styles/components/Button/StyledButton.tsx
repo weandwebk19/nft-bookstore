@@ -6,7 +6,7 @@ type customVariant = "primary" | "secondary";
 
 const StyledButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== "width" && prop !== "customVariant"
-})<{ width?: string | number; customVariant: customVariant }>(
+})<{ width?: string | number; customVariant?: customVariant }>(
   ({ theme, customVariant = "primary", width }) => ({
     ...(customVariant === "primary" && {
       "&:hover": {
