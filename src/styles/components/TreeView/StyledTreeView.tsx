@@ -1,12 +1,12 @@
-import { styled } from '@mui/material/styles';
-import TreeItem, { TreeItemProps, treeItemClasses } from '@mui/lab/TreeItem';
-import { SvgIconProps } from '@mui/material/SvgIcon';
+import { SvgIconProps } from "@mui/material/SvgIcon";
+import { styled } from "@mui/material/styles";
 
+import TreeItem, { TreeItemProps, treeItemClasses } from "@mui/lab/TreeItem";
 
-declare module 'react' {
+declare module "react" {
   interface CSSProperties {
-    '--tree-view-color'?: string;
-    '--tree-view-bg-color'?: string;
+    "--tree-view-color"?: string;
+    "--tree-view-bg-color"?: string;
   }
 }
 
@@ -29,28 +29,28 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     flexDirection: "row-reverse",
     padding: 0,
 
-    '&.Mui-expanded': {
-      fontWeight: theme.typography.fontWeightRegular,
+    "&.Mui-expanded": {
+      fontWeight: theme.typography.fontWeightRegular
     },
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover,
+    "&:hover": {
+      backgroundColor: theme.palette.action.hover
     },
-    '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
+    "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
       backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: 'var(--tree-view-color)',
+      color: "var(--tree-view-color)"
     },
     [`& .${treeItemClasses.label}`]: {
-      fontWeight: 'inherit',
-      color: 'inherit',
-      paddingLeft: 0,
-    },
+      fontWeight: "inherit",
+      color: "inherit",
+      paddingLeft: 0
+    }
   },
   [`& .${treeItemClasses.group}`]: {
     marginLeft: 0,
     [`& .${treeItemClasses.content}`]: {
-      paddingLeft: theme.spacing(2),
-    },
-  },
+      paddingLeft: theme.spacing(2)
+    }
+  }
 }));
 
 export { StyledTreeItemRoot };

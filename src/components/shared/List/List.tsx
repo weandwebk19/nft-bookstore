@@ -15,9 +15,12 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { ListProps } from "@_types/list";
+import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 
 const List = ({ items, size }: ListProps) => {
+  const { pathname } = useRouter();
+
   const haveSubListItems = items!.filter((item) => item!.type === "dropdown");
   const [openFunctions, setOpenFunctions] = useState<Record<number, boolean>>(
     {}
@@ -40,7 +43,7 @@ const List = ({ items, size }: ListProps) => {
       {items!.map((item, index) => (
         <Box key={`${item?.content} ${index}`}>
           {(() => {
-            if (item.type !== "divider") {
+            if (item.type === "dropdown") {
               return (
                 <Box>
                   <ListItem disablePadding>
@@ -74,8 +77,8 @@ const List = ({ items, size }: ListProps) => {
                         sx={{ pl: 4 }}
                         onClick={itemInSubList?.onClick}
                         selected={
-                          itemInSubList?.content ===
-                            itemInSubList?.selected?.currentState &&
+                          itemInSubList?.content?.toLowerCase() ===
+                            itemInSubList?.selected?.currentState.toLowerCase() &&
                           itemInSubList?.selected.isOpen
                         }
                       >
@@ -85,6 +88,47 @@ const List = ({ items, size }: ListProps) => {
                     </Collapse>
                   ))}
                 </Box>
+              );
+            } else if (item.type === "link") {
+              return (
+                <ListItem
+                  disablePadding
+                  className={
+                    pathname === item.href
+                      ? "active-link active-link--drawer"
+                      : ""
+                  }
+                >
+                  <ListItemButton
+                    onClick={
+                      item?.onClick ||
+                      (() => {
+                        handleToggle(index);
+                      })
+                    }
+                    disabled={item?.disabled}
+                  >
+                    {item?.icon && <ListItemIcon>{item?.icon}</ListItemIcon>}
+                    <ListItemText>{item?.content}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              );
+            } else if (item.type === "button") {
+              return (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={
+                      item?.onClick ||
+                      (() => {
+                        handleToggle(index);
+                      })
+                    }
+                    disabled={item?.disabled}
+                  >
+                    {item?.icon && <ListItemIcon>{item?.icon}</ListItemIcon>}
+                    <ListItemText>{item?.content}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
               );
             } else return <Divider />;
           })()}

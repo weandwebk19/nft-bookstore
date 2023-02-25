@@ -6,19 +6,15 @@ import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
-import {
-  BookGenres,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails,
-  NftBookMeta
-} from "@/types/nftBook";
-
-import FilterBox from "./FilterBox";
+import { BookList } from "@/components/shared/BookList";
+import { FilterBar } from "@/components/shared/FilterBar";
+import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
+  const router = useRouter();
   const topBook = {
     tokenId: "0",
     price: 0.5,
@@ -265,7 +261,7 @@ const DisplayBox: FunctionComponent = () => {
   const { nftBooks } = useListedBooks();
 
   const handleBookClick = (tokenId: number | string) => {
-    alert(tokenId);
+    router.push(`/publishing/${tokenId}`);
   };
 
   return (
@@ -346,7 +342,7 @@ const DisplayBox: FunctionComponent = () => {
         <Grid item xs={4} sm={8} md={12} lg={6}>
           <Stack spacing={3}>
             <ContentPaper title="Filter">
-              <FilterBox />
+              <FilterBar />
             </ContentPaper>
           </Stack>
         </Grid>
