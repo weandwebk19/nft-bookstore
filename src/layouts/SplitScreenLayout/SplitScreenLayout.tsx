@@ -10,7 +10,7 @@ const SplitScreenLayout = ({ children }: SplitScreenLayoutProps) => {
   return (
     <>
       <NavBar />
-      <Box sx={{ minHeight: "100vh", mr: 1 }}>
+      <Box sx={{ minHeight: "100vh" }}>
         <Container maxWidth={false}>
           <Box className="content">{children}</Box>
         </Container>

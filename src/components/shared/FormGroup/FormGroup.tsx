@@ -1,7 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
 interface FormGroupProps {
   label: React.ReactNode | string;
+  desc?: string;
   children?: React.ReactNode;
   required?: Boolean;
   style?: Object;
@@ -10,23 +11,26 @@ interface FormGroupProps {
 
 const FormGroup = ({
   label,
+  desc,
   children,
   required = false,
   style = {},
   className
 }: FormGroupProps) => {
   return (
-    <Box className={`form-control ${className}`} style={style}>
+    <Stack className={`form-control ${className}`} style={style}>
       <Typography
-        variant="h6"
+        variant="label"
         gutterBottom
-        sx={{ fontWeight: 400, lineHeight: 1.3, fontSize: 18 }}
         className={`form-label ${required ? "required" : ""}`}
       >
         {label}
       </Typography>
+      <Typography variant="caption" sx={{ fontStyle: "italic" }}>
+        {desc}
+      </Typography>
       {children}
-    </Box>
+    </Stack>
   );
 };
 
