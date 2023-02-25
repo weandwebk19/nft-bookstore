@@ -25,6 +25,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { Dialog } from "@shared/Dialog";
 import { StyledButton } from "@styles/components/Button";
+import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 
 import { truncate } from "@/utils/truncate";
@@ -42,6 +43,8 @@ const AccountMenu = ({
   onClose,
   disconnect
 }: AccountMenuProps) => {
+  const route = useRouter();
+
   const accountItems = [
     {
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
@@ -68,9 +71,9 @@ const AccountMenu = ({
       icon: (
         <CollectionsBookmarkOutlinedIcon color="primary" fontSize="small" />
       ),
-      content: "My Collections",
+      content: "My Bookshelf",
       onClick: () => {
-        console.log("Collection");
+        route.push("/account/bookshelf");
       }
     },
     {
