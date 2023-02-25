@@ -94,6 +94,7 @@ video {
   // -webkit-user-select: none; /* Safari */
   // -ms-user-select: none; /* IE 10 and IE 11 */
   // user-select: none; /* Standard syntax */
+  // overflow-y: scroll;
 }
 
 // Disable dragging images/svgs
@@ -131,6 +132,7 @@ svg {
 }
 
 html {
+  overflow-y: overlay !important;
   /* width */
   ::-webkit-scrollbar {
     width: 5px;
@@ -245,8 +247,10 @@ section {
 
 .required::after {
   content: " *";
-  color: red;
+  font-family: "Fraunces", Helvetica, Arial;
+  color: $red;
 }
+
 .active-link {
   ::after {
     content: "";
