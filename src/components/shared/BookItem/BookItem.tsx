@@ -96,7 +96,7 @@ const BookItem = ({ meta, author, onClick }: BookItemProps) => {
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            {author}
+            {`0x${author[2]}${author[3]}${author[4]}....${author.slice(-4)}`}
           </Typography>
         </Box>
       </Box>

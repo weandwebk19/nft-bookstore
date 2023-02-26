@@ -16,10 +16,9 @@ const BookList = ({ bookList, onClick }: BookListProps) => {
         <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={4}>
           <BookItem
             tokenId={book.tokenId}
-            price={book.price}
-            isListed={book.isListed}
-            meta={book.meta}
             author={book.author}
+            balance={book.balance}
+            meta={book.meta}
             onClick={() => {
               onClick(book.tokenId);
             }}
