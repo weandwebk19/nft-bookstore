@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import { Box, Link, Stack, TextField, Typography } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/Profile.module.scss";
+import axios from "axios";
 import dayjs, { Dayjs } from "dayjs";
+import { ethers } from "ethers";
 import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import { useNetwork } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { DatePicker } from "@/components/shared/DatePicker";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -20,15 +25,17 @@ import { UploadField } from "@/components/shared/UploadField";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTextArea } from "@/styles/components/TextField";
 import { Language } from "@/types/languages";
-import { BookGenres } from "@/types/nftBook";
+import { BookGenres, NftBookMeta, PinataRes } from "@/types/nftBook";
 import { isFloat } from "@/utils/isFloat";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 2000000;
 
 const MINIMUM_SUPPLY = 1;
-const MAXIMUM_SUPPLY = 1000;
+const MAXIMUM_SUPPLY = 500;
 
 const MAXIMUM_PRICE = 1000;
+
+const ALLOWED_FIELDS = ["title", "file", "bookCover", "attributes"];
 
 const schema = yup
   .object({
@@ -126,6 +133,16 @@ const fileSchema = yup.object().shape({
 type FileFormData = yup.InferType<typeof fileSchema>;
 
 const AuthorPublishing = () => {
+  const { ethereum, contract } = useWeb3();
+  const { network } = useNetwork();
+  const [nftURI, setNftURI] = useState("");
+  const [hasURI, setHasURI] = useState(false);
+  const [nftBookMeta, setNftBookMeta] = useState<NftBookMeta>({
+    title: "",
+    bookFile: "",
+    bookCover: "",
+    bookSample: ""
+  });
   // Book genres
   const bookGenres = Object.keys(BookGenres).filter((item) => {
     return isNaN(Number(item));
@@ -165,13 +182,13 @@ const AuthorPublishing = () => {
   const [chosenTime, setChosenTime] = useState<Dayjs | null>(dayjs());
 
   // Book file
-  const [uploadedBookFile, setUploadedBookFile] = useState<string>("");
+  const [uploadedBookFile, setUploadedBookFile] = useState<File>();
 
   // Book cover
-  const [uploadedBookCover, setUploadedBookCover] = useState<string>("");
+  const [uploadedBookCover, setUploadedBookCover] = useState<File>();
 
   // Book sample
-  const [uploadedBookSample, setUploadedBookSample] = useState<string>("");
+  const [uploadedBookSample, setUploadedBookSample] = useState<File>();
 
   const handlePublishingTimeChange = (newValue: Dayjs | null) => {
     setChosenTime(newValue);
@@ -209,8 +226,186 @@ const AuthorPublishing = () => {
   const MAXIMUM_NUMBER_OF_CHARACTERS = 1000;
   const [numberOfCharacters, setNumberOfCharacters] = useState<Number>(0);
 
+  const getSignedData = async () => {
+    const messageToSign = await axios.get("/api/verify");
+    const accounts = (await ethereum?.request({
+      method: "eth_requestAccounts"
+    })) as string[];
+    const account = accounts[0];
+
+    const signedData = await ethereum?.request({
+      method: "personal_sign",
+      params: [
+        JSON.stringify(messageToSign.data),
+        account,
+        messageToSign.data.id
+      ]
+    });
+
+    return { signedData, account };
+  };
+
+  const uploadBookSample = async (file: File) => {
+    if (file !== undefined) {
+      // const file = uploadedBookSample;
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      console.log(bytes);
+
+      try {
+        const { signedData, account } = await getSignedData();
+        const promise = axios.post("/api/verify-image", {
+          address: account,
+          signature: signedData,
+          bytes,
+          contentType: file.type,
+          fileName: file.name.replace(/\.[^/.]+$/, "")
+        });
+
+        const res = await toast.promise(promise, {
+          pending: "Uploading Book Sample",
+          success: "Book Sample uploaded",
+          error: "Book Sample upload error"
+        });
+
+        const data = res.data as PinataRes;
+        console.log(data);
+
+        setNftBookMeta({
+          ...nftBookMeta,
+          bookSample: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+        });
+      } catch (e: any) {
+        console.error(e.message);
+      }
+    }
+  };
+
+  const uploadBookFile = async (file: File) => {
+    if (file !== undefined) {
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+
+      try {
+        const { signedData, account } = await getSignedData();
+
+        const promise = axios.post("/api/verify-file", {
+          address: account,
+          signature: signedData,
+          bytes,
+          contentType: file.type,
+          fileName: file.name.replace(/\.[^/.]+$/, "")
+        });
+
+        const res = await toast.promise(promise, {
+          pending: "Uploading Book File",
+          success: "Book file uploaded",
+          error: "Book file upload error"
+        });
+
+        const data = res.data as PinataRes;
+        console.log("data", data);
+
+        setNftBookMeta({
+          ...nftBookMeta,
+          bookFile: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+        });
+      } catch (e: any) {
+        console.error(e.message);
+      }
+    }
+  };
+
+  const uploadBookCover = async (file: File) => {
+    if (file !== undefined) {
+      // const file = uploadedBookCover;
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+
+      try {
+        const { signedData, account } = await getSignedData();
+        const promise = axios.post("/api/verify-image", {
+          address: account,
+          signature: signedData,
+          bytes,
+          contentType: file.type,
+          fileName: file.name.replace(/\.[^/.]+$/, "")
+        });
+
+        const res = await toast.promise(promise, {
+          pending: "Uploading image",
+          success: "Image uploaded",
+          error: "Image upload error"
+        });
+
+        const data = res.data as PinataRes;
+
+        setNftBookMeta({
+          ...nftBookMeta,
+          bookCover: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+        });
+      } catch (e: any) {
+        console.error(e.message);
+      }
+    }
+  };
+
+  const uploadMetadata = async () => {
+    try {
+      const { signedData, account } = await getSignedData();
+
+      const promise = axios.post("/api/verify", {
+        address: account,
+        signature: signedData,
+        nftBook: nftBookMeta
+      });
+
+      const res = await toast.promise(promise, {
+        pending: "Uploading metadata",
+        success: "Metadata uploaded",
+        error: "Metadata upload error"
+      });
+
+      const data = res.data as PinataRes;
+      setNftURI(
+        `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+      );
+    } catch (e: any) {
+      console.error(e.message);
+    }
+  };
+
+  const createNFTBook = async (amount: number) => {
+    try {
+      const nftRes = await axios.get(nftURI);
+      const content = nftRes.data;
+
+      Object.keys(content).forEach((key) => {
+        if (!ALLOWED_FIELDS.includes(key)) {
+          throw new Error("Invalid Json structure");
+        }
+      });
+
+      const tx = await contract?.mintBook(nftURI, amount, {
+        value: ethers.utils.parseEther((0.025).toString())
+      });
+
+      await toast.promise(tx!.wait(), {
+        pending: "Minting Nft Token",
+        success: "Nft has ben created",
+        error: "Minting error"
+      });
+    } catch (e: any) {
+      console.error(e.message);
+    }
+  };
+
   const onSubmit = (data: any) => {
-    console.log("data:", data);
+    // console.log("data:", data);
+    // uploadBookCover(data.bookCover);
+    uploadBookFile(data.bookFile);
+    // uploadBookSample(data.bookSample);
+    console.log("nftBookMeta:", nftBookMeta);
   };
 
   return (
@@ -262,7 +457,7 @@ const AuthorPublishing = () => {
 
                       const file = e.target.files[0];
                       setValue("bookFile", file, { shouldValidate: true });
-                      setUploadedBookFile(file.name);
+                      setUploadedBookFile(file);
                     }}
                     uploaded={uploadedBookFile}
                   />
@@ -281,12 +476,9 @@ const AuthorPublishing = () => {
                           }
 
                           const file = e.target.files[0];
-                          const buffer = await file.arrayBuffer();
-                          const bytes = new Uint8Array(buffer);
-                          console.log(bytes);
 
                           setValue("bookCover", file, { shouldValidate: true });
-                          setUploadedBookCover(file.name);
+                          setUploadedBookCover(file);
                         })();
                       }}
                       uploaded={uploadedBookCover}
@@ -301,7 +493,9 @@ const AuthorPublishing = () => {
 
                         const file = e.target.files[0];
                         setValue("bookSample", file, { shouldValidate: true });
+                        setUploadedBookSample(file);
                       }}
+                      uploaded={uploadedBookSample}
                     />
                   </Stack>
                 </Stack>
@@ -316,10 +510,17 @@ const AuthorPublishing = () => {
                         render={({ field }) => {
                           return (
                             <TextField
-                              id="userName"
+                              id="bookTitle"
                               fullWidth
                               error={!!errors.bookTitle?.message}
                               {...field}
+                              // onChange={(e) => {
+                              //   const title = e.target.value;
+                              //   setNftBookMeta({
+                              //     ...nftBookMeta,
+                              //     title: title
+                              //   });
+                              // }}
                             />
                           );
                         }}
