@@ -67,8 +67,7 @@ export type ListedBookCore = {
 export type NftBook = {
   meta: NftBookMeta;
   details?: NftBookDetails;
-} & NftBookCore &
-  ListedBookCore;
+} & NftBookCore;
 
 export type PinataRes = {
   IpfsHash: string;
