@@ -396,6 +396,7 @@ const BookDetail = () => {
                 author={bookDetails.author}
                 price={bookDetails.price}
                 isListed={bookDetails.isListed}
+                isPublished={false}
                 onClick={() => {
                   alert(bookDetails.meta.title);
                 }}

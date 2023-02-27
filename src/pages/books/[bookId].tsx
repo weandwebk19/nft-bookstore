@@ -1,30 +1,55 @@
-import { FunctionComponent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { Box, Grid, Stack } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Grid,
+  Link as MUILink,
+  Stack,
+  Typography
+} from "@mui/material";
 
-import { useListedBooks } from "@hooks/web3";
-import { BookBanner } from "@shared/BookBanner";
-import { BookItem } from "@shared/BookItem";
-import { ContentPaper } from "@shared/ContentPaper";
-import { useRouter } from "next/router";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/dist/ScrollTrigger";
 
 import images from "@/assets/images";
-import { BookList } from "@/components/shared/BookList";
-import { FilterBar } from "@/components/shared/FilterBar";
-import {
-  BookGenres,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails
-} from "@/types/nftBook";
+import { BookDetails } from "@/components/shared/BookDetails";
+import { BookItem } from "@/components/shared/BookItem";
+import { BookRatings } from "@/components/shared/BookRatings";
+import { BookTicket } from "@/components/shared/BookTicket";
+import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
+import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
-const DisplayBox: FunctionComponent = () => {
-  const router = useRouter();
-  const topBook = {
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+gsap.registerPlugin(ScrollTrigger);
+
+const BookDetail = () => {
+  const [isSelled, setIsSelled] = useState<boolean>(false);
+  const bookDetailsRef = useRef(null);
+  const tl = useRef<any>();
+
+  useIsomorphicLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      tl.current = gsap.timeline().from(bookDetailsRef.current, {
+        duration: 1,
+        delay: 1,
+        opacity: 0,
+        y: 100
+      });
+    });
+
+    return () => {
+      ctx.revert(); // animation cleanup!
+    };
+  }, []);
+
+  const bookDetails = {
     tokenId: "0",
     price: 0.5,
     author: "Markus Zusak",
-    isListed: true,
+    isListed: false,
     meta: {
       title: "The Book Thief",
       file: "epub",
@@ -37,12 +62,18 @@ const DisplayBox: FunctionComponent = () => {
         {
           value: 918,
           statType: "registered"
+        },
+        {
+          value: 918,
+          statType: "owners"
         }
       ] as NftBookAttribute[]
     },
     details: {
       contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
-      desc: "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
+      desc: `Lorem ipsum dolor sit amet consectetur. Mus maecenas viverra sed consequat ultricies nisl sagittis purus nulla. Feugiat rhoncus a at arcu a habitant et at enim. Elit sed orci ut commodo dignissim vivamus cursus arcu tincidunt. Pellentesque lectus platea ac nisi rhoncus. Interdum id arcu morbi dolor. Lectus cursus erat faucibus sit arcu. Quam at nulla vel amet. Arcu eros sit.
+      \nDonec quis lectus in enim lacinia pretium quis. Duis ornare vitae in praesent maecenas tellus pellentesque non. Augue dolor porttitor tristique neque. Tellus sit vel ut sit. Posuere non vitae id ut. Augue pellentesque lectus aenean risus in diam. Sit purus nullam imperdiet elit quis vulputate.
+      \nNon donec ac sagittis tellus et pellentesque bibendum vitae. Varius faucibus nulla malesuada ante enim adipiscing. At sit sit tellus tincidunt viverra ultricies tellus. Dolor nibh senectus egestas ac tempus ullamcorper praesent. Aliquet convallis odio et tellus sollicitudin. Nunc fermentum condimentum nunc purus blandit nibh. At porttitor nulla mattis accumsan vitae nisl.`,
 
       bookId: "645146126",
       pages: 205,
@@ -263,97 +294,124 @@ const DisplayBox: FunctionComponent = () => {
     }
   ];
 
-  const { nftBooks } = useListedBooks();
-
   const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+    alert(tokenId);
   };
 
-  return (
-    <Box>
-      <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-        <Grid item xs={4} sm={8} md={12} lg={18}>
-          <Stack spacing={3}>
-            {/* Book Banner */}
-            <BookBanner
-              // bookCover={topBook.meta.bookCover}
-              // title={topBook.meta.title}
-              // file={topBook.meta.file}
-              // attributes={topBook.meta.attributes}
-              // desc={topBook.details.desc}
-              // genres={topBook.details.genres}
-              // openDate={topBook.details.openDate}
-              // endDate={topBook.details.endDate}
-              meta={topBook.meta}
-              details={topBook.details}
-              tokenId={topBook.tokenId}
-              author={topBook.author}
-              price={topBook.price}
-              onClick={() => {
-                alert(topBook.meta.title);
-              }}
-              balance={0}
-              seller={""}
-              amount={0}
-            />
+  // animation
+  const bookCoverRef = useRef();
+  const bookCoverImageRef = useRef();
+  const bookDetailRef = useRef();
 
-            <ContentPaper isPaginate={true} title={<>Publishing books</>}>
-              <Grid
-                container
-                spacing={3}
-                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
-              >
-                {nftBooks.data?.map((book: NftBook) => (
-                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
-                    <BookItem
-                      tokenId={book.tokenId}
-                      balance={book.balance}
-                      price={book.price}
-                      meta={book.meta}
-                      author={book.author}
-                      seller={book.seller}
-                      amount={book.amount}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))}
-                {/* {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))} */}
-              </Grid>
-            </ContentPaper>
-          </Stack>
+  useEffect(() => {
+    gsap.to(bookCoverRef.current, {
+      scrollTrigger: {
+        trigger: bookCoverRef?.current,
+        start: "bottom center",
+        end: "bottom 100px",
+        scrub: true,
+        // markers: true,
+        id: "scrub"
+      }
+    });
+    gsap.to(bookCoverImageRef.current, {
+      borderRadius: "1em",
+      width: "60%",
+      outline: "5px double white",
+      outlineOffset: "8px",
+      // transform: "scale(0.9)",
+      // height: "240px",
+
+      scrollTrigger: {
+        trigger: bookCoverRef?.current,
+        start: "bottom center",
+        end: "bottom 100px",
+        scrub: true,
+        // markers: true,
+        id: "scrub"
+      }
+    });
+    gsap.to(bookDetailRef.current, {
+      scrollTrigger: {
+        trigger: bookCoverRef?.current,
+        start: "bottom center",
+        end: "bottom 100px"
+      }
+    });
+  }, []);
+
+  return (
+    <Stack>
+      <Grid
+        container
+        spacing={{ xs: 2, md: 3 }}
+        columns={{ xs: 4, sm: 8, md: 12 }}
+      >
+        <Grid item xs={4} sm={8} md={5}>
+          <Box
+            sx={{
+              width: "100%",
+              height: "100%",
+              backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(${bookDetails.meta.bookCover})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              pt: 8,
+              position: "relative"
+            }}
+          >
+            <Box
+              className="noise"
+              ref={bookCoverRef}
+              sx={{
+                width: "100%",
+                height: "100vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                position: "sticky",
+                top: 64,
+                overflow: "hidden",
+                backdropFilter: "blur(10px)"
+              }}
+            >
+              <Box
+                ref={bookCoverImageRef}
+                component="img"
+                src={bookDetails.meta.bookCover}
+                sx={{
+                  width: "50%",
+                  objectFit: "cover"
+                }}
+              />
+            </Box>
+          </Box>
         </Grid>
-        <Grid item xs={4} sm={8} md={12} lg={6}>
-          <Stack spacing={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+        <Grid item xs={4} sm={8} md={7}>
+          <Stack pt={8}>
+            <Box ref={bookDetailsRef}>
+              <BookDetails
+                meta={bookDetails.meta}
+                details={bookDetails.details}
+                tokenId={bookDetails.tokenId}
+                author={bookDetails.author}
+                price={bookDetails.price}
+                isListed={bookDetails.isListed}
+                isPublished={true}
+                isSelled={isSelled}
+                setIsSelled={setIsSelled}
+                onClick={() => {
+                  alert(bookDetails.meta.title);
+                }}
+              />
+            </Box>
           </Stack>
         </Grid>
       </Grid>
-    </Box>
+    </Stack>
   );
 };
 
-export default DisplayBox;
+BookDetail.PageLayout = SplitScreenLayout;
+
+export default BookDetail;
