@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
   Box,
@@ -26,6 +26,7 @@ const useIsomorphicLayoutEffect =
 gsap.registerPlugin(ScrollTrigger);
 
 const BookDetail = () => {
+  const [isSelled, setIsSelled] = useState<boolean>(false);
   const bookDetailsRef = useRef(null);
   const tl = useRef<any>();
 
@@ -48,7 +49,7 @@ const BookDetail = () => {
     tokenId: "0",
     price: 0.5,
     author: "Markus Zusak",
-    isListed: true,
+    isListed: false,
     meta: {
       title: "The Book Thief",
       file: "epub",
@@ -396,65 +397,14 @@ const BookDetail = () => {
                 author={bookDetails.author}
                 price={bookDetails.price}
                 isListed={bookDetails.isListed}
-                isPublished={false}
+                isPublished={true}
+                isSelled={isSelled}
+                setIsSelled={setIsSelled}
                 onClick={() => {
                   alert(bookDetails.meta.title);
                 }}
               />
             </Box>
-
-            <Divider sx={{ my: 6 }} />
-
-            <Stack>
-              <Typography variant="h5" mb={1}>
-                Listings
-              </Typography>
-
-              <Stack direction={{ sm: "column", md: "row" }} spacing={3}>
-                <BookTicket
-                  owner="Tho Le"
-                  price={bookDetails.price}
-                  date="6/25/2023"
-                  contractAddress={bookDetails.details.contractAddress}
-                  link="xf56e4fxre6"
-                />
-                <BookTicket
-                  owner="Tho Le"
-                  price={bookDetails.price}
-                  date="6/25/2023"
-                  contractAddress={bookDetails.details.contractAddress}
-                  link="xf56e4fxre6"
-                />
-              </Stack>
-            </Stack>
-
-            <Divider sx={{ my: 6 }} />
-
-            <Stack>
-              <Typography variant="h5" mb={1}>
-                You may <i>love</i>
-              </Typography>
-              <Grid container spacing={3}>
-                {bookList.map((book) => (
-                  <Grid item key={book.tokenId}>
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Stack>
-
-            <Divider sx={{ my: 6 }} />
-
-            <BookRatings bookId={bookDetails.details.bookId} />
           </Stack>
         </Grid>
       </Grid>
