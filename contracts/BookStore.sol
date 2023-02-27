@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+import "./ListedBookStorage.sol";
+import "./RentedBookStorage.sol";
 
 contract BookStore is ERC1155URIStorage, Ownable {
   using Counters for Counters.Counter;
@@ -20,45 +22,43 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint256 balance
   );
 
-  struct ListedBook {
-    uint256 tokenId;
-    address seller;
-    uint price;
-    uint amount;
-  }
-
-  struct PrimaryKeyListedBook {
-    uint256 tokenId;
-    address seller;
-  }
-
-  event ListedBookCreated (
-    uint tokenId,
-    address seller,
-    uint price,
-    uint amount
-  );
+  ListedBookStorage private _listedBookStorage;
+  RentedBookStorage private _rentedBookStorage;
 
   uint MAX_BALANCE = 500;
+  uint MIN_TIME = 604800; // Rental period is at least one week
   uint public listingPrice = 0.025 ether;
+  uint public rentingPrice = 0.001 ether;
   Counters.Counter private _tokenIds;
 
   mapping (uint => NFTBook) _idToNFTBook;
-  mapping (uint => mapping (address => ListedBook)) _keyToListedBook; // Key is tokenId and seller
   mapping (string => bool) private _usedTokenURIs;
 
+  // For buyer
   mapping(address => mapping(uint => uint)) private _ownedTokens;
   mapping(address => uint) private _totalOwnedToken;
 
-  mapping(uint => PrimaryKeyListedBook) private _allListedBook;
-  mapping (uint => mapping (address => uint)) _keyToIndexAllListedBooks; // Key is tokenId and seller
-  Counters.Counter private _listedBooks;
+  // For borrower
+  // mapping(address => mapping(uint => uint)) private _ownedTemporaryTokens;
+  // mapping(address => uint) private _totalOwnedTemporaryToken;
 
-  constructor() ERC1155("https://example.com/api/{id}.json") {}
+  constructor(ListedBookStorage  listedBookStorage,
+               RentedBookStorage rentedBookStorage)
+    ERC1155("https://example.com/api/{id}.json") {
+
+    _listedBookStorage = listedBookStorage;
+    _rentedBookStorage = rentedBookStorage;
+
+  }
 
   function setListingPrice(uint newPrice) external onlyOwner {
     require(newPrice > 0, "Price must be at least 1 wei");
     listingPrice = newPrice;
+  }
+
+  function setRentingPrice(uint newPrice) external onlyOwner {
+    require(newPrice > 0, "Price must be at least 1 wei");
+    rentingPrice = newPrice;
   }
 
   function _beforeTokenTransfer(
@@ -89,17 +89,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   }
 
-  // Not necessary
-
-  // function getBalanceOfBook(uint256 tokenId, address owner) public view returns (uint256) {
-  //   require(isOwnerOfToken(tokenId, owner), "You do not own this token");
-  //   return ERC1155.balanceOf(owner, tokenId);
-  // }
-
   function _addTokenToOwnerEnumeration(address owner, uint tokenId) private {
-    uint length = _totalOwnedToken[owner];
-    _ownedTokens[owner][length] = tokenId;
-    _totalOwnedToken[owner]++;
+    if (!isOwnerOfToken(tokenId, owner)) {
+      uint length = _totalOwnedToken[owner];
+      _ownedTokens[owner][length] = tokenId;
+      _totalOwnedToken[owner]++;
+    }
   }
 
   function _removeTokenFromOwnerEnumeration(address owner, uint tokenId) private {
@@ -117,10 +112,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   function getNftBook(uint tokenId) public view returns (NFTBook memory) {
     return _idToNFTBook[tokenId];
-  }
-
-  function getListedBook(uint tokenId, address seller) public view returns (ListedBook memory) {
-    return _keyToListedBook[tokenId][seller];
   }
 
   function isTokenURIExist(string memory tokenURI) public view returns (bool) {
@@ -152,31 +143,13 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _idToNFTBook[tokenId] = NFTBook(tokenId, msg.sender, balance);
     emit NFTBookCreated(tokenId, msg.sender, balance);
   }
-
-  function _createListedBook(uint tokenId, address seller, uint256 price, uint amount) private {
-    _keyToListedBook[tokenId][seller] = ListedBook(tokenId, seller, price, amount);
-    // _allListedBook[_listedBooks.current()] = ListedBook(tokenId, seller, price, amount);
-    _allListedBook[_listedBooks.current()] = PrimaryKeyListedBook(tokenId, seller);
-    _keyToIndexAllListedBooks[tokenId][seller] = _listedBooks.current();
-    _listedBooks.increment();
-    emit ListedBookCreated(tokenId, seller, price, amount);
-  }
-
+  
   function isOwnerOfToken(uint tokenId, address owner) public view returns(bool) {
-    // uint total = _totalOwnedToken[owner];
-    // for (uint i = 0; i < total; i++) {
-    //   if (_ownedTokens[owner][i] == tokenId) {
-    //     return true;
-    //   }
-    // }
-    // return false;
-
-    // Suggest
     return ERC1155.balanceOf(owner, tokenId) > 0;
   }
 
   function getOwnedNFTBooks() public view returns (NFTBook[] memory) {
-    uint ownedItemsCount = _totalOwnedToken[msg.sender];
+    uint ownedItemsCount = getTotalOwnedToken();
     NFTBook[] memory books = new NFTBook[](ownedItemsCount);
 
     for (uint i = 0; i < ownedItemsCount; i++) {
@@ -189,16 +162,16 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return books;
   }
 
-  function getOwnedListedBooks() public view returns (ListedBook[] memory) {
-    uint ownedItemsCount = _totalOwnedToken[msg.sender];
-    ListedBook[] memory books = new ListedBook[](ownedItemsCount);
+  function getOwnedListedBooks() public view returns (ListedBookStorage.ListedBook[] memory) {
+    uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
+    uint ownedItemsCount = getTotalOwnedToken();
+    ListedBookStorage.ListedBook[] memory books = new ListedBookStorage.ListedBook[](ownedListedBookCount);
 
     uint currentIndex = 0;
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
-      ListedBook memory book = _keyToListedBook[tokenId][msg.sender];
-
-      if(book.tokenId != 0 && book.seller != address(0)) {
+      ListedBookStorage.ListedBook memory book = _listedBookStorage.getListedBook(tokenId, msg.sender);
+      if (book.tokenId != 0 && book.seller != address(0)) {
         books[currentIndex] = book;
         currentIndex++;
       }
@@ -207,115 +180,136 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return books;
   }
 
-  // TODO: not necessary
-
-  // return false: You don't have enough books to sell
-  // function checkQuantityToSell(uint256 quantity, uint256 tokenId) public view returns(bool) {
-  //   return quantity <= getBalanceOfBook(tokenId, msg.sender) && quantity > 0;
-  // }
-
-  // return i > 0: listed book on sale
-  // return -1: unlisted book on sale
-  // function getIdListedBookOnSale(uint256 tokenId,
-  //                               uint price,
-  //                               address seller) public view returns (int) {
-  //   for (uint256 i = 0; i < _listedBooks.current(); i++) {
-  //     ListedBook memory listedBook = _allListedBook[i];
-
-  //     if (tokenId == listedBook.tokenId &&
-  //         seller == listedBook.seller &&
-  //         price == listedBook.price) {
-  //       return int(i);
-  //     }
-  //   }
-  //   return -1;
-  // }
-
-  function getAmountOfListedBook(uint256 tokenId, address seller) public view returns(uint256) {
-    return _keyToListedBook[tokenId][seller].amount;
+  function getTotalOwnedToken() public view returns(uint) {
+    return _totalOwnedToken[msg.sender];
   }
 
-  function sellBooks(uint256 tokenId, uint price, uint256 amount) public payable {
+  function getOwnedRentedBooks() public view returns (RentedBookStorage.RentedBook[] memory) {
+    uint ownedRentedBookCount = _rentedBookStorage.getTotalOwnedRentedBook(msg.sender);
+    uint ownedItemsCount = getTotalOwnedToken();
+    RentedBookStorage.RentedBook[] memory books = new RentedBookStorage.RentedBook[](ownedRentedBookCount);
+
+    uint currentIndex = 0;
+    for (uint i = 0; i < ownedItemsCount; i++) {
+      uint tokenId = _ownedTokens[msg.sender][i];
+      RentedBookStorage.RentedBook memory book = _rentedBookStorage.getRentedBook(tokenId, msg.sender);
+      if (book.tokenId != 0 &&
+          book.renter != address(0) &&
+          book.rentalDuration != 0) {
+
+        books[currentIndex] = book;
+        currentIndex++;
+      }
+    }
+
+    return books;
+  }
+
+  function getAmountOfAllTypeBooks(uint256 tokenId, address owner) public view returns(uint) {
+    return _listedBookStorage.getAmountOfListedBooks(tokenId, owner) +
+          _rentedBookStorage.getAmountOfRentedBooks(tokenId, owner);
+  }
+
+  function sellBooks(uint256 tokenId,
+                    uint price,
+                    uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfListedBook(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId) &&
-           amount > 0,
+    require(getAmountOfAllTypeBooks(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
           "You don't have enough books to sell");
     require(msg.value == listingPrice,
            "Price must be equal to listing price");
-    // int idListedBook = getIdListedBookOnSale(tokenId, price, msg.sender);
-    ListedBook memory listedBook = _keyToListedBook[tokenId][msg.sender];
-
-    if (listedBook.tokenId == 0 && listedBook.seller == address(0)) {
-      _createListedBook(tokenId, msg.sender, price, amount);
-
-    } else {
-      // require(checkQuantityToSell(listedBook.amount + amount,
-      //                          tokenId),
-      //                         "You don't have enough books to sell"); // TODO: not necessary
-      _keyToListedBook[tokenId][msg.sender].amount += amount;
-    }
+    _listedBookStorage.sellListedBooks(tokenId, price, amount, msg.sender);
   }
 
-  function removeItemFromAllListedBooks(PrimaryKeyListedBook memory value) public {
-    uint index = _keyToIndexAllListedBooks[value.tokenId][value.seller];
-    uint length = _listedBooks.current();
-    _allListedBook[index] = _allListedBook[length - 1];
-    delete _allListedBook[length - 1];
-    _listedBooks.decrement();
+  function rentBooks(uint256 tokenId,
+                    uint price,
+                    uint256 amount,
+                    uint rentalDuration) public payable {
+    require(isOwnerOfToken(tokenId, msg.sender),
+          "You are not the owner of this token");
+    require(getAmountOfAllTypeBooks(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId) &&
+           amount > 0,
+          "You don't have enough books to sell");
+    require(msg.value == rentingPrice,
+           "Price must be equal to renting price");
+    require(rentalDuration >= MIN_TIME,
+           "Rental period is at least one week");
+
+    _rentedBookStorage.rentRentedBooks(tokenId, msg.sender, price, amount, rentalDuration);
   }
 
-  function decreaseListedBookFromSale(uint256 tokenId, uint256 amount, address seller) public {
+  function updateBookFromSale(uint256 tokenId, 
+                              uint newPrice, 
+                              uint256 newAmount, 
+                              address seller) public {
     require(isOwnerOfToken(tokenId, seller),
           "You are not the owner of this token");
-    require(amount > 0,
-          "removed amount of book is invalid");
-    
-    // int idListedBook = getIdListedBookOnSale(tokenId, price, seller);
-
-    // ListedBook memory listedBook = getListedBook(uint256(idListedBook));
-    ListedBook memory listedBook = _keyToListedBook[tokenId][seller];
-    require(listedBook.amount > 0,
-          "Your book are not on sale");
-
-    if (amount < listedBook.amount) {
-      _keyToListedBook[tokenId][seller].amount -= amount;
-    } else {
-      // uint256 lastIndexListedBook = _listedBooks.current() - 1;
-      // ListedBook memory lastListedBook = getListedBook(uint256(lastIndexListedBook));
-      // _allListedBook[uint256(idListedBook)] = lastListedBook;
-      removeItemFromAllListedBooks(PrimaryKeyListedBook(tokenId, seller));
-      delete _keyToListedBook[tokenId][seller];
-    }
+    require(seller == msg.sender,
+          "You are not the seller of this token");
+    _listedBookStorage.updateListedBookFromSale(tokenId,
+                                                newPrice, 
+                                                newAmount, 
+                                                seller);
   }
 
-  function getAllBooksOnSale() public view returns (ListedBook[] memory) {
-    ListedBook[] memory books = new ListedBook[](_listedBooks.current());
+  function updateBookFromRenting(uint256 tokenId,
+                                uint newPrice,
+                                uint256 newAmount,
+                                uint newStartTime,
+                                uint newRentalDuration,
+                                address renter) public {
+    require(isOwnerOfToken(tokenId, renter),
+          "You are not the owner of this token");
+    require(renter == msg.sender,
+          "You are not the renter of this token");
+    require(newRentalDuration >= MIN_TIME, 
+          "New rental duration is invalid");
+    
+    _rentedBookStorage.updateRentedBookFromRenting(tokenId,
+                                                  newPrice,
+                                                  newAmount,
+                                                  newStartTime, 
+                                                  newRentalDuration, 
+                                                  renter);
+  }
 
-    uint currentIndex = 0;
-    for (uint i = 0; i < _listedBooks.current(); i++) {
-      PrimaryKeyListedBook memory keyListedBook = _allListedBook[i];
-      ListedBook memory book = _keyToListedBook[keyListedBook.tokenId][keyListedBook.seller];
-      if(book.tokenId != 0 && book.seller != address(0)) {
-        books[currentIndex] = book;
-        currentIndex++;
-      }
-    }
-    return books;
+  function getAllBooksOnSale() public view returns (ListedBookStorage.ListedBook[] memory) {
+    return _listedBookStorage.getAllListedBooks();
+  }
+
+  function getAllBooksOnRenting() public view returns (RentedBookStorage.RentedBook[] memory) {
+    return _rentedBookStorage.getAllRentedBooks();
   }
 
   function buyBooks(uint256 tokenId, address seller, uint256 amount) public payable {
-    // int idListedBook = getIdListedBookOnSale(tokenId, price, seller);
-    // ListedBook memory listedBook = getListedBook(uint256(idListedBook));
-    ListedBook memory listedBook = _keyToListedBook[tokenId][seller];
-    require(msg.sender != listedBook.seller, "You can't buy your own books on sale");
-    require(msg.value == amount * listedBook.price, "Please submit the asking price");
-    require(amount <= listedBook.amount && amount > 0, "Amount is invalid");
 
-    uint256 totalPrice = amount * listedBook.price;
-    decreaseListedBookFromSale(tokenId, amount, seller);
-    _safeTransferFrom(seller, msg.sender, tokenId, amount, "");
-    payable(seller).transfer(totalPrice);
+    uint totalPrice = _listedBookStorage.buyListedBooks(tokenId, seller, amount, msg.sender, msg.value);
+    if (totalPrice != 0) {
+      _safeTransferFrom(seller, msg.sender, tokenId, amount, "");
+      payable(seller).transfer(totalPrice);
+    }
   }
+
+  // This function is incomplete
+
+  // function borrowBooks(uint256 tokenId,
+  //                     address renter,
+  //                     uint256 amount,
+  //                     uint startTime,
+  //                     uint rentalDuration) public payable {
+
+  //   uint totalPrice = _rentedBookStorage.borrowRentedBooks(tokenId,
+  //                                                          renter, 
+  //                                                          amount, 
+  //                                                          msg.sender, 
+  //                                                          startTime, 
+  //                                                          rentalDuration, 
+  //                                                          msg.value);
+  //   if (totalPrice != 0) {
+  //     // _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
+  //     payable(renter).transfer(totalPrice);
+  //   }
+  // }
 
 }
