@@ -46,9 +46,9 @@ export type NftBookDetails = {
 
 export type NftBookMeta = {
   title: string;
-  file: string;
+  bookFile: string;
   bookCover: string;
-  attributes: NftBookAttribute[];
+  bookSample: string;
 };
 
 export type NftBookCore = {
@@ -69,6 +69,19 @@ export type NftBook = {
   details?: NftBookDetails;
 } & NftBookCore &
   ListedBookCore;
+
+export type PinataRes = {
+  IpfsHash: string;
+  PinSize: number;
+  Timestamp: string;
+  isDuplicate: boolean;
+};
+
+export type FileReq = {
+  bytes: Uint8Array;
+  contentType: string;
+  fileName: string;
+};
 
 export enum BookGenres {
   "Art & photography",

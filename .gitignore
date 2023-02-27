@@ -40,3 +40,4 @@ next-env.d.ts
 
 # dependencies
 package-lock.json
+public/contracts/

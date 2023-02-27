@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 import { Box, Button, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -6,7 +8,7 @@ interface UploadFieldProps {
   description?: string;
   required?: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  uploaded?: string;
+  uploaded?: File;
 }
 
 const UploadField = ({
@@ -14,7 +16,7 @@ const UploadField = ({
   description,
   onChange,
   required = false,
-  uploaded = ""
+  uploaded
 }: UploadFieldProps) => {
   const theme = useTheme();
   return (
@@ -39,7 +41,7 @@ const UploadField = ({
         <input type="file" hidden />
       </Button>
       <Typography variant="caption" sx={{ position: "absolute", bottom: 0 }}>
-        {uploaded}
+        {uploaded?.name}
       </Typography>
     </Box>
   );

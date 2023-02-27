@@ -11,7 +11,12 @@ import { useRouter } from "next/router";
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
+import {
+  BookGenres,
+  NftBook,
+  NftBookAttribute,
+  NftBookDetails
+} from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
