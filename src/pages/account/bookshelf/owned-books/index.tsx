@@ -2,14 +2,15 @@
 import { Box } from "@mui/material";
 
 import images from "@/assets/images";
+import { useOwnedNfts } from "@/components/hooks/web3";
 import { BookList } from "@/components/shared/BookList";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { NftBook } from "@/types/nftBook";
-import { useOwnedNfts } from "@/components/hooks/web3";
+
 // import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
 const OwnedBooks = () => {
-  const {nfts} = useOwnedNfts();
+  const { nfts } = useOwnedNfts();
 
   // const bookList: NftBook[] = [];
   // const bookList = [
