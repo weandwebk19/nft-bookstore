@@ -289,7 +289,7 @@ const AuthorPublishing = () => {
       try {
         const { signedData, account } = await getSignedData();
 
-        const promise = axios.post("/api/verify-file", {
+        const promise = axios.post("http://localhost:3001/verify-file", {
           address: account,
           signature: signedData,
           bytes,
