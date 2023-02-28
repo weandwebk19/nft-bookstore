@@ -60,7 +60,7 @@ const BookItem = ({ meta, author, onClick }: BookItemProps) => {
         >
           <Stack direction="row">
             <InsertDriveFileIcon fontSize="small" color="disabled" />
-            <Typography variant="caption">{meta.file}</Typography>
+            <Typography variant="caption">{meta.bookFile}</Typography>
           </Stack>
 
           {meta.attributes?.map((stat, i) => {

@@ -16,6 +16,7 @@ import * as yup from "yup";
 import images from "@/assets/images";
 import { useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
+import { BigTitle } from "@/components/shared/BigTitle";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { DatePicker } from "@/components/shared/DatePicker";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -427,21 +428,7 @@ const AuthorPublishing = () => {
           }}
           className={styles["profile__container"]}
         >
-          <Box component="section" sx={{ marginTop: "100px" }}>
-            <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
-              <Typography variant="h2">Publish </Typography>
-              <Typography variant="h2">your book </Typography>
-              <Box
-                component="img"
-                src={images.decoLine}
-                sx={{
-                  position: "absolute",
-                  maxWidth: "385px",
-                  transform: "translateX(-50%) translateY(-40%)"
-                }}
-              />
-            </Box>
-          </Box>
+          <BigTitle title1="Publish" title2="your book" />
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Stack spacing={6}>
               <ContentGroup title="Upload your book">

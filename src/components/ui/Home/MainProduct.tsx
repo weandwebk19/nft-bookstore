@@ -12,6 +12,7 @@ import { StyledCard, StyledCardMedia } from "@styles/components/Card";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
+import { BigTitle } from "@/components/shared/BigTitle";
 import cssFilter from "@/utils/cssFilter";
 
 const MainProduct = () => {
@@ -20,19 +21,7 @@ const MainProduct = () => {
 
   return (
     <Box>
-      <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
-        <Typography variant="h2">Our products</Typography>
-        <Box
-          component="img"
-          src={images.decoLine}
-          sx={{
-            position: "absolute",
-            maxWidth: "385px",
-            transform: "translateX(-50%) translateY(-40%)",
-            filter: cssFilter(`${theme.palette.primary.main}`)
-          }}
-        />
-      </Box>
+      <BigTitle title1="Our products" />
       <Grid
         container
         direction="row"

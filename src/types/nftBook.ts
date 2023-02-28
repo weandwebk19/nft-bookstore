@@ -49,13 +49,13 @@ export type NftBookMeta = {
   bookFile: string;
   bookCover: string;
   bookSample: string;
+  attributes: NftBookAttribute[];
 };
 
 export type NftBookCore = {
   tokenId: number | string;
   author: string;
   balance: number;
-  isListed: boolean;
 };
 
 export type ListedBookCore = {
