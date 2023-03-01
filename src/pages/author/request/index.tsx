@@ -21,12 +21,11 @@ import {
 } from "@mui/icons-material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import styles from "@styles/ContentContainer.module.scss";
+import styles from "@styles/BoxGroup.module.scss";
 import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
-import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
@@ -103,20 +102,47 @@ const Profile = () => {
   return (
     <>
       <Head>
-        <title>Profile - NFT Bookstore</title>
+        <title>Author request - NFT Bookstore</title>
         <meta name="description" content="The world's first NFT Bookstore" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer titles={["My Profile"]}>
+        <Stack
+          spacing={8}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            margin: "auto"
+          }}
+          className={styles["profile__container"]}
+        >
+          <Box component="section" sx={{ marginTop: "100px" }}>
+            <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
+              <Typography variant="h2">Make an</Typography>
+              <Typography variant="h2">Author request</Typography>
+              <Box
+                component="img"
+                src={images.decoLine}
+                sx={{
+                  position: "absolute",
+                  maxWidth: "385px",
+                  transform: "translateX(-50%) translateY(-40%)"
+                }}
+              />
+            </Box>
+          </Box>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Stack spacing={6}>
-              <ContentGroup title="Upload your photo">
+              <ContentGroup
+                title="Upload your photo"
+                desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+              >
                 <Stack
                   direction={{ xs: "column", sm: "column", md: "row" }}
                   spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
-                  className={styles["content__avatar"]}
+                  className={styles["profile__avatar"]}
                 >
                   {!true ? (
                     <Box
@@ -158,7 +184,7 @@ const Profile = () => {
                   </Stack>
                 </Stack>
               </ContentGroup>
-              <ContentGroup title="User information">
+              <ContentGroup title="Author information">
                 <Stack direction="column" spacing={3}>
                   <Stack
                     direction={{ xs: "column", md: "row" }}
@@ -455,7 +481,7 @@ const Profile = () => {
               </Stack>
             </Stack>
           </Box>
-        </ContentContainer>
+        </Stack>
       </main>
     </>
   );

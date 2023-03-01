@@ -1,0 +1,46 @@
+.box__container {
+    width: 80%;
+
+    .form__group-half {
+        width: 100%;
+    }
+
+    .box__group__title {
+        margin-bottom: 20px;
+    }
+}
+
+@media (min-width: 600px) and (max-width: 899.99px) {
+    .box__container {
+        width: 80%;
+    }
+}
+
+@media (min-width: 900px) and (max-width: 1199.99px) {
+    .box__container {
+
+        .form__group-half {
+            width: 50%;
+        }
+
+        .box__group__title {
+            margin-bottom: 24px;
+        }
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1535.99px) {
+    .box__container {
+        width: 1140px;
+    }
+}
+
+@media (min-width: 1536px) {
+    .box__container {
+        width: 1280px;
+
+        .box__group__title {
+            margin-bottom: 32px;
+        }
+    }
+}
