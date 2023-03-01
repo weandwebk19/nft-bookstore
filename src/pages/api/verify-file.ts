@@ -5,8 +5,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
 import { v4 as uuidv4 } from "uuid";
 
-import { Crypto } from "@/utils/crypto";
-
 import {
   addressCheckMiddleware,
   pinataApiKey,
@@ -14,21 +12,24 @@ import {
   withSession
 } from "./utils";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "100mb"
+    }
+  }
+};
+
 export default withSession(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
-    console.log("bytes3");
-
     if (req.method === "POST") {
       const { bytes, fileName, contentType } = req.body as FileReq;
-      console.log("bytes2");
 
       if (!bytes || !fileName || !contentType) {
         return res.status(422).send({ message: "File data are missing" });
       }
 
       await addressCheckMiddleware(req, res);
-
-      // const cipherText = await Crypto.encryption(bytes, encKey!, iv!);
 
       const buffer = Buffer.from(Object.values(bytes));
       const formData = new FormData();

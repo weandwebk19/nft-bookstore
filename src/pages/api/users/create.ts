@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import clientPromise from "../../../lib/mongodb";
 
-type Data = {
+type ResponseData = {
   success: boolean;
   message: string;
   data: object | null;
@@ -10,7 +10,7 @@ type Data = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<ResponseData>
 ) {
   try {
     const client = await clientPromise;
@@ -18,7 +18,7 @@ export default async function handler(
     const { address, username } = req.body;
 
     // Check if the address is exists
-    const countAccount = await db.collection("accounts").count({
+    const countAccount = await db.collection("users").count({
       address: address
     });
 
@@ -30,7 +30,7 @@ export default async function handler(
       });
     } else {
       const newAccount = await db
-        .collection("accounts")
+        .collection("users")
         .insertOne({ address, username });
 
       return res.json({
