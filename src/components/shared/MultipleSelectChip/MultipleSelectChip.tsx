@@ -1,15 +1,23 @@
 import * as React from "react";
 
-import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
-import FormControl from "@mui/material/FormControl";
-import MenuItem from "@mui/material/MenuItem";
-import OutlinedInput from "@mui/material/OutlinedInput";
+import {
+  Box,
+  Chip,
+  FormControl,
+  MenuItem,
+  OutlinedInput,
+  Stack,
+  Typography
+} from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { useTheme } from "@mui/material/styles";
+
+import styles from "@styles/Form.module.scss";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
+  disableScrollLock: true,
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
@@ -20,18 +28,23 @@ const MenuProps = {
 
 interface MultipleSelectChipProps {
   items: string[];
-  value: string[];
+  value: any;
+  error?: boolean;
+  helperText?: string;
   onChange: (event: SelectChangeEvent<string[]>) => void;
 }
 
 export default function MultipleSelectChip({
   items,
   value,
+  error,
+  helperText,
   onChange
 }: MultipleSelectChipProps) {
+  const theme = useTheme();
   return (
-    <div>
-      <FormControl sx={{ width: "100%" }}>
+    <FormControl sx={{ width: "100%" }}>
+      <Stack>
         <Select
           labelId="demo-multiple-chip-label"
           id="demo-multiple-chip"
@@ -54,7 +67,16 @@ export default function MultipleSelectChip({
             </MenuItem>
           ))}
         </Select>
-      </FormControl>
-    </div>
+        <Typography
+          className={styles["form__helper-text"]}
+          variant="caption"
+          sx={{
+            color: `${theme.palette.error.main}`
+          }}
+        >
+          {helperText}
+        </Typography>
+      </Stack>
+    </FormControl>
   );
 }

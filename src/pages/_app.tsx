@@ -38,7 +38,7 @@ export default function App({ Component, pageProps }: ComponentWithPageLayout) {
               animate="animateState"
               exit="exitState"
               className="base-page-size"
-              transition={{ duration: 0.75, delay: 0.25 }}
+              transition={{ duration: 0.3 }}
               variants={{
                 initialState: {
                   opacity: 0,
