@@ -5,8 +5,7 @@ import { styled } from "@mui/system";
 type customVariant = "primary" | "secondary";
 
 const StyledButton = styled(Button, {
-  shouldForwardProp: (prop) =>
-    prop !== "width" && prop !== "customVariant" && prop !== "component"
+  shouldForwardProp: (prop) => prop !== "width" && prop !== "customVariant"
 })<{
   width?: string | number;
   customVariant?: customVariant;

@@ -252,10 +252,10 @@ const Profile = () => {
                       Upload your photo
                       <input
                         type="file"
+                        hidden
                         onChange={handleImage}
                         accept="image/*"
                         // accept="image/png, image/jpeg"
-                        hidden
                       />
                     </StyledButton>
 
