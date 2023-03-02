@@ -37,6 +37,8 @@ import { UploadField } from "@/components/shared/UploadField";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTextArea } from "@/styles/components/TextField";
 
+const MAXIMUM_ATTACHMENTS_SIZE = 2000000;
+
 const schema = yup
   .object({
     pseudonym: yup.string().required("Please enter your pseudonym"),
@@ -49,7 +51,6 @@ const schema = yup
       .string()
       .required("Please enter your phone number")
       .matches(
-        // /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/,
         /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
         "Please enter valid phone number"
       ),
@@ -249,7 +250,13 @@ const Profile = () => {
                   <Stack spacing={3} sx={{ justifyContent: "center" }}>
                     <StyledButton customVariant="primary" component="label">
                       Upload your photo
-                      <input type="file" hidden onChange={handleImage} />
+                      <input
+                        type="file"
+                        onChange={handleImage}
+                        accept="image/*"
+                        // accept="image/png, image/jpeg"
+                        hidden
+                      />
                     </StyledButton>
 
                     <StyledButton customVariant="secondary" onClick={() => {}}>
