@@ -19,7 +19,7 @@ import StarIcon from "@mui/icons-material/Star";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import TreeView from "@mui/lab/TreeView";
-import styles from "@styles/FilterBox.module.scss";
+import styles from "@styles/FilterBar.module.scss";
 import * as yup from "yup";
 
 import { StyledButton } from "@/styles/components/Button";
@@ -156,7 +156,7 @@ const FilterBar = () => {
       divider={<Divider orientation="horizontal" />}
       spacing={3}
       sx={{ marginTop: 4 }}
-      className={styles["filter-box"]}
+      className={styles["filter-bar"]}
     >
       <FilterItem title="Genres">
         <Box>

@@ -1,0 +1,13 @@
+.filter-bar {
+    .filter-rating {
+        gap: 16px;
+    }
+}
+
+@media (max-width: 1199.99px) {
+    .filter-bar {
+        .filter-rating {
+            gap: 32px;
+        }
+    }
+}

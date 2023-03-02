@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -6,7 +6,7 @@ import { Box, Link, Stack, TextField, Typography } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import styles from "@styles/Profile.module.scss";
+import styles from "@styles/ContentContainer.module.scss";
 import axios from "axios";
 import dayjs, { Dayjs } from "dayjs";
 import { ethers } from "ethers";
@@ -17,6 +17,7 @@ import images from "@/assets/images";
 import { useFetchData, useGenres, useLanguages } from "@/components/hooks/api";
 import { useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
+import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { DatePicker } from "@/components/shared/DatePicker";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -448,31 +449,7 @@ const AuthorPublishing = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Stack
-          spacing={8}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            margin: "auto"
-          }}
-          className={styles["profile__container"]}
-        >
-          <Box component="section" sx={{ marginTop: "100px" }}>
-            <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
-              <Typography variant="h2">Publish </Typography>
-              <Typography variant="h2">your book </Typography>
-              <Box
-                component="img"
-                src={images.decoLine}
-                sx={{
-                  position: "absolute",
-                  maxWidth: "385px",
-                  transform: "translateX(-50%) translateY(-40%)"
-                }}
-              />
-            </Box>
-          </Box>
+        <ContentContainer titles={["Publish", "your book"]}>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Stack spacing={6}>
               <ContentGroup title="Upload your book">
@@ -618,7 +595,7 @@ const AuthorPublishing = () => {
                       <FormGroup
                         label="Version"
                         required
-                        className={styles["profile__formGroup-half"]}
+                        className={styles["form__group-half"]}
                       >
                         <Controller
                           name="version"
@@ -638,7 +615,7 @@ const AuthorPublishing = () => {
                       <FormGroup
                         label="Max supply"
                         required
-                        className={styles["profile__formGroup-half"]}
+                        className={styles["form__group-half"]}
                       >
                         <Controller
                           name="maxSupply"
@@ -763,7 +740,7 @@ const AuthorPublishing = () => {
                       </FormGroup>
                       <FormGroup
                         label="Key words"
-                        className={styles["profile__formGroup-half"]}
+                        className={styles["form__group-half"]}
                       >
                         <Controller
                           name="keywords"
@@ -788,7 +765,7 @@ const AuthorPublishing = () => {
                     >
                       <FormGroup
                         label="Min price"
-                        className={styles["profile__formGroup-half"]}
+                        className={styles["form__group-half"]}
                       >
                         <Controller
                           name="minPrice"
@@ -821,7 +798,7 @@ const AuthorPublishing = () => {
                       </FormGroup>
                       <FormGroup
                         label="Max price"
-                        className={styles["profile__formGroup-half"]}
+                        className={styles["form__group-half"]}
                       >
                         <Controller
                           name="maxPrice"
@@ -889,7 +866,7 @@ const AuthorPublishing = () => {
                   >
                     <FormGroup
                       label="Publishing date"
-                      className={styles["profile__formGroup-half"]}
+                      className={styles["form__group-half"]}
                     >
                       <DatePicker
                         value={chosenDate}
@@ -903,7 +880,7 @@ const AuthorPublishing = () => {
                     </FormGroup>
                     <FormGroup
                       label="Publishing time"
-                      className={styles["profile__formGroup-half"]}
+                      className={styles["form__group-half"]}
                     >
                       <TimePicker
                         value={chosenTime}
@@ -953,7 +930,7 @@ const AuthorPublishing = () => {
               </Typography>
             </Stack>
           </Box>
-        </Stack>
+        </ContentContainer>
       </main>
     </>
   );
