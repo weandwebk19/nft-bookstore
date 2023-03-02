@@ -6,8 +6,7 @@ import {
   IconButton,
   InputAdornment,
   Stack,
-  TextField,
-  Typography
+  TextField
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { useTheme } from "@mui/material/styles";
@@ -378,6 +377,37 @@ const Profile = () => {
                             gap: "8px"
                           }}
                         >
+                          <LinkedInIcon />
+                          LinkedIn
+                        </Box>
+                      }
+                      className={styles["form__group-half"]}
+                    >
+                      <Controller
+                        name="linkedIn"
+                        control={control}
+                        render={({ field }) => {
+                          return (
+                            <TextField
+                              id="linkedIn"
+                              fullWidth
+                              error={!!errors.linkedIn?.message}
+                              {...field}
+                            />
+                          );
+                        }}
+                      />
+                    </FormGroup>
+                    <FormGroup
+                      label={
+                        <Box
+                          component="span"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px"
+                          }}
+                        >
                           <InstagramIcon />
                           Instagram
                         </Box>
@@ -399,60 +429,29 @@ const Profile = () => {
                         }}
                       />
                     </FormGroup>
-                    <FormGroup
-                      label={
-                        <Box
-                          component="span"
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px"
-                          }}
-                        >
-                          <LinkedInIcon />
-                          linkedIn
-                        </Box>
-                      }
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="linkedIn"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="linkedIn"
-                              fullWidth
-                              error={!!errors.linkedIn?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
                   </Stack>
                 </Stack>
               </ContentGroup>
-              <Stack
-                direction="row"
-                spacing={2}
-                sx={{ alignItems: "center", justifyContent: "flex-end" }}
+            </Stack>
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{ alignItems: "center", justifyContent: "flex-end", mt: 6 }}
+            >
+              <StyledButton
+                customVariant="secondary"
+                type="submit"
+                onClick={() => {}}
               >
-                <StyledButton
-                  customVariant="secondary"
-                  type="submit"
-                  onClick={() => {}}
-                >
-                  Cancel
-                </StyledButton>
-                <StyledButton
-                  customVariant="primary"
-                  type="submit"
-                  onClick={handleSubmit(onSubmit)}
-                >
-                  Save changes
-                </StyledButton>
-              </Stack>
+                Cancel
+              </StyledButton>
+              <StyledButton
+                customVariant="primary"
+                type="submit"
+                onClick={handleSubmit(onSubmit)}
+              >
+                Save changes
+              </StyledButton>
             </Stack>
           </Box>
         </ContentContainer>

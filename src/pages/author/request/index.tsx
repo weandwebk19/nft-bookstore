@@ -5,6 +5,7 @@ import {
   Box,
   IconButton,
   InputAdornment,
+  Link,
   Stack,
   TextField,
   Typography
@@ -21,24 +22,27 @@ import {
 } from "@mui/icons-material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import styles from "@styles/BoxGroup.module.scss";
+import styles from "@styles/ContentContainer.module.scss";
 import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { UploadField } from "@/components/shared/UploadField";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTextArea } from "@/styles/components/TextField";
 
 const schema = yup
   .object({
-    userName: yup.string().required("Please enter your username"),
+    pseudonym: yup.string().required("Please enter your pseudonym"),
+    about: yup.string(),
     email: yup
       .string()
       .required("Please enter your email address")
       .email("Please enter valid email address"),
-    bio: yup.string(),
+    phoneNumber: yup.string().required("Please enter your phone number"),
     website: yup.string(),
     walletAddress: yup.string(),
     facebook: yup.string(),
@@ -50,6 +54,33 @@ const schema = yup
 
 type FormData = yup.InferType<typeof schema>;
 
+const fileSchema = yup.object().shape({
+  frontDocument: yup
+    .mixed()
+    .test("required", "You need to provide a file", (file) => {
+      // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
+      if (file) return true;
+      return false;
+    })
+    .test("fileSize", "The file is too large", (file) => {
+      //if u want to allow only certain file sizes
+      return file && file.size <= MAXIMUM_ATTACHMENTS_SIZE;
+    }),
+  backDocument: yup
+    .mixed()
+    .test("required", "You need to provide a file", (file) => {
+      // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
+      if (file) return true;
+      return false;
+    })
+    .test("fileSize", "The file is too large", (file) => {
+      //if u want to allow only certain file sizes
+      return file && file.size <= MAXIMUM_ATTACHMENTS_SIZE;
+    })
+});
+
+type FileFormData = yup.InferType<typeof fileSchema>;
+
 const Profile = () => {
   const theme = useTheme();
   const {
@@ -58,31 +89,33 @@ const Profile = () => {
     control,
     setValue,
     getValues
-  } = useForm<FormData>({
+  } = useForm<FormData & FileFormData>({
     defaultValues: {
-      userName: "",
+      pseudonym: "",
+      about: "",
       email: "",
-      bio: "",
       website: "",
       walletAddress: "0x6d5f4vrRafverHKJ561692842xderyb",
       facebook: "",
       twitter: "",
       linkedIn: "",
-      instagram: ""
+      instagram: "",
+      frontDocument: [],
+      backDocument: []
     },
     resolver: yupResolver(schema)
   });
+
   const MAXIMUM_NUMBER_OF_CHARACTERS = 1000;
   const [numberOfCharacters, setNumberOfCharacters] = useState<Number>(0);
 
+  // Front document
+  const [uploadedFrontDocument, setUploadedFrontDocument] = useState<File>();
+
+  // Back document
+  const [uploadedBackDocument, setUploadedBackDocument] = useState<File>();
+
   const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    // const file = document.getElementById("profileImage").files[0];
-    // const reader = new FileReader();
-    // reader.readAsDataURL(file);
-    // reader.onloadend = () => {
-    //   setValue("profileImage", reader.result);
-    // };
-    console.log("e.target.value:", e.target.value);
     console.log("e.target.files:", e.target.files);
     if (!e.target.files || e.target.files.length === 0) {
       console.error("Select a file");
@@ -108,31 +141,7 @@ const Profile = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Stack
-          spacing={8}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            margin: "auto"
-          }}
-          className={styles["profile__container"]}
-        >
-          <Box component="section" sx={{ marginTop: "100px" }}>
-            <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
-              <Typography variant="h2">Make an</Typography>
-              <Typography variant="h2">Author request</Typography>
-              <Box
-                component="img"
-                src={images.decoLine}
-                sx={{
-                  position: "absolute",
-                  maxWidth: "385px",
-                  transform: "translateX(-50%) translateY(-40%)"
-                }}
-              />
-            </Box>
-          </Box>
+        <ContentContainer titles={["Make an", "Author request"]}>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Stack spacing={6}>
               <ContentGroup
@@ -186,30 +195,58 @@ const Profile = () => {
               </ContentGroup>
               <ContentGroup title="Author information">
                 <Stack direction="column" spacing={3}>
+                  <FormGroup label="Pseudonym" required>
+                    <Controller
+                      name="pseudonym"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <TextField
+                            id="pseudonym"
+                            fullWidth
+                            error={!!errors.pseudonym?.message}
+                            {...field}
+                          />
+                        );
+                      }}
+                    />
+                  </FormGroup>
+                  <FormGroup label="More about you">
+                    <Controller
+                      name="about"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <StyledTextArea
+                            id="about"
+                            minRows={3}
+                            multiline={true}
+                            label={`${numberOfCharacters}/${MAXIMUM_NUMBER_OF_CHARACTERS}`}
+                            fullWidth
+                            InputLabelProps={{
+                              shrink: true
+                            }}
+                            error={!!errors.about?.message}
+                            {...field}
+                            onChange={(e) => {
+                              let lengthOfCharacters = e.target.value.length;
+                              if (
+                                lengthOfCharacters <=
+                                MAXIMUM_NUMBER_OF_CHARACTERS
+                              ) {
+                                setNumberOfCharacters(lengthOfCharacters);
+                                field.onChange(e);
+                              }
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                  </FormGroup>
                   <Stack
                     direction={{ xs: "column", md: "row" }}
                     spacing={{ xs: 2 }}
                   >
-                    <FormGroup
-                      label="User name"
-                      required
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="userName"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="userName"
-                              fullWidth
-                              error={!!errors.userName?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
                     <FormGroup
                       label="Email"
                       required
@@ -236,38 +273,70 @@ const Profile = () => {
                         }}
                       />
                     </FormGroup>
+                    <FormGroup
+                      label="Phone number"
+                      required
+                      className={styles["form__group-half"]}
+                    >
+                      <Controller
+                        name="phoneNumber"
+                        control={control}
+                        render={({ field }) => {
+                          return (
+                            <TextField
+                              id="phoneNumber"
+                              fullWidth
+                              error={!!errors.phoneNumber?.message}
+                              {...field}
+                            />
+                          );
+                        }}
+                      />
+                    </FormGroup>
                   </Stack>
-                  <FormGroup label="Bio">
-                    <Controller
-                      name="bio"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <StyledTextArea
-                            id="bio"
-                            minRows={3}
-                            multiline={true}
-                            label={`${numberOfCharacters}/${MAXIMUM_NUMBER_OF_CHARACTERS}`}
-                            fullWidth
-                            InputLabelProps={{
-                              shrink: true
-                            }}
-                            error={!!errors.bio?.message}
-                            {...field}
-                            onChange={(e) => {
-                              let lengthOfCharacters = e.target.value.length;
-                              if (
-                                lengthOfCharacters <=
-                                MAXIMUM_NUMBER_OF_CHARACTERS
-                              ) {
-                                setNumberOfCharacters(lengthOfCharacters);
-                                field.onChange(e);
-                              }
-                            }}
-                          />
-                        );
-                      }}
-                    />
+                  <FormGroup label="ID Document" required>
+                    <Stack
+                      direction={{ xs: "column", md: "row" }}
+                      spacing={{ xs: 3 }}
+                    >
+                      <UploadField
+                        content="Front"
+                        required
+                        onChange={(e) => {
+                          (async () => {
+                            if (!e.target.files) {
+                              console.error("Select a file");
+                              return;
+                            }
+
+                            const file = e.target.files[0];
+
+                            setValue("frontDocument", file, {
+                              shouldValidate: true
+                            });
+                            setUploadedFrontDocument(file);
+                          })();
+                        }}
+                        uploaded={uploadedFrontDocument}
+                      />
+                      <UploadField
+                        content="Back"
+                        required
+                        onChange={(e) => {
+                          if (!e.target.files) {
+                            console.error("Select a file");
+                            return;
+                          }
+
+                          const file = e.target.files[0];
+                          setValue("backDocument", file, {
+                            shouldValidate: true
+                          });
+                          setUploadedBackDocument(file);
+                        }}
+                        uploaded={uploadedBackDocument}
+                      />
+                    </Stack>
                   </FormGroup>
                 </Stack>
               </ContentGroup>
@@ -404,6 +473,37 @@ const Profile = () => {
                             gap: "8px"
                           }}
                         >
+                          <LinkedInIcon />
+                          LinkedIn
+                        </Box>
+                      }
+                      className={styles["form__group-half"]}
+                    >
+                      <Controller
+                        name="linkedIn"
+                        control={control}
+                        render={({ field }) => {
+                          return (
+                            <TextField
+                              id="linkedIn"
+                              fullWidth
+                              error={!!errors.linkedIn?.message}
+                              {...field}
+                            />
+                          );
+                        }}
+                      />
+                    </FormGroup>
+                    <FormGroup
+                      label={
+                        <Box
+                          component="span"
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px"
+                          }}
+                        >
                           <InstagramIcon />
                           Instagram
                         </Box>
@@ -425,44 +525,15 @@ const Profile = () => {
                         }}
                       />
                     </FormGroup>
-                    <FormGroup
-                      label={
-                        <Box
-                          component="span"
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px"
-                          }}
-                        >
-                          <LinkedInIcon />
-                          linkedIn
-                        </Box>
-                      }
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="linkedIn"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="linkedIn"
-                              fullWidth
-                              error={!!errors.linkedIn?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
                   </Stack>
                 </Stack>
               </ContentGroup>
+            </Stack>
+            <Stack spacing={3}>
               <Stack
                 direction="row"
                 spacing={2}
-                sx={{ alignItems: "center", justifyContent: "flex-end" }}
+                sx={{ alignItems: "center", justifyContent: "flex-end", mt: 6 }}
               >
                 <StyledButton
                   customVariant="secondary"
@@ -476,12 +547,22 @@ const Profile = () => {
                   type="submit"
                   onClick={handleSubmit(onSubmit)}
                 >
-                  Save changes
+                  Submit
                 </StyledButton>
               </Stack>
+              <Typography sx={{ fontStyle: "italic" }}>
+                By clicking{" "}
+                <b>
+                  <i>Submit</i>
+                </b>
+                , you agree to our{" "}
+                <Link href="/terms-of-service">Terms of Service</Link> and that
+                you have read our{" "}
+                <Link href="/term-of-service">Privacy Policy</Link>.
+              </Typography>
             </Stack>
           </Box>
-        </Stack>
+        </ContentContainer>
       </main>
     </>
   );
