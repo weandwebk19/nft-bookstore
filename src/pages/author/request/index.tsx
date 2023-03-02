@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import {
   Box,
@@ -23,10 +24,12 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/ContentContainer.module.scss";
+import axios from "axios";
 import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -42,7 +45,14 @@ const schema = yup
       .string()
       .required("Please enter your email address")
       .email("Please enter valid email address"),
-    phoneNumber: yup.string().required("Please enter your phone number"),
+    phoneNumber: yup
+      .string()
+      .required("Please enter your phone number")
+      .matches(
+        // /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/,
+        /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
+        "Please enter valid phone number"
+      ),
     website: yup.string(),
     walletAddress: yup.string(),
     facebook: yup.string(),
@@ -83,6 +93,7 @@ type FileFormData = yup.InferType<typeof fileSchema>;
 
 const Profile = () => {
   const theme = useTheme();
+  const { ethereum, contract } = useWeb3();
   const {
     handleSubmit,
     formState: { errors },
@@ -126,6 +137,60 @@ const Profile = () => {
     // const buffer = await file.arrayBuffer();
     // const bytes = new Uint8Array(buffer);
     // console.log("click");
+  };
+
+  const getSignedData = async () => {
+    const messageToSign = await axios.get("/api/verify");
+    const accounts = (await ethereum?.request({
+      method: "eth_requestAccounts"
+    })) as string[];
+    const account = accounts[0];
+
+    const signedData = await ethereum?.request({
+      method: "personal_sign",
+      params: [
+        JSON.stringify(messageToSign.data),
+        account,
+        messageToSign.data.id
+      ]
+    });
+
+    return { signedData, account };
+  };
+
+  const uploadFrontDocument = async (file: File) => {
+    if (file !== undefined) {
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      console.log(bytes);
+
+      try {
+        const { signedData, account } = await getSignedData();
+        const promise = axios.post("/api/verify-image", {
+          address: account,
+          signature: signedData,
+          bytes,
+          contentType: file.type,
+          fileName: file.name.replace(/\.[^/.]+$/, "")
+        });
+
+        const res = await toast.promise(promise, {
+          pending: "Uploading Front Document",
+          success: "Front Document uploaded",
+          error: "Front Document upload error"
+        });
+
+        // const data = res.data as PinataRes;
+        // console.log(data);
+
+        // setNftBookMeta({
+        //   ...nftBookMeta,
+        //   bookSample: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+        // });
+      } catch (e: any) {
+        console.error(e.message);
+      }
+    }
   };
 
   const onSubmit = (data: any) => {
@@ -288,6 +353,10 @@ const Profile = () => {
                               fullWidth
                               error={!!errors.phoneNumber?.message}
                               {...field}
+                              onChange={(e) => {
+                                e.target.value = e.target.value.trim();
+                                field.onChange(e);
+                              }}
                             />
                           );
                         }}
@@ -533,7 +602,11 @@ const Profile = () => {
               <Stack
                 direction="row"
                 spacing={2}
-                sx={{ alignItems: "center", justifyContent: "flex-end", mt: 6 }}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  mt: 6
+                }}
               >
                 <StyledButton
                   customVariant="secondary"
@@ -550,7 +623,7 @@ const Profile = () => {
                   Submit
                 </StyledButton>
               </Stack>
-              <Typography sx={{ fontStyle: "italic" }}>
+              <Typography sx={{ fontStyle: "italic", mt: "32px !important" }}>
                 By clicking{" "}
                 <b>
                   <i>Submit</i>
