@@ -13,6 +13,8 @@ import { ethers } from "ethers";
 import Head from "next/head";
 import * as yup from "yup";
 
+import images from "@/assets/images";
+import { useFetchData, useGenres, useLanguages } from "@/components/hooks/api";
 import { useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -24,8 +26,15 @@ import { TimePicker } from "@/components/shared/TimePicker";
 import { UploadField } from "@/components/shared/UploadField";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTextArea } from "@/styles/components/TextField";
+import { DataFetchResponse } from "@/types/api";
 import { Language } from "@/types/languages";
-import { BookGenres, NftBookMeta, PinataRes } from "@/types/nftBook";
+import {
+  BookGenres,
+  BookInfo,
+  NftBookDetails,
+  NftBookMeta,
+  PinataRes
+} from "@/types/nftBook";
 import { isFloat } from "@/utils/isFloat";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 2000000;
@@ -35,7 +44,7 @@ const MAXIMUM_SUPPLY = 500;
 
 const MAXIMUM_PRICE = 1000;
 
-const ALLOWED_FIELDS = ["title", "file", "bookCover", "attributes"];
+const ALLOWED_FIELDS = ["title", "bookFile", "bookCover"];
 
 const schema = yup
   .object({
@@ -63,11 +72,11 @@ const schema = yup
       .array()
       .of(yup.string())
       .required("Please enter your book languages"),
-    pages: yup
+    totalPages: yup
       .number()
-      .min(0, `The pages must be greater than or equal 0`)
+      .min(0, `The total page must be greater than or equal 0`)
       .required("Please enter the page number of your book"),
-    keyWords: yup.string(),
+    keywords: yup.string(),
     minPrice: yup
       .number()
       .min(0, `The min price must be greater than or equal 0`)
@@ -144,10 +153,10 @@ const AuthorPublishing = () => {
     bookSample: ""
   });
   // Book genres
-  const bookGenres = Object.keys(BookGenres).filter((item) => {
-    return isNaN(Number(item));
-  });
-
+  // const bookGenres = Object.keys(BookGenres).filter((item) => {
+  //   return isNaN(Number(item));
+  // });
+  const bookGenres = useGenres();
   const [chosenGenres, setChosenGenres] = useState<typeof bookGenres>([]);
 
   // const handleGenresChange = (event: SelectChangeEvent<typeof bookGenres>) => {
@@ -161,7 +170,7 @@ const AuthorPublishing = () => {
   // };
 
   // Languages
-  const languages = Object.values(Language);
+  const languages = useLanguages();
   const [chosenLanguages, setChosenLanguages] = useState<string[]>([]);
 
   // const handleLanguagesChange = (event: SelectChangeEvent<string[]>) => {
@@ -213,12 +222,11 @@ const AuthorPublishing = () => {
       maxSupply: MINIMUM_SUPPLY,
       genres: [],
       languages: [],
-      pages: 1,
-      keyWords: "",
+      totalPages: 1,
+      keywords: "",
       minPrice: 0,
       maxPrice: MAXIMUM_PRICE,
       listingPrice: 0,
-      publishingDate: new Date(),
       publishingTime: new Date()
     },
     resolver: yupResolver(schema)
@@ -247,14 +255,12 @@ const AuthorPublishing = () => {
 
   const uploadBookSample = async (file: File) => {
     if (file !== undefined) {
-      // const file = uploadedBookSample;
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
-      console.log(bytes);
 
       try {
         const { signedData, account } = await getSignedData();
-        const promise = axios.post("/api/verify-image", {
+        const promise = axios.post("/api/verify-file", {
           address: account,
           signature: signedData,
           bytes,
@@ -269,7 +275,6 @@ const AuthorPublishing = () => {
         });
 
         const data = res.data as PinataRes;
-        console.log(data);
 
         setNftBookMeta({
           ...nftBookMeta,
@@ -289,7 +294,7 @@ const AuthorPublishing = () => {
       try {
         const { signedData, account } = await getSignedData();
 
-        const promise = axios.post("http://localhost:3001/verify-file", {
+        const promise = axios.post("/api/verify-file", {
           address: account,
           signature: signedData,
           bytes,
@@ -304,7 +309,6 @@ const AuthorPublishing = () => {
         });
 
         const data = res.data as PinataRes;
-        console.log("data", data);
 
         setNftBookMeta({
           ...nftBookMeta,
@@ -318,7 +322,6 @@ const AuthorPublishing = () => {
 
   const uploadBookCover = async (file: File) => {
     if (file !== undefined) {
-      // const file = uploadedBookCover;
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
 
@@ -391,8 +394,8 @@ const AuthorPublishing = () => {
       });
 
       await toast.promise(tx!.wait(), {
-        pending: "Minting Nft Token",
-        success: "Nft has ben created",
+        pending: "Minting NftBook Token",
+        success: "NftBook has ben created",
         error: "Minting error"
       });
     } catch (e: any) {
@@ -400,12 +403,41 @@ const AuthorPublishing = () => {
     }
   };
 
+  const uploadBookDetails = async (bookInfo: BookInfo) => {
+    try {
+      const promise = axios.post("/api/books/create", bookInfo);
+
+      const res = await toast.promise(promise, {
+        pending: "Uploading book details...",
+        success: "Book details uploaded",
+        error: "Book details upload error"
+      });
+
+      console.log(res);
+    } catch (e: any) {
+      console.error(e.message);
+    }
+  };
+
   const onSubmit = (data: any) => {
-    // console.log("data:", data);
+    // // Upload metadata to pinata
     // uploadBookCover(data.bookCover);
-    uploadBookFile(data.bookFile);
+    // uploadBookFile(data.bookFile);
     // uploadBookSample(data.bookSample);
-    console.log("nftBookMeta:", nftBookMeta);
+    // // Mint book
+    // createNFTBook(data.maxSupply);
+    // Upload data to database
+    uploadBookDetails({
+      description: data.description,
+      languages: data.languages,
+      genres: data.genres,
+      version: data.version,
+      max_supply: data.maxSupply,
+      external_link: data.externalLink,
+      total_pages: data.totalPages,
+      keywords: data.keywords,
+      publishing_time: data.publishingTime
+    });
   };
 
   return (
@@ -490,13 +522,16 @@ const AuthorPublishing = () => {
                               fullWidth
                               error={!!errors.bookTitle?.message}
                               {...field}
-                              // onChange={(e) => {
-                              //   const title = e.target.value;
-                              //   setNftBookMeta({
-                              //     ...nftBookMeta,
-                              //     title: title
-                              //   });
-                              // }}
+                              onChange={(e) => {
+                                const title = e.target.value;
+                                setNftBookMeta({
+                                  ...nftBookMeta,
+                                  title: title
+                                });
+                                setValue("bookTitle", title, {
+                                  shouldValidate: true
+                                });
+                              }}
                             />
                           );
                         }}
@@ -662,19 +697,19 @@ const AuthorPublishing = () => {
                       spacing={{ xs: 2 }}
                     >
                       <FormGroup
-                        label="Pages"
-                        className={styles["form__group-half"]}
+                        label="Total Page"
+                        className={styles["profile__formGroup-half"]}
                         required
                       >
                         <Controller
-                          name="pages"
+                          name="totalPages"
                           control={control}
                           render={({ field }) => {
                             return (
                               <TextField
-                                id="pages"
+                                id="totalPages"
                                 fullWidth
-                                error={!!errors.pages?.message}
+                                error={!!errors.totalPages?.message}
                                 {...field}
                                 onChange={(e) => {
                                   if (
@@ -689,9 +724,13 @@ const AuthorPublishing = () => {
                                   }
 
                                   field.onChange(e);
-                                  setValue("pages", getValues("pages"), {
-                                    shouldValidate: true
-                                  });
+                                  setValue(
+                                    "totalPages",
+                                    getValues("totalPages"),
+                                    {
+                                      shouldValidate: true
+                                    }
+                                  );
                                 }}
                               />
                             );
@@ -704,14 +743,14 @@ const AuthorPublishing = () => {
                         className={styles["form__group-half"]}
                       >
                         <Controller
-                          name="keyWords"
+                          name="keywords"
                           control={control}
                           render={({ field }) => {
                             return (
                               <TextField
                                 id="userName"
                                 fullWidth
-                                error={!!errors.keyWords?.message}
+                                error={!!errors.keywords?.message}
                                 {...field}
                               />
                             );
