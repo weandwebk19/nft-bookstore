@@ -4,7 +4,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   Box,
   Snackbar,
-  Stack,
   Step,
   StepLabel,
   Stepper,
@@ -15,18 +14,17 @@ import Paper from "@mui/material/Paper";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Alert } from "@mui/lab";
-import styles from "@styles/Form.module.scss";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { BigTitle } from "@/components/shared/BigTitle";
+import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
   FinalStep,
   Step1,
   Step2,
   Step3
-} from "@/components/ui/author/publishing/steps";
+} from "@/components/ui/author/creating/steps";
 import { StyledButton } from "@/styles/components/Button";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
@@ -40,9 +38,10 @@ const steps = [
   "Book details",
   "Terms and Conditions"
 ];
+
 const defaultValues = {
   // Step 1
-  bookTitle: "",
+  title: "",
   description: "",
 
   // Step 2
@@ -71,7 +70,7 @@ const Form = () => {
   const validationSchema = [
     // validation for step1 (Fill in book name and description)
     yup.object({
-      bookTitle: yup.string().required("Please enter your book title"),
+      title: yup.string().required("Please enter your book title"),
       description: yup.string().required("Please enter your book description")
     }),
 
@@ -259,17 +258,7 @@ const Form = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Stack
-          spacing={8}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            margin: "auto"
-          }}
-          className={styles["form__container"]}
-        >
-          <BigTitle title1="Create" title2="your book" />
+        <ContentContainer titles={["Create", "your book"]}>
           <Box
             component="section"
             sx={{ width: "100%", maxWidth: "720px" }}
@@ -346,7 +335,7 @@ const Form = () => {
               </div>
             </Paper>
           </Box>
-        </Stack>
+        </ContentContainer>
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
           <Alert
             onClose={handleClose}

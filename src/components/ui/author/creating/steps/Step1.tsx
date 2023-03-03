@@ -15,7 +15,7 @@ const Step1 = () => {
       </Box>
       <Stack direction="column" spacing={3}>
         <FormGroup label="Book title" required>
-          <InputController name="bookTitle" />
+          <InputController name="title" />
         </FormGroup>
         <FormGroup label="Description" required>
           <TextAreaController name="description" />

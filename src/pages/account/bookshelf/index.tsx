@@ -1,10 +1,8 @@
 import { Stack, Typography } from "@mui/material";
 
-import { useRouter } from "next/router";
-
 import images from "@/assets/images";
-import { BigTitle } from "@/components/shared/BigTitle";
 import { BookTicket } from "@/components/shared/BookTicket";
+import { ContentContainer } from "@/components/shared/ContentContainer";
 import { Wrapper } from "@/components/shared/Wrapper";
 
 const preUrl = "/account/bookshelf";
@@ -86,13 +84,12 @@ const bottomCategories = [
 ];
 
 const BookShelf = () => {
-  const router = useRouter();
-
   return (
     <Stack spacing={6}>
-      <BigTitle title1="My bookshelf" />
-      <Wrapper items={topCategories} itemsInARow={4} />
-      <Wrapper items={bottomCategories} itemsInARow={4} />
+      <ContentContainer titles={["My bookshelf"]}>
+        <Wrapper items={topCategories} itemsInARow={4} />
+        <Wrapper items={bottomCategories} itemsInARow={4} />
+      </ContentContainer>
     </Stack>
   );
 };
