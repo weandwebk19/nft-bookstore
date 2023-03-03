@@ -22,6 +22,7 @@ export const config = {
 
 export default withSession(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
+    console.log("verify-file");
     if (req.method === "POST") {
       const { bytes, fileName, contentType } = req.body as FileReq;
 

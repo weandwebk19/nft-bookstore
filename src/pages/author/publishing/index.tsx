@@ -25,7 +25,7 @@ import { TimePicker } from "@/components/shared/TimePicker";
 import { UploadField } from "@/components/shared/UploadField";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTextArea } from "@/styles/components/TextField";
-import { DataFetchResponse } from "@/types/api";
+import { HookFetchResponse } from "@/types/api";
 import { Language } from "@/types/languages";
 import {
   BookGenres,
@@ -47,7 +47,7 @@ const ALLOWED_FIELDS = ["title", "bookFile", "bookCover"];
 
 const schema = yup
   .object({
-    bookTitle: yup.string().required("Please enter your book title"),
+    title: yup.string().required("Please enter your book title"),
     description: yup.string().required("Please enter your book description"),
     externalLink: yup.string(),
     version: yup.string().required("Please enter your book version"),
@@ -211,10 +211,10 @@ const AuthorPublishing = () => {
     getValues
   } = useForm<FormData & FileFormData>({
     defaultValues: {
-      bookFile: [],
-      bookCover: [],
-      bookSample: [],
-      bookTitle: "",
+      bookFile: undefined,
+      bookCover: undefined,
+      bookSample: undefined,
+      title: "",
       description: "",
       externalLink: "",
       version: "",
@@ -275,14 +275,18 @@ const AuthorPublishing = () => {
 
         const data = res.data as PinataRes;
 
+        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
         setNftBookMeta({
           ...nftBookMeta,
-          bookSample: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+          bookSample: link
         });
+
+        return link;
       } catch (e: any) {
         console.error(e.message);
       }
     }
+    return "";
   };
 
   const uploadBookFile = async (file: File) => {
@@ -309,14 +313,17 @@ const AuthorPublishing = () => {
 
         const data = res.data as PinataRes;
 
+        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
         setNftBookMeta({
           ...nftBookMeta,
-          bookFile: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+          bookFile: link
         });
+        return link;
       } catch (e: any) {
         console.error(e.message);
       }
     }
+    return "";
   };
 
   const uploadBookCover = async (file: File) => {
@@ -342,18 +349,23 @@ const AuthorPublishing = () => {
 
         const data = res.data as PinataRes;
 
+        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+
         setNftBookMeta({
           ...nftBookMeta,
-          bookCover: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+          bookCover: link
         });
+        return link;
       } catch (e: any) {
         console.error(e.message);
       }
     }
+    return "";
   };
 
-  const uploadMetadata = async () => {
+  const uploadMetadata = async (nftBookMeta: NftBookMeta) => {
     try {
+      console.log("nftBookMeta", nftBookMeta);
       const { signedData, account } = await getSignedData();
 
       const promise = axios.post("/api/verify", {
@@ -369,34 +381,45 @@ const AuthorPublishing = () => {
       });
 
       const data = res.data as PinataRes;
-      setNftURI(
-        `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
-      );
+      const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+      setNftURI(link);
+      return link;
     } catch (e: any) {
       console.error(e.message);
     }
+    return "";
   };
 
-  const createNFTBook = async (amount: number) => {
+  const createNFTBook = async (nftUri: string, amount: number) => {
     try {
-      const nftRes = await axios.get(nftURI);
-      const content = nftRes.data;
-
-      Object.keys(content).forEach((key) => {
-        if (!ALLOWED_FIELDS.includes(key)) {
-          throw new Error("Invalid Json structure");
-        }
+      const nftRes = await axios.post("/api/pinata/metadata", {
+        nftUri
       });
+      console.log("nftRes", nftRes);
+      if (nftRes.data.success === true) {
+        const content = nftRes.data.data;
 
-      const tx = await contract?.mintBook(nftURI, amount, {
-        value: ethers.utils.parseEther((0.025).toString())
-      });
+        Object.keys(content).forEach((key) => {
+          if (!ALLOWED_FIELDS.includes(key)) {
+            console.log("key", key);
+            // throw new Error("Invalid Json structure");
+          }
+        });
 
-      await toast.promise(tx!.wait(), {
-        pending: "Minting NftBook Token",
-        success: "NftBook has ben created",
-        error: "Minting error"
-      });
+        const tx = await contract?.mintBook(nftUri, amount, {
+          value: ethers.utils.parseEther((0.025).toString())
+        });
+
+        console.log("tx", tx);
+
+        const res: any = await toast.promise(tx!.wait(), {
+          pending: "Minting NftBook Token",
+          success: "NftBook has ben created",
+          error: "Minting error"
+        });
+
+        console.log("res", res);
+      }
     } catch (e: any) {
       console.error(e.message);
     }
@@ -419,24 +442,34 @@ const AuthorPublishing = () => {
   };
 
   const onSubmit = (data: any) => {
-    // // Upload metadata to pinata
-    // uploadBookCover(data.bookCover);
-    // uploadBookFile(data.bookFile);
-    // uploadBookSample(data.bookSample);
-    // // Mint book
+    (async () => {
+      const bookCoverLink = await uploadBookCover(data.bookCover);
+      const bookFileLink = await uploadBookFile(data.bookFile);
+      const bookSampleLink = await uploadBookSample(data.bookSample);
+      // Upload metadata to pinata
+      const metadataLink = await uploadMetadata({
+        title: data.title,
+        bookCover: bookCoverLink,
+        bookFile: bookFileLink,
+        bookSample: bookSampleLink
+      });
+      // Mint book
+      createNFTBook(metadataLink, data.maxSupply);
+    })();
+    // Mint book
     // createNFTBook(data.maxSupply);
     // Upload data to database
-    uploadBookDetails({
-      description: data.description,
-      languages: data.languages,
-      genres: data.genres,
-      version: data.version,
-      max_supply: data.maxSupply,
-      external_link: data.externalLink,
-      total_pages: data.totalPages,
-      keywords: data.keywords,
-      publishing_time: data.publishingTime
-    });
+    // uploadBookDetails({
+    //   description: data.description,
+    //   languages: data.languages,
+    //   genres: data.genres,
+    //   version: data.version,
+    //   max_supply: data.maxSupply,
+    //   external_link: data.externalLink,
+    //   total_pages: data.totalPages,
+    //   keywords: data.keywords,
+    //   publishing_time: data.publishingTime
+    // });
   };
 
   return (
@@ -536,14 +569,14 @@ const AuthorPublishing = () => {
                   <Stack direction="column" spacing={3}>
                     <FormGroup label="Book title" required>
                       <Controller
-                        name="bookTitle"
+                        name="title"
                         control={control}
                         render={({ field }) => {
                           return (
                             <TextField
-                              id="bookTitle"
+                              id="title"
                               fullWidth
-                              error={!!errors.bookTitle?.message}
+                              error={!!errors.title?.message}
                               {...field}
                               onChange={(e) => {
                                 const title = e.target.value;
@@ -551,7 +584,7 @@ const AuthorPublishing = () => {
                                   ...nftBookMeta,
                                   title: title
                                 });
-                                setValue("bookTitle", title, {
+                                setValue("title", title, {
                                   shouldValidate: true
                                 });
                               }}

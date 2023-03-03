@@ -1,5 +1,11 @@
-export type DataFetchResponse = {
+export type HookFetchResponse = {
   data?: any;
   isLoading?: boolean;
   error?: boolean;
+};
+
+export type ResponseData = {
+  success: boolean;
+  message: string;
+  data: object | null;
 };
