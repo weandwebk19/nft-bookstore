@@ -1,0 +1,17 @@
+.content__group {
+    margin-bottom: 20px;
+}
+
+@media (min-width: 900px) and (max-width: 1199.99px) {
+    .content__group {
+        margin-bottom: 24px;
+    }
+
+}
+
+
+@media (min-width: 1536px) {
+    .content__group {
+        margin-bottom: 32px;
+    }
+}

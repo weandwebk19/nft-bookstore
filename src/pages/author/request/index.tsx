@@ -1,12 +1,15 @@
 import { ChangeEvent, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import {
   Box,
   IconButton,
   InputAdornment,
+  Link,
   Stack,
-  TextField
+  TextField,
+  Typography
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import { useTheme } from "@mui/material/styles";
@@ -21,24 +24,36 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/ContentContainer.module.scss";
+import axios from "axios";
 import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { UploadField } from "@/components/shared/UploadField";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledTextArea } from "@/styles/components/TextField";
 
+const MAXIMUM_ATTACHMENTS_SIZE = 2000000;
+
 const schema = yup
   .object({
-    userName: yup.string().required("Please enter your username"),
+    pseudonym: yup.string().required("Please enter your pseudonym"),
+    about: yup.string(),
     email: yup
       .string()
       .required("Please enter your email address")
       .email("Please enter valid email address"),
-    bio: yup.string(),
+    phoneNumber: yup
+      .string()
+      .required("Please enter your phone number")
+      .matches(
+        /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
+        "Please enter valid phone number"
+      ),
     website: yup.string(),
     walletAddress: yup.string(),
     facebook: yup.string(),
@@ -50,39 +65,69 @@ const schema = yup
 
 type FormData = yup.InferType<typeof schema>;
 
+const fileSchema = yup.object().shape({
+  frontDocument: yup
+    .mixed()
+    .test("required", "You need to provide a file", (file) => {
+      // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
+      if (file) return true;
+      return false;
+    })
+    .test("fileSize", "The file is too large", (file) => {
+      //if u want to allow only certain file sizes
+      return file && file.size <= MAXIMUM_ATTACHMENTS_SIZE;
+    }),
+  backDocument: yup
+    .mixed()
+    .test("required", "You need to provide a file", (file) => {
+      // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
+      if (file) return true;
+      return false;
+    })
+    .test("fileSize", "The file is too large", (file) => {
+      //if u want to allow only certain file sizes
+      return file && file.size <= MAXIMUM_ATTACHMENTS_SIZE;
+    })
+});
+
+type FileFormData = yup.InferType<typeof fileSchema>;
+
 const Profile = () => {
   const theme = useTheme();
+  const { ethereum, contract } = useWeb3();
   const {
     handleSubmit,
     formState: { errors },
     control,
     setValue,
     getValues
-  } = useForm<FormData>({
+  } = useForm<FormData & FileFormData>({
     defaultValues: {
-      userName: "",
+      pseudonym: "",
+      about: "",
       email: "",
-      bio: "",
       website: "",
       walletAddress: "0x6d5f4vrRafverHKJ561692842xderyb",
       facebook: "",
       twitter: "",
       linkedIn: "",
-      instagram: ""
+      instagram: "",
+      frontDocument: [],
+      backDocument: []
     },
     resolver: yupResolver(schema)
   });
+
   const MAXIMUM_NUMBER_OF_CHARACTERS = 1000;
   const [numberOfCharacters, setNumberOfCharacters] = useState<Number>(0);
 
+  // Front document
+  const [uploadedFrontDocument, setUploadedFrontDocument] = useState<File>();
+
+  // Back document
+  const [uploadedBackDocument, setUploadedBackDocument] = useState<File>();
+
   const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    // const file = document.getElementById("profileImage").files[0];
-    // const reader = new FileReader();
-    // reader.readAsDataURL(file);
-    // reader.onloadend = () => {
-    //   setValue("profileImage", reader.result);
-    // };
-    console.log("e.target.value:", e.target.value);
     console.log("e.target.files:", e.target.files);
     if (!e.target.files || e.target.files.length === 0) {
       console.error("Select a file");
@@ -95,6 +140,60 @@ const Profile = () => {
     // console.log("click");
   };
 
+  const getSignedData = async () => {
+    const messageToSign = await axios.get("/api/verify");
+    const accounts = (await ethereum?.request({
+      method: "eth_requestAccounts"
+    })) as string[];
+    const account = accounts[0];
+
+    const signedData = await ethereum?.request({
+      method: "personal_sign",
+      params: [
+        JSON.stringify(messageToSign.data),
+        account,
+        messageToSign.data.id
+      ]
+    });
+
+    return { signedData, account };
+  };
+
+  const uploadFrontDocument = async (file: File) => {
+    if (file !== undefined) {
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      console.log(bytes);
+
+      try {
+        const { signedData, account } = await getSignedData();
+        const promise = axios.post("/api/verify-image", {
+          address: account,
+          signature: signedData,
+          bytes,
+          contentType: file.type,
+          fileName: file.name.replace(/\.[^/.]+$/, "")
+        });
+
+        const res = await toast.promise(promise, {
+          pending: "Uploading Front Document",
+          success: "Front Document uploaded",
+          error: "Front Document upload error"
+        });
+
+        // const data = res.data as PinataRes;
+        // console.log(data);
+
+        // setNftBookMeta({
+        //   ...nftBookMeta,
+        //   bookSample: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`
+        // });
+      } catch (e: any) {
+        console.error(e.message);
+      }
+    }
+  };
+
   const onSubmit = (data: any) => {
     console.log("data:", data);
   };
@@ -102,20 +201,23 @@ const Profile = () => {
   return (
     <>
       <Head>
-        <title>Profile - NFT Bookstore</title>
+        <title>Author request - NFT Bookstore</title>
         <meta name="description" content="The world's first NFT Bookstore" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer titles={["My Profile"]}>
+        <ContentContainer titles={["Make an", "Author request"]}>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Stack spacing={6}>
-              <ContentGroup title="Upload your photo">
+              <ContentGroup
+                title="Upload your photo"
+                desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+              >
                 <Stack
                   direction={{ xs: "column", sm: "column", md: "row" }}
                   spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
-                  className={styles["content__avatar"]}
+                  className={styles["profile__avatar"]}
                 >
                   {!true ? (
                     <Box
@@ -148,7 +250,13 @@ const Profile = () => {
                   <Stack spacing={3} sx={{ justifyContent: "center" }}>
                     <StyledButton customVariant="primary" component="label">
                       Upload your photo
-                      <input type="file" hidden onChange={handleImage} />
+                      <input
+                        type="file"
+                        hidden
+                        onChange={handleImage}
+                        accept="image/*"
+                        // accept="image/png, image/jpeg"
+                      />
                     </StyledButton>
 
                     <StyledButton customVariant="secondary" onClick={() => {}}>
@@ -157,32 +265,60 @@ const Profile = () => {
                   </Stack>
                 </Stack>
               </ContentGroup>
-              <ContentGroup title="User information">
+              <ContentGroup title="Author information">
                 <Stack direction="column" spacing={3}>
+                  <FormGroup label="Pseudonym" required>
+                    <Controller
+                      name="pseudonym"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <TextField
+                            id="pseudonym"
+                            fullWidth
+                            error={!!errors.pseudonym?.message}
+                            {...field}
+                          />
+                        );
+                      }}
+                    />
+                  </FormGroup>
+                  <FormGroup label="More about you">
+                    <Controller
+                      name="about"
+                      control={control}
+                      render={({ field }) => {
+                        return (
+                          <StyledTextArea
+                            id="about"
+                            minRows={3}
+                            multiline={true}
+                            label={`${numberOfCharacters}/${MAXIMUM_NUMBER_OF_CHARACTERS}`}
+                            fullWidth
+                            InputLabelProps={{
+                              shrink: true
+                            }}
+                            error={!!errors.about?.message}
+                            {...field}
+                            onChange={(e) => {
+                              let lengthOfCharacters = e.target.value.length;
+                              if (
+                                lengthOfCharacters <=
+                                MAXIMUM_NUMBER_OF_CHARACTERS
+                              ) {
+                                setNumberOfCharacters(lengthOfCharacters);
+                                field.onChange(e);
+                              }
+                            }}
+                          />
+                        );
+                      }}
+                    />
+                  </FormGroup>
                   <Stack
                     direction={{ xs: "column", md: "row" }}
                     spacing={{ xs: 2 }}
                   >
-                    <FormGroup
-                      label="User name"
-                      required
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="userName"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="userName"
-                              fullWidth
-                              error={!!errors.userName?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
                     <FormGroup
                       label="Email"
                       required
@@ -209,38 +345,74 @@ const Profile = () => {
                         }}
                       />
                     </FormGroup>
-                  </Stack>
-                  <FormGroup label="Bio">
-                    <Controller
-                      name="bio"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <StyledTextArea
-                            id="bio"
-                            minRows={3}
-                            multiline={true}
-                            label={`${numberOfCharacters}/${MAXIMUM_NUMBER_OF_CHARACTERS}`}
-                            fullWidth
-                            InputLabelProps={{
-                              shrink: true
-                            }}
-                            error={!!errors.bio?.message}
-                            {...field}
-                            onChange={(e) => {
-                              let lengthOfCharacters = e.target.value.length;
-                              if (
-                                lengthOfCharacters <=
-                                MAXIMUM_NUMBER_OF_CHARACTERS
-                              ) {
-                                setNumberOfCharacters(lengthOfCharacters);
+                    <FormGroup
+                      label="Phone number"
+                      required
+                      className={styles["form__group-half"]}
+                    >
+                      <Controller
+                        name="phoneNumber"
+                        control={control}
+                        render={({ field }) => {
+                          return (
+                            <TextField
+                              id="phoneNumber"
+                              fullWidth
+                              error={!!errors.phoneNumber?.message}
+                              {...field}
+                              onChange={(e) => {
+                                e.target.value = e.target.value.trim();
                                 field.onChange(e);
-                              }
-                            }}
-                          />
-                        );
-                      }}
-                    />
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </FormGroup>
+                  </Stack>
+                  <FormGroup label="ID Document" required>
+                    <Stack
+                      direction={{ xs: "column", md: "row" }}
+                      spacing={{ xs: 3 }}
+                    >
+                      <UploadField
+                        content="Front"
+                        required
+                        onChange={(e) => {
+                          (async () => {
+                            if (!e.target.files) {
+                              console.error("Select a file");
+                              return;
+                            }
+
+                            const file = e.target.files[0];
+
+                            setValue("frontDocument", file, {
+                              shouldValidate: true
+                            });
+                            setUploadedFrontDocument(file);
+                          })();
+                        }}
+                        uploaded={uploadedFrontDocument}
+                      />
+                      <UploadField
+                        content="Back"
+                        required
+                        onChange={(e) => {
+                          if (!e.target.files) {
+                            console.error("Select a file");
+                            return;
+                          }
+
+                          const file = e.target.files[0];
+                          setValue("backDocument", file, {
+                            shouldValidate: true
+                          });
+                          setUploadedBackDocument(file);
+                        }}
+                        uploaded={uploadedBackDocument}
+                      />
+                    </Stack>
                   </FormGroup>
                 </Stack>
               </ContentGroup>
@@ -433,25 +605,41 @@ const Profile = () => {
                 </Stack>
               </ContentGroup>
             </Stack>
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{ alignItems: "center", justifyContent: "flex-end", mt: 6 }}
-            >
-              <StyledButton
-                customVariant="secondary"
-                type="submit"
-                onClick={() => {}}
+            <Stack spacing={3}>
+              <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  mt: 6
+                }}
               >
-                Cancel
-              </StyledButton>
-              <StyledButton
-                customVariant="primary"
-                type="submit"
-                onClick={handleSubmit(onSubmit)}
-              >
-                Save changes
-              </StyledButton>
+                <StyledButton
+                  customVariant="secondary"
+                  type="submit"
+                  onClick={() => {}}
+                >
+                  Cancel
+                </StyledButton>
+                <StyledButton
+                  customVariant="primary"
+                  type="submit"
+                  onClick={handleSubmit(onSubmit)}
+                >
+                  Submit
+                </StyledButton>
+              </Stack>
+              <Typography sx={{ fontStyle: "italic", mt: "32px !important" }}>
+                By clicking{" "}
+                <b>
+                  <i>Submit</i>
+                </b>
+                , you agree to our{" "}
+                <Link href="/terms-of-service">Terms of Service</Link> and that
+                you have read our{" "}
+                <Link href="/term-of-service">Privacy Policy</Link>.
+              </Typography>
             </Stack>
           </Box>
         </ContentContainer>

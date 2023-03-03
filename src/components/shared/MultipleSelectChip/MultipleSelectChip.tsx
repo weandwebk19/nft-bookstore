@@ -61,7 +61,7 @@ export default function MultipleSelectChip({
           )}
           MenuProps={MenuProps}
         >
-          {items.map((item) => (
+          {items?.map((item) => (
             <MenuItem key={item} value={item}>
               {item}
             </MenuItem>
