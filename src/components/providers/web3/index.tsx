@@ -25,11 +25,9 @@ const pageReload = () => {
 
 const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
   try {
-    // console.log("ethereum._metamask", ethereum);
-
     //create new account
     let response = await axios
-      .post("/api/account/create", {
+      .post("/api/users/create", {
         address: ethereum.selectedAddress,
         username: "Anonymous"
       })
