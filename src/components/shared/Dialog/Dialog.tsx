@@ -2,8 +2,8 @@ import { Box, IconButton, Typography } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
 
-import PropTypes from "prop-types";
 import { StyledDialog, StyledDialogTitle } from "@styles/components/Dialog";
+import PropTypes from "prop-types";
 
 interface DialogProps {
   title?: string;
@@ -20,7 +20,7 @@ const Dialog = ({
   selfClose,
   onClose,
   open,
-  children,
+  children
 }: DialogProps) => {
   const handleClose = () => {
     onClose(false);
@@ -32,6 +32,7 @@ const Dialog = ({
       onClose={handleClose}
       maxWidth={dialogSize}
       fullWidth
+      disableScrollLock={true}
     >
       <StyledDialogTitle>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -58,13 +59,13 @@ Dialog.propTypes = {
   dialogSize: PropTypes.string,
   selfClose: PropTypes.bool,
   open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
 };
 
 Dialog.defaultProps = {
   title: "",
   dialogSize: "md",
-  selfClose: false,
+  selfClose: false
 };
 
 export default Dialog;

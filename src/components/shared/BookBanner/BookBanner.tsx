@@ -6,46 +6,13 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import styles from "@styles/BookBanner.module.scss";
 
-import {
-  NftBook,
-  NftBookAttribute,
-  NftBookCore,
-  NftBookDetails,
-  NftBookMeta
-} from "@/types/nftBook";
-
-// type NftBookDetailsForBanner = {
-//   desc: NftBookDetails["desc"];
-//   genres: NftBookDetails["genres"];
-//   openDate: NftBookDetails["openDate"];
-//   endDate: NftBookDetails["endDate"];
-// };
-
-// type BookBannerProps = {
-//   onClick: () => void;
-// } & NftBookMeta &
-//   NftBookDetailsForBanner &
-//   NftBookCore;
+import { NftBook } from "@/types/nftBook";
 
 type BookBannerProps = {
   onClick: () => void;
 } & NftBook;
 
-const BookBanner = ({
-  // bookCover,
-  // title,
-  // file,
-  // attributes,
-  // desc,
-  // genres,
-  // openDate,
-  // endDate,
-  meta,
-  details,
-  author,
-  isListed,
-  onClick
-}: BookBannerProps) => {
+const BookBanner = ({ meta, details, author, onClick }: BookBannerProps) => {
   const countDown = "7D:06:25:45";
 
   return (
@@ -75,7 +42,7 @@ const BookBanner = ({
           >
             <Stack direction="row" spacing={1}>
               <InsertDriveFileOutlinedIcon />
-              <Typography>{meta.file}</Typography>
+              <Typography>{meta.bookFile}</Typography>
             </Stack>
             {meta.attributes?.map((stat, i) => (
               <Stack key={i} direction="row" spacing={1}>
@@ -129,14 +96,14 @@ const BookBanner = ({
             </Typography>
             {countDown && <Typography>Register closing soon</Typography>}
           </Stack>
-          <Box sx={{ display: "flex", flexDirection: "row-reverse" }}>
+          {/* <Box sx={{ display: "flex", flexDirection: "row-reverse" }}>
             <Typography
               sx={{ textAlign: "end" }}
               className={styles["book-banner__open"]}
             >
               {isListed ? "Openning" : "Closed"}
             </Typography>
-          </Box>
+          </Box> */}
         </Grid>
       </Grid>
     </Box>

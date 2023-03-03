@@ -14,7 +14,7 @@ const FormGroup = ({
   desc,
   children,
   required = false,
-  style = {},
+  style = { width: "100%" },
   className
 }: FormGroupProps) => {
   return (

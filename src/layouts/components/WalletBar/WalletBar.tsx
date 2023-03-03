@@ -141,6 +141,7 @@ const WalletBar = ({
             id="create-menu"
             open={openCreateMenu}
             onClose={handleCreateMenuClose}
+            disableScrollLock={true}
             // onClick={handleSettingsMenuClose}
             PaperProps={{
               elevation: 0,
