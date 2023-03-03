@@ -19,6 +19,7 @@ export default async function handler(
     const client = await clientPromise;
     const db = client.db("NftBookStore");
     const {
+      token_id,
       description,
       external_link,
       version,
@@ -32,6 +33,7 @@ export default async function handler(
 
     // Insert book into database
     const newBooks = await db.collection("books").insertOne({
+      token_id,
       description,
       external_link,
       version,

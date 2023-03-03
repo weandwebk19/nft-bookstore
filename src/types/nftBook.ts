@@ -31,6 +31,8 @@ export type NftBookAttribute = {
 };
 
 export type BookInfo = {
+  token_id: string;
+  contract_address?: string;
   description: string;
   languages: string[];
   genres: (keyof typeof BookGenres)[];
@@ -43,7 +45,6 @@ export type BookInfo = {
 };
 
 export type NftBookDetails = {
-  contractAddress?: string;
   bookId: string;
   registered: number;
   openDate?: Date;
@@ -55,6 +56,7 @@ export type NftBookMeta = {
   bookFile: string;
   bookCover: string;
   bookSample: string;
+  fileType: string;
 };
 
 export type NftBookCore = {

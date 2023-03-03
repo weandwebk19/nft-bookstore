@@ -1,9 +1,13 @@
 import axios from "axios";
+import axiosRetry from "axios-retry";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
 
-import clientPromise from "../../../lib/mongodb";
+axiosRetry(axios, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay
+});
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,7 +19,8 @@ export default async function handler(
       const nftRes = await axios.get(nftUri, {
         headers: {
           Accept: "text/plain"
-        }
+        },
+        timeout: 20000
       });
       return res.status(200).json({
         success: true,
@@ -23,7 +28,7 @@ export default async function handler(
         data: nftRes.data
       });
     } catch (e: any) {
-      console.error(e);
+      console.error("e.response", e.response);
       // throw new Error(e).message;
     }
   } else {
