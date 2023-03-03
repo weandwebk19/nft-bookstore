@@ -55,7 +55,6 @@ export type NftBookMeta = {
   bookFile: string;
   bookCover: string;
   bookSample: string;
-  attributes: NftBookAttribute[];
 };
 
 export type NftBookCore = {
