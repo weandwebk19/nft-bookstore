@@ -1,7 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { Box } from "@mui/material";
-
-import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { NftBook } from "@/types/nftBook";

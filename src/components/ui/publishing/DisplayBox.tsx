@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { FunctionComponent } from "react";
 
 import { Box, Grid, Stack } from "@mui/material";
@@ -13,6 +14,7 @@ import { BookList } from "@/components/shared/BookList";
 import { FilterBar } from "@/components/shared/FilterBar";
 import {
   BookGenres,
+  ListedBook,
   NftBook,
   NftBookAttribute,
   NftBookDetails
@@ -263,7 +265,9 @@ const DisplayBox: FunctionComponent = () => {
     }
   ];
 
-  const { nftBooks } = useListedBooks();
+  const { listedBooks } = useListedBooks();
+
+  console.log('nftBooks: ', listedBooks);
 
   const handleBookClick = (tokenId: number | string) => {
     router.push(`/publishing/${tokenId}`);
@@ -303,16 +307,16 @@ const DisplayBox: FunctionComponent = () => {
                 spacing={3}
                 columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
               >
-                {nftBooks.data?.map((book: NftBook) => (
+                {listedBooks.data?.map((book: ListedBook) => (
                   <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
                     <BookItem
                       tokenId={book.tokenId}
-                      balance={book.balance}
-                      price={book.price}
-                      meta={book.meta}
-                      author={book.author}
                       seller={book.seller}
                       amount={book.amount}
+                      price={book.price}
+                      meta={book.meta}
+                      author=""
+                      balance={0}
                       onClick={() => {
                         handleBookClick(book.tokenId);
                       }}
