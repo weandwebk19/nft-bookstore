@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Box } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import { useOwnedNfts } from "@/components/hooks/web3";

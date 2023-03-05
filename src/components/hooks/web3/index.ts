@@ -24,7 +24,7 @@ export const useListedBooks = () => {
   const swrRes = hooks.useListedBooks();
 
   return {
-    nftBooks: swrRes
+    listedBooks: swrRes
   };
 };
 

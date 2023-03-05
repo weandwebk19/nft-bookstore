@@ -19,6 +19,9 @@ const BookList = ({ bookList, onClick }: BookListProps) => {
             author={book.author}
             balance={book.balance}
             meta={book.meta}
+            seller=""
+            price={0}
+            amount={0}
             onClick={() => {
               onClick(book.tokenId);
             }}

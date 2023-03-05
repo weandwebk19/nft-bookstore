@@ -2,22 +2,5 @@
   "title": "To Kill A Mockingbird.",
   "file": "epub",
   "bookCover": "https://gateway.pinata.cloud/ipfs/QmVfJR8tQwLTxs8dpMQDbfe1SdWD5bo2prUc98EgQpaXKu",
-  "attributes": [
-    {
-      "statType": "views",
-      "value": "1.161"
-    },
-    {
-      "statType": "stars",
-      "value": "4.5"
-    },
-    {
-      "statType": "registered",
-      "value": "918"
-    },
-    {
-      "statType": "owners",
-      "value": "50"
-    }
-  ]
+  "bookSample": ""
 }
