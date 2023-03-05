@@ -6,29 +6,20 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import style from "@styles/BookTicket.module.scss";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
-import { truncate } from "@/utils/truncate";
-
 interface BookTicketProps {
-  owner: string;
-  date: string;
-  contractAddress: string;
-  price: number | string;
-  link: string;
+  header?: string;
+  body?: string[];
+  image?: string;
+  footer?: string;
+  href: string;
 }
 
-const BookTicket = ({
-  owner,
-  date,
-  contractAddress,
-  price,
-  link
-}: BookTicketProps) => {
+const BookTicket = ({ header, body, image, footer, href }: BookTicketProps) => {
   const theme = useTheme();
   const router = useRouter();
 
   return (
-    <Box className={style["ticket"]} onClick={() => router.push(`${owner}`)}>
+    <Box className={style["ticket"]} onClick={() => router.push(`${href}`)}>
       <Box
         className={style["ticket__top"]}
         sx={{
@@ -37,7 +28,7 @@ const BookTicket = ({
       >
         <header className={style["ticket__wrapper"]}>
           <div className={style["ticket__header"]}>
-            NFT Bookstore
+            {header}
             <LaunchIcon color="primary" />
           </div>
         </header>
@@ -102,11 +93,26 @@ const BookTicket = ({
             backgroundColor: `${theme.palette.background.paper} !important`
           }}
         >
-          <Box component="section" className={style["ticket__section"]}>
-            <Typography variant="h6">{owner}</Typography>
-            <Typography>{date}</Typography>
-            <Typography>{truncate(contractAddress, 6, -4)}</Typography>
-          </Box>
+          {image && (
+            <Box
+              sx={{
+                width: "100%",
+                height: "10em",
+                backgroundImage: `url(${image})`,
+                backgroundSize: "cover"
+              }}
+            />
+          )}
+          {body && (
+            <Box component="section" className={style["ticket__section"]}>
+              {body?.map((text, i) => {
+                if (!i) return <Typography variant="h6">{text}</Typography>;
+                return <Typography key={i}>{text}</Typography>;
+              })}
+              {/* <Typography>{date}</Typography>
+            <Typography>{truncate(contractAddress, 6, -4)}</Typography> */}
+            </Box>
+          )}
         </Box>
         <Box
           className={style["ticket__footer"]}
@@ -115,7 +121,7 @@ const BookTicket = ({
           }}
         >
           {/* <span>Total Paid</span> */}
-          <span>{price} ETH</span>
+          <span>{footer}</span>
         </Box>
       </Box>
     </Box>

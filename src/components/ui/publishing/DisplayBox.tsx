@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { Wrapper } from "@/components/shared/Wrapper";
 import {
   BookGenres,
   ListedBook,
@@ -29,7 +30,7 @@ const DisplayBox: FunctionComponent = () => {
     isListed: true,
     meta: {
       title: "The Book Thief",
-      file: "epub",
+      bookFile: "epub",
       bookCover: images.mockupBookCover2,
       attributes: [
         {
@@ -62,7 +63,7 @@ const DisplayBox: FunctionComponent = () => {
     }
   };
 
-  const bookList = [
+  const bookList: NftBook[] = [
     {
       tokenId: "0",
       price: 0.5,
@@ -70,7 +71,7 @@ const DisplayBox: FunctionComponent = () => {
       isListed: true,
       meta: {
         title: "To Kill A Mockingbird",
-        file: "epub",
+        bookFile: "epub",
         bookCover: images.mockupBookCover,
         attributes: [
           {
@@ -110,7 +111,7 @@ const DisplayBox: FunctionComponent = () => {
       isListed: true,
       meta: {
         title: "The Kite Runner",
-        file: "epub",
+        bookFile: "epub",
         bookCover: images.mockupBookCover,
         attributes: [
           {
@@ -150,7 +151,7 @@ const DisplayBox: FunctionComponent = () => {
       isListed: true,
       meta: {
         title: "The Boy in the Striped Pajamas",
-        file: "epub",
+        bookFile: "epub",
         bookCover: images.mockupBookCover,
         attributes: [
           {
@@ -190,7 +191,7 @@ const DisplayBox: FunctionComponent = () => {
       isListed: true,
       meta: {
         title: "The Giver",
-        file: "epub",
+        bookFile: "epub",
         bookCover: images.mockupBookCover3,
         attributes: [
           {
@@ -230,7 +231,7 @@ const DisplayBox: FunctionComponent = () => {
       isListed: true,
       meta: {
         title: "Life of Pi",
-        file: "pdf",
+        bookFile: "pdf",
         bookCover: images.mockupBookCover2,
         attributes: [
           {
@@ -275,19 +276,11 @@ const DisplayBox: FunctionComponent = () => {
 
   return (
     <Box>
-      <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-        <Grid item xs={4} sm={8} md={12} lg={18}>
+      <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
+        <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
             {/* Book Banner */}
             <BookBanner
-              // bookCover={topBook.meta.bookCover}
-              // title={topBook.meta.title}
-              // file={topBook.meta.file}
-              // attributes={topBook.meta.attributes}
-              // desc={topBook.details.desc}
-              // genres={topBook.details.genres}
-              // openDate={topBook.details.openDate}
-              // endDate={topBook.details.endDate}
               meta={topBook.meta}
               details={topBook.details}
               tokenId={topBook.tokenId}
@@ -345,10 +338,11 @@ const DisplayBox: FunctionComponent = () => {
                   </Grid>
                 ))} */}
               </Grid>
+              <BookList bookList={bookList} onClick={handleBookClick} />
             </ContentPaper>
           </Stack>
         </Grid>
-        <Grid item xs={4} sm={8} md={12} lg={6}>
+        <Grid item xs={4} sm={3} md={3}>
           <Stack spacing={3}>
             <ContentPaper title="Filter">
               <FilterBar />

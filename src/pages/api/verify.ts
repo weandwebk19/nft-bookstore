@@ -14,8 +14,7 @@ import {
 
 export default withSession(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
-    console.log("verify");
-
+    console.log("Verify");
     if (req.method === "POST") {
       try {
         const { body } = req;

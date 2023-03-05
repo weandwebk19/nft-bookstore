@@ -19,7 +19,8 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
 
     const handleComplete = (url: string) => {
       if (url === router.asPath) {
-        setTimeout(() => setLoading(false), 500);
+        // setTimeout(() => setLoading(false), 0);
+        setLoading(false);
       }
     };
 

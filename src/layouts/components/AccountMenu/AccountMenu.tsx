@@ -43,14 +43,14 @@ const AccountMenu = ({
   onClose,
   disconnect
 }: AccountMenuProps) => {
-  const route = useRouter();
+  const router = useRouter();
 
   const accountItems = [
     {
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
       content: "My Profile",
       onClick: () => {
-        console.log("My Profile");
+        router.push("/account/profile");
       }
     },
     {
@@ -73,7 +73,7 @@ const AccountMenu = ({
       ),
       content: "My Bookshelf",
       onClick: () => {
-        route.push("/account/bookshelf");
+        router.push("/account/bookshelf");
       }
     },
     {

@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 export type Trait = "attack" | "health" | "speed";
 
 export type NftAttribute = {
@@ -16,9 +14,10 @@ export type NftMeta = {
 
 export type NftCore = {
   tokenId: number;
-  author: string;
-  balance: number;
-}
+  price: number;
+  creator: string;
+  isListed: boolean;
+};
 
 export type Nft = {
   meta: NftMeta;

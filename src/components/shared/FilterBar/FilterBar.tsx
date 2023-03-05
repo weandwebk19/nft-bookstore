@@ -1,3 +1,4 @@
+import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import {
@@ -19,7 +20,7 @@ import StarIcon from "@mui/icons-material/Star";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import TreeView from "@mui/lab/TreeView";
-import styles from "@styles/FilterBox.module.scss";
+import styles from "@styles/FilterBar.module.scss";
 import * as yup from "yup";
 
 import { StyledButton } from "@/styles/components/Button";
@@ -31,6 +32,7 @@ import {
 import { BookGenres } from "@/types/nftBook";
 
 import { FilterItem } from "../FilterItem";
+import { RangeSlider } from "../RangeSlider";
 
 const schema = yup
   .object({
@@ -39,22 +41,23 @@ const schema = yup
     author: yup.string(),
     rating: yup.number(),
     language: yup.string(),
-    priceStarting: yup
-      .number()
-      .typeError("Please enter the starting price")
-      .min(0, "The starting price must be greater than or equal 0")
-      .max(
-        yup.ref("priceEnding"),
-        "The starting price must be lesser than the ending price"
-      ),
-    priceEnding: yup
-      .number()
-      .typeError("Please enter the ending price")
-      .min(0, "The ending price must be greater than or equal 0")
-      .min(
-        yup.ref("priceStarting"),
-        "The ending price must be greater than the starting price"
-      )
+    priceRange: yup.array(yup.number())
+    // priceStarting: yup
+    //   .number()
+    //   .typeError("Please enter the starting price")
+    //   .min(0, "The starting price must be greater than or equal 0")
+    //   .max(
+    //     yup.ref("priceEnding"),
+    //     "The starting price must be lesser than the ending price"
+    //   ),
+    // priceEnding: yup
+    //   .number()
+    //   .typeError("Please enter the ending price")
+    //   .min(0, "The ending price must be greater than or equal 0")
+    //   .min(
+    //     yup.ref("priceStarting"),
+    //     "The ending price must be greater than the starting price"
+    //   )
   })
   .required();
 
@@ -113,12 +116,52 @@ const labels: { [index: string | number]: string } = {
   5: "from 5 stars"
 };
 
+const MIN_PRICE = 0;
+const MAX_PRICE = 10;
+
 function getLabelText(value: number) {
   return `${value} Star${value !== 1 ? "s" : ""}, ${labels[value]}`;
 }
 
 const FilterBar = () => {
   const theme = useTheme();
+
+  const [priceRange, setPriceRange] = useState<number[]>([
+    MIN_PRICE,
+    MAX_PRICE
+  ]);
+
+  const handleSliderChange = useCallback(
+    (event: Event, newValue: number | number[]) => {
+      setPriceRange(newValue as number[]);
+    },
+    []
+  );
+
+  const handleMinInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      let items = [...priceRange];
+      let item = [
+        event.target.value === "" ? "" : Number(event.target.value),
+        items[1]
+      ] as number[];
+      setPriceRange(item);
+    },
+    [priceRange]
+  );
+
+  const handleMaxInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      let items = [...priceRange];
+      let item = [
+        items[0],
+        event.target.value === "" ? "" : Number(event.target.value)
+      ] as number[];
+      setPriceRange(item);
+    },
+    [priceRange]
+  );
+
   const {
     handleSubmit,
     formState: { errors },
@@ -132,8 +175,9 @@ const FilterBar = () => {
       author: "",
       rating: 3,
       language: "",
-      priceStarting: 0,
-      priceEnding: 10000
+      priceRange: [MIN_PRICE, MAX_PRICE]
+      // priceStarting: MIN_PRICE,
+      // priceEnding: MAX_PRICE
     },
     resolver: yupResolver(schema)
   });
@@ -142,9 +186,12 @@ const FilterBar = () => {
     return isNaN(Number(item));
   });
 
-  const handleChangeSelect = (event: React.SyntheticEvent, nodeIds: any) => {
-    setValue("genre", nodeIds, { shouldValidate: true });
-  };
+  const handleChangeSelect = useCallback(
+    (event: React.SyntheticEvent, nodeIds: any) => {
+      setValue("genre", nodeIds, { shouldValidate: true });
+    },
+    [setValue]
+  );
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
@@ -156,7 +203,7 @@ const FilterBar = () => {
       divider={<Divider orientation="horizontal" />}
       spacing={3}
       sx={{ marginTop: 4 }}
-      className={styles["filter-box"]}
+      className={styles["filter-bar"]}
     >
       <FilterItem title="Genres">
         <Box>
@@ -230,14 +277,14 @@ const FilterBar = () => {
                   }
                   size="medium"
                 />
-                <Box>{labels[getValues("rating")]}</Box>
+                <Box>{labels[Number(getValues("rating"))]}</Box>
               </Box>
             );
           }}
         />
       </FilterItem>
       <FilterItem title="Price">
-        <Stack
+        {/* <Stack
           direction="row"
           spacing={3}
           sx={{ justifyContent: "space-between" }}
@@ -315,7 +362,16 @@ const FilterBar = () => {
               );
             }}
           />
-        </Stack>
+        </Stack> */}
+        <RangeSlider
+          value={priceRange}
+          min={MIN_PRICE}
+          max={MAX_PRICE}
+          step={0.5}
+          onMinInputChange={handleMinInputChange}
+          onMaxInputChange={handleMaxInputChange}
+          onSliderChange={handleSliderChange}
+        />
       </FilterItem>
       <FilterItem title="Author">
         <Controller

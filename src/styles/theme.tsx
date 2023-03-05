@@ -133,7 +133,7 @@ export const darkTheme = createTheme({
       main: "#657E5B"
     },
     error: {
-      main: "#BA1A1A"
+      main: "#CF6679"
     },
     info: {
       main: "#006684"

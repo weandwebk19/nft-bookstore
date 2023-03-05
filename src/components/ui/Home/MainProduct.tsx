@@ -1,5 +1,4 @@
 import {
-  Box,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -8,31 +7,17 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import { StyledCard, StyledCardMedia } from "@styles/components/Card";
+import { StyledCard } from "@styles/components/Card";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
-import cssFilter from "@/utils/cssFilter";
+import { ContentContainer } from "@/components/shared/ContentContainer";
 
 const MainProduct = () => {
   const router = useRouter();
-  const theme = useTheme();
 
   return (
-    <Box>
-      <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
-        <Typography variant="h2">Our products</Typography>
-        <Box
-          component="img"
-          src={images.decoLine}
-          sx={{
-            position: "absolute",
-            maxWidth: "385px",
-            transform: "translateX(-50%) translateY(-40%)",
-            filter: cssFilter(`${theme.palette.primary.main}`)
-          }}
-        />
-      </Box>
+    <ContentContainer titles={["Our products"]}>
       <Grid
         container
         direction="row"
@@ -105,7 +90,7 @@ const MainProduct = () => {
           </CardActionArea>
         </StyledCard>
       </Grid>
-    </Box>
+    </ContentContainer>
   );
 };
 

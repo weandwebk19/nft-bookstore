@@ -1,6 +1,6 @@
-import { setupHooks, Web3Hooks } from "@hooks/web3/setupHooks";
-import { MetaMaskInpageProvider } from "@metamask/providers";
 import { Web3Dependencies } from "@_types/hooks";
+import { Web3Hooks, setupHooks } from "@hooks/web3/setupHooks";
+import { MetaMaskInpageProvider } from "@metamask/providers";
 import { Contract, ethers, providers } from "ethers";
 
 declare global {
@@ -24,7 +24,7 @@ export const createDefaultState = () => {
     provider: null,
     contract: null,
     isLoading: true,
-    hooks: setupHooks({ isLoading: true } as any),
+    hooks: setupHooks({ isLoading: true } as any)
   };
 };
 
@@ -32,14 +32,14 @@ export const createWeb3State = ({
   ethereum,
   provider,
   contract,
-  isLoading,
+  isLoading
 }: Web3Dependencies) => {
   return {
     ethereum,
     provider,
     contract,
     isLoading,
-    hooks: setupHooks({ ethereum, provider, contract, isLoading }),
+    hooks: setupHooks({ ethereum, provider, contract, isLoading })
   };
 };
 
