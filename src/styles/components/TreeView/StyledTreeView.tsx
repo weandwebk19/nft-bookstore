@@ -13,7 +13,7 @@ declare module "react" {
 export type StyledTreeItemProps = TreeItemProps & {
   bgColor?: string;
   color?: string;
-  labelIcon: React.ElementType<SvgIconProps>;
+  labelIcon?: React.ElementType<SvgIconProps>;
   labelInfo?: string;
   labelText: string;
 };
@@ -22,11 +22,10 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
-    borderTopRightRadius: theme.spacing(2),
-    borderBottomRightRadius: theme.spacing(2),
+    clipPath:
+      "polygon(0% 0%, 100% 0%, calc(100% - 16px) 50%, 100% 100%, 0% 100%)",
     paddingRight: theme.spacing(1),
     fontWeight: theme.typography.fontWeightMedium,
-    flexDirection: "row-reverse",
     padding: 0,
 
     "&.Mui-expanded": {
@@ -36,8 +35,8 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
       backgroundColor: theme.palette.action.hover
     },
     "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
-      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.action.selected})`,
-      color: "var(--tree-view-color)"
+      backgroundColor: theme.palette.background.default,
+      color: theme.palette.primary.main
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: "inherit",

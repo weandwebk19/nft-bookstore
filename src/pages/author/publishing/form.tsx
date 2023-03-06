@@ -45,6 +45,7 @@ const defaultValues = {
   description: "",
 
   // Step 2
+  fileType: "",
   bookFile: "",
   bookCover: "",
   bookSample: "",
