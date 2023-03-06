@@ -196,7 +196,7 @@ const Profile = () => {
               </Typography>
             </Box>
             <FormProvider {...methods}>
-              <form autocomplete="off">
+              <form>
                 <Stack spacing={6}>
                   <ContentGroup
                     title="Upload your photo"
