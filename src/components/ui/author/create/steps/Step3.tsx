@@ -6,16 +6,13 @@ import {
 } from "@shared/FormController";
 import styles from "@styles/Form.module.scss";
 
+import { useGenres, useLanguages } from "@/components/hooks/api";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
-import { Language } from "@/types/languages";
-import { BookGenres } from "@/types/nftBook";
 
 const Step3 = () => {
-  const bookGenres = Object.keys(BookGenres).filter((item) => {
-    return isNaN(Number(item));
-  });
-  const languages = Object.values(Language);
+  const genres = useGenres();
+  const languages = useLanguages();
   return (
     <ContentGroup title="Book details">
       <Box sx={{ my: 2 }}>
@@ -48,10 +45,10 @@ const Step3 = () => {
             </FormGroup>
           </Stack>
           <FormGroup label="Genres" required>
-            <MultipleSelectController items={bookGenres} name="genres" />
+            <MultipleSelectController items={genres.data} name="genres" />
           </FormGroup>
           <FormGroup label="Languages" required>
-            <MultipleSelectController items={languages} name="languages" />
+            <MultipleSelectController items={languages.data} name="languages" />
           </FormGroup>
           <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 2 }}>
             <FormGroup

@@ -27,11 +27,13 @@ const MenuProps = {
 };
 
 interface MultipleSelectChipProps {
-  items: string[];
+  items: any[] | null;
   value: any;
   error?: boolean;
   helperText?: string;
   onChange: (event: SelectChangeEvent<string[]>) => void;
+  itemName?: string;
+  itemValue?: string;
 }
 
 export default function MultipleSelectChip({
@@ -39,7 +41,9 @@ export default function MultipleSelectChip({
   value,
   error,
   helperText,
-  onChange
+  onChange,
+  itemName = "name",
+  itemValue = "_id"
 }: MultipleSelectChipProps) {
   const theme = useTheme();
   return (
@@ -55,15 +59,22 @@ export default function MultipleSelectChip({
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {selected.map((value) => (
-                <Chip key={value} label={value} />
+                <Chip
+                  key={value}
+                  label={
+                    items?.filter((item) => item[itemValue] === value)?.[0][
+                      itemName
+                    ]
+                  }
+                />
               ))}
             </Box>
           )}
           MenuProps={MenuProps}
         >
           {items?.map((item) => (
-            <MenuItem key={item} value={item}>
-              {item}
+            <MenuItem key={item[itemValue]} value={item[itemValue]}>
+              {item[itemName]}
             </MenuItem>
           ))}
         </Select>

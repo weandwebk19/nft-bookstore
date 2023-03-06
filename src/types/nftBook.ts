@@ -53,7 +53,7 @@ export type NftBookDetails = {
 
 export type NftBookMeta = {
   title: string;
-  file: string;
+  bookFile: string;
   bookCover: string;
   bookSample: string;
   fileType: string;

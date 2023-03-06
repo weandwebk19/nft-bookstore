@@ -29,7 +29,7 @@ import {
   Step1,
   Step2,
   Step3
-} from "@/components/ui/author/creating/steps";
+} from "@/components/ui/author/create/steps";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 
@@ -182,7 +182,7 @@ const Form = () => {
       genres: yup
         .array()
         .of(yup.string())
-        .test("required", "Please enter your book languages", (arr) => {
+        .test("required", "Please enter your book genres", (arr) => {
           if (arr && (arr as any).length !== 0) return true;
           return false;
         }),
