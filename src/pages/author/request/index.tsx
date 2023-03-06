@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import {
@@ -32,6 +32,10 @@ import images from "@/assets/images";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
+import {
+  InputController,
+  TextAreaController
+} from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { UploadField } from "@/components/shared/UploadField";
 import { StyledButton } from "@/styles/components/Button";
@@ -95,13 +99,7 @@ type FileFormData = yup.InferType<typeof fileSchema>;
 const Profile = () => {
   const theme = useTheme();
   const { ethereum, contract } = useWeb3();
-  const {
-    handleSubmit,
-    formState: { errors },
-    control,
-    setValue,
-    getValues
-  } = useForm<FormData & FileFormData>({
+  const methods = useForm<FormData & FileFormData>({
     defaultValues: {
       pseudonym: "",
       about: "",
@@ -117,6 +115,13 @@ const Profile = () => {
     },
     resolver: yupResolver(schema)
   });
+  const {
+    handleSubmit,
+    formState: { errors },
+    control,
+    setValue,
+    getValues
+  } = methods;
 
   const MAXIMUM_NUMBER_OF_CHARACTERS = 1000;
   const [numberOfCharacters, setNumberOfCharacters] = useState<Number>(0);
@@ -209,66 +214,80 @@ const Profile = () => {
       <main>
         <ContentContainer titles={["Make an", "Author request"]}>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
-            <Stack spacing={6}>
-              <ContentGroup
-                title="Upload your photo"
-                desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+            <Box sx={{ my: 2 }}>
+              <Typography
+                variant="caption"
+                className="form-label required"
+                sx={{ fontSize: "14px" }}
               >
-                <Stack
-                  direction={{ xs: "column", sm: "column", md: "row" }}
-                  spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
-                  className={styles["profile__avatar"]}
-                >
-                  {!true ? (
-                    <Box
-                      component="img"
-                      src={images.product1}
-                      sx={{
-                        width: "100%",
-                        maxWidth: "400px",
-                        aspectRatio: "1 / 1",
-                        borderRadius: "100rem",
-                        objectFit: "cover",
-                        margin: "auto"
-                      }}
-                    />
-                  ) : (
-                    <Avatar
-                      alt="Remy Sharp"
-                      src=""
-                      sx={{
-                        display: "flex",
-                        maxWidth: "400px",
-                        width: "100%",
-                        height: "100%",
-                        aspectRatio: "1 / 1",
-                        borderRadius: "100rem",
-                        margin: "auto"
-                      }}
-                    />
-                  )}
-                  <Stack spacing={3} sx={{ justifyContent: "center" }}>
-                    <StyledButton customVariant="primary" component="label">
-                      Upload your photo
-                      <input
-                        type="file"
-                        hidden
-                        onChange={handleImage}
-                        accept="image/*"
-                        // accept="image/png, image/jpeg"
-                      />
-                    </StyledButton>
+                Required
+              </Typography>
+            </Box>
+            <FormProvider {...methods}>
+              <form>
+                <Stack spacing={6}>
+                  <ContentGroup
+                    title="Upload your photo"
+                    desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+                  >
+                    <Stack
+                      direction={{ xs: "column", sm: "column", md: "row" }}
+                      spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
+                      className={styles["profile__avatar"]}
+                    >
+                      {!true ? (
+                        <Box
+                          component="img"
+                          src={images.product1}
+                          sx={{
+                            width: "100%",
+                            maxWidth: "400px",
+                            aspectRatio: "1 / 1",
+                            borderRadius: "100rem",
+                            objectFit: "cover",
+                            margin: "auto"
+                          }}
+                        />
+                      ) : (
+                        <Avatar
+                          alt="Remy Sharp"
+                          src=""
+                          sx={{
+                            display: "flex",
+                            maxWidth: "400px",
+                            width: "100%",
+                            height: "100%",
+                            aspectRatio: "1 / 1",
+                            borderRadius: "100rem",
+                            margin: "auto"
+                          }}
+                        />
+                      )}
+                      <Stack spacing={3} sx={{ justifyContent: "center" }}>
+                        <StyledButton customVariant="primary" component="label">
+                          Upload your photo
+                          <input
+                            type="file"
+                            hidden
+                            onChange={handleImage}
+                            accept="image/*"
+                            // accept="image/png, image/jpeg"
+                          />
+                        </StyledButton>
 
-                    <StyledButton customVariant="secondary" onClick={() => {}}>
-                      Remove current
-                    </StyledButton>
-                  </Stack>
-                </Stack>
-              </ContentGroup>
-              <ContentGroup title="Author information">
-                <Stack direction="column" spacing={3}>
-                  <FormGroup label="Pseudonym" required>
-                    <Controller
+                        <StyledButton
+                          customVariant="secondary"
+                          onClick={() => {}}
+                        >
+                          Remove current
+                        </StyledButton>
+                      </Stack>
+                    </Stack>
+                  </ContentGroup>
+                  <ContentGroup title="Author information">
+                    <Stack direction="column" spacing={3}>
+                      <FormGroup label="Pseudonym" required>
+                        {/* <Controller
                       name="pseudonym"
                       control={control}
                       render={({ field }) => {
@@ -281,366 +300,374 @@ const Profile = () => {
                           />
                         );
                       }}
-                    />
-                  </FormGroup>
-                  <FormGroup label="More about you">
-                    <Controller
-                      name="about"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <StyledTextArea
-                            id="about"
-                            minRows={3}
-                            multiline={true}
-                            label={`${numberOfCharacters}/${MAXIMUM_NUMBER_OF_CHARACTERS}`}
-                            fullWidth
-                            InputLabelProps={{
-                              shrink: true
-                            }}
-                            error={!!errors.about?.message}
-                            {...field}
-                            onChange={(e) => {
-                              let lengthOfCharacters = e.target.value.length;
-                              if (
-                                lengthOfCharacters <=
-                                MAXIMUM_NUMBER_OF_CHARACTERS
-                              ) {
-                                setNumberOfCharacters(lengthOfCharacters);
-                                field.onChange(e);
-                              }
-                            }}
-                          />
-                        );
-                      }}
-                    />
-                  </FormGroup>
-                  <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={{ xs: 2 }}
-                  >
-                    <FormGroup
-                      label="Email"
-                      required
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="email"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="email"
-                              fullWidth
-                              sx={{
-                                "& input.MuiInputBase-input.MuiOutlinedInput-input:-webkit-autofill":
-                                  {
-                                    backgroundColor: "transparent !important"
+                    /> */}
+                        <InputController name="pseudonym" />
+                      </FormGroup>
+                      <FormGroup label="More about you">
+                        {/* <Controller
+                          name="about"
+                          control={control}
+                          render={({ field }) => {
+                            return (
+                              <StyledTextArea
+                                id="about"
+                                minRows={3}
+                                multiline={true}
+                                label={`${numberOfCharacters}/${MAXIMUM_NUMBER_OF_CHARACTERS}`}
+                                fullWidth
+                                InputLabelProps={{
+                                  shrink: true
+                                }}
+                                error={!!errors.about?.message}
+                                {...field}
+                                onChange={(e) => {
+                                  let lengthOfCharacters =
+                                    e.target.value.length;
+                                  if (
+                                    lengthOfCharacters <=
+                                    MAXIMUM_NUMBER_OF_CHARACTERS
+                                  ) {
+                                    setNumberOfCharacters(lengthOfCharacters);
+                                    field.onChange(e);
                                   }
-                              }}
-                              error={!!errors.email?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
-                    <FormGroup
-                      label="Phone number"
-                      required
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="phoneNumber"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="phoneNumber"
-                              fullWidth
-                              error={!!errors.phoneNumber?.message}
-                              {...field}
-                              onChange={(e) => {
-                                e.target.value = e.target.value.trim();
-                                field.onChange(e);
-                              }}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
-                  </Stack>
-                  <FormGroup label="ID Document" required>
-                    <Stack
-                      direction={{ xs: "column", md: "row" }}
-                      spacing={{ xs: 3 }}
-                    >
-                      <UploadField
-                        content="Front"
-                        required
-                        onChange={(e) => {
-                          (async () => {
-                            if (!e.target.files) {
-                              console.error("Select a file");
-                              return;
-                            }
-
-                            const file = e.target.files[0];
-
-                            setValue("frontDocument", file, {
-                              shouldValidate: true
-                            });
-                            setUploadedFrontDocument(file);
-                          })();
-                        }}
-                        uploaded={uploadedFrontDocument}
-                      />
-                      <UploadField
-                        content="Back"
-                        required
-                        onChange={(e) => {
-                          if (!e.target.files) {
-                            console.error("Select a file");
-                            return;
-                          }
-
-                          const file = e.target.files[0];
-                          setValue("backDocument", file, {
-                            shouldValidate: true
-                          });
-                          setUploadedBackDocument(file);
-                        }}
-                        uploaded={uploadedBackDocument}
-                      />
-                    </Stack>
-                  </FormGroup>
-                </Stack>
-              </ContentGroup>
-              <ContentGroup title="Social link">
-                <Stack direction="column" spacing={3}>
-                  <FormGroup label="Website">
-                    <Controller
-                      name="website"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <TextField
-                            id="website"
-                            fullWidth
-                            error={!!errors.website?.message}
-                            {...field}
-                          />
-                        );
-                      }}
-                    />
-                  </FormGroup>
-                  <FormGroup label="Wallet address">
-                    <Controller
-                      name="walletAddress"
-                      control={control}
-                      render={({ field }) => {
-                        return (
-                          <TextField
-                            id="walletAddress"
-                            fullWidth
-                            InputProps={{
-                              readOnly: true,
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    edge="end"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(
-                                        `${getValues("walletAddress")}`
-                                      );
-                                    }}
-                                  >
-                                    <ContentCopyIcon />
-                                  </IconButton>
-                                </InputAdornment>
-                              )
+                                }}
+                              />
+                            );
+                          }}
+                        /> */}
+                        <TextAreaController name="about" />
+                      </FormGroup>
+                      <Stack
+                        direction={{ xs: "column", md: "row" }}
+                        spacing={{ xs: 2 }}
+                      >
+                        <FormGroup
+                          label="Email"
+                          required
+                          className={styles["form__group-half"]}
+                        >
+                          <Controller
+                            name="email"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <TextField
+                                  id="email"
+                                  fullWidth
+                                  sx={{
+                                    "& input.MuiInputBase-input.MuiOutlinedInput-input:-webkit-autofill":
+                                      {
+                                        backgroundColor:
+                                          "transparent !important"
+                                      }
+                                  }}
+                                  error={!!errors.email?.message}
+                                  {...field}
+                                />
+                              );
                             }}
-                            error={!!errors.walletAddress?.message}
-                            {...field}
                           />
-                        );
-                      }}
-                    />
-                  </FormGroup>
-                  <FormGroup label="Social media" />
-                  <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={{ xs: 2 }}
-                  >
-                    <FormGroup
-                      label={
-                        <Box
-                          component="span"
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px"
-                          }}
+                        </FormGroup>
+                        <FormGroup
+                          label="Phone number"
+                          required
+                          className={styles["form__group-half"]}
                         >
-                          <FacebookRoundedIcon />
-                          Facebook
-                        </Box>
-                      }
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="facebook"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="facebook"
-                              fullWidth
-                              error={!!errors.facebook?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
-                    <FormGroup
-                      label={
-                        <Box
-                          component="span"
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px"
-                          }}
+                          <Controller
+                            name="phoneNumber"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <TextField
+                                  id="phoneNumber"
+                                  fullWidth
+                                  error={!!errors.phoneNumber?.message}
+                                  {...field}
+                                  onChange={(e) => {
+                                    e.target.value = e.target.value.trim();
+                                    field.onChange(e);
+                                  }}
+                                />
+                              );
+                            }}
+                          />
+                        </FormGroup>
+                      </Stack>
+                      <FormGroup label="ID Document" required>
+                        <Stack
+                          direction={{ xs: "column", md: "row" }}
+                          spacing={{ xs: 3 }}
                         >
-                          <TwitterIcon />
-                          Twitter
-                        </Box>
-                      }
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="twitter"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="twitter"
-                              fullWidth
-                              error={!!errors.twitter?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
-                  </Stack>
-                  <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={{ xs: 2 }}
-                  >
-                    <FormGroup
-                      label={
-                        <Box
-                          component="span"
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px"
+                          <UploadField
+                            content="Front"
+                            required
+                            onChange={(e) => {
+                              (async () => {
+                                if (!e.target.files) {
+                                  console.error("Select a file");
+                                  return;
+                                }
+
+                                const file = e.target.files[0];
+
+                                setValue("frontDocument", file, {
+                                  shouldValidate: true
+                                });
+                                setUploadedFrontDocument(file);
+                              })();
+                            }}
+                            uploaded={uploadedFrontDocument}
+                          />
+                          <UploadField
+                            content="Back"
+                            required
+                            onChange={(e) => {
+                              if (!e.target.files) {
+                                console.error("Select a file");
+                                return;
+                              }
+
+                              const file = e.target.files[0];
+                              setValue("backDocument", file, {
+                                shouldValidate: true
+                              });
+                              setUploadedBackDocument(file);
+                            }}
+                            uploaded={uploadedBackDocument}
+                          />
+                        </Stack>
+                      </FormGroup>
+                    </Stack>
+                  </ContentGroup>
+                  <ContentGroup title="Social link">
+                    <Stack direction="column" spacing={3}>
+                      <FormGroup label="Website">
+                        <Controller
+                          name="website"
+                          control={control}
+                          render={({ field }) => {
+                            return (
+                              <TextField
+                                id="website"
+                                fullWidth
+                                error={!!errors.website?.message}
+                                {...field}
+                              />
+                            );
                           }}
-                        >
-                          <LinkedInIcon />
-                          LinkedIn
-                        </Box>
-                      }
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="linkedIn"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="linkedIn"
-                              fullWidth
-                              error={!!errors.linkedIn?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
-                    <FormGroup
-                      label={
-                        <Box
-                          component="span"
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px"
+                        />
+                      </FormGroup>
+                      <FormGroup label="Wallet address">
+                        <Controller
+                          name="walletAddress"
+                          control={control}
+                          render={({ field }) => {
+                            return (
+                              <TextField
+                                id="walletAddress"
+                                fullWidth
+                                InputProps={{
+                                  readOnly: true,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        edge="end"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(
+                                            `${getValues("walletAddress")}`
+                                          );
+                                        }}
+                                      >
+                                        <ContentCopyIcon />
+                                      </IconButton>
+                                    </InputAdornment>
+                                  )
+                                }}
+                                error={!!errors.walletAddress?.message}
+                                {...field}
+                              />
+                            );
                           }}
+                        />
+                      </FormGroup>
+                      <FormGroup label="Social media" />
+                      <Stack
+                        direction={{ xs: "column", md: "row" }}
+                        spacing={{ xs: 2 }}
+                      >
+                        <FormGroup
+                          label={
+                            <Box
+                              component="span"
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px"
+                              }}
+                            >
+                              <FacebookRoundedIcon />
+                              Facebook
+                            </Box>
+                          }
+                          className={styles["form__group-half"]}
                         >
-                          <InstagramIcon />
-                          Instagram
-                        </Box>
-                      }
-                      className={styles["form__group-half"]}
-                    >
-                      <Controller
-                        name="instagram"
-                        control={control}
-                        render={({ field }) => {
-                          return (
-                            <TextField
-                              id="instagram"
-                              fullWidth
-                              error={!!errors.instagram?.message}
-                              {...field}
-                            />
-                          );
-                        }}
-                      />
-                    </FormGroup>
-                  </Stack>
+                          <Controller
+                            name="facebook"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <TextField
+                                  id="facebook"
+                                  fullWidth
+                                  error={!!errors.facebook?.message}
+                                  {...field}
+                                />
+                              );
+                            }}
+                          />
+                        </FormGroup>
+                        <FormGroup
+                          label={
+                            <Box
+                              component="span"
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px"
+                              }}
+                            >
+                              <TwitterIcon />
+                              Twitter
+                            </Box>
+                          }
+                          className={styles["form__group-half"]}
+                        >
+                          <Controller
+                            name="twitter"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <TextField
+                                  id="twitter"
+                                  fullWidth
+                                  error={!!errors.twitter?.message}
+                                  {...field}
+                                />
+                              );
+                            }}
+                          />
+                        </FormGroup>
+                      </Stack>
+                      <Stack
+                        direction={{ xs: "column", md: "row" }}
+                        spacing={{ xs: 2 }}
+                      >
+                        <FormGroup
+                          label={
+                            <Box
+                              component="span"
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px"
+                              }}
+                            >
+                              <LinkedInIcon />
+                              LinkedIn
+                            </Box>
+                          }
+                          className={styles["form__group-half"]}
+                        >
+                          <Controller
+                            name="linkedIn"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <TextField
+                                  id="linkedIn"
+                                  fullWidth
+                                  error={!!errors.linkedIn?.message}
+                                  {...field}
+                                />
+                              );
+                            }}
+                          />
+                        </FormGroup>
+                        <FormGroup
+                          label={
+                            <Box
+                              component="span"
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px"
+                              }}
+                            >
+                              <InstagramIcon />
+                              Instagram
+                            </Box>
+                          }
+                          className={styles["form__group-half"]}
+                        >
+                          <Controller
+                            name="instagram"
+                            control={control}
+                            render={({ field }) => {
+                              return (
+                                <TextField
+                                  id="instagram"
+                                  fullWidth
+                                  error={!!errors.instagram?.message}
+                                  {...field}
+                                />
+                              );
+                            }}
+                          />
+                        </FormGroup>
+                      </Stack>
+                    </Stack>
+                  </ContentGroup>
                 </Stack>
-              </ContentGroup>
-            </Stack>
-            <Stack spacing={3}>
-              <Stack
-                direction="row"
-                spacing={2}
-                sx={{
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  mt: 6
-                }}
-              >
-                <StyledButton
-                  customVariant="secondary"
-                  type="submit"
-                  onClick={() => {}}
-                >
-                  Cancel
-                </StyledButton>
-                <StyledButton
-                  customVariant="primary"
-                  type="submit"
-                  onClick={handleSubmit(onSubmit)}
-                >
-                  Submit
-                </StyledButton>
-              </Stack>
-              <Typography sx={{ fontStyle: "italic", mt: "32px !important" }}>
-                By clicking{" "}
-                <b>
-                  <i>Submit</i>
-                </b>
-                , you agree to our{" "}
-                <Link href="/terms-of-service">Terms of Service</Link> and that
-                you have read our{" "}
-                <Link href="/term-of-service">Privacy Policy</Link>.
-              </Typography>
-            </Stack>
+                <Stack spacing={3}>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      mt: 6
+                    }}
+                  >
+                    <StyledButton
+                      customVariant="secondary"
+                      type="submit"
+                      onClick={() => {}}
+                    >
+                      Cancel
+                    </StyledButton>
+                    <StyledButton
+                      customVariant="primary"
+                      type="submit"
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      Submit
+                    </StyledButton>
+                  </Stack>
+                  <Typography
+                    sx={{ fontStyle: "italic", mt: "32px !important" }}
+                  >
+                    By clicking{" "}
+                    <b>
+                      <i>Submit</i>
+                    </b>
+                    , you agree to our{" "}
+                    <Link href="/terms-of-service">Terms of Service</Link> and
+                    that you have read our{" "}
+                    <Link href="/term-of-service">Privacy Policy</Link>.
+                  </Typography>
+                </Stack>
+              </form>
+            </FormProvider>
           </Box>
         </ContentContainer>
       </main>
