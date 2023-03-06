@@ -60,9 +60,9 @@ const RangeSlider = ({
           onChange={onMinInputChange}
           onBlur={onBlur}
           inputProps={{
-            step: 10,
-            min: 0,
-            max: 100,
+            step: 1,
+            min,
+            max,
             type: "number",
             "aria-labelledby": "input-slider"
           }}
@@ -83,9 +83,9 @@ const RangeSlider = ({
           onChange={onMaxInputChange}
           onBlur={onBlur}
           inputProps={{
-            step: 10,
-            min: 0,
-            max: 100,
+            step: 1,
+            min,
+            max,
             type: "number",
             "aria-labelledby": "input-slider"
           }}
