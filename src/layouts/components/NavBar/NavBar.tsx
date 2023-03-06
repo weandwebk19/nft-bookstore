@@ -173,7 +173,7 @@ const NavBar = () => {
   };
 
   const handlePublishABookClick = () => {
-    router.push("/author/publishing");
+    router.push("/author/create");
   };
 
   const handleCreateListingClick = () => {

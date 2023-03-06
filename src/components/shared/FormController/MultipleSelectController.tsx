@@ -4,11 +4,15 @@ import { MultipleSelectChip } from "@/components/shared/MultipleSelectChip";
 
 interface MultipleSelectControllerProps {
   name: string;
-  items: string[];
+  items: any[] | null;
+  itemName?: string;
+  itemValue?: string;
 }
 
 const MultipleSelectController = ({
   items,
+  itemName,
+  itemValue,
   ...rest
 }: MultipleSelectControllerProps) => {
   const { control } = useFormContext();
@@ -26,6 +30,8 @@ const MultipleSelectController = ({
           onChange={onChange}
           helperText={invalid ? error?.message : ""}
           error={invalid}
+          itemName={itemName}
+          itemValue={itemValue}
         />
       )}
       name={rest.name}
