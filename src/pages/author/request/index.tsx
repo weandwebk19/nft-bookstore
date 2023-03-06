@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -8,7 +8,6 @@ import {
   InputAdornment,
   Link,
   Stack,
-  TextField,
   Typography
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -134,7 +133,8 @@ const Profile = () => {
   });
   const {
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    getValues
   } = methods;
 
   console.log("errors:", errors);
