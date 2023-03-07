@@ -120,6 +120,18 @@ svg {
   background: $blend;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .noise {
   // content: "";
   // position: absolute;
@@ -132,6 +144,7 @@ svg {
 }
 
 html {
+
   // overflow-y: overlay !important;
   /* width */
   ::-webkit-scrollbar {
@@ -161,11 +174,9 @@ html {
 body {
   text-rendering: optimizeSpeed;
   background-size: 3vh 3vh;
-  background-image: linear-gradient(
-      to right,
+  background-image: linear-gradient(to right,
       rgba(122, 122, 122, 0.08) 1px,
-      transparent 1px
-    ),
+      transparent 1px),
     linear-gradient(to bottom, rgba(122, 122, 122, 0.08) 1px, transparent 1px);
   transition: 0.3s cubic-bezier(0.4, 0.4, 0, 1);
   overflow-x: hidden;
@@ -207,6 +218,7 @@ section {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  word-break: break-word;
 
   &.text-limit--1 {
     -webkit-line-clamp: 1;
@@ -263,6 +275,7 @@ section {
     background-color: $blend;
     border-radius: 20px;
   }
+
   &--drawer {
     ::after {
       content: "";
