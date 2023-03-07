@@ -4,6 +4,15 @@ declare module "@mui/material/styles" {
   interface TypeText {
     hint: string;
   }
+  interface TypeBackground {
+    appbar: string;
+  }
+}
+
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    label: true;
+  }
 }
 
 const typography = {
@@ -35,6 +44,11 @@ const typography = {
     fontFamily: '"Fraunces", "Helvetica", "Arial", serif',
     fontVariationSettings: '"wght" 400, "SOFT" 20, "WONK" 1'
   },
+  label: {
+    fontWeight: 700,
+    fontSize: "1rem",
+    lineHeight: 1.5
+  },
   subtitle2: {
     fontWeight: 700,
     fontSize: "0.8rem"
@@ -63,7 +77,8 @@ export const lightTheme = createTheme({
     },
     background: {
       paper: "#FFFBFF",
-      default: "#EAE1D9"
+      default: "#eae1d9",
+      appbar: "rgba(234, 225, 217,0.8)"
     },
     text: {
       primary: "rgba(31,27,22,0.87)",
@@ -105,7 +120,8 @@ export const darkTheme = createTheme({
     },
     background: {
       default: "#34302A",
-      paper: "#1F1B16"
+      paper: "#1f1b16",
+      appbar: "rgba(31, 27, 22,0.8)"
     },
     text: {
       primary: "#fdefdd",
@@ -117,7 +133,7 @@ export const darkTheme = createTheme({
       main: "#657E5B"
     },
     error: {
-      main: "#BA1A1A"
+      main: "#CF6679"
     },
     info: {
       main: "#006684"

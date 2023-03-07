@@ -7,6 +7,7 @@ import {
   useState
 } from "react";
 
+import { BookStoreContract } from "@_types/BookStoreContract";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -24,11 +25,9 @@ const pageReload = () => {
 
 const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
   try {
-    // console.log("ethereum._metamask", ethereum);
-
     //create new account
     let response = await axios
-      .post("/api/account/create", {
+      .post("/api/users/create", {
         address: ethereum.selectedAddress,
         username: "Anonymous"
       })
@@ -80,7 +79,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
           createWeb3State({
             ethereum: window.ethereum,
             provider,
-            contract,
+            contract: signedContract as unknown as BookStoreContract,
             isLoading: false
           })
         );

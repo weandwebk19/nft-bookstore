@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useHooks } from "@providers/web3";
 
 export const useAccount = () => {
@@ -18,12 +19,12 @@ export const useNetwork = () => {
   };
 };
 
-export const useListedNfts = () => {
+export const useListedBooks = () => {
   const hooks = useHooks();
-  const swrRes = hooks.useListedNfts();
+  const swrRes = hooks.useListedBooks();
 
   return {
-    nfts: swrRes
+    listedBooks: swrRes
   };
 };
 

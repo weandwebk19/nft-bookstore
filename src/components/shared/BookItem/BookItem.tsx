@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Box, Stack, Typography } from "@mui/material";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
@@ -5,13 +6,18 @@ import StarIcon from "@mui/icons-material/Star";
 
 import styles from "@styles/BookItem.module.scss";
 
-import { NftBook } from "@/types/nftBook";
+import { ListedBook, NftBook } from "@/types/nftBook";
 
 type BookItemProps = {
   onClick: () => void;
-} & NftBook;
+} & ListedBook & NftBook;
 
-const BookItem = ({ meta, author, onClick }: BookItemProps) => {
+const BookItem = ({meta,
+                  seller,
+                  amount,
+                  price,
+                  author,
+                  onClick }: BookItemProps) => {
   return (
     <Stack
       className={styles["book-item"]}
@@ -42,38 +48,82 @@ const BookItem = ({ meta, author, onClick }: BookItemProps) => {
         className={styles["book-item__book-cover"]}
         src={meta.bookCover}
         alt={meta.title}
+        sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
       />
-      <Stack
-        direction="row"
-        spacing={1}
-        alignItems="center"
-        className="book-item__chips"
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column"
+        }}
       >
-        <Stack direction="row">
-          <InsertDriveFileIcon fontSize="small" color="disabled" />
-          <Typography variant="caption">{meta.file}</Typography>
-        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          className="book-item__chips"
+          sx={{ flexShrink: 0, marginBottom: "auto" }}
+        >
+          <Stack direction="row">
+            <InsertDriveFileIcon fontSize="small" color="disabled" />
+            <Typography variant="caption">{meta.bookFile}</Typography>
+          </Stack>
 
-        {meta.attributes?.map((stat, i) => {
-          switch (stat.statType) {
-            case "stars":
-              return (
-                <Stack key={i} direction="row">
-                  <StarIcon fontSize="small" color="disabled" />
-                  <Typography variant="caption">{`${stat.value} ${stat.statType}`}</Typography>
-                </Stack>
-              );
-            default:
-              return "";
-          }
-        })}
-      </Stack>
-      <Typography className="text-limit text-limit--2" variant="h6">
-        {meta.title}
-      </Typography>
-      <Typography className="text-limit text-limit--1" variant="body2">
-        {author}
-      </Typography>
+          {/* {meta.attributes?.map((stat, i) => {
+            switch (stat.statType) {
+              case "stars":
+                return (
+                  <Stack key={i} direction="row">
+                    <StarIcon fontSize="small" color="disabled" />
+                    <Typography variant="caption">{`${stat.value} ${stat.statType}`}</Typography>
+                  </Stack>
+                );
+              default:
+                return "";
+            }
+          })} */}
+        </Stack>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column"
+          }}
+        >
+          <Typography
+            className="text-limit text-limit--2"
+            variant="h6"
+            sx={{ flex: 1 }}
+          >
+            {meta.title}
+          </Typography>
+          <Typography
+            className="text-limit text-limit--1"
+            variant="body2"
+            sx={{ flexShrink: 0, marginTop: "auto" }}
+          >
+            
+            {seller ? `0x${seller[2]}${seller[3]}${seller[4]}${seller[5]}....${seller.slice(-4)}` :
+                      `0x${author[2]}${author[3]}${author[4]}${author[5]}....${author.slice(-4)}`}
+          </Typography>
+
+          <Typography
+            className="text-limit text-limit--1"
+            variant="body2"
+            sx={{ flexShrink: 0, marginTop: "auto" }}
+          >
+            {amount ? `Amount: ${amount}`: ``}
+          </Typography>
+
+          <Typography
+            className="text-limit text-limit--1"
+            variant="body2"
+            sx={{ flexShrink: 0, marginTop: "auto" }}
+          >
+            {price ? `Price: ${price} ETH` : ``}
+          </Typography>
+        </Box>
+      </Box>
     </Stack>
   );
 };

@@ -28,3 +28,26 @@
     padding: 4px 16px;
   }
 }
+
+@media (max-width: 599.99px) {
+  .book-banner {
+
+    &__title {
+      font-size: 48px;
+    }
+
+    &__meta {
+      flex-wrap: wrap;
+      gap: 12px
+    }
+
+    &__countdown {
+      padding-top: 32px;
+      font-size: 48px;
+    }
+
+    &__open {
+      margin-top: 6px;
+    }
+  }
+}

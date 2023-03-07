@@ -6,11 +6,10 @@ import MainProduct from "@ui/Home/MainProduct";
 import Head from "next/head";
 
 import images from "@/assets/images";
-import { DefaultLayout } from "@/layouts";
 
 export default function Home() {
   return (
-    <>
+    <Box>
       <Head>
         <title>NFT Bookstore</title>
         <meta name="description" content="The world's first NFT Bookstore" />
@@ -19,7 +18,7 @@ export default function Home() {
       </Head>
       <main>
         <Stack spacing={8}>
-          <Box component="section" sx={{ height: "70vh" }}>
+          <Box component="section" sx={{ height: "100vh" }}>
             <Hero />
           </Box>
           <Box component="section">
@@ -27,7 +26,7 @@ export default function Home() {
           </Box>
 
           {/* Just for you */}
-          <Box component="section" sx={{ height: "30vh" }}>
+          {/* <Box component="section" sx={{ height: "30vh" }}>
             <Box
               className="thumbnail"
               sx={{
@@ -45,13 +44,13 @@ export default function Home() {
                 className="portrait"
               />
             </Box>
-          </Box>
+          </Box> */}
 
-          <Box component="section">
+          {/* <Box component="section">
             <DisplayBox />
-          </Box>
+          </Box> */}
         </Stack>
       </main>
-    </>
+    </Box>
   );
 }

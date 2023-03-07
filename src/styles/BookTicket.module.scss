@@ -1,0 +1,178 @@
+$grey-light: hsl(200, 10%, 92%);
+$grey: hsl(200, 10%, 85%);
+$grey-dark: hsl(200, 10%, 70%);
+$shadow: hsla(200, 20%, 20%, 0.25);
+$red: #dc143c;
+
+$bg: hsl(200, 0%, 100%);
+$divider: $grey-light;
+$border: $grey-dark;
+
+$cutout-size: 1rem;
+
+.ticket {
+  cursor: pointer;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  max-width: 24rem;
+
+  &:hover {
+    & .ticket__top {
+      transform: translateY(-10px);
+    }
+    & .ticket__bottom {
+      transform: translateY(10px);
+    }
+  }
+  &__top,
+  &__bottom {
+    transition: all 0.3s ease;
+  }
+  &__header,
+  &__body,
+  &__footer {
+    padding: 1.25rem;
+    // background-color: $bg;
+    // border: 1px solid $border;
+    box-shadow: 0 2px 4px $shadow;
+  }
+  &__header {
+    font-size: 1.5rem;
+    border-top: 0.25rem solid $red;
+    border-bottom: none;
+    box-shadow: none;
+  }
+  &__wrapper {
+    box-shadow: 0 2px 4px $shadow;
+    border-radius: 0.375em 0.375em 0 0;
+    overflow: hidden;
+  }
+  &__divider {
+    position: relative;
+    height: $cutout-size;
+    margin-left: ($cutout-size / 2);
+    margin-right: ($cutout-size / 2);
+    // background-color: $bg;
+    &::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      // height: 50%;
+      top: 0;
+    }
+    &--top {
+      // background-color: $bg;
+
+      height: 10%;
+      &::after {
+        border-bottom: 6px dotted $divider;
+        transform: translateY(50%);
+      }
+    }
+    &--bottom {
+      // background-color: $bg;
+
+      &::after {
+      }
+    }
+  }
+  &__notch {
+    position: absolute;
+    left: ($cutout-size / 2) * -1;
+    width: $cutout-size;
+    height: $cutout-size;
+    // overflow: hidden;
+    &::after {
+      content: "";
+      position: relative;
+      display: block;
+      width: ($cutout-size * 2);
+      height: ($cutout-size * 2);
+      right: 100%;
+      top: -50%;
+      border: ($cutout-size / 2) solid $bg;
+      border-radius: 50%;
+      // box-shadow: inset 0 2px 4px $shadow;
+
+      transform: rotate(-45deg);
+    }
+    &--topright {
+      &::after {
+        border-right-color: transparent;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+      }
+      left: auto;
+      right: ($cutout-size / 2) * -1;
+      &::after {
+        right: 0;
+      }
+    }
+    &--topleft {
+      &::after {
+        border-top-color: transparent;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+      }
+      left: ($cutout-size * 1.5) * -1;
+      right: auto;
+      &::after {
+        right: 0;
+      }
+    }
+    &--bottomright {
+      &::after {
+        border-top-color: transparent;
+        border-right-color: transparent;
+        border-bottom-color: transparent;
+      }
+      left: auto;
+      right: ($cutout-size / 2) * -1;
+      &::after {
+        right: 0;
+      }
+    }
+    &--bottomleft {
+      &::after {
+        border-top-color: transparent;
+        border-right-color: transparent;
+        border-left-color: transparent;
+      }
+      right: auto;
+      left: ($cutout-size * 1.5) * -1;
+      &::after {
+        right: 0;
+      }
+    }
+  }
+  &__body {
+    border-bottom: none;
+    border-top: none;
+    & > * + * {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid $divider;
+    }
+  }
+  &__section {
+    & > * + * {
+      margin-top: 0.25rem;
+    }
+    & p {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  &__header,
+  &__footer {
+    font-weight: bold;
+    font-size: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+  }
+  &__footer {
+    border-top: 2px dashed $divider;
+    border-radius: 0.325rem;
+  }
+}

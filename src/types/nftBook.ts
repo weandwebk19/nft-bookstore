@@ -13,6 +13,16 @@ export type TransferHistory = {
   date: Date;
 };
 
+export type Ratings = {
+  star1: number;
+  star2: number;
+  star3: number;
+  star4: number;
+  star5: number;
+  average: number;
+  total: number;
+};
+
 export type NftBookStats = "views" | "stars" | "registered" | "owners";
 
 export type NftBookAttribute = {
@@ -20,38 +30,75 @@ export type NftBookAttribute = {
   value: number;
 };
 
-export type NftBookDetails = {
-  contractAddress: string;
-  desc: string;
-  bookId: string;
-  pages: number;
-  language: string[];
+export type BookInfo = {
+  token_id: string;
+  contract_address?: string;
+  description: string;
+  languages: string[];
   genres: (keyof typeof BookGenres)[];
-  editionVersion: number;
-  maxSupply: number;
-  registered: number;
-  openDate: Date;
-  endDate: Date;
+  version: number | string;
+  max_supply: number;
+  external_link?: string;
+  total_pages?: number;
+  keywords?: string;
+  publishing_time?: Date;
 };
+
+export type NftBookDetails = {
+  bookId: string;
+  registered: number;
+  openDate?: Date;
+  endDate?: Date;
+} & BookInfo;
 
 export type NftBookMeta = {
   title: string;
-  file: string;
+  bookFile: string;
   bookCover: string;
-  attributes: NftBookAttribute[];
+  bookSample: string;
+  fileType: string;
 };
 
 export type NftBookCore = {
   tokenId: number | string;
-  price: number;
   author: string;
-  isListed: boolean;
+  balance: number;
 };
+
+export type ListedBookCore = {
+  tokenId: number | string;
+  seller: string;
+  price: number;
+  amount: number;
+};
+
+export type ListedBook = {
+  meta: NftBookMeta;
+  details?: NftBookDetails;
+} & ListedBookCore;
 
 export type NftBook = {
   meta: NftBookMeta;
   details?: NftBookDetails;
 } & NftBookCore;
+
+export type NftListedBook = {
+  meta: NftBookMeta;
+  details?: NftBookDetails;
+} & ListedBookCore;
+
+export type PinataRes = {
+  IpfsHash: string;
+  PinSize: number;
+  Timestamp: string;
+  isDuplicate: boolean;
+};
+
+export type FileReq = {
+  bytes: Uint8Array;
+  contentType: string;
+  fileName: string;
+};
 
 export enum BookGenres {
   "Art & photography",
@@ -130,7 +177,7 @@ export enum BookGenres {
   "Psychology",
   "Professions",
   "Atlases - Encyclopedia",
-  "🌐 Science - Technology",
+  "Science - Technology",
   "Astronomy & Space Science",
   "Environment",
   "Agriculture & Forestry",

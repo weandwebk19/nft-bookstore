@@ -89,9 +89,47 @@ video {
   // transition: 0.3s cubic-bezier(0.4, 0.4, 0, 1);
   // word-spacing: 1px;
   -webkit-backface-visibility: hidden;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+
+  // Disable text selection
+  // -webkit-user-select: none; /* Safari */
+  // -ms-user-select: none; /* IE 10 and IE 11 */
+  // user-select: none; /* Standard syntax */
+  // overflow-y: scroll;
+}
+
+// Disable dragging images/svgs
+img,
+svg {
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+// Change text selection color
+::-moz-selection {
+  /* Code for Firefox */
+  color: $white;
+  background: $blend;
+}
+
+::selection {
+  color: $white;
+  background: $blend;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .noise {
@@ -106,6 +144,8 @@ video {
 }
 
 html {
+
+  // overflow-y: overlay !important;
   /* width */
   ::-webkit-scrollbar {
     width: 5px;
@@ -132,13 +172,11 @@ html {
 }
 
 body {
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizeSpeed;
   background-size: 3vh 3vh;
-  background-image: linear-gradient(
-      to right,
+  background-image: linear-gradient(to right,
       rgba(122, 122, 122, 0.08) 1px,
-      transparent 1px
-    ),
+      transparent 1px),
     linear-gradient(to bottom, rgba(122, 122, 122, 0.08) 1px, transparent 1px);
   transition: 0.3s cubic-bezier(0.4, 0.4, 0, 1);
   overflow-x: hidden;
@@ -180,9 +218,11 @@ section {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  word-break: break-word;
 
   &.text-limit--1 {
-    -webkit-line-clamp: 1; /* number of lines to show */
+    -webkit-line-clamp: 1;
+    /* number of lines to show */
     line-clamp: 1;
   }
 
@@ -199,6 +239,7 @@ section {
 
 .thumbnail {
   overflow: hidden;
+
   img {
     position: absolute;
     left: 50%;
@@ -208,9 +249,38 @@ section {
     -webkit-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+
     &.portrait {
       width: 100%;
       height: auto;
+    }
+  }
+}
+
+.required::after {
+  content: " *";
+  font-family: "Fraunces", Helvetica, Arial;
+  color: $red;
+}
+
+.active-link {
+  ::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    height: 5px;
+    width: 5px;
+    background-color: $blend;
+    border-radius: 20px;
+  }
+
+  &--drawer {
+    ::after {
+      content: "";
+      left: 0;
+      height: 100%;
     }
   }
 }
