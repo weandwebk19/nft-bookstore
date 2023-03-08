@@ -15,7 +15,7 @@ import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { BookDetails } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
-import { BookTicket } from "@/components/shared/BookTicket";
+import { Ticket } from "@/components/shared/Ticket";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
 import { book, bookList } from "@/mocks";
 
@@ -161,7 +161,7 @@ const BookDetail = () => {
               </Typography>
 
               <Stack direction={{ sm: "column", md: "row" }} spacing={3}>
-                <BookTicket
+                <Ticket
                   header="NFT Bookstore"
                   body={["Tho Le", "6/25/2023", book.details.contractAddress]}
                   href="xf56e4fxre6"

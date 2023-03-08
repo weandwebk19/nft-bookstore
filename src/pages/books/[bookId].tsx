@@ -16,7 +16,7 @@ import images from "@/assets/images";
 import { BookInfo } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
-import { BookTicket } from "@/components/shared/BookTicket";
+import { BookTicket } from "@/components/shared/Ticket";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 

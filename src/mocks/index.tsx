@@ -289,3 +289,5 @@ export const book2 = {
     publishing_time: new Date()
   }
 };
+
+export const bookList2 = [book2, book2, book2];
