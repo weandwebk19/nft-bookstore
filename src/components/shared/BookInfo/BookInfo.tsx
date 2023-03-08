@@ -31,74 +31,7 @@ import { ReadMore } from "../ReadMore";
 import { Timer } from "../Timer";
 import { BookBriefing, BookDetail } from "./sections";
 
-type BookInfoProps = {
-  onClick: () => void;
-  isListed: boolean;
-  isPublished: boolean;
-  isSelled: boolean;
-  setIsSelled: (flag: boolean) => void;
-} & NftBook;
-
-const schema = yup
-  .object({
-    listingPrice: yup
-      .number()
-      .required("Please enter the listing price")
-      .typeError("The listing price must be a positive number")
-      .positive("The listing price must be a positive number"),
-    quantity: yup
-      .number()
-      .required("Please enter the quantity")
-      .typeError("The quantity must be a positive integer")
-      .positive("The quantity must be a positive integer")
-      .integer("The quantity must be a positive integer")
-  })
-  .required();
-
-type FormData = yup.InferType<typeof schema>;
-
-const BookInfo = ({
-  tokenId,
-  price,
-  meta,
-  details,
-  author,
-  isListed,
-  onClick,
-  isPublished,
-  isSelled,
-  setIsSelled
-}: BookInfoProps) => {
-  const {
-    handleSubmit,
-    formState: { errors },
-    control,
-    setValue,
-    getValues
-  } = useForm<FormData>({
-    defaultValues: {
-      listingPrice: 0.5,
-      quantity: 1
-    },
-    resolver: yupResolver(schema)
-  });
-  // const [countdown, setCountdown] = useState({
-  //   days: 0,
-  //   hours: 0,
-  //   minutes: 0,
-  //   seconds: 0
-  // });
-
-  // const onSubmitSeller = (data: any) => {
-  //   console.log("data:", data);
-
-  //   // handle set isListed is true
-  // };
-
-  // useEffect(() => {
-  //   setCountdown({ days, hours, minutes, seconds });
-  // }, [days, hours, minutes, seconds]);
-
+const BookInfo = () => {
   return (
     <Stack>
       <BookBriefing

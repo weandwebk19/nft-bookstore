@@ -11,12 +11,14 @@ import {
 
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
+import { useBookDetail } from "@/components/hooks/web3";
+import { BookDetails } from "@/components/shared/BookInfo";
 import { BookInfo } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
-import { BookTicket } from "@/components/shared/Ticket";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
@@ -29,6 +31,10 @@ const BookDetail = () => {
   const [isSelled, setIsSelled] = useState<boolean>(false);
   const bookDetailsRef = useRef(null);
   const tl = useRef<any>();
+  const router = useRouter();
+  const { bookId } = router.query;
+  const { bookDetail } = useBookDetail(bookId as string);
+  console.log("bookDetail", bookDetail);
 
   useIsomorphicLayoutEffect(() => {
     const ctx = gsap.context(() => {

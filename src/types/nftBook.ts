@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export type PricingHistory = {
   highest: number;
   lowest: number;
@@ -44,24 +46,13 @@ export type BookInfo = {
   publishing_time?: Date;
 };
 
-export type NftBookDetail = {
-  core: NftBookCore; // Data from smartcontract
+export type NftBookDetails = {
+  bookId: string;
+  nftCore: NftBookCore; // Data from smartcontract
+  listedCore?: ListedBookCore; // Data from smartcontract
   meta: NftBookMeta; // Data from metadata
   info: BookInfo; // Data from database
 };
-
-export type NftListedBookDetail = {
-  core: ListedBookCore;
-  meta: NftBookMeta;
-  info: BookInfo;
-};
-
-// export type NftBookDetails = {
-//   bookId: string;
-//   registered: number;
-//   openDate?: Date;
-//   endDate?: Date;
-// } & BookInfo;
 
 export type NftBookMeta = {
   title: string;
