@@ -1,6 +1,9 @@
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Divider, Stack } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
+
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import SelectAllIcon from "@mui/icons-material/SelectAll";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
@@ -21,7 +24,7 @@ import {
 
 const schema = yup
   .object({
-    genre: yup.string(),
+    genre: yup.array(yup.string()),
     title: yup.string(),
     author: yup.string(),
     rating: yup.number(),
@@ -56,7 +59,7 @@ function getLabelText(value: number) {
 }
 
 const defaultValues = {
-  genre: "",
+  genre: [],
   title: "",
   author: "",
   rating: 3,
@@ -81,6 +84,8 @@ const FilterBar = () => {
     console.log("data:", data);
   };
 
+  // console.log("genres.data:", genres.data);
+
   return (
     <FormProvider {...methods}>
       <Stack
@@ -90,7 +95,32 @@ const FilterBar = () => {
         sx={{ marginTop: 4 }}
         className={styles["filter-bar"]}
       >
-        <FormGroup label="Genres">
+        <FormGroup
+          label={
+            <Stack
+              direction={{ xs: "row" }}
+              spacing={{ xs: 2 }}
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              Genres
+              <Stack direction={{ xs: "row" }}>
+                <Tooltip title="Reset">
+                  <IconButton onClick={() => {}}>
+                    <RestartAltIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Select all">
+                  <IconButton onClick={() => {}}>
+                    <SelectAllIcon />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Stack>
+          }
+        >
           {genres.isLoading && "Loading..."}
           {genres.error &&
             "Oops! There was a problem loading genres \n Try refresh the page."}

@@ -15,7 +15,7 @@ interface TreeViewControllerProps {
 }
 
 const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
-  const { control, setValue } = useFormContext();
+  const { control, setValue, getValues } = useFormContext();
 
   const [nestedItems, setNestedItems] = useState<any[]>([]);
 
@@ -24,6 +24,81 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
       setNestedItems(nestify(items));
     }
   }, [items]);
+
+  // console.log("nestedItems:", nestedItems);
+
+  const handleClickTreeItem = (nodeId: string) => {
+    console.log("_id:", nodeId);
+
+    if (typeof rest.name === "string") {
+      let oldValue = getValues(rest.name);
+      let newValue: Array<string> = [];
+      let flag = oldValue?.includes(nodeId) ? true : false;
+
+      const foundItemChildren = items?.find(
+        (item) => item._id === nodeId && item?.parent_id
+      );
+
+      if (foundItemChildren) {
+        let foundNestItem = nestedItems?.find(
+          (item) =>
+            item._id === foundItemChildren.parent_id &&
+            item?.children?.length > 0
+        );
+
+        if (flag) {
+          newValue = oldValue?.filter((item: string) => item !== nodeId);
+          newValue = newValue?.filter(
+            (item: string) => item !== foundNestItem._id
+          );
+        } else {
+          newValue = [...oldValue, nodeId];
+          const childrenItems = foundNestItem.children.map(
+            (item: any) => item._id
+          );
+          const isAllChildren = childrenItems.filter(
+            (item: string) => !newValue.includes(item)
+          );
+
+          if (isAllChildren.length === 0) {
+            newValue = [...newValue, foundNestItem._id];
+          }
+        }
+      } else {
+        let foundNestItem = nestedItems?.find(
+          (item) => item._id === nodeId && item?.children?.length > 0
+        );
+
+        if (foundNestItem) {
+          if (flag) {
+            newValue = oldValue?.filter((item: string) => item !== nodeId);
+            const childrenItems = foundNestItem.children.map(
+              (item: any) => item._id
+            );
+            newValue = newValue.filter(
+              (item: string) => !childrenItems.includes(item)
+            );
+          } else {
+            newValue = [...oldValue, nodeId];
+            const childrenItems = foundNestItem.children.map(
+              (item: any) => item._id
+            );
+            newValue = newValue.concat(childrenItems);
+          }
+        } else {
+          if (flag) {
+            newValue = oldValue?.filter((item: string) => item !== nodeId);
+          } else {
+            newValue = [...oldValue, nodeId];
+          }
+        }
+      }
+
+      console.log("newValue:", newValue);
+
+      setValue(rest.name, newValue, { shouldValidate: true });
+    }
+  };
 
   return (
     <Controller
@@ -34,10 +109,8 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
           defaultCollapseIcon={<ArrowDropDownIcon />}
           defaultExpandIcon={<ArrowRightIcon />}
           defaultEndIcon={<div style={{ width: 24, backgroundColor: "red" }} />}
-          onNodeSelect={(e: React.SyntheticEvent, nodeIds: any) => {
-            setValue(rest.name, nodeIds, { shouldValidate: true });
-          }}
           sx={{ height: 264, flexGrow: 1, width: "100", overflowY: "auto" }}
+          multiSelect={true}
         >
           {nestedItems?.map((parentItem) => {
             return (
@@ -45,6 +118,10 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
                 key={parentItem._id}
                 nodeId={parentItem._id}
                 labelText={parentItem.name}
+                formName={rest.name}
+                setValue={setValue}
+                getValues={getValues}
+                handleClick={handleClickTreeItem}
               >
                 {parentItem?.children.map((childrenItem: any) => {
                   return (
@@ -52,6 +129,10 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
                       key={childrenItem._id}
                       nodeId={childrenItem._id}
                       labelText={childrenItem.name}
+                      formName={rest.name}
+                      setValue={setValue}
+                      getValues={getValues}
+                      handleClick={handleClickTreeItem}
                     />
                   );
                 })}
