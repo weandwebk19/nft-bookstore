@@ -8,7 +8,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/api/:path*",
+        source: "/api/pinata/:path*",
         destination: "https://gateway.pinata.cloud/:path*"
       }
     ];

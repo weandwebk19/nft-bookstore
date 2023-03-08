@@ -4,18 +4,19 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
 
-axiosRetry(axios, {
-  retries: 3,
-  retryDelay: axiosRetry.exponentialDelay
-});
+// axiosRetry(axios, {
+//   retries: 3,
+//   retryDelay: axiosRetry.exponentialDelay
+// });
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  if (req.method === "POST") {
+  if (req.method === "GET") {
     try {
-      const { nftUri } = req.body;
+      const nftUri: string = req.query.uri as string;
+      console.log("nftUri", nftUri);
       const nftRes = await axios.get(nftUri, {
         headers: {
           Accept: "text/plain"
@@ -28,8 +29,12 @@ export default async function handler(
         data: nftRes.data
       });
     } catch (e: any) {
-      console.error("e.response", e.response);
-      // throw new Error(e).message;
+      console.error("e", e);
+      return res.status(500).json({
+        message: "Something went wrong.",
+        success: false,
+        data: e
+      });
     }
   } else {
     return res.status(400).json({
