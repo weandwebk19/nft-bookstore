@@ -8,13 +8,13 @@
   .form__group__title {
     margin-bottom: 48px;
   }
+}
 
-  .form__helper-text {
-    margin-top: 3px;
-    margin-right: 14px;
-    margin-bottom: 0;
-    margin-left: 14px;
-  }
+.form__helper-text {
+  margin-top: 3px !important;
+  margin-right: 14px !important;
+  margin-bottom: 0 !important;
+  margin-left: 14px !important;
 }
 
 @media (min-width: 600px) and (max-width: 899.99px) {

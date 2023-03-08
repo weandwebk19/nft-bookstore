@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
-import { NftBook } from "@_types/nftBook";
+import { ListedBook, NftBook } from "@_types/nftBook";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
@@ -15,7 +15,7 @@ type UseListedBooksResponse = {
   ) => Promise<void>;
 };
 type ListedBooksHookFactory = CryptoHookFactory<
-  NftBook[],
+  ListedBook[],
   UseListedBooksResponse
 >;
 
@@ -27,7 +27,7 @@ export const hookFactory: ListedBooksHookFactory =
     const { data, ...swr } = useSWR(
       contract ? "web3/useListedBooks" : null,
       async () => {
-        const nftBooks = [] as NftBook[];
+        const listedBooks = [] as ListedBook[];
         const coreListedBooks = await contract!.getAllBooksOnSale();
 
         for (let i = 0; i < coreListedBooks.length; i++) {
@@ -37,18 +37,16 @@ export const hookFactory: ListedBooksHookFactory =
           const metaRes = await fetch(tokenURI);
           const meta = await metaRes.json();
 
-          nftBooks.push({
+          listedBooks.push({
             tokenId: listedBook.tokenId.toNumber(),
-            author: nftBook.author,
-            balance: nftBook.balance.toNumber(),
-            price: parseFloat(ethers.utils.formatEther(listedBook.price)),
             seller: listedBook.seller,
+            price: parseFloat(ethers.utils.formatEther(listedBook.price)),
             amount: listedBook.amount.toNumber(),
             meta
           });
         }
 
-        return nftBooks;
+        return listedBooks;
       }
     );
 

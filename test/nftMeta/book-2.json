@@ -2,22 +2,5 @@
   "title": "The Kite Runner",
   "file": "epub",
   "bookCover": "https://gateway.pinata.cloud/ipfs/QmRbq7HpEv1Zvf75aFngxr7NaccM1Unf6HvjCZb8udrFXT",
-  "attributes": [
-    {
-      "statType": "views",
-      "value": "1000"
-    },
-    {
-      "statType": "stars",
-      "value": "4.5"
-    },
-    {
-      "statType": "registered",
-      "value": "30"
-    },
-    {
-      "statType": "owners",
-      "value": "50"
-    }
-  ]
+  "bookSample": ""
 }

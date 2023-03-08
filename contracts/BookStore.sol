@@ -34,13 +34,9 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
   mapping (uint => NFTBook) _idToNFTBook;
   mapping (string => bool) private _usedTokenURIs;
 
-  // For buyer
   mapping(address => mapping(uint => uint)) private _ownedTokens;
   mapping(address => uint) private _totalOwnedToken;
 
-  // For borrower
-  // mapping(address => mapping(uint => uint)) private _ownedTemporaryTokens;
-  // mapping(address => uint) private _totalOwnedTemporaryToken;
 
   constructor(ListedBookStorage  listedBookStorage,
                RentedBookStorage rentedBookStorage)
@@ -78,7 +74,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
       _addTokenToOwnerEnumeration(to, tokenId);
     }
 
-    // Buy books
+    // Buy books and Borrow books
     if (from != address(0) && to != address(0) && to != from) {
       uint tokenId = ids[0];
       _addTokenToOwnerEnumeration(to, tokenId);
@@ -87,6 +83,13 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
       }
     }
 
+  }
+
+  function getBalanceOfOwnerBook(uint tokenId) public view returns(uint){
+    require(isOwnerOfToken(tokenId, msg.sender),
+          "You are not the owner of this token");
+
+    return ERC1155.balanceOf(msg.sender, tokenId);
   }
 
   function _addTokenToOwnerEnumeration(address owner, uint tokenId) private {
@@ -145,7 +148,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
   }
   
   function isOwnerOfToken(uint tokenId, address owner) public view returns(bool) {
-    return ERC1155.balanceOf(owner, tokenId) > 0;
+    return ERC1155.balanceOf(owner, tokenId) > 0 ;
   }
 
   function getOwnedNFTBooks() public view returns (NFTBook[] memory) {
@@ -194,8 +197,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
       uint tokenId = _ownedTokens[msg.sender][i];
       RentedBookStorage.RentedBook memory book = _rentedBookStorage.getRentedBook(tokenId, msg.sender);
       if (book.tokenId != 0 &&
-          book.renter != address(0) &&
-          book.rentalDuration != 0) {
+          book.renter != address(0)) {
 
         books[currentIndex] = book;
         currentIndex++;
@@ -205,7 +207,24 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     return books;
   }
 
-  function getAmountOfAllTypeBooks(uint256 tokenId, address owner) public view returns(uint) {
+  function getOwnedBorrowedBooks() public view returns (RentedBookStorage.BorrowedBook[] memory) {
+    RentedBookStorage.BorrowedBook[] memory borrowedBooks = 
+                                    _rentedBookStorage.getOwnedBorrowedBooks(msg.sender);
+    
+    require(borrowedBooks.length == 
+            _rentedBookStorage.getTotalOwnedBorrowedBook(msg.sender),
+            "Length of owned borrowed books is invalid");
+      
+    return borrowedBooks;
+  }
+
+  function getAmountOfAllTypeBooksUnsellable(uint256 tokenId, address owner) public view returns(uint) {
+    return _listedBookStorage.getAmountOfListedBooks(tokenId, owner) +
+          _rentedBookStorage.getAmountOfRentedBooks(tokenId, owner) + 
+          _rentedBookStorage.getAmountOfBorrowedBooks(tokenId, owner);
+  }
+
+  function getAmountOfAllTypeBooksUnrentable(uint256 tokenId, address owner) public view returns(uint) {
     return _listedBookStorage.getAmountOfListedBooks(tokenId, owner) +
           _rentedBookStorage.getAmountOfRentedBooks(tokenId, owner);
   }
@@ -215,7 +234,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooks(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
+    require(getAmountOfAllTypeBooksUnsellable(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
           "You don't have enough books to sell");
     require(msg.value == listingPrice,
            "Price must be equal to listing price");
@@ -224,19 +243,17 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
 
   function rentBooks(uint256 tokenId,
                     uint price,
-                    uint256 amount,
-                    uint rentalDuration) public payable {
+                    uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooks(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId) &&
+    require(getAmountOfAllTypeBooksUnrentable(tokenId, msg.sender) +
+           amount <= ERC1155.balanceOf(msg.sender, tokenId) &&
            amount > 0,
           "You don't have enough books to sell");
     require(msg.value == rentingPrice,
            "Price must be equal to renting price");
-    require(rentalDuration >= MIN_TIME,
-           "Rental period is at least one week");
+    _rentedBookStorage.rentRentedBooks(tokenId, msg.sender, price, amount);
 
-    _rentedBookStorage.rentRentedBooks(tokenId, msg.sender, price, amount, rentalDuration);
   }
 
   function updateBookFromSale(uint256 tokenId, 
@@ -256,21 +273,15 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
   function updateBookFromRenting(uint256 tokenId,
                                 uint newPrice,
                                 uint256 newAmount,
-                                uint newStartTime,
-                                uint newRentalDuration,
                                 address renter) public {
     require(isOwnerOfToken(tokenId, renter),
           "You are not the owner of this token");
     require(renter == msg.sender,
           "You are not the renter of this token");
-    require(newRentalDuration >= MIN_TIME, 
-          "New rental duration is invalid");
     
     _rentedBookStorage.updateRentedBookFromRenting(tokenId,
                                                   newPrice,
                                                   newAmount,
-                                                  newStartTime, 
-                                                  newRentalDuration, 
                                                   renter);
   }
 
@@ -291,25 +302,31 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     }
   }
 
-  // This function is incomplete
+  function borrowBooks(uint256 tokenId,
+                      address renter,
+                      uint256 price,
+                      uint256 amount,
+                      uint rentalDuration) public payable {
+    require(rentalDuration >= MIN_TIME,
+           "Rental period is at least one week");
 
-  // function borrowBooks(uint256 tokenId,
-  //                     address renter,
-  //                     uint256 amount,
-  //                     uint startTime,
-  //                     uint rentalDuration) public payable {
-
-  //   uint totalPrice = _rentedBookStorage.borrowRentedBooks(tokenId,
-  //                                                          renter, 
-  //                                                          amount, 
-  //                                                          msg.sender, 
-  //                                                          startTime, 
-  //                                                          rentalDuration, 
-  //                                                          msg.value);
-  //   if (totalPrice != 0) {
-  //     // _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
-  //     payable(renter).transfer(totalPrice);
-  //   }
-  // }
+    uint startTime = block.timestamp;
+    uint endTime = startTime + rentalDuration;
+    uint256 totalPrice = _rentedBookStorage.borrowRentedBooks(tokenId,
+                                                           renter, 
+                                                           amount, 
+                                                           price,
+                                                           startTime, 
+                                                           endTime, 
+                                                           msg.sender, 
+                                                           msg.value);
+    if (totalPrice != 0) {
+      _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
+      payable(renter).transfer(totalPrice);
+    } else {
+      require(false,
+           "Book execution failed");
+    }
+  }
 
 }
