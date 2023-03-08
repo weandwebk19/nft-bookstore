@@ -25,11 +25,7 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
     }
   }, [items]);
 
-  // console.log("nestedItems:", nestedItems);
-
   const handleClickTreeItem = (nodeId: string) => {
-    console.log("_id:", nodeId);
-
     if (typeof rest.name === "string") {
       let oldValue = getValues(rest.name);
       let newValue: Array<string> = [];
@@ -93,9 +89,6 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
           }
         }
       }
-
-      console.log("newValue:", newValue);
-
       setValue(rest.name, newValue, { shouldValidate: true });
     }
   };

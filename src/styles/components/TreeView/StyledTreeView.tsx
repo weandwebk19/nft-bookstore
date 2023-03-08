@@ -25,9 +25,6 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     color: theme.palette.primary.main,
 
-    "&:hover": {
-      backgroundColor: theme.palette.background.default
-    },
     "&.Mui-selected.Mui-focused": {
       backgroundColor: theme.palette.background.default,
       color: theme.palette.primary.main
@@ -35,6 +32,9 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
       backgroundColor: theme.palette.background.default,
       color: theme.palette.primary.main
+    },
+    "&:hover": {
+      backgroundColor: theme.palette.background.default
     }
   },
   [`& .${treeItemClasses.content}`]: {
@@ -49,15 +49,15 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     "&.Mui-expanded": {
       fontWeight: theme.typography.fontWeightRegular
     },
-    "&:hover, .hover2": {
-      backgroundColor: theme.palette.action.hover
-    },
-
     "&.Mui-selected.Mui-focused": {
       backgroundColor: theme.palette.background.paper
     },
     "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
       backgroundColor: "inherit"
+    },
+    "&:hover, &.Mui-selected:hover": {
+      transition: "all 0.2s ease-in-out 0s",
+      backgroundColor: theme.palette.action.hover
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: "inherit",

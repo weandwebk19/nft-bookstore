@@ -2,9 +2,10 @@ import { FormProvider, useForm } from "react-hook-form";
 
 import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
 
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import SelectAllIcon from "@mui/icons-material/SelectAll";
-
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { faBorderAll, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
 import * as yup from "yup";
@@ -21,6 +22,8 @@ import {
   SelectController,
   TreeViewController
 } from "../FormController";
+
+config.autoAddCss = false;
 
 const schema = yup
   .object({
@@ -78,13 +81,20 @@ const FilterBar = () => {
     mode: "all"
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setValue } = methods;
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
   };
 
-  // console.log("genres.data:", genres.data);
+  const handleResetGenres = () => {
+    setValue("genre", [], { shouldValidate: true });
+  };
+  const handleSelectAllGenres = () => {
+    const data: any[] = genres?.data || [];
+    let valueGenres: any[] = data?.map((item: any) => item._id);
+    setValue("genre", valueGenres as never[], { shouldValidate: true });
+  };
 
   return (
     <FormProvider {...methods}>
@@ -108,13 +118,13 @@ const FilterBar = () => {
               Genres
               <Stack direction={{ xs: "row" }}>
                 <Tooltip title="Reset">
-                  <IconButton onClick={() => {}}>
-                    <RestartAltIcon />
+                  <IconButton onClick={handleResetGenres}>
+                    <FontAwesomeIcon icon={faUndoAlt} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Select all">
-                  <IconButton onClick={() => {}}>
-                    <SelectAllIcon />
+                  <IconButton onClick={handleSelectAllGenres}>
+                    <FontAwesomeIcon icon={faBorderAll} />
                   </IconButton>
                 </Tooltip>
               </Stack>
