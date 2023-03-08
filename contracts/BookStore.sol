@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ListedBookStorage.sol";
 import "./RentedBookStorage.sol";
 
-contract BookStore is ERC1155URIStorage, Ownable {
+contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookStorage {
   using Counters for Counters.Counter;
 
   struct NFTBook {

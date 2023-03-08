@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
+import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
@@ -28,7 +29,9 @@ export const hookFactory: OwnedNftsHookFactory =
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
           const tokenURI = await contract!.uri(item.tokenId);
-          const meta = await (await fetch(tokenURI)).json();
+          const meta = await (
+            await axios.get(`/api/pinata/metadata?uri=${tokenURI}`)
+          ).data;
 
           nfts.push({
             tokenId: item.tokenId.toNumber(),

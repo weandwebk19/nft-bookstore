@@ -266,8 +266,8 @@ const DisplayBox: FunctionComponent = () => {
 
   const { nftBooks } = useListedBooks();
 
-  const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+  const handleBookClick = (bookId: number | string) => {
+    router.push(`/books/${bookId}`);
   };
 
   return (
