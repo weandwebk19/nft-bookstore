@@ -3,7 +3,7 @@ import {
   BookGenres,
   NftBook,
   NftBookAttribute,
-  NftBookDetails
+  NftBookDetail
 } from "@/types/nftBook";
 
 export const book = {
@@ -249,3 +249,43 @@ export const bookList: NftBook[] = [
     }
   }
 ];
+
+export const book2 = {
+  core: {
+    tokenId: "t0k3n1D",
+    author: "Markus Zusak",
+    balance: 1.95,
+    seller: "0x94fwe5f56ef3rv1t6vf6f5bh1bg8try6n465",
+    amount: 100,
+    price: 0.5
+  },
+  meta: {
+    title: "The Book Thief",
+    bookFile:
+      "https://altmshfkgudtjr.github.io/react-epub-viewer/files/Alices%20Adventures%20in%20Wonderland.epub",
+    bookCover: images.mockupBookCover2,
+    bookSample: "",
+    fileType: "epub"
+  },
+  info: {
+    book_id: "80Ok1D",
+    contract_address: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
+    description:
+      "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
+
+    bookId: "645146126",
+    pages: 205,
+    languages: ["64053f020ad15f006f1abc8c", "64053f020ad15f006f1abc8d"],
+    genres: [
+      "64020e40ea7cdb41da9417b7",
+      "64020e40ea7cdb41da9417b8",
+      "64020e40ea7cdb41da9417b9"
+    ],
+    version: 1,
+    max_supply: 100,
+    external_link: "https://github.com/",
+    total_pages: 256,
+    keywords: "",
+    publishing_time: new Date()
+  }
+};

@@ -44,12 +44,24 @@ export type BookInfo = {
   publishing_time?: Date;
 };
 
-export type NftBookDetails = {
-  bookId: string;
-  registered: number;
-  openDate?: Date;
-  endDate?: Date;
-} & BookInfo;
+export type NftBookDetail = {
+  core: NftBookCore; // Data from smartcontract
+  meta: NftBookMeta; // Data from metadata
+  info: BookInfo; // Data from database
+};
+
+export type NftListedBookDetail = {
+  core: ListedBookCore;
+  meta: NftBookMeta;
+  info: BookInfo;
+};
+
+// export type NftBookDetails = {
+//   bookId: string;
+//   registered: number;
+//   openDate?: Date;
+//   endDate?: Date;
+// } & BookInfo;
 
 export type NftBookMeta = {
   title: string;

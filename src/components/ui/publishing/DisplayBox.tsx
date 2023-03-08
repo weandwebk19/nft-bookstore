@@ -30,7 +30,7 @@ const DisplayBox: FunctionComponent = () => {
   console.log("nftBooks: ", listedBooks);
 
   const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+    router.push(`/books/${tokenId}`);
   };
 
   return (

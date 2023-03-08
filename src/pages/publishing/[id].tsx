@@ -12,7 +12,7 @@ import {
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 
-import { BookDetails } from "@/components/shared/BookDetails";
+import { BookDetails } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
 import { BookTicket } from "@/components/shared/BookTicket";
