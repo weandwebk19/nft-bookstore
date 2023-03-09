@@ -26,7 +26,7 @@ const DisplayBox = () => {
   const router = useRouter();
 
   const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+    router.push(`/books/${tokenId}`);
   };
 
   return (

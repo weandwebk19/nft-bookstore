@@ -2,6 +2,7 @@ export { default as AttachmentController } from "./AttachmentController";
 export { default as CheckboxController } from "./CheckboxController";
 export { default as InputController } from "./InputController";
 export { default as MultipleSelectController } from "./MultipleSelectController";
+export { default as NumericStepperController } from "./NumericStepperController";
 export { default as RadioGroupController } from "./RadioGroupController";
 export { default as RangeSliderController } from "./RangeSliderController";
 export { default as RatingController } from "./RatingController";

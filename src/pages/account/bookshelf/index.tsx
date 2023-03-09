@@ -1,8 +1,8 @@
 import { Stack, Typography } from "@mui/material";
 
 import images from "@/assets/images";
-import { BookTicket } from "@/components/shared/BookTicket";
 import { ContentContainer } from "@/components/shared/ContentContainer";
+import { Ticket } from "@/components/shared/Ticket";
 import { Wrapper } from "@/components/shared/Wrapper";
 
 const preUrl = "/account/bookshelf";
@@ -11,7 +11,7 @@ const topCategories = [
   {
     id: `${preUrl}/created-books`,
     component: (
-      <BookTicket
+      <Ticket
         href={`${preUrl}/created-books`}
         header="Created books"
         image={images.product1}
@@ -21,7 +21,7 @@ const topCategories = [
   {
     id: `${preUrl}/owned-books`,
     component: (
-      <BookTicket
+      <Ticket
         href={`${preUrl}/owned-books`}
         header="Owned books"
         image={images.product2}
@@ -31,7 +31,7 @@ const topCategories = [
   {
     id: `${preUrl}/rental-books`,
     component: (
-      <BookTicket
+      <Ticket
         href={`${preUrl}/rental-books`}
         header="Rental books"
         image={images.product3}
@@ -64,7 +64,7 @@ const bottomCategories = [
   {
     id: `${preUrl}/listing-books`,
     component: (
-      <BookTicket
+      <Ticket
         href={`${preUrl}/listing-books`}
         header="Listing books"
         image={images.product1}
@@ -74,7 +74,7 @@ const bottomCategories = [
   {
     id: `${preUrl}/books-for-rent`,
     component: (
-      <BookTicket
+      <Ticket
         href={`${preUrl}/books-for-rent`}
         header="Books for rent"
         image={images.product1}

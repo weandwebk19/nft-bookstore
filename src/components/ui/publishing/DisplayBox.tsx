@@ -13,7 +13,7 @@ import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList } from "@/mocks";
+import { book, bookList, bookList2 } from "@/mocks";
 import {
   BookGenres,
   ListedBook,
@@ -29,8 +29,8 @@ const DisplayBox: FunctionComponent = () => {
 
   // console.log("nftBooks: ", listedBooks);
 
-  const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+  const handleBookClick = (bookId: number | string) => {
+    router.push(`/books/${bookId}`);
   };
 
   return (
@@ -53,7 +53,7 @@ const DisplayBox: FunctionComponent = () => {
               amount={0}
             />
 
-            <ContentPaper isPaginate={true} title={<>Publishing books</>}>
+            <ContentPaper isPaginate={true} title="Publishing books">
               <Grid
                 container
                 spacing={3}
