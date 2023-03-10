@@ -312,7 +312,7 @@ export const book3: BookDetailsProps = {
     },
     info: {
       tokenId: "fd5k9xzi9",
-      contract_address: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
+      contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
       description:
         "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
       languages: ["64053f020ad15f006f1abc8c", "64053f020ad15f006f1abc8d"],
@@ -322,11 +322,11 @@ export const book3: BookDetailsProps = {
         "64020e40ea7cdb41da9417b9"
       ],
       version: 2,
-      max_supply: 110,
-      external_link: "https://github.com/",
-      total_pages: 360,
+      maxSupply: 110,
+      externalLink: "https://github.com/",
+      totalPages: 360,
       keywords: "",
-      publishing_time: new Date(),
+      publishingTime: new Date(),
       openDate: new Date("06/15/2023"),
       endDate: new Date("07/30/2023")
     }
@@ -391,7 +391,7 @@ export const book4: BookDetailsProps = {
     },
     info: {
       tokenId: "fd5k9xzi9",
-      contract_address: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
+      contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
       description:
         "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
       languages: ["64053f020ad15f006f1abd38", "64053f020ad15f006f1abcb3"],
@@ -401,11 +401,11 @@ export const book4: BookDetailsProps = {
         "64020e40ea7cdb41da9417bd"
       ],
       version: 1,
-      max_supply: 100,
-      external_link: "https://github.com/",
-      total_pages: 300,
+      maxSupply: 100,
+      externalLink: "https://github.com/",
+      totalPages: 300,
       keywords: "",
-      publishing_time: new Date(),
+      publishingTime: new Date(),
       openDate: new Date("06/15/2023"),
       endDate: new Date("06/30/2023")
     }
@@ -470,7 +470,7 @@ export const book5: BookDetailsProps = {
     },
     info: {
       tokenId: "fd5k9xzi9",
-      contract_address: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
+      contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
       description:
         "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
       languages: ["64053f020ad15f006f1abd38", "64053f020ad15f006f1abcb3"],
@@ -480,11 +480,11 @@ export const book5: BookDetailsProps = {
         "64020e40ea7cdb41da9417bd"
       ],
       version: 1,
-      max_supply: 100,
-      external_link: "https://github.com/",
-      total_pages: 256,
+      maxSupply: 100,
+      externalLink: "https://github.com/",
+      totalPages: 256,
       keywords: "",
-      publishing_time: new Date(),
+      publishingTime: new Date(),
       openDate: new Date("06/15/2023"),
       endDate: new Date("06/30/2023")
     }
@@ -549,7 +549,7 @@ export const book6: BookDetailsProps = {
     },
     info: {
       tokenId: "fd5k9xzi9",
-      contract_address: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
+      contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
       description:
         "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
       languages: ["64053f020ad15f006f1abd38", "64053f020ad15f006f1abcb3"],
@@ -559,11 +559,11 @@ export const book6: BookDetailsProps = {
         "64020e40ea7cdb41da9417bd"
       ],
       version: 1,
-      max_supply: 100,
-      external_link: "https://github.com/",
-      total_pages: 278,
+      maxSupply: 100,
+      externalLink: "https://github.com/",
+      totalPages: 278,
       keywords: "",
-      publishing_time: new Date(),
+      publishingTime: new Date(),
       openDate: new Date("06/15/2023"),
       endDate: new Date("06/30/2023")
     }
@@ -628,7 +628,7 @@ export const book7: BookDetailsProps = {
     },
     info: {
       tokenId: "569fe56r5e6",
-      contract_address: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
+      contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
       description:
         "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
       languages: [
@@ -642,11 +642,11 @@ export const book7: BookDetailsProps = {
         "64020e40ea7cdb41da9417c9"
       ],
       version: 1,
-      max_supply: 100,
-      external_link: "https://github.com/",
-      total_pages: 278,
+      maxSupply: 100,
+      externalLink: "https://github.com/",
+      totalPages: 278,
       keywords: "",
-      publishing_time: new Date(),
+      publishingTime: new Date(),
       openDate: new Date("06/15/2023"),
       endDate: new Date("06/30/2023")
     }

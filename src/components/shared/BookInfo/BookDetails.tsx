@@ -154,7 +154,7 @@ const BookDetails = ({
                 <Typography variant="label" mb={1}>
                   Contract address:
                 </Typography>
-                <MUILink href="#">{details?.info?.contract_address}</MUILink>
+                <MUILink href="#">{details?.info?.contractAddress}</MUILink>
               </Stack>
 
               {/* Description */}
@@ -349,7 +349,7 @@ const BookDetails = ({
                   {/* № page */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">№ pages:</Typography>
-                    <Typography>{details?.info?.total_pages}</Typography>
+                    <Typography>{details?.info?.totalPages}</Typography>
                   </Stack>
 
                   {/* Write in Language */}
@@ -391,7 +391,7 @@ const BookDetails = ({
                   {/* Max supply */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Max supply:</Typography>
-                    <Typography>{details?.info?.max_supply}</Typography>
+                    <Typography>{details?.info?.maxSupply}</Typography>
                   </Stack>
 
                   {/* Owners */}

@@ -182,7 +182,7 @@ const BookDetail = () => {
                   body={[
                     "Tho Le",
                     "6/25/2023",
-                    book3?.details?.info?.contract_address
+                    book3?.details?.info?.contractAddress
                   ]}
                   href="xf56e4fxre6"
                   footer={`${book.price} ETH`}
