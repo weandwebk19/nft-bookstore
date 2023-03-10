@@ -18,6 +18,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "axios";
 import Link from "next/link";
 import * as yup from "yup";
 
@@ -25,37 +26,71 @@ import { useCountdown } from "@/components/hooks/common";
 import { book2 } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
 import { NftBook } from "@/types/nftBook";
+import { NftBookDetails } from "@/types/nftBook";
 
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
 import { Timer } from "../Timer";
 import { BookBriefing, BookDetail } from "./sections";
 
-const BookInfo = () => {
+type BookInfoProps = {
+  onClick?: () => void;
+  bookDetail: NftBookDetails;
+};
+
+const BookInfo = ({ bookDetail }: BookInfoProps) => {
+  const [authorName, setAuthorName] = useState<string>("");
+  const isPublished = bookDetail?.listedCore ? true : false;
+  const isSelled = bookDetail?.nftCore?.balance > 0 ? false : true;
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (bookDetail && bookDetail?.nftCore) {
+          const userRes = await axios.get(
+            `/api/users/wallet/${bookDetail.nftCore?.author}`
+          );
+
+          if (userRes.data.success === true) {
+            setAuthorName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [bookDetail]);
+
   return (
     <Stack>
       <BookBriefing
-        tokenId={book2.core.tokenId}
-        isOpenForSale={false}
+        tokenId={bookDetail?.nftCore.tokenId}
+        isOpenForSale={isPublished}
         isOpenForTradeIn={false}
         isOpenForBorrow={false}
-        bookTitle={book2.meta.title}
-        author={book2.core.author}
-        contractAddress={book2.info.contract_address}
-        description={book2.info.description}
-        bookSample={book2.meta.bookSample}
-        price={book2.core.price}
+        bookTitle={bookDetail?.meta.title}
+        author={bookDetail?.nftCore.author}
+        authorName={authorName}
+        contractAddress={bookDetail?.info.contract_address}
+        description={bookDetail?.info.description}
+        bookSample={bookDetail?.meta.bookSample}
+        price={bookDetail?.listedCore?.price}
       />
       <Divider sx={{ my: 6 }} />
       <BookDetail
-        bookId={book2.info.book_id}
-        fileType={book2.meta.fileType}
-        totalPages={book2.info.total_pages}
-        languages={book2.info.languages}
-        genres={book2.info.genres}
-        version={book2.info.version}
-        maxSupply={book2.info.max_supply}
-        publishingTime={book2.info.publishing_time}
+        bookId={bookDetail?.bookId}
+        fileType={bookDetail?.meta.fileType}
+        totalPages={bookDetail?.info.total_pages}
+        languages={bookDetail?.info.languages}
+        genres={bookDetail?.info.genres}
+        version={bookDetail?.info.version}
+        maxSupply={bookDetail?.info.max_supply}
+        publishingTime={bookDetail?.info.publishing_time}
+        owners={
+          bookDetail?.listedCore
+            ? bookDetail?.listedCore.seller
+            : bookDetail?.nftCore.author
+        }
       />
     </Stack>
     // <>

@@ -1,31 +1,68 @@
-/* eslint-disable prettier/prettier */
+import { useEffect, useState } from "react";
+
 import { Box, Stack, Typography } from "@mui/material";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import StarIcon from "@mui/icons-material/Star";
 
 import styles from "@styles/BookItem.module.scss";
+import axios from "axios";
 
 import { ListedBook, NftBook } from "@/types/nftBook";
 import { truncate } from "@/utils/truncate";
 
-type BookItemProps = {
-  onClick: () => void;
-} & ListedBook &
-  NftBook;
+// type BookItemProps = {
+//   onClick: () => void;
+// } & ListedBook &
+//   NftBook;
+
+interface BookItemProps {
+  bookCover: string;
+  bookTitle: string;
+  fileType: string;
+  tokenId: string;
+  author: string;
+  onClick: (tokenId: number | string) => void;
+}
 
 const BookItem = ({
-  meta,
-  seller,
-  amount,
-  price,
+  bookCover,
+  bookTitle,
+  fileType,
+  tokenId,
   author,
   onClick
-}: BookItemProps) => {
+}: // meta,
+// seller,
+// amount,
+// price,
+// author,
+// onClick
+BookItemProps) => {
+  const [authorName, setAuthorName] = useState();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (author) {
+          const userRes = await axios.get(`/api/users/wallet/${author}`);
+
+          if (userRes.data.success === true) {
+            setAuthorName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [author]);
+
   return (
     <Stack
       className={styles["book-item"]}
-      onClick={onClick}
+      onClick={() => {
+        onClick(tokenId);
+      }}
       spacing={1}
       sx={{
         "&:hover": {
@@ -41,7 +78,7 @@ const BookItem = ({
             position: "absolute",
             borderRadius: "16px",
             backgroundSize: "cover",
-            backgroundImage: `url(${meta.bookCover})`,
+            backgroundImage: `url(${bookCover})`,
             backgroundRepeat: "no-repeat"
           }
         }
@@ -50,8 +87,8 @@ const BookItem = ({
       <Box
         component="img"
         className={styles["book-item__book-cover"]}
-        src={meta.bookCover}
-        alt={meta.title}
+        src={bookCover}
+        alt={bookTitle}
         sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
       />
       <Box
@@ -70,7 +107,7 @@ const BookItem = ({
         >
           <Stack direction="row">
             <InsertDriveFileIcon fontSize="small" color="disabled" />
-            <Typography variant="caption">{meta.bookFile}</Typography>
+            <Typography variant="caption">{fileType}</Typography>
           </Stack>
 
           {/* {meta.attributes?.map((stat, i) => {
@@ -99,17 +136,17 @@ const BookItem = ({
             variant="h6"
             sx={{ flex: 1 }}
           >
-            {meta.title}
+            {bookTitle}
           </Typography>
           <Typography
             className="text-limit text-limit--1"
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            {truncate(seller, 6, -4)}
+            {authorName}
           </Typography>
 
-          <Typography
+          {/* <Typography
             className="text-limit text-limit--1"
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
@@ -123,7 +160,7 @@ const BookItem = ({
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
             {price ? `Price: ${price} ETH` : ``}
-          </Typography>
+          </Typography> */}
         </Box>
       </Box>
     </Stack>

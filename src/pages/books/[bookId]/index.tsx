@@ -1,20 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import {
-  Box,
-  Divider,
-  Grid,
-  Link as MUILink,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, Grid, Stack } from "@mui/material";
 
-import axios from "axios";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
 import { useBookDetail } from "@/components/hooks/web3";
 import { BookInfo } from "@/components/shared/BookInfo";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
@@ -46,6 +37,10 @@ const BookDetail = () => {
       ctx.revert(); // animation cleanup!
     };
   }, []);
+
+  const handleBookClick = (tokenId: number | string) => {
+    alert(tokenId);
+  };
 
   // animation
   const bookCoverRef = useRef(null);
@@ -142,12 +137,6 @@ const BookDetail = () => {
           <Grid item xs={4} sm={8} md={7}>
             <Stack pt={8}>
               <Box ref={bookDetailsRef}>
-                {/* <BookDetails
-                  bookDetail={bookDetail.data}
-                  onClick={function (): void {
-                    throw new Error("Function not implemented.");
-                  }}
-                /> */}
                 <BookInfo bookDetail={bookDetail.data} />
               </Box>
             </Stack>

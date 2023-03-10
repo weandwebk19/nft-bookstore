@@ -13,7 +13,7 @@ const ReadMore = ({ children, maxLines = 200 }: ReadMoreProps) => {
   const typeofChildren = typeof children;
 
   const text = children;
-  const textLength = text.length;
+  const textLength = text?.length;
   const [isReadMore, setIsReadMore] = useState(false);
   const toggleReadMore = () => {
     setIsReadMore(!isReadMore);

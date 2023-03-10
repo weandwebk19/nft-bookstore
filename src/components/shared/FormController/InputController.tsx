@@ -3,6 +3,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FormHelperText, TextField } from "@mui/material";
 
 interface InputControllerProps {
+  type?: string;
   label?: string;
   name: string;
   defaultValue?: string;
@@ -13,6 +14,7 @@ interface InputControllerProps {
 }
 
 const InputController = ({
+  type,
   label,
   name,
   defaultValue,
@@ -28,6 +30,7 @@ const InputController = ({
       render={({ field, fieldState: { invalid, error } }) => (
         <>
           <TextField
+            type={type}
             label={label}
             error={invalid}
             InputProps={InputProps}

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -21,7 +21,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useNetwork } from "@/components/hooks/web3";
+import { useBookDetail, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
@@ -45,31 +45,6 @@ const steps = [
   "Terms and Conditions"
 ];
 
-const defaultValues = {
-  // Step 1
-  title: "",
-  description: "",
-
-  // Step 2
-  fileType: "",
-  bookFile: "",
-  bookCover: "",
-  bookSample: "",
-
-  // Step 3
-  externalLink: "",
-  version: "",
-  maxSupply: MINIMUM_SUPPLY,
-  genres: [],
-  languages: [],
-  pages: 1,
-  keywords: "",
-
-  // Final step
-  termsOfService: false,
-  privacyPolicy: false
-};
-
 const ALLOWED_FIELDS = [
   "title",
   "bookFile",
@@ -78,13 +53,48 @@ const ALLOWED_FIELDS = [
   "fileType"
 ];
 
-const CreateBook = () => {
+const BookDetailEdit = () => {
+  const router = useRouter();
+  const { bookId } = router.query;
+
+  const { bookDetail } = useBookDetail(bookId as string);
+  const defaultData = bookDetail?.data;
+
   const [activeStep, setActiveStep] = useState(0);
   const formRef = useRef<any>();
   const { ethereum, contract } = useWeb3();
   const { network } = useNetwork();
   const [nftURI, setNftURI] = useState("");
   const [hasURI, setHasURI] = useState(false);
+
+  const defaultValues = useMemo(() => {
+    if (defaultData) {
+      return {
+        // Step 1
+        title: defaultData?.meta.title,
+        description: defaultData?.info.description,
+
+        // Step 2
+        fileType: "",
+        bookFile: "",
+        bookCover: "",
+        bookSample: "",
+
+        // Step 3
+        externalLink: "",
+        version: "",
+        maxSupply: MINIMUM_SUPPLY,
+        genres: [],
+        languages: [],
+        pages: 1,
+        keywords: "",
+
+        // Final step
+        termsOfService: false,
+        privacyPolicy: false
+      };
+    }
+  }, [defaultData]);
 
   const validationSchema = [
     // validation for step1 (Fill in book name and description)
@@ -211,7 +221,6 @@ const CreateBook = () => {
     })
   ];
 
-  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const currentValidationSchema = validationSchema[activeStep];
@@ -426,7 +435,16 @@ const CreateBook = () => {
     }
   };
 
-  const { handleSubmit, trigger } = methods;
+  const { handleSubmit, trigger, setValue } = methods;
+
+  useEffect(() => {
+    console.log(defaultData);
+    setValue("title", defaultData?.meta.title);
+    setValue("description", defaultData?.info.description);
+
+    setValue("fileType", defaultData?.meta.fileType);
+  }, [defaultData]);
+
   const onSubmit = (data: any) => {
     console.log(data);
     if (activeStep === 1) {
@@ -507,7 +525,7 @@ const CreateBook = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer titles={["Create", "your book"]}>
+        <ContentContainer titles={["Edit", "this book"]}>
           <Box
             component="section"
             sx={{ width: "100%", maxWidth: "720px" }}
@@ -599,4 +617,4 @@ const CreateBook = () => {
   );
 };
 
-export default CreateBook;
+export default BookDetailEdit;

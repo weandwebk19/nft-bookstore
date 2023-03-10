@@ -1,7 +1,5 @@
 import { Grid, Stack, Typography } from "@mui/material";
 
-import { useGenres, useLanguages } from "@/components/hooks/api";
-
 interface BookDetailProps {
   bookId: string;
   fileType: string;
@@ -11,6 +9,7 @@ interface BookDetailProps {
   version: string | number;
   maxSupply: number;
   publishingTime: Date;
+  owners: string | string[];
 }
 
 const BookDetail = ({
@@ -21,11 +20,9 @@ const BookDetail = ({
   genres,
   version,
   maxSupply,
-  publishingTime
+  publishingTime,
+  owners
 }: BookDetailProps) => {
-  const fetchedLanguages = useLanguages();
-  const fetchedGenres = useGenres();
-
   return (
     <Grid item xs={4} sm={8} md={6}>
       {/* Nft book details */}
@@ -40,7 +37,7 @@ const BookDetail = ({
           <Typography>#{bookId}</Typography>
         </Stack>
 
-        {/* Book id */}
+        {/* File type */}
         <Stack direction="row" spacing={1}>
           <Typography variant="label">File:</Typography>
           <Typography>{fileType}</Typography>
@@ -56,10 +53,11 @@ const BookDetail = ({
         <Stack direction="row" spacing={1}>
           <Typography variant="label">Languages:</Typography>
           <Typography>
-            {fetchedLanguages.data
-              ?.filter((language: any) => languages.includes(language._id))
+            {/* {fetchedLanguages.data
+              ?.filter((language: any) => languages?.includes(language._id))
               .map((languages: any) => languages.name)
-              .join(" | ")}
+              .join(" | ")} */}
+            {languages?.join(" | ")}
           </Typography>
         </Stack>
 
@@ -67,10 +65,11 @@ const BookDetail = ({
         <Stack direction="row" spacing={1}>
           <Typography variant="label">Genres:</Typography>
           <Typography>
-            {fetchedGenres.data
-              ?.filter((genre: any) => genres.includes(genre._id))
+            {/* {fetchedGenres.data
+              ?.filter((genre: any) => genres?.includes(genre._id))
               .map((genres: any) => genres.name)
-              .join(" | ")}
+              .join(" | ")} */}
+            {genres?.join(" | ")}
           </Typography>
         </Stack>
 
@@ -87,17 +86,15 @@ const BookDetail = ({
         </Stack>
 
         {/* Owners */}
-        {/* <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1}>
           <Typography variant="label">Owners:</Typography>
-          <Typography>
-            {meta?.attributes.find((attr) => attr.statType === "owners")?.value}
-          </Typography>
-        </Stack> */}
+          <Typography>{owners}</Typography>
+        </Stack>
 
         {/* Open on */}
         <Stack direction="row" spacing={1}>
           <Typography variant="label">Open publication on:</Typography>
-          <Typography>{publishingTime.toLocaleDateString("en-US")}</Typography>
+          <Typography>{publishingTime?.toLocaleDateString("en-US")}</Typography>
         </Stack>
 
         {/* End on */}

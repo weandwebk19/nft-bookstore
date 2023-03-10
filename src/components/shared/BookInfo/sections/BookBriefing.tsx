@@ -18,10 +18,11 @@ import { ReadMore } from "../../ReadMore";
 import { TimerGroup } from "../../TimerGroup";
 
 interface BookBriefingProps {
-  tokenId: string;
+  tokenId: number;
   bookSample?: string;
   bookTitle: string;
   author: string;
+  authorName: string;
   contractAddress: string;
   description: string;
   price: number;
@@ -39,7 +40,7 @@ const schema = yup
   .required();
 
 const defaultValues = {
-  tokenId: "",
+  tokenId: -1,
   seller: "",
   amount: 1
 };
@@ -49,6 +50,7 @@ const BookBriefing = ({
   bookSample,
   bookTitle,
   author,
+  authorName,
   contractAddress,
   description,
   price,
@@ -112,7 +114,7 @@ const BookBriefing = ({
             <Typography>By</Typography>
             <Link href="#">
               <Typography variant="h6" color="secondary">
-                {author}
+                {authorName}
               </Typography>
             </Link>
           </Stack>
@@ -138,7 +140,7 @@ const BookBriefing = ({
             {/* <ReadMore>{details!.desc}</ReadMore> */}
 
             <ReadMore>
-              {description.split("\n").map((paragraph, i) => (
+              {description?.split("\n").map((paragraph, i) => (
                 <Typography key={i} gutterBottom>
                   {paragraph}
                 </Typography>

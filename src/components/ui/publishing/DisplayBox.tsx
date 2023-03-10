@@ -5,32 +5,31 @@ import { Box, Grid, Stack } from "@mui/material";
 
 import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
-import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
+import axios from "axios";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList, bookList2 } from "@/mocks";
-import {
-  BookGenres,
-  ListedBook,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails
-} from "@/types/nftBook";
+import { book } from "@/mocks";
 
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
 
   const { listedBooks } = useListedBooks();
 
-  // console.log("nftBooks: ", listedBooks);
+  console.log("nftBooks: ", listedBooks.data);
 
-  const handleBookClick = (bookId: number | string) => {
-    router.push(`/books/${bookId}`);
+  const handleBookClick = (tokenId: number | string) => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
   };
 
   return (
@@ -59,7 +58,7 @@ const DisplayBox: FunctionComponent = () => {
                 spacing={3}
                 columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
               >
-                {listedBooks.data?.map((book: ListedBook) => (
+                {/* {listedBooks.data?.map((book: ListedBook) => (
                   <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
                     <BookItem
                       tokenId={book.tokenId}
@@ -74,30 +73,13 @@ const DisplayBox: FunctionComponent = () => {
                       }}
                     />
                   </Grid>
-                ))}
-                {/* {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
                 ))} */}
+
+                <BookList
+                  bookList={listedBooks?.data}
+                  onClick={handleBookClick}
+                />
               </Grid>
-              <BookList bookList={bookList} onClick={handleBookClick} />
             </ContentPaper>
           </Stack>
         </Grid>

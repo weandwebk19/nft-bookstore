@@ -33,7 +33,7 @@ export type NftBookAttribute = {
 };
 
 export type BookInfo = {
-  token_id: string;
+  book_id: string;
   contract_address?: string;
   description: string;
   languages: string[];

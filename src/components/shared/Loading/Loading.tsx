@@ -23,12 +23,9 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
       if (router.asPath === "/") {
         setLoading(false);
       }
-      console.log("url", baseUrlWithoutLocale);
 
-      if (url.startsWith(baseUrlWithoutLocale)) {
+      if (url.toString().startsWith(baseUrlWithoutLocale)) {
         const pathWithoutLocale = url.substring(baseUrlWithoutLocale.length);
-        console.log("path", pathWithoutLocale);
-        console.log("asPath", router.asPath);
         if (!url && !router.asPath) {
           setLoading(false);
         } else if (pathWithoutLocale === router.asPath) {
