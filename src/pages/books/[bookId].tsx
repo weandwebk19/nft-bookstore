@@ -16,8 +16,8 @@ import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { useBookDetail } from "@/components/hooks/web3";
-import { BookDetails } from "@/components/shared/BookInfo";
 import { BookInfo } from "@/components/shared/BookInfo";
+import { BookDetails } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
@@ -168,7 +168,7 @@ const BookDetail = () => {
             >
               <Box
                 className="noise"
-                ref={bookCoverRef}
+                // ref={bookCoverRef}
                 sx={{
                   width: "100%",
                   height: "100vh",
@@ -182,7 +182,7 @@ const BookDetail = () => {
                 }}
               >
                 <Box
-                  ref={bookCoverImageRef}
+                  // ref={bookCoverImageRef}
                   component="img"
                   src={bookDetail?.data?.meta?.bookCover}
                   sx={{
@@ -202,6 +202,7 @@ const BookDetail = () => {
                     throw new Error("Function not implemented.");
                   }}
                 />
+                <BookInfo />
               </Box>
             </Stack>
           </Grid>
