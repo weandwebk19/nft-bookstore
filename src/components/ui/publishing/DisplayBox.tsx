@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { PlaceholderNode } from "@/components/shared/PlaceholderNode";
 import { Wrapper } from "@/components/shared/Wrapper";
 import { book, bookList, bookList2 } from "@/mocks";
 import {
@@ -78,6 +79,7 @@ const DisplayBox: FunctionComponent = () => {
                     />
                   </Grid>
                 ))} */}
+              {listedBooks.isLoading && "Putting books on the shelves..."}
 
               {listedBooks.data && (
                 <BookList
@@ -85,6 +87,8 @@ const DisplayBox: FunctionComponent = () => {
                   onClick={handleBookClick}
                 />
               )}
+
+              {!listedBooks.data && <PlaceholderNode />}
             </ContentPaper>
           </Stack>
         </Grid>
