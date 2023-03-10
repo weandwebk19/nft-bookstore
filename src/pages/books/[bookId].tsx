@@ -16,10 +16,10 @@ import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { useBookDetail } from "@/components/hooks/web3";
-import { BookDetails } from "@/components/shared/BookDetails";
+import { BookDetails } from "@/components/shared/BookInfo";
+import { BookInfo } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
-import { BookTicket } from "@/components/shared/BookTicket";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
@@ -97,254 +97,51 @@ const BookDetail = () => {
     }
   };
 
-  const bookList = [
-    {
-      tokenId: "0",
-      price: 0.5,
-      author: "Markus Zusak",
-      isListed: true,
-      meta: {
-        title: "To Kill A Mockingbird",
-        file: "epub",
-        bookCover: images.mockupBookCover,
-        attributes: [
-          {
-            value: 1.161,
-            statType: "views"
-          },
-          {
-            value: 918,
-            statType: "registered"
-          },
-          { value: 4.5, statType: "stars" }
-        ] as NftBookAttribute[]
-      },
-      details: {
-        contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
-        desc: "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
-
-        bookId: "645146126",
-        pages: 205,
-        language: ["English", "Vietnamese"],
-        genres: [
-          BookGenres[BookGenres["Action & Adventure"]],
-          BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
-          BookGenres[BookGenres["Mystery - Horror"]]
-        ] as NftBookDetails["genres"],
-        editionVersion: 1,
-        maxSupply: 100,
-        registered: 25,
-        openDate: new Date("06/15/2023"),
-        endDate: new Date("07/30/2023")
-      }
-    },
-    {
-      tokenId: "1",
-      price: 0.5,
-      author: "Khaled Hosseini",
-      isListed: true,
-      meta: {
-        title: "The Kite Runner",
-        file: "epub",
-        bookCover: images.mockupBookCover,
-        attributes: [
-          {
-            value: 1.161,
-            statType: "views"
-          },
-          {
-            value: 918,
-            statType: "registered"
-          },
-          { value: 3.8, statType: "stars" }
-        ] as NftBookAttribute[]
-      },
-      details: {
-        contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
-        desc: "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
-
-        bookId: "6495145222",
-        pages: 205,
-        language: ["English", "Vietnamese"],
-        genres: [
-          BookGenres[BookGenres["Action & Adventure"]],
-          BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
-          BookGenres[BookGenres["Mystery - Horror"]]
-        ] as NftBookDetails["genres"],
-        editionVersion: 1,
-        maxSupply: 100,
-        registered: 25,
-        openDate: new Date("06/15/2023"),
-        endDate: new Date("07/30/2023")
-      }
-    },
-    {
-      tokenId: "2",
-      price: 0.5,
-      author: "Markus Zusak",
-      isListed: true,
-      meta: {
-        title: "The Boy in the Striped Pajamas",
-        file: "epub",
-        bookCover: images.mockupBookCover,
-        attributes: [
-          {
-            value: 1.161,
-            statType: "views"
-          },
-          {
-            value: 918,
-            statType: "registered"
-          },
-          { value: 4.5, statType: "stars" }
-        ] as NftBookAttribute[]
-      },
-      details: {
-        contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
-        desc: "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
-
-        bookId: "645669asa6",
-        pages: 205,
-        language: ["English", "Vietnamese"],
-        genres: [
-          BookGenres[BookGenres["Action & Adventure"]],
-          BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
-          BookGenres[BookGenres["Mystery - Horror"]]
-        ] as NftBookDetails["genres"],
-        editionVersion: 1,
-        maxSupply: 100,
-        registered: 25,
-        openDate: new Date("06/15/2023"),
-        endDate: new Date("07/30/2023")
-      }
-    },
-    {
-      tokenId: "3",
-      price: 0.5,
-      author: "Louis Lowry",
-      isListed: true,
-      meta: {
-        title: "The Giver",
-        file: "epub",
-        bookCover: images.mockupBookCover3,
-        attributes: [
-          {
-            value: 1.161,
-            statType: "views"
-          },
-          {
-            value: 918,
-            statType: "registered"
-          },
-          { value: 4.5, statType: "stars" }
-        ] as NftBookAttribute[]
-      },
-      details: {
-        contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
-        desc: "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
-
-        bookId: "645dsfd126",
-        pages: 205,
-        language: ["English", "Vietnamese"],
-        genres: [
-          BookGenres[BookGenres["Action & Adventure"]],
-          BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
-          BookGenres[BookGenres["Mystery - Horror"]]
-        ] as NftBookDetails["genres"],
-        editionVersion: 1,
-        maxSupply: 100,
-        registered: 25,
-        openDate: new Date("06/15/2023"),
-        endDate: new Date("07/30/2023")
-      }
-    },
-    {
-      tokenId: "4",
-      price: 0.8,
-      author: "Harper Lee",
-      isListed: true,
-      meta: {
-        title: "Life of Pi",
-        file: "pdf",
-        bookCover: images.mockupBookCover2,
-        attributes: [
-          {
-            value: 1.161,
-            statType: "views"
-          },
-          {
-            value: 918,
-            statType: "registered"
-          },
-          { value: 4.6, statType: "stars" }
-        ] as NftBookAttribute[]
-      },
-      details: {
-        contractAddress: "0x5dfv5rg6c26dt6vcgg2b6v23hcdv1af5wbkmiunu",
-        desc: "The Book Thief tells the story of Liesel, a little girl who is taken to a new home because her mother can't afford to take care of her. The story is told by Death, who becomes a character you come to respect and even feel sorry for by the end. The narration puts an odd perspective on the story.",
-
-        bookId: "645146129",
-        pages: 205,
-        language: ["English", "Vietnamese"],
-        genres: [
-          BookGenres[BookGenres["Action & Adventure"]],
-          BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
-          BookGenres[BookGenres["Mystery - Horror"]]
-        ] as NftBookDetails["genres"],
-        editionVersion: 1,
-        maxSupply: 100,
-        registered: 25,
-        openDate: new Date("06/15/2023"),
-        endDate: new Date("07/30/2023")
-      }
-    }
-  ];
-
   const handleBookClick = (tokenId: number | string) => {
     alert(tokenId);
   };
 
   // animation
-  const bookCoverRef = useRef();
-  const bookCoverImageRef = useRef();
-  const bookDetailRef = useRef();
+  // const bookCoverRef = useRef(null);
+  // const bookCoverImageRef = useRef(null);
+  // const bookDetailRef = useRef(null);
 
-  useEffect(() => {
-    gsap.to(bookCoverRef.current, {
-      scrollTrigger: {
-        trigger: bookCoverRef?.current,
-        start: "bottom center",
-        end: "bottom 100px",
-        scrub: true,
-        // markers: true,
-        id: "scrub"
-      }
-    });
-    gsap.to(bookCoverImageRef.current, {
-      borderRadius: "1em",
-      width: "60%",
-      outline: "5px double white",
-      outlineOffset: "8px",
-      // transform: "scale(0.9)",
-      // height: "240px",
+  // useEffect(() => {
+  //   gsap.to(bookCoverRef.current, {
+  //     scrollTrigger: {
+  //       trigger: bookCoverRef?.current,
+  //       start: "bottom center",
+  //       end: "bottom 100px",
+  //       scrub: true,
+  //       // markers: true,
+  //       id: "scrub"
+  //     }
+  //   });
+  //   gsap.to(bookCoverImageRef.current, {
+  //     borderRadius: "1em",
+  //     width: "60%",
+  //     outline: "5px double white",
+  //     outlineOffset: "8px",
+  //     // transform: "scale(0.9)",
+  //     // height: "240px",
 
-      scrollTrigger: {
-        trigger: bookCoverRef?.current,
-        start: "bottom center",
-        end: "bottom 100px",
-        scrub: true,
-        // markers: true,
-        id: "scrub"
-      }
-    });
-    gsap.to(bookDetailRef.current, {
-      scrollTrigger: {
-        trigger: bookCoverRef?.current,
-        start: "bottom center",
-        end: "bottom 100px"
-      }
-    });
-  }, []);
+  //     scrollTrigger: {
+  //       trigger: bookCoverRef?.current,
+  //       start: "bottom center",
+  //       end: "bottom 100px",
+  //       scrub: true,
+  //       // markers: true,
+  //       id: "scrub"
+  //     }
+  //   });
+  //   gsap.to(bookDetailRef.current, {
+  //     scrollTrigger: {
+  //       trigger: bookCoverRef?.current,
+  //       start: "bottom center",
+  //       end: "bottom 100px"
+  //     }
+  //   });
+  // }, []);
 
   if (bookDetail.isLoading === false && bookDetail.error) {
     return <div>Book ID not true</div>;

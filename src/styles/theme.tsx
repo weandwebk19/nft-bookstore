@@ -76,7 +76,7 @@ export const lightTheme = createTheme({
       contrastText: "#F8EFE7"
     },
     background: {
-      paper: "#FFFBFF",
+      paper: "#FFF8F3",
       default: "#eae1d9",
       appbar: "rgba(234, 225, 217,0.8)"
     },

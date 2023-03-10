@@ -7,17 +7,21 @@ import StarIcon from "@mui/icons-material/Star";
 import styles from "@styles/BookItem.module.scss";
 
 import { ListedBook, NftBook } from "@/types/nftBook";
+import { truncate } from "@/utils/truncate";
 
 type BookItemProps = {
   onClick: () => void;
-} & ListedBook & NftBook;
+} & ListedBook &
+  NftBook;
 
-const BookItem = ({meta,
-                  seller,
-                  amount,
-                  price,
-                  author,
-                  onClick }: BookItemProps) => {
+const BookItem = ({
+  meta,
+  seller,
+  amount,
+  price,
+  author,
+  onClick
+}: BookItemProps) => {
   return (
     <Stack
       className={styles["book-item"]}
@@ -102,9 +106,7 @@ const BookItem = ({meta,
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            
-            {seller ? `0x${seller[2]}${seller[3]}${seller[4]}${seller[5]}....${seller.slice(-4)}` :
-                      `0x${author[2]}${author[3]}${author[4]}${author[5]}....${author.slice(-4)}`}
+            {truncate(seller, 6, -4)}
           </Typography>
 
           <Typography
@@ -112,7 +114,7 @@ const BookItem = ({meta,
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            {amount ? `Amount: ${amount}`: ``}
+            {amount ? `Amount: ${amount}` : ``}
           </Typography>
 
           <Typography

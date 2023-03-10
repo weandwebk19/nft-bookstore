@@ -6,7 +6,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import style from "@styles/BookTicket.module.scss";
 import { useRouter } from "next/router";
 
-interface BookTicketProps {
+interface TicketProps {
   header?: string;
   body?: string[];
   image?: string;
@@ -14,7 +14,7 @@ interface BookTicketProps {
   href: string;
 }
 
-const BookTicket = ({ header, body, image, footer, href }: BookTicketProps) => {
+const Ticket = ({ header, body, image, footer, href }: TicketProps) => {
   const theme = useTheme();
   const router = useRouter();
 
@@ -128,4 +128,4 @@ const BookTicket = ({ header, body, image, footer, href }: BookTicketProps) => {
   );
 };
 
-export default BookTicket;
+export default Ticket;
