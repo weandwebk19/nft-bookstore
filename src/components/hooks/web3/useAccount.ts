@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { CryptoHookFactory } from "@_types/hooks";
+import axios from "axios";
 import useSWR from "swr";
 
 type UseAccountResponse = {
