@@ -1,7 +1,11 @@
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Divider, Stack } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
 
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { faBorderAll, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
 import * as yup from "yup";
@@ -19,9 +23,11 @@ import {
   TreeViewController
 } from "../FormController";
 
+config.autoAddCss = false;
+
 const schema = yup
   .object({
-    genre: yup.string(),
+    genre: yup.array(yup.string()),
     title: yup.string(),
     author: yup.string(),
     rating: yup.number(),
@@ -56,7 +62,7 @@ function getLabelText(value: number) {
 }
 
 const defaultValues = {
-  genre: "",
+  genre: [],
   title: "",
   author: "",
   rating: 3,
@@ -75,10 +81,19 @@ const FilterBar = () => {
     mode: "all"
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setValue } = methods;
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
+  };
+
+  const handleResetGenres = () => {
+    setValue("genre", [], { shouldValidate: true });
+  };
+  const handleSelectAllGenres = () => {
+    const data: any[] = genres?.data || [];
+    let valueGenres: any[] = data?.map((item: any) => item._id);
+    setValue("genre", valueGenres as never[], { shouldValidate: true });
   };
 
   return (
@@ -90,7 +105,32 @@ const FilterBar = () => {
         sx={{ marginTop: 4 }}
         className={styles["filter-bar"]}
       >
-        <FormGroup label="Genres">
+        <FormGroup
+          label={
+            <Stack
+              direction={{ xs: "row" }}
+              spacing={{ xs: 2 }}
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              Genres
+              <Stack direction={{ xs: "row" }}>
+                <Tooltip title="Reset">
+                  <IconButton onClick={handleResetGenres}>
+                    <FontAwesomeIcon icon={faUndoAlt} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Select all">
+                  <IconButton onClick={handleSelectAllGenres}>
+                    <FontAwesomeIcon icon={faBorderAll} />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Stack>
+          }
+        >
           {genres.isLoading && "Loading..."}
           {genres.error &&
             "Oops! There was a problem loading genres \n Try refresh the page."}

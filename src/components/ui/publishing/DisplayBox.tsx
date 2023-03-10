@@ -12,7 +12,16 @@ import { useRouter } from "next/router";
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { book } from "@/mocks";
+import { Wrapper } from "@/components/shared/Wrapper";
+import { book, bookList, bookList2 } from "@/mocks";
+import {
+  BookGenres,
+  ListedBook,
+  NftBook,
+  NftBookAttribute,
+  NftBookDetails,
+  NftListedBook
+} from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
@@ -53,12 +62,7 @@ const DisplayBox: FunctionComponent = () => {
             />
 
             <ContentPaper isPaginate={true} title="Publishing books">
-              <Grid
-                container
-                spacing={3}
-                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
-              >
-                {/* {listedBooks.data?.map((book: ListedBook) => (
+              {/* {listedBooks.data?.map((book: ListedBook) => (
                   <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
                     <BookItem
                       tokenId={book.tokenId}
@@ -75,11 +79,12 @@ const DisplayBox: FunctionComponent = () => {
                   </Grid>
                 ))} */}
 
+              {listedBooks.data && (
                 <BookList
-                  bookList={listedBooks?.data}
+                  bookList={listedBooks.data as NftListedBook[]}
                   onClick={handleBookClick}
                 />
-              </Grid>
+              )}
             </ContentPaper>
           </Stack>
         </Grid>
