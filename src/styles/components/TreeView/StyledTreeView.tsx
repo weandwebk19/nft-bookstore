@@ -16,10 +16,27 @@ export type StyledTreeItemProps = TreeItemProps & {
   labelIcon?: React.ElementType<SvgIconProps>;
   labelInfo?: string;
   labelText: string;
+  formName?: string;
 };
 
 const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   color: theme.palette.text.secondary,
+  [`&.tree-item-selected > .${treeItemClasses.content}`]: {
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.primary.main,
+
+    "&.Mui-selected.Mui-focused": {
+      backgroundColor: theme.palette.background.default,
+      color: theme.palette.primary.main
+    },
+    "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
+      backgroundColor: theme.palette.background.default,
+      color: theme.palette.primary.main
+    },
+    "&:hover": {
+      backgroundColor: theme.palette.background.default
+    }
+  },
   [`& .${treeItemClasses.content}`]: {
     color: theme.palette.text.secondary,
     clipPath:
@@ -27,16 +44,20 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
     paddingRight: theme.spacing(1),
     fontWeight: theme.typography.fontWeightMedium,
     padding: 0,
+    backgroundColor: "inherit",
 
     "&.Mui-expanded": {
       fontWeight: theme.typography.fontWeightRegular
     },
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover
+    "&.Mui-selected.Mui-focused": {
+      backgroundColor: theme.palette.background.paper
     },
     "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
-      backgroundColor: theme.palette.background.default,
-      color: theme.palette.primary.main
+      backgroundColor: "inherit"
+    },
+    "&:hover, &.Mui-selected:hover": {
+      transition: "all 0.2s ease-in-out 0s",
+      backgroundColor: theme.palette.action.hover
     },
     [`& .${treeItemClasses.label}`]: {
       fontWeight: "inherit",

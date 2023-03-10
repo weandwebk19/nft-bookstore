@@ -33,17 +33,17 @@ export type NftBookAttribute = {
 };
 
 export type BookInfo = {
-  token_id: string;
-  contract_address?: string;
+  tokenId: string;
+  contractAddress?: string;
   description: string;
   languages: string[];
   genres: (keyof typeof BookGenres)[];
   version: number | string;
-  max_supply: number;
-  external_link?: string;
-  total_pages?: number;
+  maxSupply: number;
+  externalLink?: string;
+  totalPages?: number;
   keywords?: string;
-  publishing_time?: Date;
+  publishingTime?: Date;
 };
 
 export type NftBookDetails = {
@@ -88,7 +88,8 @@ export type NftBook = {
 export type NftListedBook = {
   meta: NftBookMeta;
   details?: NftBookDetails;
-} & ListedBookCore;
+} & ListedBookCore &
+  NftBookCore;
 
 export type PinataRes = {
   IpfsHash: string;

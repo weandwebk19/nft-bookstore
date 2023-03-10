@@ -106,7 +106,7 @@ const BookItem = ({
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            {truncate(seller, 6, -4)}
+            {/* {truncate(seller, 6, -4)} */}
           </Typography>
 
           <Typography

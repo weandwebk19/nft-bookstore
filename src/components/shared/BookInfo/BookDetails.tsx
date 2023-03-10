@@ -22,9 +22,10 @@ import axios from "axios";
 import Link from "next/link";
 import * as yup from "yup";
 
+import { useGenres, useLanguages } from "@/components/hooks/api";
 import { useCountdown } from "@/components/hooks/common/useCountdown";
 import { StyledButton } from "@/styles/components/Button";
-import { NftBook, NftBookDetails } from "@/types/nftBook";
+import { ListedBook, NftBook, NftBookDetails } from "@/types/nftBook";
 
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
@@ -54,6 +55,9 @@ const schema = yup
 type FormData = yup.InferType<typeof schema>;
 
 const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
+  const genres = useGenres();
+  const languages = useLanguages();
+
   const {
     handleSubmit,
     formState: { errors },
@@ -67,7 +71,8 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
     },
     resolver: yupResolver(schema)
   });
-  const [days, hours, minutes, seconds] = useCountdown("2023/02/16");
+  // const [days, hours, minutes, seconds] = useCountdown("2023/02/16");
+  const [days, hours, minutes, seconds] = useCountdown("2023/3/16");
   const [countdown, setCountdown] = useState({
     days: 0,
     hours: 0,
@@ -158,7 +163,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                 <Typography variant="label" mb={1}>
                   Contract address:
                 </Typography>
-                {/* <MUILink href="#">{bookDetail?.info.contractAddress}</MUILink> */}
+                <MUILink href="#">{bookDetail?.info.contractAddress}</MUILink>
               </Stack>
 
               {/* Description */}
@@ -351,14 +356,22 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                   {/* № page */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">№ pages:</Typography>
-                    <Typography>{bookDetail?.info?.total_pages}</Typography>
+                    <Typography>{bookDetail?.info?.totalPages}</Typography>
                   </Stack>
 
                   {/* Write in Language */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Languages:</Typography>
                     <Typography>
-                      {bookDetail?.info?.languages?.join(" | ")}
+                      {!languages.isLoading &&
+                        languages.data &&
+                        languages.data
+                          .filter((language: any) =>
+                            bookDetail?.info?.languages.includes(language._id)
+                          )
+                          .map((languages: any) => languages.name)
+                          .join(" | ")}
+                      {/* {bookDetail?.info?.languages?.join(" | ")} */}
                     </Typography>
                   </Stack>
 
@@ -366,7 +379,15 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Genres:</Typography>
                     <Typography>
-                      {bookDetail?.info?.genres?.join(" | ")}
+                      {!genres.isLoading &&
+                        genres.data &&
+                        genres.data
+                          .filter((genre: any) =>
+                            bookDetail?.info?.genres.includes(genre._id)
+                          )
+                          .map((genres: any) => genres.name)
+                          .join(" | ")}
+                      {/* {bookDetail?.info?.genres?.join(" | ")} */}
                     </Typography>
                   </Stack>
 
@@ -379,18 +400,18 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                   {/* Max supply */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Max supply:</Typography>
-                    <Typography>{bookDetail?.info.max_supply}</Typography>
+                    <Typography>{bookDetail?.info.maxSupply}</Typography>
                   </Stack>
 
                   {/* Owners */}
-                  <Stack direction="row" spacing={1}>
+                  {/* <Stack direction="row" spacing={1}>
                     <Typography variant="label">Owners:</Typography>
                     <Typography>
                       {bookDetail?.listedCore
                         ? bookDetail.listedCore.seller
                         : bookDetail.nftCore.author}
                     </Typography>
-                  </Stack>
+                  </Stack> */}
 
                   {/* Open on */}
                   {/* <Stack direction="row" spacing={1}>
@@ -398,6 +419,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                       Open publication on:
                     </Typography>
                     <Typography>
+                      {details?.info?.openDate.toLocaleDateString("en-US")}
                       {bookDetail?.info.openDate.toLocaleDateString("en-US")}
                     </Typography>
                   </Stack> */}
@@ -406,7 +428,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                   {/* <Stack direction="row" spacing={1}>
                     <Typography variant="label">End publication on:</Typography>
                     <Typography>
-                      {details?.endDate.toLocaleDateString("en-US")}
+                      {details?.info?.endDate.toLocaleDateString("en-US")}
                     </Typography>
                   </Stack> */}
                 </Stack>

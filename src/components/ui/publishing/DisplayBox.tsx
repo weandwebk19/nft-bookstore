@@ -19,15 +19,14 @@ import {
   ListedBook,
   NftBook,
   NftBookAttribute,
-  NftBookDetails
+  NftBookDetails,
+  NftListedBook
 } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
 
   const { listedBooks } = useListedBooks();
-
-  // console.log("nftBooks: ", listedBooks);
 
   const handleBookClick = (bookId: number | string) => {
     router.push(`/books/${bookId}`);
@@ -97,7 +96,16 @@ const DisplayBox: FunctionComponent = () => {
                   </Grid>
                 ))} */}
               </Grid>
-              <BookList bookList={bookList} onClick={handleBookClick} />
+              {listedBooks.data && (
+                <BookList
+                  bookList={listedBooks.data as NftListedBook[]}
+                  onClick={handleBookClick}
+                />
+              )}
+              <BookList
+                bookList={bookList as NftListedBook[]}
+                onClick={handleBookClick}
+              />
             </ContentPaper>
           </Stack>
         </Grid>

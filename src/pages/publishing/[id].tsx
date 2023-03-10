@@ -17,7 +17,7 @@ import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
 import { Ticket } from "@/components/shared/Ticket";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
-import { book, bookList } from "@/mocks";
+import { book, book3, bookList, bookList2 } from "@/mocks";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -138,7 +138,7 @@ const BookDetail = () => {
         </Grid>
         <Grid item xs={4} sm={8} md={7}>
           <Stack pt={8}>
-            <Box ref={bookDetailsRef}>
+            {/* <Box ref={bookDetailsRef}>
               <BookDetails
                 meta={book.meta}
                 details={book.details}
@@ -149,6 +149,22 @@ const BookDetail = () => {
                 isPublished={false}
                 onClick={() => {
                   alert(book.meta.title);
+                }}
+              />
+            </Box> */}
+            <Box ref={bookDetailsRef}>
+              <BookDetails
+                // meta={book3.meta}
+                // details={book3.details}
+                // tokenId={book3.tokenId}
+                // author={book3.author}
+                // price={book3.price}
+                // {...book3}
+                // isListed={book3.isListed}
+                // isPublished={false}
+                bookDetail={book3.details}
+                onClick={() => {
+                  alert(book3.meta.title);
                 }}
               />
             </Box>
@@ -163,7 +179,11 @@ const BookDetail = () => {
               <Stack direction={{ sm: "column", md: "row" }} spacing={3}>
                 <Ticket
                   header="NFT Bookstore"
-                  body={["Tho Le", "6/25/2023", book.details.contractAddress]}
+                  body={[
+                    "Tho Le",
+                    "6/25/2023",
+                    book3?.details?.info?.contractAddress
+                  ]}
                   href="xf56e4fxre6"
                   footer={`${book.price} ETH`}
                 />
@@ -177,6 +197,7 @@ const BookDetail = () => {
                 You may <i>love</i>
               </Typography>
               <Grid container spacing={3}>
+                {/* {bookList2.map((book) => ( */}
                 {bookList.map((book) => (
                   <Grid item key={book.tokenId}>
                     <BookItem
@@ -184,6 +205,7 @@ const BookDetail = () => {
                       price={book.price}
                       meta={book.meta}
                       author={book.author}
+                      seller={book.seller}
                       onClick={() => {
                         handleBookClick(book.tokenId);
                       }}
