@@ -9,14 +9,17 @@ import {
   Typography
 } from "@mui/material";
 
+import axios from "axios";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
+import { useBookDetail } from "@/components/hooks/web3";
 import { BookInfo } from "@/components/shared/BookInfo";
+import { BookDetails } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
 import { BookRatings } from "@/components/shared/BookRatings";
-import { BookTicket } from "@/components/shared/Ticket";
 import { SplitScreenLayout } from "@/layouts/SplitScreenLayout";
 import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
 
@@ -29,6 +32,9 @@ const BookDetail = () => {
   const [isSelled, setIsSelled] = useState<boolean>(false);
   const bookDetailsRef = useRef(null);
   const tl = useRef<any>();
+  const router = useRouter();
+  const { bookId } = router.query;
+  const { bookDetail } = useBookDetail(bookId as string);
 
   useIsomorphicLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -137,79 +143,73 @@ const BookDetail = () => {
   //   });
   // }, []);
 
-  return (
-    <Stack>
-      <Grid
-        container
-        spacing={{ xs: 2, md: 3 }}
-        columns={{ xs: 4, sm: 8, md: 12 }}
-      >
-        <Grid item xs={4} sm={8} md={5}>
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(${bookDetails.meta.bookCover})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              pt: 8,
-              position: "relative"
-            }}
-          >
+  if (bookDetail.isLoading === false && bookDetail.error) {
+    return <div>Book ID not true</div>;
+  } else {
+    return (
+      <Stack>
+        <Grid
+          container
+          spacing={{ xs: 2, md: 3 }}
+          columns={{ xs: 4, sm: 8, md: 12 }}
+        >
+          <Grid item xs={4} sm={8} md={5}>
             <Box
-              className="noise"
-              // ref={bookCoverRef}
               sx={{
                 width: "100%",
-                height: "100vh",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                position: "sticky",
-                top: 64,
-                overflow: "hidden",
-                backdropFilter: "blur(10px)"
+                height: "100%",
+                backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(${bookDetail?.data?.meta?.bookCover})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                pt: 8,
+                position: "relative"
               }}
             >
               <Box
-                // ref={bookCoverImageRef}
-                component="img"
-                src={bookDetails.meta.bookCover}
+                className="noise"
+                // ref={bookCoverRef}
                 sx={{
-                  width: "50%",
-                  objectFit: "cover"
+                  width: "100%",
+                  height: "100vh",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  position: "sticky",
+                  top: 64,
+                  overflow: "hidden",
+                  backdropFilter: "blur(10px)"
                 }}
-              />
+              >
+                <Box
+                  // ref={bookCoverImageRef}
+                  component="img"
+                  src={bookDetail?.data?.meta?.bookCover}
+                  sx={{
+                    width: "50%",
+                    objectFit: "cover"
+                  }}
+                />
+              </Box>
             </Box>
-          </Box>
+          </Grid>
+          <Grid item xs={4} sm={8} md={7}>
+            <Stack pt={8}>
+              <Box ref={bookDetailsRef}>
+                <BookDetails
+                  bookDetail={bookDetail.data}
+                  onClick={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+                <BookInfo />
+              </Box>
+            </Stack>
+          </Grid>
         </Grid>
-        <Grid item xs={4} sm={8} md={7}>
-          <Stack pt={8}>
-            <Box
-            // ref={bookDetailsRef}
-            >
-              {/* <BookInfo
-                meta={bookDetails.meta}
-                details={bookDetails.details}
-                tokenId={bookDetails.tokenId}
-                author={bookDetails.author}
-                price={bookDetails.price}
-                isListed={bookDetails.isListed}
-                isPublished={true}
-                isSelled={isSelled}
-                setIsSelled={setIsSelled}
-                onClick={() => {
-                  alert(bookDetails.meta.title);
-                }}
-              /> */}
-              <BookInfo />
-            </Box>
-          </Stack>
-        </Grid>
-      </Grid>
-    </Stack>
-  );
+      </Stack>
+    );
+  }
 };
 
 BookDetail.PageLayout = SplitScreenLayout;

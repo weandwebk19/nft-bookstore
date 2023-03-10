@@ -12,11 +12,11 @@ export default async function handler(
     try {
       const client = await clientPromise;
       const db = client.db("NftBookStore");
-      const { address, username } = req.body;
+      const { wallet_address, fullname } = req.body;
 
       // Check if the address is exists
       const countAccount = await db.collection("users").count({
-        address: address
+        wallet_address
       });
 
       if (countAccount > 0) {
@@ -28,7 +28,7 @@ export default async function handler(
       } else {
         const newAccount = await db
           .collection("users")
-          .insertOne({ address, username });
+          .insertOne({ wallet_address, fullname });
 
         return res.json({
           success: true,

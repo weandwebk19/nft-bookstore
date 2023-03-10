@@ -377,9 +377,10 @@ const Form = () => {
 
   const createNFTBook = async (nftUri: string, amount: number) => {
     try {
-      const nftRes = await axios.post("/api/pinata/metadata", {
-        nftUri
-      });
+      console.log("nftUri", nftUri);
+      const nftRes = await axios.get(`/api/pinata/metadata?uri=${nftUri}`);
+      // const nftRes = await axios.get(nftURI);
+      console.log("nftRes", nftRes);
       if (nftRes.data.success === true) {
         const content = nftRes.data.data;
 
@@ -445,22 +446,24 @@ const Form = () => {
     } else if (activeStep === 3) {
       (async () => {
         // Mint book
-        console.log("Creating book");
         const tokenId = await createNFTBook(nftURI, data.maxSupply);
+        console.log("Creating book", tokenId);
 
         // Upload data to database
-        uploadBookDetails({
-          token_id: tokenId,
-          description: data.description,
-          languages: data.languages,
-          genres: data.genres,
-          version: data.version,
-          max_supply: data.maxSupply,
-          external_link: data.externalLink,
-          total_pages: data.totalPages,
-          keywords: data.keywords,
-          publishing_time: data.publishingTime
-        });
+        if (tokenId) {
+          uploadBookDetails({
+            token_id: tokenId,
+            description: data.description,
+            languages: data.languages,
+            genres: data.genres,
+            version: data.version,
+            max_supply: data.maxSupply,
+            external_link: data.externalLink,
+            total_pages: data.totalPages,
+            keywords: data.keywords,
+            publishing_time: data.publishingTime
+          });
+        }
       })();
     }
     setOpen(true);

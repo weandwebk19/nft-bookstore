@@ -7,5 +7,5 @@ export type HookFetchResponse = {
 export type ResponseData = {
   success: boolean;
   message: string;
-  data: object | null;
+  data: any | null;
 };
