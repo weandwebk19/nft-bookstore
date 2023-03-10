@@ -8,6 +8,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { StyledButton } from "@/styles/components/Button";

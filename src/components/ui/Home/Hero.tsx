@@ -13,14 +13,17 @@ import CodeOutlinedIcon from "@mui/icons-material/CodeOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 
 import styles from "@styles/Hero.module.scss";
+import { useTranslation } from "next-i18next";
 
 import images from "@/assets/images";
+import { useTranslate } from "@/components/hooks/common";
 import { StackedLogo } from "@/components/shared/Logo";
 import { StyledButton } from "@/styles/components/Button";
 import cssFilter from "@/utils/cssFilter";
 
 const Hero = () => {
   const theme = useTheme();
+  const { t } = useTranslation("home");
 
   return (
     <Box className={styles.hero}>
@@ -32,7 +35,7 @@ const Hero = () => {
           alignItems="center"
           sx={{ display: { xs: "none", sm: "none", md: "flex" } }}
         >
-          <Stack>
+          <Stack sx={{ maxWidth: "450px" }}>
             <Box
               component="img"
               src={images.stackedLogo}
@@ -42,13 +45,16 @@ const Hero = () => {
                 filter: cssFilter(`${theme.palette.primary.main}`)
               }}
             />
-            <Typography variant="body1">
-              We wants to change the way people read
+            {/* <Typography variant="body1">
+              {translate.home.hero.subtitle1}
             </Typography>
             <Typography variant="body1">
-              books by making them more accessible and
+              {translate.home.hero.subtitle2}
             </Typography>
-            <Typography variant="body1">inexpensive for everyone.</Typography>
+            <Typography variant="body1">
+              {translate.home.hero.subtitle3}
+            </Typography> */}
+            <Typography>{t("home:subtitle")}</Typography>
             <Stack sx={{ mt: 3 }} direction="row" spacing={2}>
               <StyledButton customVariant="primary">
                 <InsertDriveFileOutlinedIcon sx={{ mr: 1 }} />

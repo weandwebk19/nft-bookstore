@@ -3,9 +3,19 @@ import { Box, Stack } from "@mui/material";
 import DisplayBox from "@ui/Home/DisplayBox";
 import Hero from "@ui/Home/Hero";
 import MainProduct from "@ui/Home/MainProduct";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
 import images from "@/assets/images";
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["home"]))
+      // Will be passed to the page component as props
+    }
+  };
+}
 
 export default function Home() {
   return (

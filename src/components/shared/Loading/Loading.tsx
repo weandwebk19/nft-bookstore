@@ -18,9 +18,23 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
     };
 
     const handleComplete = (url: string) => {
-      if (url === router.asPath) {
-        // setTimeout(() => setLoading(false), 0);
+      const baseUrlWithoutLocale = `/${router.locale}`;
+
+      if (router.asPath === "/") {
         setLoading(false);
+      }
+      console.log("url", baseUrlWithoutLocale);
+
+      if (url.startsWith(baseUrlWithoutLocale)) {
+        const pathWithoutLocale = url.substring(baseUrlWithoutLocale.length);
+        console.log("path", pathWithoutLocale);
+        console.log("asPath", router.asPath);
+        if (!url && !router.asPath) {
+          setLoading(false);
+        } else if (pathWithoutLocale === router.asPath) {
+          // setTimeout(() => setLoading(false), 0);
+          setLoading(false);
+        }
       }
     };
 
@@ -34,6 +48,10 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
       router.events.off("routeChangeError", handleComplete);
     };
   });
+
+  useEffect(() => {
+    setLoading(false);
+  }, [router.locale]);
 
   return (
     <>

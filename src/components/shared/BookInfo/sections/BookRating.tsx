@@ -21,7 +21,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { borderRadius } from "@mui/system";
 import Link from "next/link";
 
-import { useCountdown } from "@/components/hooks/common/useCountdown";
+import { useCountdown } from "@/components/hooks/common";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledLinearProgress } from "@/styles/components/LinearProgress";
 

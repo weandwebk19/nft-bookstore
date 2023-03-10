@@ -1,0 +1,16 @@
+{
+  "about": "About",
+  "contact": "Contact",
+  "bookstore": "Bookstore",
+  "toolTip_bookstore": "Marketplace",
+  "publishing": "Publishing",
+  "trade-in": "Trade-in",
+  "borrow": "Borrow",
+  "create": "Create5",
+  "toolTip_create": "Start listing",
+  "newBook": "+ New Book",
+  "createListing": "Create Listing",
+  "createRental": "Create Rental",
+  "toolTip_accountMenu": "Account menu",
+  "toolTip_appSettings": "App Settings"
+}

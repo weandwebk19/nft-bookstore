@@ -27,8 +27,10 @@ import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
 import { StyledButton } from "@styles/components/Button";
 import { motion } from "framer-motion";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
+import { useLocalStorage } from "@/components/hooks/common";
 import { useAccount } from "@/components/hooks/web3";
 import { ActiveLink } from "@/components/shared/ActiveLink";
 import { DropdownMenu } from "@/components/shared/DropdownMenu";
@@ -69,11 +71,15 @@ interface SyntheticEvent {
 }
 
 const NavBar = () => {
+  const { t } = useTranslation("navbar");
+
   const [clientTheme, setClientTheme] = useMyTheme();
+  const [clientLocale, setClientLocale] = useLocalStorage("locale", "en");
 
   const setStoredTheme = useSetMyThemeContext();
 
   const router = useRouter();
+  const { pathname, asPath, query } = router;
   const { account } = useAccount();
   const [address, setAddress] = useState("");
 
@@ -92,7 +98,7 @@ const NavBar = () => {
   const openSettingsMenu = Boolean(anchorSettingsMenu);
 
   const [openLanguage, setOpenLanguage] = useState({
-    currentState: "English",
+    currentState: clientLocale,
     isOpen: true
   });
 
@@ -157,9 +163,16 @@ const NavBar = () => {
   };
 
   const handleLanguageClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const locale = e.currentTarget.innerText.slice(0, 2).toLowerCase();
+    console.log(locale);
+    setClientLocale(locale);
     setOpenLanguage({
       ...openLanguage,
-      currentState: e.currentTarget.innerText.slice(3)
+      currentState: locale
+    });
+
+    router.push({ pathname, query }, asPath, {
+      locale
     });
   };
 
@@ -222,6 +235,7 @@ const NavBar = () => {
           type: "button",
           icon: <LightModeOutlinedIcon color="primary" />,
           content: "Light",
+          value: "light",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
           },
@@ -232,6 +246,7 @@ const NavBar = () => {
           type: "button",
           icon: <DarkModeOutlinedIcon color="primary" />,
           content: "Dark",
+          value: "dark",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
           },
@@ -249,6 +264,7 @@ const NavBar = () => {
           type: "button",
           icon: "EN",
           content: "English",
+          value: "en",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleLanguageClick(e);
           },
@@ -259,6 +275,7 @@ const NavBar = () => {
           type: "button",
           icon: "VI",
           content: "Tiếng Việt",
+          value: "vi",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleLanguageClick(e);
           },
@@ -484,13 +501,14 @@ const NavBar = () => {
                     items={bookStoreList}
                   />
                 </Box>
+                {/* <p>{t("navbar:about")}</p> */}
 
                 {account.data && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
                       tooltipTitle="Open Listing/Renting"
                       buttonVariant="contained"
-                      buttonName="Create"
+                      buttonName="create"
                       items={createList}
                     />
                   </Box>

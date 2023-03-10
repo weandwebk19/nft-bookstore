@@ -21,7 +21,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import * as yup from "yup";
 
-import { useCountdown } from "@/components/hooks/common/useCountdown";
+import { useCountdown } from "@/components/hooks/common";
 import { StyledButton } from "@/styles/components/Button";
 import { NftBook } from "@/types/nftBook";
 

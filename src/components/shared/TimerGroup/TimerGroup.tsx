@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Stack } from "@mui/material";
 
-import { useCountdown } from "@/components/hooks/common/useCountdown";
+import { useCountdown } from "@/components/hooks/common";
 
 import { Timer } from "../Timer";
 
