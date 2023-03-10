@@ -25,7 +25,7 @@ import * as yup from "yup";
 import { useGenres, useLanguages } from "@/components/hooks/api";
 import { useCountdown } from "@/components/hooks/common/useCountdown";
 import { StyledButton } from "@/styles/components/Button";
-import { NftBook } from "@/types/nftBook";
+import { ListedBook, NftBook, NftBookDetails } from "@/types/nftBook";
 
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
@@ -33,11 +33,8 @@ import { Timer } from "../Timer";
 
 type BookDetailsProps = {
   onClick: () => void;
-  isListed: boolean;
-  isPublished: boolean;
-  isSelled: boolean;
-  setIsSelled: (flag: boolean) => void;
-} & NftBook;
+  bookDetail: NftBookDetails;
+};
 
 const schema = yup
   .object({
@@ -57,18 +54,10 @@ const schema = yup
 
 type FormData = yup.InferType<typeof schema>;
 
-const BookDetails = ({
-  tokenId,
-  price,
-  meta,
-  details,
-  author,
-  isListed,
-  onClick,
-  isPublished,
-  isSelled,
-  setIsSelled
-}: BookDetailsProps) => {
+const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
+  const genres = useGenres();
+  const languages = useLanguages();
+
   const {
     handleSubmit,
     formState: { errors },
@@ -129,7 +118,7 @@ const BookDetails = ({
       <Box component="section">
         <Stack spacing={3}>
           {/* Title */}
-          <Typography variant="h2">The Giver</Typography>
+          <Typography variant="h2">{bookDetail?.meta?.title}</Typography>
 
           {/* Attributes */}
           {/* {!isSelled && (
@@ -162,7 +151,7 @@ const BookDetails = ({
             <Typography>By</Typography>
             <Link href="#">
               <Typography variant="h6" color="secondary">
-                Lois Amstrong
+                {authorName}
               </Typography>
             </Link>
           </Stack>
@@ -174,7 +163,7 @@ const BookDetails = ({
                 <Typography variant="label" mb={1}>
                   Contract address:
                 </Typography>
-                <MUILink href="#">{details?.contractAddress}</MUILink>
+                <MUILink href="#">{bookDetail?.info.contractAddress}</MUILink>
               </Stack>
 
               {/* Description */}
@@ -192,11 +181,13 @@ const BookDetails = ({
                 {/* <ReadMore>{bookDetail!.desc}</ReadMore> */}
 
                 <ReadMore>
-                  {details?.desc.split("\n").map((paragraph, i) => (
-                    <Typography key={i} gutterBottom>
-                      {paragraph}
-                    </Typography>
-                  ))}
+                  {bookDetail?.info.description
+                    .split("\n")
+                    .map((paragraph, i) => (
+                      <Typography key={i} gutterBottom>
+                        {paragraph}
+                      </Typography>
+                    ))}
                 </ReadMore>
               </Stack>
             </>
@@ -359,37 +350,57 @@ const BookDetails = ({
                   {/* Book id */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">File:</Typography>
-                    <Typography>{meta?.file}</Typography>
+                    <Typography>{bookDetail?.meta?.fileType}</Typography>
                   </Stack>
 
                   {/* № page */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">№ pages:</Typography>
-                    <Typography>{details?.pages}</Typography>
+                    <Typography>{bookDetail?.info?.totalPages}</Typography>
                   </Stack>
 
                   {/* Write in Language */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Languages:</Typography>
-                    <Typography>{details?.language.join(" | ")}</Typography>
+                    <Typography>
+                      {!languages.isLoading &&
+                        languages.data &&
+                        languages.data
+                          .filter((language: any) =>
+                            bookDetail?.info?.languages.includes(language._id)
+                          )
+                          .map((languages: any) => languages.name)
+                          .join(" | ")}
+                      {/* {bookDetail?.info?.languages?.join(" | ")} */}
+                    </Typography>
                   </Stack>
 
                   {/* Genres */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Genres:</Typography>
-                    <Typography>{details?.genres.join(" | ")}</Typography>
+                    <Typography>
+                      {!genres.isLoading &&
+                        genres.data &&
+                        genres.data
+                          .filter((genre: any) =>
+                            bookDetail?.info?.genres.includes(genre._id)
+                          )
+                          .map((genres: any) => genres.name)
+                          .join(" | ")}
+                      {/* {bookDetail?.info?.genres?.join(" | ")} */}
+                    </Typography>
                   </Stack>
 
                   {/* Edition version */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Edition version:</Typography>
-                    <Typography>{details?.editionVersion}</Typography>
+                    <Typography>{bookDetail?.info.version}</Typography>
                   </Stack>
 
                   {/* Max supply */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Max supply:</Typography>
-                    <Typography>{details?.maxSupply}</Typography>
+                    <Typography>{bookDetail?.info.maxSupply}</Typography>
                   </Stack>
 
                   {/* Owners */}
@@ -408,7 +419,8 @@ const BookDetails = ({
                       Open publication on:
                     </Typography>
                     <Typography>
-                      {details?.openDate.toLocaleDateString("en-US")}
+                      {details?.info?.openDate.toLocaleDateString("en-US")}
+                      {bookDetail?.info.openDate.toLocaleDateString("en-US")}
                     </Typography>
                   </Stack> */}
 

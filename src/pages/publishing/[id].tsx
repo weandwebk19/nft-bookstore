@@ -159,10 +159,10 @@ const BookDetail = () => {
                 // tokenId={book3.tokenId}
                 // author={book3.author}
                 // price={book3.price}
-                {...book3}
-                isListed={true}
+                // {...book3}
                 // isListed={book3.isListed}
-                isPublished={false}
+                // isPublished={false}
+                bookDetail={book3.details}
                 onClick={() => {
                   alert(book3.meta.title);
                 }}
