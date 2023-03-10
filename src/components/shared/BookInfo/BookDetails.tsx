@@ -21,9 +21,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import * as yup from "yup";
 
+import { useGenres, useLanguages } from "@/components/hooks/api";
 import { useCountdown } from "@/components/hooks/common/useCountdown";
 import { StyledButton } from "@/styles/components/Button";
-import { NftBook } from "@/types/nftBook";
+import { ListedBook, NftBook } from "@/types/nftBook";
 
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
@@ -31,11 +32,12 @@ import { Timer } from "../Timer";
 
 type BookDetailsProps = {
   onClick: () => void;
-  isListed: boolean;
-  isPublished: boolean;
-  isSelled: boolean;
-  setIsSelled: (flag: boolean) => void;
-} & NftBook;
+  isListed?: boolean;
+  isPublished?: boolean;
+  isSelled?: boolean;
+  setIsSelled?: (flag: boolean) => void;
+} & ListedBook &
+  NftBook;
 
 const schema = yup
   .object({
@@ -67,6 +69,9 @@ const BookDetails = ({
   isSelled,
   setIsSelled
 }: BookDetailsProps) => {
+  const genres = useGenres();
+  const languages = useLanguages();
+
   const {
     handleSubmit,
     formState: { errors },
@@ -80,7 +85,8 @@ const BookDetails = ({
     },
     resolver: yupResolver(schema)
   });
-  const [days, hours, minutes, seconds] = useCountdown("2023/02/16");
+  // const [days, hours, minutes, seconds] = useCountdown("2023/02/16");
+  const [days, hours, minutes, seconds] = useCountdown("2023/3/16");
   const [countdown, setCountdown] = useState({
     days: 0,
     hours: 0,
@@ -103,7 +109,7 @@ const BookDetails = ({
       <Box component="section">
         <Stack spacing={3}>
           {/* Title */}
-          <Typography variant="h2">The Giver</Typography>
+          <Typography variant="h2">{meta.title}</Typography>
 
           {/* Attributes */}
           {!isSelled && (
@@ -136,7 +142,7 @@ const BookDetails = ({
             <Typography>By</Typography>
             <Link href="#">
               <Typography variant="h6" color="secondary">
-                Lois Amstrong
+                {author}
               </Typography>
             </Link>
           </Stack>
@@ -148,7 +154,7 @@ const BookDetails = ({
                 <Typography variant="label" mb={1}>
                   Contract address:
                 </Typography>
-                <MUILink href="#">{details?.contractAddress}</MUILink>
+                <MUILink href="#">{details?.info?.contract_address}</MUILink>
               </Stack>
 
               {/* Description */}
@@ -165,12 +171,18 @@ const BookDetails = ({
             </> */}
                 {/* <ReadMore>{details!.desc}</ReadMore> */}
 
-                <ReadMore>
+                {/* <ReadMore>
                   {details?.desc.split("\n").map((paragraph, i) => (
                     <Typography key={i} gutterBottom>
                       {paragraph}
                     </Typography>
                   ))}
+                </ReadMore> */}
+
+                <ReadMore>
+                  <Typography gutterBottom>
+                    {details?.info?.description}
+                  </Typography>
                 </ReadMore>
               </Stack>
             </>
@@ -331,41 +343,59 @@ const BookDetails = ({
                   {/* Book id */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">File:</Typography>
-                    <Typography>{meta?.file}</Typography>
+                    <Typography>{meta?.fileType}</Typography>
                   </Stack>
 
                   {/* № page */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">№ pages:</Typography>
-                    <Typography>{details?.pages}</Typography>
+                    <Typography>{details?.info?.total_pages}</Typography>
                   </Stack>
 
                   {/* Write in Language */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Languages:</Typography>
-                    <Typography>{details?.language.join(" | ")}</Typography>
+                    <Typography>
+                      {!languages.isLoading &&
+                        languages.data &&
+                        languages.data
+                          .filter((language: any) =>
+                            details?.info?.languages.includes(language._id)
+                          )
+                          .map((languages: any) => languages.name)
+                          .join(" | ")}
+                    </Typography>
                   </Stack>
 
                   {/* Genres */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Genres:</Typography>
-                    <Typography>{details?.genres.join(" | ")}</Typography>
+                    <Typography>
+                      {!genres.isLoading &&
+                        genres.data &&
+                        genres.data
+                          .filter((genre: any) =>
+                            details?.info?.genres.includes(genre._id)
+                          )
+                          .map((genres: any) => genres.name)
+                          .join(" | ")}
+                    </Typography>
                   </Stack>
 
                   {/* Edition version */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Edition version:</Typography>
-                    <Typography>{details?.editionVersion}</Typography>
+                    <Typography>{details?.info?.version}</Typography>
                   </Stack>
 
                   {/* Max supply */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Max supply:</Typography>
-                    <Typography>{details?.maxSupply}</Typography>
+                    <Typography>{details?.info?.max_supply}</Typography>
                   </Stack>
 
                   {/* Owners */}
-                  <Stack direction="row" spacing={1}>
+                  {/* <Stack direction="row" spacing={1}>
                     <Typography variant="label">Owners:</Typography>
                     <Typography>
                       {
@@ -374,7 +404,7 @@ const BookDetails = ({
                         )?.value
                       }
                     </Typography>
-                  </Stack>
+                  </Stack> */}
 
                   {/* Open on */}
                   <Stack direction="row" spacing={1}>
@@ -382,7 +412,8 @@ const BookDetails = ({
                       Open publication on:
                     </Typography>
                     <Typography>
-                      {details?.openDate.toLocaleDateString("en-US")}
+                      {/* {details?.openDate.toLocaleDateString("en-US")} */}
+                      {details?.info?.openDate.toLocaleDateString("en-US")}
                     </Typography>
                   </Stack>
 
@@ -390,7 +421,7 @@ const BookDetails = ({
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">End publication on:</Typography>
                     <Typography>
-                      {details?.endDate.toLocaleDateString("en-US")}
+                      {details?.info?.endDate.toLocaleDateString("en-US")}
                     </Typography>
                   </Stack>
                 </Stack>
