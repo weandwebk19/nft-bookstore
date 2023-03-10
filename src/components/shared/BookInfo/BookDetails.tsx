@@ -18,13 +18,14 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import axios from "axios";
 import Link from "next/link";
 import * as yup from "yup";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
 import { useCountdown } from "@/components/hooks/common/useCountdown";
 import { StyledButton } from "@/styles/components/Button";
-import { ListedBook, NftBook } from "@/types/nftBook";
+import { NftBook } from "@/types/nftBook";
 
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
@@ -32,12 +33,11 @@ import { Timer } from "../Timer";
 
 type BookDetailsProps = {
   onClick: () => void;
-  isListed?: boolean;
-  isPublished?: boolean;
-  isSelled?: boolean;
-  setIsSelled?: (flag: boolean) => void;
-} & ListedBook &
-  NftBook;
+  isListed: boolean;
+  isPublished: boolean;
+  isSelled: boolean;
+  setIsSelled: (flag: boolean) => void;
+} & NftBook;
 
 const schema = yup
   .object({
@@ -69,9 +69,6 @@ const BookDetails = ({
   isSelled,
   setIsSelled
 }: BookDetailsProps) => {
-  const genres = useGenres();
-  const languages = useLanguages();
-
   const {
     handleSubmit,
     formState: { errors },
@@ -93,6 +90,9 @@ const BookDetails = ({
     minutes: 0,
     seconds: 0
   });
+  const [authorName, setAuthorName] = useState();
+  const isPublished = bookDetail?.listedCore ? true : false;
+  const isSelled = bookDetail?.nftCore?.balance > 0 ? false : true;
 
   const onSubmitSeller = (data: any) => {
     console.log("data:", data);
@@ -104,15 +104,35 @@ const BookDetails = ({
     setCountdown({ days, hours, minutes, seconds });
   }, [days, hours, minutes, seconds]);
 
+  useEffect(() => {
+    (async () => {
+      console.log("bookDetail", bookDetail);
+
+      try {
+        if (bookDetail && bookDetail?.nftCore) {
+          const userRes = await axios.get(
+            `/api/users/wallet/${bookDetail.nftCore?.author}`
+          );
+
+          if (userRes.data.success === true) {
+            setAuthorName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [bookDetail]);
+
   return (
     <>
       <Box component="section">
         <Stack spacing={3}>
           {/* Title */}
-          <Typography variant="h2">{meta.title}</Typography>
+          <Typography variant="h2">The Giver</Typography>
 
           {/* Attributes */}
-          {!isSelled && (
+          {/* {!isSelled && (
             <Stack direction="row" spacing={2}>
               {meta?.attributes.map((stat, i) => {
                 switch (stat.statType) {
@@ -135,14 +155,14 @@ const BookDetails = ({
                 }
               })}
             </Stack>
-          )}
+          )} */}
 
           {/* Author */}
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography>By</Typography>
             <Link href="#">
               <Typography variant="h6" color="secondary">
-                {author}
+                Lois Amstrong
               </Typography>
             </Link>
           </Stack>
@@ -154,7 +174,7 @@ const BookDetails = ({
                 <Typography variant="label" mb={1}>
                   Contract address:
                 </Typography>
-                <MUILink href="#">{details?.info?.contractAddress}</MUILink>
+                <MUILink href="#">{details?.contractAddress}</MUILink>
               </Stack>
 
               {/* Description */}
@@ -163,26 +183,20 @@ const BookDetails = ({
                   Description:
                 </Typography>
                 {/* <>
-              {details?.desc.split("\n").map((paragraph, i) => (
+              {bookDetail?.desc.split("\n").map((paragraph, i) => (
                 <Typography key={i} gutterBottom>
                   {paragraph}
                 </Typography>
               ))}
             </> */}
-                {/* <ReadMore>{details!.desc}</ReadMore> */}
+                {/* <ReadMore>{bookDetail!.desc}</ReadMore> */}
 
-                {/* <ReadMore>
+                <ReadMore>
                   {details?.desc.split("\n").map((paragraph, i) => (
                     <Typography key={i} gutterBottom>
                       {paragraph}
                     </Typography>
                   ))}
-                </ReadMore> */}
-
-                <ReadMore>
-                  <Typography gutterBottom>
-                    {details?.info?.description}
-                  </Typography>
                 </ReadMore>
               </Stack>
             </>
@@ -212,8 +226,10 @@ const BookDetails = ({
 
               {/* Price [dep] */}
               <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="h4">{price} ETH</Typography>
-                <Typography>(0.59489412 USD)</Typography>
+                <Typography variant="h4">
+                  {bookDetail?.listedCore?.price} ETH
+                </Typography>
+                {/* <Typography>(0.59489412 USD)</Typography> */}
               </Stack>
 
               {/* "Register now" button / "Add to watchlist" button */}
@@ -237,7 +253,7 @@ const BookDetails = ({
             </>
           )}
 
-          {isPublished && !isSelled && (
+          {/* {isPublished && !isSelled && (
             <Stack direction="row" spacing={2}>
               <StyledButton customVariant="secondary">Edit book</StyledButton>
               {isListed ? (
@@ -253,9 +269,9 @@ const BookDetails = ({
                 </StyledButton>
               )}
             </Stack>
-          )}
+          )} */}
 
-          {isPublished && isSelled && (
+          {/* {isPublished && isSelled && (
             <>
               <Stack direction="column" spacing={2}>
                 <FormGroup label="Listing price" required>
@@ -317,7 +333,7 @@ const BookDetails = ({
                 </StyledButton>
               </Stack>
             </>
-          )}
+          )} */}
         </Stack>
       </Box>
 
@@ -337,93 +353,72 @@ const BookDetails = ({
                   {/* Book id */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Book ID:</Typography>
-                    <Typography>#{details?.bookId}</Typography>
+                    <Typography>#{bookDetail?.bookId}</Typography>
                   </Stack>
 
                   {/* Book id */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">File:</Typography>
-                    <Typography>{meta?.fileType}</Typography>
+                    <Typography>{meta?.file}</Typography>
                   </Stack>
 
                   {/* № page */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">№ pages:</Typography>
-                    <Typography>{details?.info?.totalPages}</Typography>
+                    <Typography>{details?.pages}</Typography>
                   </Stack>
 
                   {/* Write in Language */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Languages:</Typography>
-                    <Typography>
-                      {!languages.isLoading &&
-                        languages.data &&
-                        languages.data
-                          .filter((language: any) =>
-                            details?.info?.languages.includes(language._id)
-                          )
-                          .map((languages: any) => languages.name)
-                          .join(" | ")}
-                    </Typography>
+                    <Typography>{details?.language.join(" | ")}</Typography>
                   </Stack>
 
                   {/* Genres */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Genres:</Typography>
-                    <Typography>
-                      {!genres.isLoading &&
-                        genres.data &&
-                        genres.data
-                          .filter((genre: any) =>
-                            details?.info?.genres.includes(genre._id)
-                          )
-                          .map((genres: any) => genres.name)
-                          .join(" | ")}
-                    </Typography>
+                    <Typography>{details?.genres.join(" | ")}</Typography>
                   </Stack>
 
                   {/* Edition version */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Edition version:</Typography>
-                    <Typography>{details?.info?.version}</Typography>
+                    <Typography>{details?.editionVersion}</Typography>
                   </Stack>
 
                   {/* Max supply */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Max supply:</Typography>
-                    <Typography>{details?.info?.maxSupply}</Typography>
+                    <Typography>{details?.maxSupply}</Typography>
                   </Stack>
 
                   {/* Owners */}
                   {/* <Stack direction="row" spacing={1}>
                     <Typography variant="label">Owners:</Typography>
                     <Typography>
-                      {
-                        meta?.attributes.find(
-                          (attr) => attr.statType === "owners"
-                        )?.value
-                      }
+                      {bookDetail?.listedCore
+                        ? bookDetail.listedCore.seller
+                        : bookDetail.nftCore.author}
                     </Typography>
                   </Stack> */}
 
                   {/* Open on */}
-                  <Stack direction="row" spacing={1}>
+                  {/* <Stack direction="row" spacing={1}>
                     <Typography variant="label">
                       Open publication on:
                     </Typography>
                     <Typography>
-                      {/* {details?.openDate.toLocaleDateString("en-US")} */}
-                      {details?.info?.openDate.toLocaleDateString("en-US")}
+                      {details?.openDate.toLocaleDateString("en-US")}
                     </Typography>
-                  </Stack>
+                  </Stack> */}
 
                   {/* End on */}
-                  <Stack direction="row" spacing={1}>
+                  {/* <Stack direction="row" spacing={1}>
                     <Typography variant="label">End publication on:</Typography>
                     <Typography>
                       {details?.info?.endDate.toLocaleDateString("en-US")}
                     </Typography>
-                  </Stack>
+                  </Stack> */}
                 </Stack>
               </Grid>
               <Grid item xs={4} sm={8} md={6}>
