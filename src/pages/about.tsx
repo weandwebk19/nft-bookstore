@@ -46,7 +46,7 @@ const About = () => {
                   backgroundColor: `${theme.palette.background.paper}`
                 }}
               >
-                <Typography variant="h4">Huynh Van</Typography>
+                <Typography variant="h4">Huynh Van Long</Typography>
                 <Box component="img" src="" alt="" />
                 <Typography>Roles</Typography>
               </Box>
