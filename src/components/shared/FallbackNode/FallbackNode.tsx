@@ -3,7 +3,11 @@ import { useTheme } from "@mui/material/styles";
 
 import { Logo } from "../Logo";
 
-const PlaceholderNode = () => {
+interface FallbackNodeProps {
+  children?: React.ReactNode;
+}
+
+const FallbackNode = ({ children }: FallbackNodeProps) => {
   const theme = useTheme();
   return (
     <Stack justifyContent="center" alignItems="center">
@@ -27,10 +31,11 @@ const PlaceholderNode = () => {
         </Box>
       </Divider>
       <Typography variant="h6">*</Typography>
-      <Typography>There&apos;s nothing here.</Typography>
+      {children}
+      {!children && <Typography>There&apos;s nothing here.</Typography>}
       <Divider sx={{ my: 3, width: "50%" }} />
     </Stack>
   );
 };
 
-export default PlaceholderNode;
+export default FallbackNode;

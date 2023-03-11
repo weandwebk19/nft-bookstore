@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Box, Stack, Typography } from "@mui/material";
 
@@ -7,6 +7,7 @@ import StarIcon from "@mui/icons-material/Star";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { useRouter } from "next/router";
 
 import { ListedBook, NftBook } from "@/types/nftBook";
 import { truncate } from "@/utils/truncate";
@@ -22,7 +23,6 @@ interface BookItemProps {
   fileType: string;
   tokenId: string;
   author: string;
-  onClick: (tokenId: number | string) => void;
 }
 
 const BookItem = ({
@@ -30,16 +30,21 @@ const BookItem = ({
   bookTitle,
   fileType,
   tokenId,
-  author,
-  onClick
-}: // meta,
-// seller,
-// amount,
-// price,
-// author,
-// onClick
-BookItemProps) => {
+  author
+}: BookItemProps) => {
   const [authorName, setAuthorName] = useState();
+  const router = useRouter();
+
+  const handleBookClick = useCallback((tokenId: string) => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -61,7 +66,7 @@ BookItemProps) => {
     <Stack
       className={styles["book-item"]}
       onClick={() => {
-        onClick(tokenId);
+        handleBookClick(tokenId);
       }}
       spacing={1}
       sx={{

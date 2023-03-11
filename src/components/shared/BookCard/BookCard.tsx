@@ -32,7 +32,6 @@ interface BookItemProps {
   fileType: string;
   tokenId: string;
   author: string;
-  onClick: (event: Event) => void;
 }
 
 const schema = yup
@@ -58,8 +57,7 @@ const BookCard = ({
   bookTitle,
   fileType,
   tokenId,
-  author,
-  onClick
+  author
 }: // meta,
 // seller,
 // amount,
