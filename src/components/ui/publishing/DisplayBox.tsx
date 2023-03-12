@@ -29,6 +29,17 @@ const DisplayBox: FunctionComponent = () => {
 
   const { listedBooks } = useListedBooks();
 
+  const handleBookClick = (tokenId: number | string) => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
+  };
+
   // console.log("nftBooks: ", listedBooks.data);
   return (
     <Box>
@@ -70,7 +81,10 @@ const DisplayBox: FunctionComponent = () => {
               {listedBooks.isLoading && "Putting books on the shelves..."}
 
               {listedBooks.data && (
-                <BookList bookList={listedBooks.data as NftListedBook[]} />
+                <BookList
+                  bookList={listedBooks.data as NftListedBook[]}
+                  onClick={handleBookClick}
+                />
               )}
 
               {!listedBooks.data && <FallbackNode />}

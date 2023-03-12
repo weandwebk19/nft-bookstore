@@ -5,6 +5,7 @@ import { Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
+import { useRouter } from "next/router";
 
 import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
 import { BookList } from "@/components/shared/BookList";
@@ -15,8 +16,20 @@ import { FilterBar } from "@/components/shared/FilterBar";
 const OwnedBooks = () => {
   const { nfts } = useOwnedNfts();
   const [ownedBooks, setOwnedBooks] = useState<any[]>([]);
+  const router = useRouter();
 
   const { account } = useAccount();
+
+  const handleBookClick = (tokenId: number | string) => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
+  };
 
   useEffect(() => {
     if (nfts.data?.length !== 0) {
@@ -41,11 +54,7 @@ const OwnedBooks = () => {
                 );
               }
               return (
-                <BookList
-                  itemsPerRow={12}
-                  bookList={ownedBooks!}
-                  variant="seller"
-                />
+                <BookList bookList={ownedBooks!} onClick={handleBookClick} />
               );
             })()}
           </ContentPaper>

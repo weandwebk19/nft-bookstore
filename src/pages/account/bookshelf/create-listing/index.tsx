@@ -15,6 +15,18 @@ import { FilterBar } from "@/components/shared/FilterBar";
 
 const CreateListing = () => {
   const { nfts } = useOwnedNfts();
+  const router = useRouter();
+
+  const handleBookClick = (tokenId: number | string) => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
+  };
 
   return (
     <Stack sx={{ pt: 12 }}>
@@ -32,11 +44,7 @@ const CreateListing = () => {
                 );
               }
               return (
-                <BookList
-                  itemsPerRow={12}
-                  bookList={nfts.data!}
-                  variant="seller"
-                />
+                <BookList bookList={nfts.data!} onClick={handleBookClick} />
               );
             })()}
           </ContentPaper>

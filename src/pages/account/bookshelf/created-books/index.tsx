@@ -4,17 +4,21 @@ import { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
+import axios from "axios";
+import { useRouter } from "next/router";
+
 import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
-import { BookList } from "@/components/shared/BookList";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import BookCard from "@/components/ui/account/bookshelf/created-books/BookCard";
 
 const CreatedBooks = () => {
+  const router = useRouter();
+  const { account } = useAccount();
+
   const { nfts } = useOwnedNfts();
   const [createdBooks, setCreatedBooks] = useState<any[]>([]);
-
-  const { account } = useAccount();
 
   useEffect(() => {
     if (nfts.data?.length !== 0) {
@@ -22,6 +26,17 @@ const CreatedBooks = () => {
       if (res) setCreatedBooks(res);
     }
   }, [nfts.data, account.data]);
+
+  const handleBookClick = (tokenId: number | string) => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
+  };
 
   return (
     <Stack sx={{ pt: 12 }}>
@@ -39,11 +54,33 @@ const CreatedBooks = () => {
                 );
               }
               return (
-                <BookList
-                  itemsPerRow={12}
-                  bookList={createdBooks!}
-                  variant="seller"
-                />
+                <Grid
+                  container
+                  spacing={3}
+                  columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                >
+                  {createdBooks!.map((book) => {
+                    return (
+                      <Grid
+                        item
+                        key={book.tokenId}
+                        xs={4}
+                        sm={8}
+                        md={6}
+                        lg={12}
+                      >
+                        <BookCard
+                          tokenId={book?.tokenId}
+                          bookCover={book?.meta.data.bookCover}
+                          bookTitle={book?.meta.data.title}
+                          fileType={book?.meta.data.fileType}
+                          author={book?.author}
+                          onClick={handleBookClick}
+                        />
+                      </Grid>
+                    );
+                  })}
+                </Grid>
               );
             })()}
           </ContentPaper>

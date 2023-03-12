@@ -1,30 +1,21 @@
 import { useEffect, useState } from "react";
-// type BookItemProps = {
-//   onClick: () => void;
-// } & ListedBook &
-//   NftBook;
 import { FormProvider, useForm } from "react-hook-form";
 
 import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import StarIcon from "@mui/icons-material/Star";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import { borderRadius } from "@mui/system";
 import { Dialog } from "@shared/Dialog";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { InputController } from "@/components/shared/FormController";
+import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
-import { ListedBook, NftBook } from "@/types/nftBook";
-import { truncate } from "@/utils/truncate";
-
-import { InputController } from "../FormController";
-import { FormGroup } from "../FormGroup";
 
 interface BookItemProps {
   bookCover: string;
@@ -32,6 +23,7 @@ interface BookItemProps {
   fileType: string;
   tokenId: string;
   author: string;
+  onClick: (tokenId: string) => void;
 }
 
 const schema = yup
@@ -57,14 +49,9 @@ const BookCard = ({
   bookTitle,
   fileType,
   tokenId,
-  author
-}: // meta,
-// seller,
-// amount,
-// price,
-// author,
-// onClick
-BookItemProps) => {
+  author,
+  onClick
+}: BookItemProps) => {
   const router = useRouter();
 
   const handleEditBookClick = (tokenId: number | string) => {
@@ -130,7 +117,12 @@ BookItemProps) => {
       }}
     >
       <Grid container columns={{ xs: 4, sm: 8, md: 12 }}>
-        <Grid item md={4}>
+        <Grid
+          item
+          md={4}
+          onClick={() => onClick(tokenId)}
+          sx={{ cursor: "pointer" }}
+        >
           <Box
             component="img"
             className={styles["book-item__book-cover"]}
@@ -219,9 +211,7 @@ BookItemProps) => {
 
               <StyledButton
                 customVariant="secondary"
-                onClick={() => {
-                  handleEditBookClick(tokenId);
-                }}
+                onClick={() => handleEditBookClick(tokenId)}
               >
                 Edit
               </StyledButton>

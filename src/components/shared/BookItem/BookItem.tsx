@@ -23,6 +23,7 @@ interface BookItemProps {
   fileType: string;
   tokenId: string;
   author: string;
+  onClick: (tokenId: string) => void;
 }
 
 const BookItem = ({
@@ -30,7 +31,8 @@ const BookItem = ({
   bookTitle,
   fileType,
   tokenId,
-  author
+  author,
+  onClick
 }: BookItemProps) => {
   const [authorName, setAuthorName] = useState();
   const router = useRouter();
@@ -66,7 +68,7 @@ const BookItem = ({
     <Stack
       className={styles["book-item"]}
       onClick={() => {
-        handleBookClick(tokenId);
+        onClick(tokenId);
       }}
       spacing={1}
       sx={{
