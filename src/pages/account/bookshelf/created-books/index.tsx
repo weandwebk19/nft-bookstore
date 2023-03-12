@@ -8,10 +8,12 @@ import axios from "axios";
 import { useRouter } from "next/router";
 
 import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
+import { BookCard } from "@/components/shared/BookCard";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import BookCard from "@/components/ui/account/bookshelf/created-books/BookCard";
+import EditButton from "@/components/ui/account/bookshelf/created-books/EditButton";
+import SellButton from "@/components/ui/account/bookshelf/created-books/SellButton";
 
 const CreatedBooks = () => {
   const router = useRouter();
@@ -59,6 +61,10 @@ const CreatedBooks = () => {
                   spacing={3}
                   columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                 >
+                  {/* Can not call BookList component, since the BookCard component has
+                  `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
+                  title, bookCover, author,... */}
+
                   {createdBooks!.map((book) => {
                     return (
                       <Grid
@@ -72,10 +78,20 @@ const CreatedBooks = () => {
                         <BookCard
                           tokenId={book?.tokenId}
                           bookCover={book?.meta.data.bookCover}
-                          bookTitle={book?.meta.data.title}
+                          title={book?.meta.data.title}
                           fileType={book?.meta.data.fileType}
                           author={book?.author}
                           onClick={handleBookClick}
+                          buttons={
+                            <>
+                              <SellButton
+                                title={book?.meta.data.title}
+                                bookCover={book?.meta.data.bookCover}
+                                author={book?.author}
+                              />
+                              <EditButton tokenId={book?.tokenId} />
+                            </>
+                          }
                         />
                       </Grid>
                     );

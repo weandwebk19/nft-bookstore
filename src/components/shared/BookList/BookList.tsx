@@ -10,6 +10,8 @@ interface BookListProps {
   variant?: string;
   bookList: any[];
   onClick: (tokenId: string) => void;
+  actionable?: boolean;
+  buttons?: React.ReactNode;
 }
 
 const BookList = ({
