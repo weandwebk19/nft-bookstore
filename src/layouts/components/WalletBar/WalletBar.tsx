@@ -15,8 +15,8 @@ import {
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 
+// import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { List as CustomList } from "@shared/List";
 import { StyledButton } from "@styles/components/Button";
 import PropTypes from "prop-types";
@@ -184,13 +184,13 @@ const WalletBar = ({
             <CustomList items={createList} />
           </Menu>
         </Box>
-        <Tooltip title={t("navbar:toolTip_shoppingBag")}>
+        {/* <Tooltip title={t("navbar:toolTip_shoppingBag")}>
           <IconButton>
             <Badge badgeContent={3} color="secondary">
               <ShoppingBagOutlinedIcon color="primary" />
             </Badge>
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
       </Stack>
     );
 
