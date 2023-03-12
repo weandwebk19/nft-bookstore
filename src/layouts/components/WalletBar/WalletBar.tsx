@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Avatar,
@@ -40,6 +41,8 @@ const WalletBar = ({
   account,
   disconnect
 }: WalletBarProps) => {
+  const { t } = useTranslation();
+
   const createList: ListItemProps[] = [
     {
       type: "button",
@@ -109,7 +112,7 @@ const WalletBar = ({
             label={truncate(account, 6, -4)}
             variant="outlined"
           />
-          <Tooltip title="Account menu">
+          <Tooltip title={t("navbar:toolTip_accountMenu")}>
             <IconButton onClick={handleAccountMenuClick}>
               <Avatar alt="Remy Sharp" src="" />
             </IconButton>
@@ -181,7 +184,7 @@ const WalletBar = ({
             <CustomList items={createList} />
           </Menu>
         </Box>
-        <Tooltip title="Shopping bag">
+        <Tooltip title={t("navbar:toolTip_shoppingBag")}>
           <IconButton>
             <Badge badgeContent={3} color="secondary">
               <ShoppingBagOutlinedIcon color="primary" />
@@ -206,7 +209,7 @@ const WalletBar = ({
             }
           }}
         >
-          Connect wallet
+          {t("navbar:connectWallet")}
         </StyledButton>
         <IconButton
           onClick={() => {
