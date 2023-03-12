@@ -19,6 +19,9 @@ const targetNetwork = process.env.NEXT_PUBLIC_NETWORK_ID as keyof NETWORK;
 export const contractAddress = contract["networks"][targetNetwork]["address"];
 export const pinataApiKey = process.env.PINATA_API_KEY as string;
 export const pinataSecretApiKey = process.env.PINATA_SECRET_API_KEY as string;
+export const pinataUnpinApiKey = process.env.PINATA_UNPIN_API_KEY as string;
+export const pinataUnpinSecretApiKey = process.env
+  .PINATA_UNPIN_SECRET_API_KEY as string;
 
 export function withSession(handler: any) {
   return withIronSession(handler, {
@@ -64,5 +67,20 @@ export const addressCheckMiddleware = async (
     } else {
       reject("Wrong Address");
     }
+  });
+};
+
+export const setURI = async (tokenId: number, tokenURI: string) => {
+  return new Promise(async (resolve, reject) => {
+    const provider = new ethers.providers.JsonRpcProvider(url);
+    const contract = new ethers.Contract(
+      contractAddress,
+      abi,
+      provider
+    ) as unknown as BookStoreContract;
+
+    await contract.setTokenUri(tokenId, tokenURI);
+
+    resolve("Set URI successfully.");
   });
 };

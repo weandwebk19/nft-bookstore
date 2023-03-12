@@ -5,19 +5,18 @@ import { Grid, Stack } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-import { useOwnedNfts } from "@/components/hooks/web3";
+import { useCreatedBooks } from "@/components/hooks/web3";
 import { BookList } from "@/components/shared/BookList";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FilterBar } from "@/components/shared/FilterBar";
 
 const CreatedBooks = () => {
-  const { nfts } = useOwnedNfts();
+  const { nfts } = useCreatedBooks();
   const router = useRouter();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
