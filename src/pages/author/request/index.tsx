@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -27,6 +27,7 @@ import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
@@ -114,7 +115,7 @@ const defaultValues = {
   about: "",
   email: "",
   website: "",
-  walletAddress: "0x6d5f4vrRafverHKJ561692842xderyb",
+  walletAddress: "",
   facebook: "",
   twitter: "",
   linkedIn: "",
@@ -123,8 +124,14 @@ const defaultValues = {
   backDocument: ""
 };
 
-const Profile = () => {
+const AuthorRequest = () => {
   const { ethereum, contract } = useWeb3();
+  const { account } = useAccount();
+
+  useEffect(() => {
+    setValue("walletAddress", account.data);
+  }, [account.data]);
+
   const methods = useForm<FormData>({
     shouldUnregister: false,
     defaultValues,
@@ -134,7 +141,8 @@ const Profile = () => {
   const {
     handleSubmit,
     formState: { errors },
-    getValues
+    getValues,
+    setValue
   } = methods;
 
   console.log("errors:", errors);
@@ -466,4 +474,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default AuthorRequest;

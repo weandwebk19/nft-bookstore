@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Chip,
   Divider,
   Grid,
   IconButton,
@@ -87,6 +88,17 @@ const AccountMenu = ({
 
   return (
     <Dialog title="Account" open={open} onClose={onClose}>
+      <Stack direction="row" sx={{ mb: 3 }} spacing={3}>
+        <Chip label="Reader account" />
+        <StyledButton
+          size="small"
+          onClick={() => {
+            router.push("/author/request");
+          }}
+        >
+          Become an author
+        </StyledButton>
+      </Stack>
       <Grid container spacing={3} columns={{ xs: 4, sm: 4, md: 12 }}>
         <Grid item xs={4} md={6}>
           <Stack

@@ -50,7 +50,11 @@ const MainProduct = () => {
           </CardActionArea>
         </StyledCard>
         <StyledCard customVariant="invertedDome" sx={{ m: 2 }}>
-          <CardActionArea>
+          <CardActionArea
+            onClick={() => {
+              router.push("/trade-in");
+            }}
+          >
             <CardContent sx={{ height: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
                 Trade-in
@@ -70,7 +74,11 @@ const MainProduct = () => {
           </CardActionArea>
         </StyledCard>
         <StyledCard customVariant="dome" sx={{ m: 2 }}>
-          <CardActionArea>
+          <CardActionArea
+            onClick={() => {
+              router.push("/borrow");
+            }}
+          >
             <CardMedia
               component="img"
               height="300"

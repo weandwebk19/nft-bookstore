@@ -2,6 +2,9 @@ import { FormProvider, useForm } from "react-hook-form";
 
 import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
 
+import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
+import SelectAllOutlinedIcon from "@mui/icons-material/SelectAllOutlined";
+
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { faBorderAll, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
@@ -119,12 +122,12 @@ const FilterBar = () => {
               <Stack direction={{ xs: "row" }}>
                 <Tooltip title="Reset">
                   <IconButton onClick={handleResetGenres}>
-                    <FontAwesomeIcon icon={faUndoAlt} />
+                    <RestartAltOutlinedIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Select all">
                   <IconButton onClick={handleSelectAllGenres}>
-                    <FontAwesomeIcon icon={faBorderAll} />
+                    <SelectAllOutlinedIcon />
                   </IconButton>
                 </Tooltip>
               </Stack>

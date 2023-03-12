@@ -30,6 +30,7 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
           setLoading(false);
         } else if (pathWithoutLocale === router.asPath) {
           // setTimeout(() => setLoading(false), 0);
+
           setLoading(false);
         }
       }
@@ -51,7 +52,7 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
   }, [router.locale]);
 
   return (
-    <>
+    <Box sx={{ zIndex: 9999 }}>
       {loading && (
         <Fade in={loading}>
           <div ref={ref as React.RefObject<HTMLDivElement>} className="loader">
@@ -69,7 +70,7 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
           </div>
         </Fade>
       )}
-    </>
+    </Box>
   );
 });
 

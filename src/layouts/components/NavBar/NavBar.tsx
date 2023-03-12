@@ -19,8 +19,8 @@ import LanguageIcon from "@mui/icons-material/Language";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 
+// import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { ListItemProps } from "@_types/list";
 import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
@@ -190,7 +190,7 @@ const NavBar = () => {
   };
 
   const handleCreateListingClick = () => {
-    alert("Create Listing");
+    router.push("/account/bookshelf/create-listing");
   };
 
   const handleCreateRentalClick = () => {
@@ -337,19 +337,19 @@ const NavBar = () => {
           type: "divider",
           subList: []
         },
-    account.data
-      ? {
-          type: "button",
-          icon: <ShoppingBagOutlinedIcon color="primary" />,
-          content: "Shopping Bag",
-          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
-          disabled: false,
-          subList: []
-        }
-      : {
-          type: "divider",
-          subList: []
-        },
+    // account.data
+    //   ? {
+    //       type: "button",
+    //       icon: <ShoppingBagOutlinedIcon color="primary" />,
+    //       content: "Shopping Bag",
+    //       onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
+    //       disabled: false,
+    //       subList: []
+    //     }
+    //   : {
+    //       type: "divider",
+    //       subList: []
+    //     },
     {
       type: "divider",
       content: "",
