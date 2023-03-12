@@ -95,14 +95,14 @@ const AccountMenu = ({
       onClose={onClose}
     >
       <Stack direction="row" sx={{ mb: 3 }} spacing={3}>
-        <Chip label="Reader account" />
+        <Chip label={t("navbar:readerAccount")} />
         <StyledButton
           size="small"
           onClick={() => {
             router.push("/author/request");
           }}
         >
-          Become an author
+          {t("navbar:becomeAnAuthor")}
         </StyledButton>
       </Stack>
       <Grid container spacing={3} columns={{ xs: 4, sm: 4, md: 12 }}>

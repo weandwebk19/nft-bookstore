@@ -1,5 +1,7 @@
 import { Stack, Typography } from "@mui/material";
 
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 import images from "@/assets/images";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { Ticket } from "@/components/shared/Ticket";
@@ -95,3 +97,11 @@ const BookShelf = () => {
 };
 
 export default BookShelf;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}

@@ -1,5 +1,6 @@
 import { Box, Stack } from "@mui/material";
 
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
 import DisplayBox from "@/components/ui/borrow/DisplayBox";
@@ -25,3 +26,11 @@ const Borrow = () => {
 };
 
 export default Borrow;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}

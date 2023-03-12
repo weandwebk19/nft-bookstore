@@ -26,5 +26,7 @@
   "watchlist": "Watchlist",
   "my_bookshelf": "My Bookshelf",
   "disconnect": "Disconnect",
-  "connectWallet": "Connect wallet"
+  "connectWallet": "Connect wallet",
+  "readerAccount": "Reader account",
+  "becomeAnAuthor": "Become an author"
 }

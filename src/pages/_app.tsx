@@ -5,7 +5,6 @@ import { Box, CssBaseline } from "@mui/material";
 import "@styles/GlobalStyles/GlobalStyles.scss";
 import { AnimatePresence, motion } from "framer-motion";
 import { appWithTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 
