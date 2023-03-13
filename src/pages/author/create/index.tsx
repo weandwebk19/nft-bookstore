@@ -452,16 +452,16 @@ const CreateBook = () => {
         // Upload data to database
         if (tokenId) {
           uploadBookDetails({
-            token_id: tokenId,
+            tokenId: tokenId,
             description: data.description,
             languages: data.languages,
             genres: data.genres,
             version: data.version,
-            max_supply: data.maxSupply,
-            external_link: data.externalLink,
-            total_pages: data.totalPages,
+            maxSupply: data.maxSupply,
+            externalLink: data.externalLink,
+            totalPages: data.totalPages,
             keywords: data.keywords,
-            publishing_time: data.publishingTime
+            publishingTime: data.publishingTime
           });
         }
       })();

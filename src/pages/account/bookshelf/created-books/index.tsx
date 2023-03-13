@@ -18,6 +18,8 @@ import SellButton from "@/components/ui/account/bookshelf/created-books/SellButt
 const CreatedBooks = () => {
   const { nfts } = useCreatedBooks();
   const router = useRouter();
+  console.log("nfts", nfts);
+  const createdBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {

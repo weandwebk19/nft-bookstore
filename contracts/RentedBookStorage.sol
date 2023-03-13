@@ -54,7 +54,7 @@ contract RentedBookStorage {
   mapping(uint => BorrowedBook) private _idToBorrowedBook; // (ID -> BorrowedBook))
   Counters.Counter private _borrowedBooks;
 
- function isRented(uint tokenId) public returns (bool) {
+ function isRented(uint tokenId) public view returns (bool) {
     uint idRentedBook = getIdRentedBook(tokenId, msg.sender);
     if(idRentedBook < 0) {
       return false;

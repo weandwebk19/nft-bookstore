@@ -47,10 +47,6 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
 
   }
 
-  function _onlyAuthor(uint256 tokenId) private {
-    require(_idToNFTBook[tokenId].author == msg.sender, "Only author of this token can call this method.");
-  }
-
   function setListingPrice(uint newPrice) external onlyOwner {
     require(newPrice > 0, "Price must be at least 1 wei");
     listingPrice = newPrice;
@@ -61,11 +57,11 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     rentingPrice = newPrice;
   }
 
-  function setTokenUri(uint256 tokenId, string memory tokenURI) external  {
-    _onlyAuthor();
+  function setTokenUri(uint256 tokenId, string memory tokenURI) external onlyOwner{
+    require(_idToNFTBook[tokenId].author == msg.sender, "Only author of this token can call this method.");
     // Delete old URI
-    string oldURI = ERC1155URIStorage.uri(tokenId);
-    delete _usedTokenURIs[tokenURI];
+    string memory oldURI = ERC1155URIStorage.uri(tokenId);
+    delete _usedTokenURIs[oldURI];
 
     // Set new URI to the token
     _setURI(tokenId, tokenURI);
@@ -200,13 +196,20 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
 
   function getCreatedNFTBooks() public view returns (NFTBook[] memory) {
     uint ownedItemsCount = getTotalOwnedToken();
-    NFTBook[] memory books = new NFTBook[]();
+    uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
+    uint ownedRentedBookCount = _rentedBookStorage.getTotalOwnedRentedBook(msg.sender);
+    uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
 
+    NFTBook[] memory books = new NFTBook[](length);
+
+    uint currentIndex = 0;
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
-      if(isListed(tokenId) == false && isRented(tokenId) == false) {
+      if(_listedBookStorage.isListed(tokenId) == false 
+        && _rentedBookStorage.isRented(tokenId) == false) {
         NFTBook memory book = _idToNFTBook[tokenId];
-        books.push(book);
+        books[currentIndex] = book;
+        currentIndex += 1;
       }
     }
 
