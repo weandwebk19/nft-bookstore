@@ -1,15 +1,21 @@
 import { Box, FormGroup, Link, Stack, Typography } from "@mui/material";
 
+import { useTranslation } from "next-i18next";
+
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { CheckboxController } from "@/components/shared/FormController";
 
 const FinalStep = () => {
+  const { t } = useTranslation("createBook");
+
   return (
-    <ContentGroup title="Terms and Conditions">
+    <ContentGroup title={t("titleStep4") as string}>
       <Box sx={{ my: 2 }}>
         <Typography variant="caption" className="form-label required">
-          You must accept the <i>Terms and Conditions</i> and{" "}
-          <i>Privacy Policy</i>
+          {t("termsAndConditions1") as string}{" "}
+          <i>{t("termsAndConditions2") as string}</i>{" "}
+          {t("termsAndConditions3") as string}{" "}
+          <i>{t("termsAndConditions4") as string}</i>
         </Typography>
       </Box>
       <Stack direction="column" spacing={3}>
@@ -18,9 +24,10 @@ const FinalStep = () => {
             name="termsOfService"
             label={
               <>
-                I certify that I am at least 18 years old and of lawful age, and
-                I have read and accpet the{" "}
-                <Link href="/term-and-conditions">Term and conditions</Link>
+                {t("termsOfService1") as string}{" "}
+                <Link href="/term-and-conditions">
+                  {t("termsOfService2") as string}
+                </Link>
               </>
             }
           />
@@ -30,8 +37,10 @@ const FinalStep = () => {
             name="privacyPolicy"
             label={
               <>
-                I have read and accept{" "}
-                <Link href="/privacy-policy">Privacy Policy</Link>
+                {t("privacyPolicy1") as string}{" "}
+                <Link href="/privacy-policy">
+                  {t("privacyPolicy2") as string}
+                </Link>
               </>
             }
           />

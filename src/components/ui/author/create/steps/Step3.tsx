@@ -5,61 +5,65 @@ import {
   MultipleSelectController
 } from "@shared/FormController";
 import styles from "@styles/Form.module.scss";
+import { useTranslation } from "next-i18next";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
 
 const Step3 = () => {
+  const { t } = useTranslation("createBook");
+
   const genres = useGenres();
   const languages = useLanguages();
+
   return (
-    <ContentGroup title="Book details">
+    <ContentGroup title={t("titleStep3") as string}>
       <Box sx={{ my: 2 }}>
         <Typography variant="caption" className="form-label required">
-          Required
+          {t("required") as string}
         </Typography>
       </Box>
       <Stack direction="column" spacing={3}>
         <Stack direction="column" spacing={3}>
           <FormGroup
-            label="External link"
-            desc="NFT Bookstore will include a link to this URL on this item's detail page, so that users can click to learn more about it. This may contain extra items for buyers."
+            label={t("externalLink") as string}
+            desc={t("descExternalLink") as string}
           >
             <InputController name="externalLink" />
           </FormGroup>
           <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 2 }}>
             <FormGroup
-              label="Version"
+              label={t("version") as string}
               required
               className={styles["form__formGroup-half"]}
             >
               <InputController name="version" />
             </FormGroup>
             <FormGroup
-              label="Max supply"
+              label={t("maxSupply") as string}
               required
               className={styles["form__formGroup-half"]}
             >
               <InputController name="maxSupply" />
             </FormGroup>
           </Stack>
-          <FormGroup label="Genres" required>
+          <FormGroup label={t("genres") as string} required>
             <MultipleSelectController items={genres.data} name="genres" />
           </FormGroup>
-          <FormGroup label="Languages" required>
+          <FormGroup label={t("languages") as string} required>
             <MultipleSelectController items={languages.data} name="languages" />
           </FormGroup>
           <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 2 }}>
             <FormGroup
-              label="Number of pages"
+              label={t("numberOfPages") as string}
               required
               className={styles["form__formGroup-half"]}
             >
               <InputController name="pages" />
             </FormGroup>
             <FormGroup
-              label="Keywords"
+              label={t("keywords") as string}
               className={styles["form__formGroup-half"]}
             >
               <InputController name="keywords" />
