@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { Box, Stack } from "@mui/material";
 
 import DisplayBox from "@ui/Home/DisplayBox";
@@ -12,6 +14,7 @@ import { StyledButton } from "@/styles/components/Button";
 
 export default function Home() {
   const router = useRouter();
+
   return (
     <Box>
       <Head>

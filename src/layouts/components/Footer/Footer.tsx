@@ -1,5 +1,4 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   Box,
@@ -12,6 +11,7 @@ import {
 
 import { styled } from "@mui/system";
 import styles from "@styles/Footer.module.scss";
+import { useTranslation } from "next-i18next";
 import Link from "next/link";
 
 import images from "@/assets/images";
@@ -22,7 +22,6 @@ const StyledTypography = styled(Typography)(({}) => ({
     opacity: 0.7
   }
 }));
-
 const Footer = () => {
   const { t } = useTranslation("footer");
 
@@ -95,7 +94,6 @@ const Footer = () => {
       ]
     }
   ];
-
   return (
     <Box className={styles.footer}>
       <Grid
@@ -132,6 +130,7 @@ const Footer = () => {
               }}
             >
               {t("info")}
+              {/* {t("footer:info")} */}
             </Typography>
           </Box>
         </Grid>
@@ -242,5 +241,4 @@ const Footer = () => {
     </Box>
   );
 };
-
 export default Footer;

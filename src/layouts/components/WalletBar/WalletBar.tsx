@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
 import {
   Avatar,
@@ -19,6 +18,7 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 // import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { List as CustomList } from "@shared/List";
 import { StyledButton } from "@styles/components/Button";
+import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
 
 import { ListItemProps } from "@/types/list";
