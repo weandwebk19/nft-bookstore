@@ -19,28 +19,28 @@ export default async function handler(
     const client = await clientPromise;
     const db = client.db("NftBookStore");
     const {
-      token_id,
+      tokenId,
       description,
-      external_link,
+      externalLink,
       version,
-      max_supply,
+      maxSupply,
       genres,
       languages,
-      total_pages,
+      totalPages,
       keywords,
-      publishing_time
+      publishingTime
     }: BookInfo = req.body;
 
     // Insert book into database
     const newBooks = await db.collection("books").insertOne({
-      token_id,
+      token_id: tokenId,
       description,
-      external_link,
+      external_link: externalLink,
       version,
-      max_supply,
-      total_pages,
+      max_supply: maxSupply,
+      total_pages: totalPages,
       keywords,
-      publishing_time
+      publishing_time: publishingTime
     });
 
     const newBookId: ObjectId = newBooks.insertedId;

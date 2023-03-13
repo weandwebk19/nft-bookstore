@@ -17,6 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Alert } from "@mui/lab";
 import axios from "axios";
 import { ethers } from "ethers";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
@@ -457,16 +458,16 @@ const CreateBook = () => {
         // Upload data to database
         if (tokenId) {
           uploadBookDetails({
-            token_id: tokenId,
+            tokenId: tokenId,
             description: data.description,
             languages: data.languages,
             genres: data.genres,
             version: data.version,
-            max_supply: data.maxSupply,
-            external_link: data.externalLink,
-            total_pages: data.totalPages,
+            maxSupply: data.maxSupply,
+            externalLink: data.externalLink,
+            totalPages: data.totalPages,
             keywords: data.keywords,
-            publishing_time: data.publishingTime
+            publishingTime: data.publishingTime
           });
         }
 
@@ -606,3 +607,11 @@ const CreateBook = () => {
 };
 
 export default CreateBook;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}

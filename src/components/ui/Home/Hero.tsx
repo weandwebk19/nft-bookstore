@@ -23,7 +23,7 @@ import cssFilter from "@/utils/cssFilter";
 
 const Hero = () => {
   const theme = useTheme();
-  const { t } = useTranslation("home");
+  const { t } = useTranslation();
 
   return (
     <Box className={styles.hero}>

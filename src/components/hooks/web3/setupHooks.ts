@@ -8,6 +8,10 @@ import {
   hookFactory as createBookDetailHook
 } from "./useBookDetail";
 import {
+  UseCreatedBooksHook,
+  hookFactory as createCreatedBooksHook
+} from "./useCreatedBooks";
+import {
   UseListedBooksHook,
   hookFactory as createListedBooksHook
 } from "./useListedBooks";
@@ -22,6 +26,7 @@ export type Web3Hooks = {
   useNetwork: UseNetworkHook;
   useListedBooks: UseListedBooksHook;
   useOwnedNfts: UseOwnedNftsHook;
+  useCreatedBooks: UseCreatedBooksHook;
   useBookDetail: UseBookDetailHook;
 };
 
@@ -35,6 +40,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useNetwork: createNetworkHook(deps),
     useListedBooks: createListedBooksHook(deps),
     useOwnedNfts: createOwnedBooksHook(deps),
+    useCreatedBooks: createCreatedBooksHook(deps),
     useBookDetail: createBookDetailHook(deps)
   };
 };

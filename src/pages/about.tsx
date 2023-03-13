@@ -1,6 +1,8 @@
 import { Box, Grid, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 import { ContentContainer } from "@/components/shared/ContentContainer";
 
 const About = () => {
@@ -104,3 +106,11 @@ const About = () => {
 };
 
 export default About;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}

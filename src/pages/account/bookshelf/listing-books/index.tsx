@@ -5,6 +5,7 @@ import { Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
 import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
@@ -81,3 +82,11 @@ const ListingBooks = () => {
 };
 
 export default ListingBooks;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}

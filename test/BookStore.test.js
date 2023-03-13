@@ -14,7 +14,10 @@ contract("BookStore", (accounts) => {
   before(async () => {
     await ListedBookStorage.deployed();
     await RentedBookStorage.deployed();
-    _contract = await BookStore.deployed(ListedBookStorage.address, RentedBookStorage.address);
+    _contract = await BookStore.deployed(
+      ListedBookStorage.address,
+      RentedBookStorage.address
+    );
   });
 
   describe("Mint book", () => {
@@ -52,6 +55,31 @@ contract("BookStore", (accounts) => {
       assert.equal(nftItem.balance, balance, "Nft balance is not correct");
       assert.equal(nftItem.author, accounts[0], "Author is not account[0]");
     });
+
+    it("should have a created books", async () => {
+      const nftBooks = await _contract.getCreatedNFTBooks({
+        from: accounts[0]
+      });
+      assert.equal(nftBooks.length, 1, "It has not created book yet.");
+    });
+  });
+
+  describe("Set new tokenUri", () => {
+    it("should set the new token URI to the existing one", async () => {
+      const tokenId = 1;
+      const newTokenUri = "https://test.com/newTokenUri";
+      const res = await _contract.setTokenUri(tokenId, newTokenUri, {
+        from: accounts[0]
+      });
+      if (res) {
+        const actualTokenURI = await _contract.uri(tokenId);
+        assert.equal(
+          actualTokenURI,
+          newTokenUri,
+          "tokenURI is not correctly set"
+        );
+      }
+    });
   });
 
   describe("Sell a book", () => {
@@ -63,7 +91,6 @@ contract("BookStore", (accounts) => {
         from: accounts[0],
         value: _listingPrice
       });
-
     });
 
     it("accounts[0] is the owner of this NFT book", async () => {
@@ -74,14 +101,24 @@ contract("BookStore", (accounts) => {
     it("should have one listed items on sale", async () => {
       const listedBooks = await _contract.getAllBooksOnSale();
       assert.equal(listedBooks.length, 1, "Invalid length of listed Books");
-
     });
 
     it("should have one listed items for seller", async () => {
       const ownedListedBooks = await _contract.getOwnedListedBooks({
         from: accounts[0]
       });
-      assert.equal(ownedListedBooks.length, 1, "Invalid length of owned listed Books");
+      assert.equal(
+        ownedListedBooks.length,
+        1,
+        "Invalid length of owned listed Books"
+      );
+    });
+
+    it("should not have created books", async () => {
+      const nftBooks = await _contract.getCreatedNFTBooks({
+        from: accounts[0]
+      });
+      assert.equal(nftBooks.length, 0, "It still have not sold yet.");
     });
   });
 
@@ -128,19 +165,20 @@ contract("BookStore", (accounts) => {
         "The number of books in possession of the book is not valid"
       );
     });
-
   });
 
   describe("Update listed book", () => {
     const _newNftPrice = ethers.utils.parseEther("0.02").toString();
     before(async () => {
-      await _contract.updateBookFromSale(1, _newNftPrice,  80, accounts[0], {
+      await _contract.updateBookFromSale(1, _newNftPrice, 80, accounts[0], {
         from: accounts[0]
       });
     });
 
     it("should have correct amount", async () => {
-      const listedBooks = await _contract.getOwnedListedBooks({from:  accounts[0]});
+      const listedBooks = await _contract.getOwnedListedBooks({
+        from: accounts[0]
+      });
       assert.equal(listedBooks[0].amount, 80, "Invalid length of Nfts");
     });
   });
@@ -176,7 +214,6 @@ contract("BookStore", (accounts) => {
       const listedBooks = await _contract.getAllBooksOnSale();
       assert.equal(listedBooks.length, 0, "Invalid length of Nfts");
     });
-
   });
 
   describe("List books on sale", () => {
@@ -209,19 +246,16 @@ contract("BookStore", (accounts) => {
     });
 
     it("account[0] is not owner of token URI 1", async () => {
-
       const total = Number(ethers.utils.parseUnits("0.6", "ether")).toString();
       await _contract.buyBooks(1, accounts[0], 20, {
         from: accounts[1],
         value: total
       });
       const listedBooks = await _contract.getAllBooksOnSale();
-      const isOwner = await _contract.isOwnerOfToken(1, accounts[0])
+      const isOwner = await _contract.isOwnerOfToken(1, accounts[0]);
       assert(!isOwner, "Set owner is wrong");
       assert.equal(listedBooks.length, 1, "Invalid length of ListedBooks");
-
     });
-
   });
 
   describe("Rent books", () => {
@@ -238,7 +272,6 @@ contract("BookStore", (accounts) => {
         from: accounts[0],
         value: _rentingPrice
       });
-
     });
 
     it("accounts[1] is the owner of this NFT book", async () => {
@@ -259,13 +292,17 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have 20 rented items and 20 listed items for account[0]", async () => {
-      const totalUnsellable = await _contract.getAmountOfAllTypeBooksUnsellable(2, accounts[0]);
-      const totalUnRentable = await _contract.getAmountOfAllTypeBooksUnrentable(2, accounts[0]);
+      const totalUnsellable = await _contract.getAmountOfAllTypeBooksUnsellable(
+        2,
+        accounts[0]
+      );
+      const totalUnRentable = await _contract.getAmountOfAllTypeBooksUnrentable(
+        2,
+        accounts[0]
+      );
       assert.equal(totalUnsellable, 40, "Total Unsellable is invalid");
       assert.equal(totalUnRentable, 40, "Total Unrentable is invalid");
-
     });
-
 
     it("should have one rented items for renter", async () => {
       const ownedRentedBooks1 = await _contract.getOwnedRentedBooks({
@@ -275,8 +312,16 @@ contract("BookStore", (accounts) => {
       const ownedRentedBooks0 = await _contract.getOwnedRentedBooks({
         from: accounts[0]
       });
-      assert.equal(ownedRentedBooks1.length, 1, "Invalid length of owned rented Books");
-      assert.equal(ownedRentedBooks0.length, 1, "Invalid length of owned rented Books");
+      assert.equal(
+        ownedRentedBooks1.length,
+        1,
+        "Invalid length of owned rented Books"
+      );
+      assert.equal(
+        ownedRentedBooks0.length,
+        1,
+        "Invalid length of owned rented Books"
+      );
     });
 
     it("accounts[1] can not sell 100 tokens id 1", async () => {
@@ -291,9 +336,7 @@ contract("BookStore", (accounts) => {
       } catch (error) {
         assert(error, "Set amount listed tokens and rented tokens are wrong");
       }
-
     });
-
   });
 
   describe("Update rented books", () => {
@@ -305,23 +348,55 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have correct amount and newprice amount", async () => {
-      const ownedRentedBooks = await _contract.getOwnedRentedBooks({from:  accounts[1]});
+      const ownedRentedBooks = await _contract.getOwnedRentedBooks({
+        from: accounts[1]
+      });
       const rentedBooks = await _contract.getAllBooksOnRenting();
-      assert.equal(ownedRentedBooks[0].amount, 5, "Invalid amount of rented book (token id 2)");
-      assert.equal(ownedRentedBooks[0].price.toString(), 2000000000000000, "Invalid price of rented book (token id 2)");
-      assert.equal(rentedBooks[0].amount, 5, "Invalid amount of rented book (token id 2)");
-      assert.equal(rentedBooks[0].price.toString(), 2000000000000000, "Invalid price of rented book (token id 2)");
+      assert.equal(
+        ownedRentedBooks[0].amount,
+        5,
+        "Invalid amount of rented book (token id 2)"
+      );
+      assert.equal(
+        ownedRentedBooks[0].price.toString(),
+        2000000000000000,
+        "Invalid price of rented book (token id 2)"
+      );
+      assert.equal(
+        rentedBooks[0].amount,
+        5,
+        "Invalid amount of rented book (token id 2)"
+      );
+      assert.equal(
+        rentedBooks[0].price.toString(),
+        2000000000000000,
+        "Invalid price of rented book (token id 2)"
+      );
     });
 
     it("should have one rented book on renting", async () => {
       await _contract.updateBookFromRenting(1, _newNftPrice, 0, accounts[1], {
         from: accounts[1]
       });
-      const ownedRentedBooks = await _contract.getOwnedRentedBooks({from:  accounts[1]});
+      const ownedRentedBooks = await _contract.getOwnedRentedBooks({
+        from: accounts[1]
+      });
       const rentedBooks = await _contract.getAllBooksOnRenting();
-      assert.equal(ownedRentedBooks.length, 0, "Invalid length of rented book of owner");
-      assert.equal(rentedBooks.length, 1, "Invalid length of rented book on renting");
-      assert.equal(rentedBooks[0].renter, accounts[0], "accounts[0] must be owner of this rented book");
+      assert.equal(
+        ownedRentedBooks.length,
+        0,
+        "Invalid length of rented book of owner"
+      );
+      assert.equal(
+        rentedBooks.length,
+        1,
+        "Invalid length of rented book on renting"
+      );
+      assert.equal(
+        rentedBooks[0].renter,
+        accounts[0],
+        "accounts[0] must be owner of this rented book"
+      );
     });
 
     it("should set new renting price", async () => {
@@ -331,22 +406,26 @@ contract("BookStore", (accounts) => {
 
       assert.equal(rentingPrice.toString(), newRentingPrice, "Invalid Price");
     });
-    
   });
-
 
   describe("Borrow books", () => {
     const value = ethers.utils.parseEther("0.2").toString();
     const price = Number(ethers.utils.parseUnits("0.005", "ether")).toString();
     const amount = 20;
-    const rentalDuration = 1209600 // 2 weeks
+    const rentalDuration = 1209600; // 2 weeks
 
     before(async () => {
-      await _contract.borrowBooks(2, accounts[0], price,  amount, rentalDuration, {
-        from: accounts[1],
-        value: value
-      });
-
+      await _contract.borrowBooks(
+        2,
+        accounts[0],
+        price,
+        amount,
+        rentalDuration,
+        {
+          from: accounts[1],
+          value: value
+        }
+      );
     });
 
     it("accounts[1] is the owner of this NFT book", async () => {
@@ -359,13 +438,20 @@ contract("BookStore", (accounts) => {
       assert.equal(rentedBooks.length, 0, "Invalid length of rented Books");
     });
 
-
     it("should have one borrowed items for accounts[1]", async () => {
       const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
         from: accounts[1]
       });
-      assert.equal(ownedBorrowedBooks.length, 1, "Invalid length of owned borrowed Books");
-      assert.equal(ownedBorrowedBooks[0].amount, 20, "Invalid amount of owned borrowed Books");
+      assert.equal(
+        ownedBorrowedBooks.length,
+        1,
+        "Invalid length of owned borrowed Books"
+      );
+      assert.equal(
+        ownedBorrowedBooks[0].amount,
+        20,
+        "Invalid amount of owned borrowed Books"
+      );
     });
 
     it("accounts[0] can not sell 80 tokens id 2", async () => {
@@ -381,16 +467,30 @@ contract("BookStore", (accounts) => {
         assert(error, "Set amount listed tokens and rented tokens are wrong");
       }
 
-      const amountOwnedBooks = await _contract.getBalanceOfOwnerBook(2, {from: accounts[0]});
-      assert.equal(amountOwnedBooks.toString(), 80, "Total Unsellable of account[0] is invalid");
+      const amountOwnedBooks = await _contract.getBalanceOfOwnerBook(2, {
+        from: accounts[0]
+      });
+      assert.equal(
+        amountOwnedBooks.toString(),
+        80,
+        "Total Unsellable of account[0] is invalid"
+      );
 
+      const amountBooksUnsellable =
+        await _contract.getAmountOfAllTypeBooksUnsellable(2, accounts[0]);
+      assert.equal(
+        amountBooksUnsellable.toString(),
+        20,
+        "Total Unsellable of account[0] is invalid"
+      );
 
-      const amountBooksUnsellable = await _contract.getAmountOfAllTypeBooksUnsellable(2, accounts[0]);
-      assert.equal(amountBooksUnsellable.toString(), 20, "Total Unsellable of account[0] is invalid");
-
-      const amountBooksUnrentable = await _contract.getAmountOfAllTypeBooksUnrentable(2, accounts[1]);
-      assert.equal(amountBooksUnrentable.toString(), 0, "Total Unsellable of account[1] is invalid");
-
+      const amountBooksUnrentable =
+        await _contract.getAmountOfAllTypeBooksUnrentable(2, accounts[1]);
+      assert.equal(
+        amountBooksUnrentable.toString(),
+        0,
+        "Total Unsellable of account[1] is invalid"
+      );
     });
 
     it("accounts[1] can not sell tokens id 2", async () => {
@@ -405,11 +505,8 @@ contract("BookStore", (accounts) => {
       } catch (error) {
         assert(error, "Set amount listed tokens and rented tokens are wrong");
       }
-
     });
-
   });
-
 
   describe("Update borrowed books", () => {
     let _nftPrice = ethers.utils.parseEther("0.005").toString();
@@ -422,7 +519,9 @@ contract("BookStore", (accounts) => {
     let rentalDuration = 1209600; // 2 weeks
 
     before(async () => {
-      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({from: accounts[1]});
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
       beforeStartTime = Number(ownedBorrowedBooks[0].startTime);
       beforeEndTime = Number(ownedBorrowedBooks[0].endTime);
       await _contract.rentBooks(2, _nftPrice, amount, {
@@ -430,11 +529,17 @@ contract("BookStore", (accounts) => {
         value: _rentingPrice
       });
 
-      await _contract.borrowBooks(2, accounts[0], price,  amount, rentalDuration, {
-        from: accounts[1],
-        value: value
-      });
-
+      await _contract.borrowBooks(
+        2,
+        accounts[0],
+        price,
+        amount,
+        rentalDuration,
+        {
+          from: accounts[1],
+          value: value
+        }
+      );
     });
 
     it("accounts[1] is the owner of this NFT book", async () => {
@@ -447,46 +552,68 @@ contract("BookStore", (accounts) => {
       assert.equal(rentedBooks.length, 1, "Invalid length of rented Books");
     });
 
-    
     it("should update time of borrowed books", async () => {
-      const owneBorroweddBooks = await _contract.getOwnedBorrowedBooks({from: accounts[1]});
-      assert(Number(owneBorroweddBooks[0].startTime.toString()) != 
-              beforeStartTime,
-              "Invalid start time of borrowed Books");
-      assert(Number(owneBorroweddBooks[0].endTime.toString()) != 
-              beforeEndTime,
-              "Invalid end time of borrowed Books");
+      const owneBorroweddBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
+      assert(
+        Number(owneBorroweddBooks[0].startTime.toString()) != beforeStartTime,
+        "Invalid start time of borrowed Books"
+      );
+      assert(
+        Number(owneBorroweddBooks[0].endTime.toString()) != beforeEndTime,
+        "Invalid end time of borrowed Books"
+      );
     });
 
     // Test in incomplete
 
     it("should update amount of borrowed books", async () => {
-      let ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({from: accounts[1]});
+      let ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
       beforeStartTime = Number(ownedBorrowedBooks[0].startTime);
       beforeEndTime = Number(ownedBorrowedBooks[0].endTime);
       amount = 30;
       price = Number(ethers.utils.parseUnits("0.005", "ether")).toString();
       value = ethers.utils.parseEther("0.3").toString();
-      await _contract.borrowBooks(2, accounts[0], price,  amount, rentalDuration, {
-        from: accounts[1],
-        value: value
-      });
+      await _contract.borrowBooks(
+        2,
+        accounts[0],
+        price,
+        amount,
+        rentalDuration,
+        {
+          from: accounts[1],
+          value: value
+        }
+      );
 
       const rentedBooks = await _contract.getAllBooksOnRenting();
-      assert.equal(rentedBooks[0].amount, 10, "Set amount of rented books is wrong");
+      assert.equal(
+        rentedBooks[0].amount,
+        10,
+        "Set amount of rented books is wrong"
+      );
 
-      ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({from: accounts[1]});
+      ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
 
-      assert(Number(ownedBorrowedBooks[0].startTime.toString()) != 
-                    beforeStartTime,
-                    "Invalid start time of borrowed Books");
-      assert(Number(ownedBorrowedBooks[0].endTime.toString()) != 
-                    beforeEndTime,
-                    "Invalid end time of borrowed Books");
+      assert(
+        Number(ownedBorrowedBooks[0].startTime.toString()) != beforeStartTime,
+        "Invalid start time of borrowed Books"
+      );
+      assert(
+        Number(ownedBorrowedBooks[0].endTime.toString()) != beforeEndTime,
+        "Invalid end time of borrowed Books"
+      );
 
-      assert.equal(ownedBorrowedBooks[0].amount, 30, "Set amount of borrowed books is wrong");
-        
+      assert.equal(
+        ownedBorrowedBooks[0].amount,
+        30,
+        "Set amount of borrowed books is wrong"
+      );
     });
   });
-
 });
