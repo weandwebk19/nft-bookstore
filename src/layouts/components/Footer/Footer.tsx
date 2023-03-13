@@ -22,7 +22,6 @@ const StyledTypography = styled(Typography)(({}) => ({
     opacity: 0.7
   }
 }));
-
 const Footer = () => {
   const { t } = useTranslation("footer");
 
@@ -95,7 +94,6 @@ const Footer = () => {
       ]
     }
   ];
-
   return (
     <Box className={styles.footer}>
       <Grid
@@ -232,5 +230,4 @@ const Footer = () => {
     </Box>
   );
 };
-
 export default Footer;

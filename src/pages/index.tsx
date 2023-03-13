@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { Box, Stack } from "@mui/material";
 
 import DisplayBox from "@ui/Home/DisplayBox";
@@ -12,6 +14,7 @@ import { StyledButton } from "@/styles/components/Button";
 
 export default function Home() {
   const router = useRouter();
+
   return (
     <Box>
       <Head>
@@ -93,7 +96,7 @@ export default function Home() {
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["home", "navbar", "footer"]))
+      ...(await serverSideTranslations(locale, ["navbar", "footer", "home"]))
       // Will be passed to the page component as props
     }
   };
