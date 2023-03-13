@@ -26,6 +26,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { Dialog } from "@shared/Dialog";
 import { StyledButton } from "@styles/components/Button";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 
@@ -44,26 +45,27 @@ const AccountMenu = ({
   onClose,
   disconnect
 }: AccountMenuProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const accountItems = [
     {
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
-      content: "My Profile",
+      content: t("navbar:my_profile") as string,
       onClick: () => {
         router.push("/account/profile");
       }
     },
     {
       icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
-      content: "Favorites",
+      content: t("navbar:favorites") as string,
       onClick: () => {
         console.log("Favorites");
       }
     },
     {
       icon: <VisibilityOutlinedIcon color="primary" fontSize="small" />,
-      content: "Watchlist",
+      content: t("navbar:watchlist") as string,
       onClick: () => {
         console.log("Watchlist");
       }
@@ -72,14 +74,14 @@ const AccountMenu = ({
       icon: (
         <CollectionsBookmarkOutlinedIcon color="primary" fontSize="small" />
       ),
-      content: "My Bookshelf",
+      content: t("navbar:my_bookshelf") as string,
       onClick: () => {
         router.push("/account/bookshelf");
       }
     },
     {
       icon: <LogoutOutlinedIcon color="primary" fontSize="small" />,
-      content: "Disconnect",
+      content: t("navbar:disconnect") as string,
       onClick: () => {
         disconnect();
       }
@@ -87,16 +89,20 @@ const AccountMenu = ({
   ];
 
   return (
-    <Dialog title="Account" open={open} onClose={onClose}>
+    <Dialog
+      title={t("navbar:title_account") as string}
+      open={open}
+      onClose={onClose}
+    >
       <Stack direction="row" sx={{ mb: 3 }} spacing={3}>
-        <Chip label="Reader account" />
+        <Chip label={t("navbar:readerAccount")} />
         <StyledButton
           size="small"
           onClick={() => {
             router.push("/author/request");
           }}
         >
-          Become an author
+          {t("navbar:becomeAnAuthor")}
         </StyledButton>
       </Stack>
       <Grid container spacing={3} columns={{ xs: 4, sm: 4, md: 12 }}>

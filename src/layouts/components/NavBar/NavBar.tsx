@@ -71,7 +71,7 @@ interface SyntheticEvent {
 }
 
 const NavBar = () => {
-  const { t } = useTranslation("navbar");
+  const { t } = useTranslation();
 
   const [clientTheme, setClientTheme] = useMyTheme();
   const [clientLocale, setClientLocale] = useLocalStorage("locale", "en");
@@ -213,7 +213,7 @@ const NavBar = () => {
     {
       type: "button",
       icon: <HelpOutlineOutlinedIcon color="primary" />,
-      content: "Guide",
+      content: t("navbar:guide") as string,
       onClick: () => {
         console.log("Guide");
       },
@@ -229,12 +229,12 @@ const NavBar = () => {
       type: "dropdown",
       isOpen: openSettingsMenu,
       icon: <Brightness4Icon color="primary" />,
-      content: "Mode",
+      content: t("navbar:mode") as string,
       subList: [
         {
           type: "button",
           icon: <LightModeOutlinedIcon color="primary" />,
-          content: "Light",
+          content: t("navbar:light") as string,
           value: "light",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
@@ -245,7 +245,7 @@ const NavBar = () => {
         {
           type: "button",
           icon: <DarkModeOutlinedIcon color="primary" />,
-          content: "Dark",
+          content: t("navbar:dark") as string,
           value: "dark",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
@@ -258,7 +258,7 @@ const NavBar = () => {
     {
       type: "dropdown",
       icon: <LanguageIcon color="primary" />,
-      content: "Language",
+      content: t("navbar:language") as string,
       subList: [
         {
           type: "button",
@@ -287,8 +287,8 @@ const NavBar = () => {
   ];
 
   const pages = [
-    { name: "About Us", href: "/about", current: false },
-    { name: "Contact", href: "/contact", current: false }
+    { name: t("navbar:about"), href: "/about", current: false },
+    { name: t("navbar:contact"), href: "/contact", current: false }
   ];
 
   const bookStoreList: ListItemProps[] = [
@@ -296,7 +296,7 @@ const NavBar = () => {
       type: "link",
       href: "/publishing",
       icon: null,
-      content: "Publishing",
+      content: t("navbar:publishing") as string,
       onClick: () => handlePublishingClick(),
       disabled: false,
       subList: []
@@ -305,7 +305,7 @@ const NavBar = () => {
       type: "link",
       href: "/trade-in",
       icon: null,
-      content: "Trade-in",
+      content: t("navbar:trade-in") as string,
       onClick: () => handleTradeInClick(),
       disabled: false,
       subList: []
@@ -314,7 +314,7 @@ const NavBar = () => {
       type: "link",
       href: "/borrow",
       icon: null,
-      content: "Borrow",
+      content: t("navbar:borrow") as string,
       onClick: () => handleBorrowClick(),
       disabled: false,
       subList: []
@@ -341,7 +341,7 @@ const NavBar = () => {
     //   ? {
     //       type: "button",
     //       icon: <ShoppingBagOutlinedIcon color="primary" />,
-    //       content: "Shopping Bag",
+    //       content: t("navbar:shoppingBag") as string,
     //       onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
     //       disabled: false,
     //       subList: []
@@ -382,16 +382,16 @@ const NavBar = () => {
     {
       type: "button",
       icon: null,
-      content: "Publish a Book",
+      content: t("navbar:newBook") as string,
       onClick: () => handlePublishABookClick(),
       disabled: false,
       subList: [],
-      href: "/author/publishing"
+      href: "/author/create"
     },
     {
       type: "button",
       icon: null,
-      content: "Create Listing",
+      content: t("navbar:createListing") as string,
       onClick: () => handleCreateListingClick(),
       disabled: false,
       subList: [],
@@ -400,7 +400,7 @@ const NavBar = () => {
     {
       type: "button",
       icon: null,
-      content: "Create Rental",
+      content: t("navbar:createRental") as string,
       onClick: () => handleCreateRentalClick(),
       disabled: false,
       subList: [],
@@ -495,20 +495,19 @@ const NavBar = () => {
                 ))}
                 <Box sx={{ mr: 2 }}>
                   <DropdownMenu
-                    tooltipTitle="Marketplace"
+                    tooltipTitle={t("navbar:toolTip_bookstore") as string}
                     buttonVariant="outlined"
-                    buttonName="Book store"
+                    buttonName={t("navbar:bookstore")}
                     items={bookStoreList}
                   />
                 </Box>
-                {/* <p>{t("navbar:about")}</p> */}
 
                 {account.data && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
-                      tooltipTitle="Open Listing/Renting"
+                      tooltipTitle={t("navbar:toolTip_create") as string}
                       buttonVariant="contained"
-                      buttonName="create"
+                      buttonName={t("navbar:create")}
                       items={createList}
                     />
                   </Box>
@@ -545,7 +544,7 @@ const NavBar = () => {
                 </IconButton>
               </Tooltip> */}
 
-                <Tooltip title="App settings">
+                <Tooltip title={t("navbar:toolTip_appSettings")}>
                   <IconButton
                     onClick={handleSettingsMenuClick}
                     sx={{

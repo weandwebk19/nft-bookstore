@@ -11,6 +11,7 @@ import {
 
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import { BookDetails } from "@/components/shared/BookInfo";
 import { BookItem } from "@/components/shared/BookItem";
@@ -228,3 +229,21 @@ const BookDetail = () => {
 BookDetail.PageLayout = SplitScreenLayout;
 
 export default BookDetail;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}
+
+export const getStaticPaths = () => {
+  return {
+    paths: [
+      { params: { id: "1" }, locale: "en" },
+      { params: { id: "2" }, locale: "vi" }
+    ],
+    fallback: true
+  };
+};
