@@ -26,6 +26,7 @@ import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
   FinalStep,
+  SigningContractStep,
   Step1,
   Step2,
   Step3
@@ -33,7 +34,9 @@ import {
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 
-const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
+const MAX_BOOKFILE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKFILE_SIZE;
+const MAX_BOOKCOVER_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKCOVER_SIZE;
+const MAX_BOOKSAMPLE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKSAMPLE_SIZE;
 
 const MINIMUM_SUPPLY = 1;
 const MAXIMUM_SUPPLY = 500;
@@ -55,6 +58,8 @@ const defaultValues = {
   bookFile: "",
   bookCover: "",
   bookSample: "",
+
+  // Signing contract
 
   // Step 3
   externalLink: "",
@@ -121,7 +126,7 @@ const CreateBook = () => {
             }, 0);
           }
 
-          return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
+          return file && fileSize <= MAX_BOOKFILE_SIZE!;
         }),
       bookCover: yup
         .mixed()
@@ -143,7 +148,7 @@ const CreateBook = () => {
             }, 0);
           }
 
-          return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
+          return file && fileSize <= MAX_BOOKCOVER_SIZE!;
         }),
 
       bookSample: yup
@@ -159,7 +164,7 @@ const CreateBook = () => {
             }, 0);
           }
 
-          return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
+          return file && fileSize <= MAX_BOOKSAMPLE_SIZE!;
         })
     }),
 
@@ -464,9 +469,10 @@ const CreateBook = () => {
             publishing_time: data.publishingTime
           });
         }
+
+        setOpen(true);
       })();
     }
-    setOpen(true);
     handleNext();
   };
 

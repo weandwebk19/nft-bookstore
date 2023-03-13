@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
 
-import { Box, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -12,10 +12,15 @@ import { BookList } from "@/components/shared/BookList";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { StyledButton } from "@/styles/components/Button";
 
-const CreateListing = () => {
+const ListingBooks = () => {
+  // *Replace my-listing-books-hook here*
   const { nfts } = useOwnedNfts();
+  const [ownedBooks, setOwnedBooks] = useState<any[]>([]);
   const router = useRouter();
+
+  const { account } = useAccount();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -28,23 +33,39 @@ const CreateListing = () => {
     })();
   };
 
+  useEffect(() => {
+    if (nfts.data?.length !== 0) {
+      const res = nfts.data?.filter((nft) => nft.author !== account.data);
+      if (res) setOwnedBooks(res);
+    }
+  }, [nfts.data, account.data]);
+
   return (
     <Stack sx={{ pt: 12 }}>
       <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
         <Grid item xs={4} sm={8} md={9}>
-          <ContentPaper title="Create listing">
+          <ContentPaper title="Listing books">
             {(() => {
               if (nfts.isLoading) {
                 return <Typography>Putting books on the shelves...</Typography>;
-              } else if (nfts.data?.length === 0 || nfts.error) {
+              } else if (ownedBooks.length === 0 || nfts.error) {
                 return (
                   <FallbackNode>
-                    <Typography>You haven&apos;t create any book.</Typography>
+                    <Stack spacing={3}>
+                      <Typography>You haven&apos;t sell any book.</Typography>
+                      <StyledButton
+                        onClick={() => {
+                          router.push("/account/bookshelf/owned-books");
+                        }}
+                      >
+                        My owned books
+                      </StyledButton>
+                    </Stack>
                   </FallbackNode>
                 );
               }
               return (
-                <BookList bookList={nfts.data!} onClick={handleBookClick} />
+                <BookList bookList={ownedBooks!} onClick={handleBookClick} />
               );
             })()}
           </ContentPaper>
@@ -59,4 +80,4 @@ const CreateListing = () => {
   );
 };
 
-export default CreateListing;
+export default ListingBooks;
