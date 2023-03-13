@@ -21,6 +21,7 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/ContentContainer.module.scss";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import * as yup from "yup";
 
@@ -350,3 +351,11 @@ const Profile = () => {
 };
 
 export default Profile;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}

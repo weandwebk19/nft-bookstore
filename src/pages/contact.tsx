@@ -4,6 +4,7 @@ import { Box, Button, Grid, TextField } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import * as yup from "yup";
 
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -81,4 +82,12 @@ export default function Contact() {
       </ContentContainer>
     </Box>
   );
+}
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
 }

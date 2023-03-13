@@ -17,6 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Alert } from "@mui/lab";
 import axios from "axios";
 import { ethers } from "ethers";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
@@ -618,3 +619,21 @@ const BookDetailEdit = () => {
 };
 
 export default BookDetailEdit;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}
+
+export const getStaticPaths = () => {
+  return {
+    paths: [
+      { params: { bookId: "1" }, locale: "en" },
+      { params: { bookId: "2" }, locale: "vi" }
+    ],
+    fallback: true
+  };
+};
