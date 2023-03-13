@@ -8,8 +8,8 @@ import axios from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
-import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
-import { BookCard } from "@/components/shared/BookCard";
+import { useCreatedBooks } from "@/components/hooks/web3";
+import { BookList } from "@/components/shared/BookList";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
@@ -17,23 +17,14 @@ import EditButton from "@/components/ui/account/bookshelf/created-books/EditButt
 import SellButton from "@/components/ui/account/bookshelf/created-books/SellButton";
 
 const CreatedBooks = () => {
+  const { nfts } = useCreatedBooks();
   const router = useRouter();
-  const { account } = useAccount();
-
-  const { nfts } = useOwnedNfts();
-  const [createdBooks, setCreatedBooks] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (nfts.data?.length !== 0) {
-      const res = nfts.data?.filter((nft) => nft.author === account.data);
-      if (res) setCreatedBooks(res);
-    }
-  }, [nfts.data, account.data]);
+  console.log("nfts", nfts);
+  const createdBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);

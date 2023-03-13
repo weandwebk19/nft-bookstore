@@ -194,7 +194,7 @@ const NavBar = () => {
   };
 
   const handleCreateRentalClick = () => {
-    alert("Create Rental");
+    router.push("/rental/create");
   };
 
   const handlePublishingClick = () => {

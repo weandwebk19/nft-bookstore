@@ -57,6 +57,17 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     rentingPrice = newPrice;
   }
 
+  function setTokenUri(uint256 tokenId, string memory tokenURI) external onlyOwner{
+    require(_idToNFTBook[tokenId].author == msg.sender, "Only author of this token can call this method.");
+    // Delete old URI
+    string memory oldURI = ERC1155URIStorage.uri(tokenId);
+    delete _usedTokenURIs[oldURI];
+
+    // Set new URI to the token
+    _setURI(tokenId, tokenURI);
+    _usedTokenURIs[tokenURI] = true;
+  }
+
   function _beforeTokenTransfer(
         address operator,
         address from,
@@ -177,6 +188,28 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
       if (book.tokenId != 0 && book.seller != address(0)) {
         books[currentIndex] = book;
         currentIndex++;
+      }
+    }
+
+    return books;
+  }
+
+  function getCreatedNFTBooks() public view returns (NFTBook[] memory) {
+    uint ownedItemsCount = getTotalOwnedToken();
+    uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
+    uint ownedRentedBookCount = _rentedBookStorage.getTotalOwnedRentedBook(msg.sender);
+    uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
+
+    NFTBook[] memory books = new NFTBook[](length);
+
+    uint currentIndex = 0;
+    for (uint i = 0; i < ownedItemsCount; i++) {
+      uint tokenId = _ownedTokens[msg.sender][i];
+      if(_listedBookStorage.isListed(tokenId) == false 
+        && _rentedBookStorage.isRented(tokenId) == false) {
+        NFTBook memory book = _idToNFTBook[tokenId];
+        books[currentIndex] = book;
+        currentIndex += 1;
       }
     }
 
