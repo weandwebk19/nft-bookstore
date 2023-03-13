@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   Box,
@@ -23,70 +24,72 @@ const StyledTypography = styled(Typography)(({}) => ({
 }));
 
 const Footer = () => {
+  const { t } = useTranslation("footer");
+
   const footerItems = [
     {
-      content: "Our store",
+      content: t("store"),
       subList: [
         {
-          content: "Explore",
+          content: t("explore"),
           url: "/"
         },
         {
-          content: "Trade-in",
+          content: t("trade-in"),
           url: "/"
         },
         {
-          content: "Borrow",
+          content: t("borrow"),
           url: "/borrow"
         },
         {
-          content: "Publish a book",
+          content: t("publishBook"),
           url: "/"
         }
       ]
     },
     {
-      content: "My account",
+      content: t("account"),
       subList: [
         {
-          content: "Profile",
+          content: t("profile"),
           url: "/profile"
         },
         {
-          content: "Watchlist",
+          content: t("watchlist"),
           url: "/watchlist"
         },
         {
-          content: "Favorites",
+          content: t("favorites"),
           url: "/favorites"
         },
         {
-          content: "My bookshelf",
+          content: t("my_bookshelf"),
           url: "/"
         }
       ]
     },
     {
-      content: "Blog",
+      content: t("blog"),
       subList: []
     },
     {
-      content: "Contact us",
+      content: t("contact"),
       subList: []
     },
     {
-      content: "Stats",
+      content: t("stats"),
       subList: [
         {
-          content: "Author ranking",
+          content: t("authorRanking"),
           url: "/"
         },
         {
-          content: "User ranking",
+          content: t("userRanking"),
           url: "/"
         },
         {
-          content: "Book ranking",
+          content: t("bookRanking"),
           url: "/"
         }
       ]
@@ -128,8 +131,7 @@ const Footer = () => {
                 userSelect: "text"
               }}
             >
-              The first and biggest digital bookstore for NFT books in the
-              world. Purchase, sell, and find unique digital books.
+              {t("info")}
             </Typography>
           </Box>
         </Grid>
@@ -215,7 +217,7 @@ const Footer = () => {
                 fontWeight: 400
               }}
             >
-              Privacy Policy
+              {t("privacyPolicy")}
             </StyledTypography>
           </Link>
           <Link
@@ -232,7 +234,7 @@ const Footer = () => {
                 fontWeight: 400
               }}
             >
-              Term of Service
+              {t("termOfService")}
             </StyledTypography>
           </Link>
         </Box>
