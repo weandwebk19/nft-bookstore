@@ -112,7 +112,7 @@ export default OwnedBooks;
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, ["navbar", "footer", "filter"]))
     }
   };
 }

@@ -1,0 +1,13 @@
+{
+  "titlePage": "Contact - NFT Bookstore",
+  "titleContent1": "We love",
+  "titleContent2": "to hear your story",
+  "name": "Name",
+  "email": "Email",
+  "message": "Message",
+  "send": "Send",
+  "textError1": "Please enter your name",
+  "textError2": "Must be a valid email",
+  "textError3": "Email is required",
+  "textError4": "Please enter your message"
+}
