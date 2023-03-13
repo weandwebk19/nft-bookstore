@@ -7,6 +7,7 @@ import {
 
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
+import formatBytes from "@/utils/formatBytes";
 
 const radioItems = [
   {
@@ -37,7 +38,9 @@ const Step2 = () => {
           <FormGroup label="Book file" required>
             <AttachmentController
               name="bookFile"
-              desc="File types recommended: PDF, EPUB. Max size: 2 GB"
+              desc={`File types recommended: PDF, EPUB. Max size: ${formatBytes(
+                process.env.NEXT_PUBLIC_MAX_BOOKFILE_SIZE
+              )}`}
             />
           </FormGroup>
           <Stack
@@ -48,15 +51,19 @@ const Step2 = () => {
             <FormGroup label="Book cover" required>
               <AttachmentController
                 name="bookCover"
-                desc="File types recommended: 
-              JPG, PNG, GIF, SVG. Max size: 100 MB"
+                desc={`File types recommended: 
+              JPG, PNG, GIF, SVG. Max size: ${formatBytes(
+                process.env.NEXT_PUBLIC_MAX_BOOKCOVER_SIZE
+              )}`}
               />
             </FormGroup>
             <FormGroup label="Book sample">
               <AttachmentController
                 name="bookSample"
                 multiple={true}
-                desc="File types recommended: PDF, EPUB. Max size: 100 MB"
+                desc={`File types recommended: PDF, EPUB. Max size: ${formatBytes(
+                  process.env.NEXT_PUBLIC_MAX_BOOKSAMPLE_SIZE
+                )}`}
               />
             </FormGroup>
           </Stack>

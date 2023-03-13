@@ -5,6 +5,7 @@ import { Box, CssBaseline } from "@mui/material";
 import "@styles/GlobalStyles/GlobalStyles.scss";
 import { AnimatePresence, motion } from "framer-motion";
 import { appWithTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 
@@ -22,6 +23,14 @@ type ComponentWithPageLayout = AppProps & {
     PageLayout?: React.ComponentType<PageLayoutProps>;
   };
 };
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}
 
 function App({ Component, pageProps }: ComponentWithPageLayout) {
   const router = useRouter();

@@ -27,68 +27,68 @@ const Footer = () => {
 
   const footerItems = [
     {
-      content: t("store"),
+      content: t("store") as string,
       subList: [
         {
-          content: t("explore"),
+          content: t("explore") as string,
           url: "/"
         },
         {
-          content: t("trade-in"),
+          content: t("trade-in") as string,
           url: "/"
         },
         {
-          content: t("borrow"),
+          content: t("borrow") as string,
           url: "/borrow"
         },
         {
-          content: t("publishBook"),
+          content: t("publishBook") as string,
           url: "/"
         }
       ]
     },
     {
-      content: t("account"),
+      content: t("account") as string,
       subList: [
         {
-          content: t("profile"),
+          content: t("profile") as string,
           url: "/profile"
         },
         {
-          content: t("watchlist"),
+          content: t("watchlist") as string,
           url: "/watchlist"
         },
         {
-          content: t("favorites"),
+          content: t("favorites") as string,
           url: "/favorites"
         },
         {
-          content: t("my_bookshelf"),
+          content: t("my_bookshelf") as string,
           url: "/"
         }
       ]
     },
     {
-      content: t("blog"),
+      content: t("blog") as string,
       subList: []
     },
     {
-      content: t("contact"),
+      content: t("contact") as string,
       subList: []
     },
     {
-      content: t("stats"),
+      content: t("stats") as string,
       subList: [
         {
-          content: t("authorRanking"),
+          content: t("authorRanking") as string,
           url: "/"
         },
         {
-          content: t("userRanking"),
+          content: t("userRanking") as string,
           url: "/"
         },
         {
-          content: t("bookRanking"),
+          content: t("bookRanking") as string,
           url: "/"
         }
       ]
@@ -120,18 +120,7 @@ const Footer = () => {
             <Typography variant="h5" className={styles.footer__description}>
               NFT Bookstore
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                fontSize: "16px",
-                lineHeight: "20px",
-                fontWeight: 400,
-                userSelect: "text"
-              }}
-            >
-              {t("info")}
-              {/* {t("footer:info")} */}
-            </Typography>
+            <Typography>{t("info") as string}</Typography>
           </Box>
         </Grid>
         <Grid item xs={4} md={16} className="footer__category">

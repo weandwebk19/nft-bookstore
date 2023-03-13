@@ -16,7 +16,6 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const nftUri: string = req.query.uri as string;
-      console.log("nftUri", nftUri);
       const nftRes = await axios.get(nftUri, {
         headers: {
           Accept: "text/plain"

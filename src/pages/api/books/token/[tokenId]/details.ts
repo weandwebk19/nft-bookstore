@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
+import { toCamel } from "@/utils/nomalizer";
 
 import clientPromise from "../../../../../lib/mongodb";
 
@@ -11,14 +12,16 @@ export default async function handler(
   try {
     const client = await clientPromise;
     const db = client.db("NftBookStore");
-    const { tokenId } = req.query;
+    const tokenId: string = req.query.tokenId as string;
 
-    const bookDetail = await db.collection("books").findOne({ tokenId });
+    const bookDetail = await db
+      .collection("books")
+      .findOne({ token_id: parseInt(tokenId) });
 
     return res.json({
       success: true,
       message: "Get bookDetail successfully.",
-      data: bookDetail
+      data: toCamel(bookDetail)
     });
   } catch (e: any) {
     console.error(e);

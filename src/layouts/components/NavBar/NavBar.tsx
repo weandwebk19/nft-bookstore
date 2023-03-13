@@ -190,11 +190,11 @@ const NavBar = () => {
   };
 
   const handleCreateListingClick = () => {
-    router.push("/account/bookshelf/create-listing");
+    router.push("/account/bookshelf/owned-books");
   };
 
   const handleCreateRentalClick = () => {
-    alert("Create Rental");
+    router.push("/rental/create");
   };
 
   const handlePublishingClick = () => {
@@ -395,7 +395,7 @@ const NavBar = () => {
       onClick: () => handleCreateListingClick(),
       disabled: false,
       subList: [],
-      href: "/account/create-listing"
+      href: "/account/owned-books"
     },
     {
       type: "button",

@@ -387,7 +387,7 @@ const BookDetailEdit = () => {
 
   const createNFTBook = async (nftUri: string, amount: number) => {
     try {
-      console.log("nftUri", nftUri);
+      // console.log("nftUri", nftUri);
       const nftRes = await axios.get(`/api/pinata/metadata?uri=${nftUri}`);
       // const nftRes = await axios.get(nftURI);
       console.log("nftRes", nftRes);

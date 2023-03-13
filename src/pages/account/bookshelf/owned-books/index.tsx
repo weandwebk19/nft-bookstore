@@ -1,6 +1,4 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useState } from "react";
-
 import { Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -9,17 +7,18 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
 import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
-import { BookList } from "@/components/shared/BookList";
+import { BookCard } from "@/components/shared/BookCard";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import LeaseButton from "@/components/ui/account/bookshelf/owned-books/LeaseButton";
+import ReadButton from "@/components/ui/account/bookshelf/owned-books/ReadButton";
+import SellButton from "@/components/ui/account/bookshelf/owned-books/SellButton";
 
 const OwnedBooks = () => {
   const { nfts } = useOwnedNfts();
-  const [ownedBooks, setOwnedBooks] = useState<any[]>([]);
   const router = useRouter();
-
-  const { account } = useAccount();
+  const ownedBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -32,13 +31,6 @@ const OwnedBooks = () => {
     })();
   };
 
-  useEffect(() => {
-    if (nfts.data?.length !== 0) {
-      const res = nfts.data?.filter((nft) => nft.author !== account.data);
-      if (res) setOwnedBooks(res);
-    }
-  }, [nfts.data, account.data]);
-
   return (
     <Stack sx={{ pt: 12 }}>
       <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
@@ -47,7 +39,7 @@ const OwnedBooks = () => {
             {(() => {
               if (nfts.isLoading) {
                 return <Typography>Putting books on the shelves...</Typography>;
-              } else if (ownedBooks.length === 0 || nfts.error) {
+              } else if (ownedBooks?.length === 0 || nfts.error) {
                 return (
                   <FallbackNode>
                     <Typography>You haven&apos;t own any book.</Typography>
@@ -55,7 +47,52 @@ const OwnedBooks = () => {
                 );
               }
               return (
-                <BookList bookList={ownedBooks!} onClick={handleBookClick} />
+                <Grid
+                  container
+                  spacing={3}
+                  columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                >
+                  {/* Can not call BookList component, since the BookCard component has
+                  `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
+                  title, bookCover, author,... */}
+
+                  {ownedBooks!.map((book) => {
+                    return (
+                      <Grid
+                        item
+                        key={book.tokenId}
+                        xs={4}
+                        sm={8}
+                        md={6}
+                        lg={12}
+                      >
+                        <BookCard
+                          tokenId={book?.tokenId}
+                          bookCover={book?.meta.data.bookCover}
+                          title={book?.meta.data.title}
+                          fileType={book?.meta.data.fileType}
+                          author={book?.author}
+                          onClick={handleBookClick}
+                          buttons={
+                            <>
+                              <SellButton
+                                title={book?.meta.data.title}
+                                bookCover={book?.meta.data.bookCover}
+                                author={book?.author}
+                              />
+                              <LeaseButton
+                                title={book?.meta.data.title}
+                                bookCover={book?.meta.data.bookCover}
+                                author={book?.author}
+                              />
+                              <ReadButton tokenId={book?.tokenId} />
+                            </>
+                          }
+                        />
+                      </Grid>
+                    );
+                  })}
+                </Grid>
               );
             })()}
           </ContentPaper>
