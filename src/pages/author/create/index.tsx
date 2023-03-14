@@ -17,6 +17,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Alert } from "@mui/lab";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
@@ -40,13 +42,6 @@ const MAX_BOOKSAMPLE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKSAMPLE_SIZE;
 
 const MINIMUM_SUPPLY = 1;
 const MAXIMUM_SUPPLY = 500;
-
-const steps = [
-  "Book title",
-  "Upload your book",
-  "Book details",
-  "Terms and Conditions"
-];
 
 const defaultValues = {
   // Step 1
@@ -84,6 +79,8 @@ const ALLOWED_FIELDS = [
 ];
 
 const CreateBook = () => {
+  const { t } = useTranslation("createBook");
+
   const [activeStep, setActiveStep] = useState(0);
   const formRef = useRef<any>();
   const { ethereum, contract } = useWeb3();
@@ -91,32 +88,39 @@ const CreateBook = () => {
   const [nftURI, setNftURI] = useState("");
   const [hasURI, setHasURI] = useState(false);
 
+  const steps = [
+    t("titleStep1") as string,
+    t("titleStep2") as string,
+    t("titleStep3") as string,
+    t("titleStep4") as string
+  ];
+
   const validationSchema = [
     // validation for step1 (Fill in book name and description)
     yup.object({
-      title: yup.string().required("Please enter your book title"),
-      description: yup.string().required("Please enter your book description")
+      title: yup.string().required(t("textError1") as string),
+      description: yup.string().required(t("textError2") as string)
     }),
 
     // validation for step2 (Upload your book)
     yup.object().shape({
       fileType: yup
         .string()
-        .required("Please choose your book's file type")
-        .oneOf(["epub", "pdf"], "Choose your book's reading format"),
+        .required(t("textError3") as string)
+        .oneOf(["epub", "pdf"], t("textError4") as string),
       bookFile: yup
         .mixed()
-        .required("File is required")
-        .test("required", "You need to provide a file", (file) => {
+        .required(t("textError5") as string)
+        .test("required", t("textError6") as string, (file) => {
           // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
 
           if (file && (file as any).length !== 0) return true;
           return false;
         })
-        .test("multipleFiles", "One file only can be provided.", (file) => {
+        .test("multipleFiles", t("textError7") as string, (file) => {
           return (file as any).length <= 1;
         })
-        .test("fileSize", "The file is too large", (file) => {
+        .test("fileSize", t("textError8") as string, (file) => {
           //if u want to allow only certain file sizes
 
           let fileSize;
@@ -130,17 +134,17 @@ const CreateBook = () => {
         }),
       bookCover: yup
         .mixed()
-        .required("File is required")
-        .test("required", "You need to provide a file", (file) => {
+        .required(t("textError5") as string)
+        .test("required", t("textError6") as string, (file) => {
           // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
 
           if (file && (file as any).length !== 0) return true;
           return false;
         })
-        .test("multipleFiles", "One file only can be provided.", (file) => {
+        .test("multipleFiles", t("textError7") as string, (file) => {
           return (file as any).length <= 1;
         })
-        .test("fileSize", "The file is too large", (file) => {
+        .test("fileSize", t("textError8") as string, (file) => {
           let fileSize;
           if ((file as any).length > 0) {
             fileSize = (file as any).reduce((total: number, current: any) => {
@@ -153,7 +157,7 @@ const CreateBook = () => {
 
       bookSample: yup
         .mixed()
-        .test("fileSize", "The file is too large", (file) => {
+        .test("fileSize", t("textError8") as string, (file) => {
           // if no file is provided, then pass
           if (!file) return true;
           // if file is provided, then check for its size
@@ -171,48 +175,38 @@ const CreateBook = () => {
     // validate for step3 (Book details)
     yup.object({
       externalLink: yup.string(),
-      version: yup.string().required("Please enter your book version"),
+      version: yup.string().required(t("textError9") as string),
       maxSupply: yup
         .number()
-        .typeError("Please enter the max supply of your book as numeric value")
-        .required("Please enter the max supply of your book")
-        .min(
-          MINIMUM_SUPPLY,
-          `The max supply must be greater than or equal ${MINIMUM_SUPPLY}`
-        )
-        .max(
-          MAXIMUM_SUPPLY,
-          `The max supply must be less than or equal ${MAXIMUM_SUPPLY}`
-        ),
+        .typeError(t("textError10") as string)
+        .required(t("textError11") as string)
+        .min(MINIMUM_SUPPLY, `${t("textError12") as string} ${MINIMUM_SUPPLY}`)
+        .max(MAXIMUM_SUPPLY, `${t("textError13") as string} ${MAXIMUM_SUPPLY}`),
       genres: yup
         .array()
         .of(yup.string())
-        .test("required", "Please enter your book genres", (arr) => {
+        .test("required", t("textError14") as string, (arr) => {
           if (arr && (arr as any).length !== 0) return true;
           return false;
         }),
       languages: yup
         .array()
         .of(yup.string())
-        .test("required", "Please enter your book languages", (arr) => {
+        .test("required", t("textError15") as string, (arr) => {
           if (arr && (arr as any).length !== 0) return true;
           return false;
         }),
       pages: yup
         .number()
-        .min(0, `The pages must be greater than or equal 0`)
-        .required("Please enter the page number of your book"),
+        .min(0, `${t("textError16") as string}`)
+        .required(t("textError17") as string),
       keywords: yup.string()
     }),
 
     // validate for final step (Accept the terms and conditions)
     yup.object().shape({
-      termsOfService: yup
-        .boolean()
-        .oneOf([true], "You must accept the terms and conditions"),
-      privacyPolicy: yup
-        .boolean()
-        .oneOf([true], "You must accept the privacy policy")
+      termsOfService: yup.boolean().oneOf([true], t("textError18") as string),
+      privacyPolicy: yup.boolean().oneOf([true], t("textError19") as string)
     })
   ];
 
@@ -273,9 +267,9 @@ const CreateBook = () => {
         });
 
         const res = await toast.promise(promise, {
-          pending: "Uploading Book Sample",
-          success: "Book Sample uploaded",
-          error: "Book Sample upload error"
+          pending: t("pendingUploadBookSample") as string,
+          success: t("successUploadBookSample") as string,
+          error: t("errorUploadBookSample") as string
         });
 
         const data = res.data as PinataRes;
@@ -306,9 +300,9 @@ const CreateBook = () => {
         });
 
         const res = await toast.promise(promise, {
-          pending: "Uploading Book File",
-          success: "Book file uploaded",
-          error: "Book file upload error"
+          pending: t("pendingUploadBookFile") as string,
+          success: t("successUploadBookFile") as string,
+          error: t("errorUploadBookFile") as string
         });
 
         const data = res.data as PinataRes;
@@ -338,9 +332,9 @@ const CreateBook = () => {
         });
 
         const res = await toast.promise(promise, {
-          pending: "Uploading image",
-          success: "Image uploaded",
-          error: "Image upload error"
+          pending: t("pendingUploadBookCover") as string,
+          success: t("successUploadBookCover") as string,
+          error: t("errorUploadBookCover") as string
         });
 
         const data = res.data as PinataRes;
@@ -365,9 +359,9 @@ const CreateBook = () => {
       });
 
       const res = await toast.promise(promise, {
-        pending: "Uploading metadata",
-        success: "Metadata uploaded",
-        error: "Metadata upload error"
+        pending: t("pendingUploadMetadata") as string,
+        success: t("successUploadMetadata") as string,
+        error: t("errorUploadMetadata") as string
       });
 
       const data = res.data as PinataRes;
@@ -391,7 +385,7 @@ const CreateBook = () => {
 
         Object.keys(content).forEach((key) => {
           if (!ALLOWED_FIELDS.includes(key)) {
-            throw new Error("Invalid Json structure");
+            throw new Error(t("invalidJson") as string);
           }
         });
 
@@ -400,9 +394,9 @@ const CreateBook = () => {
         });
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Minting NftBook Token",
-          success: "NftBook has ben created",
-          error: "Minting error"
+          pending: t("pendingMintingToken") as string,
+          success: t("successMintingToken") as string,
+          error: t("errorMintingToken") as string
         });
         const tokenId = receipt.events
           .find((x: any) => x.event == "NFTBookCreated")
@@ -420,9 +414,9 @@ const CreateBook = () => {
       const promise = axios.post("/api/books/create", bookInfo);
 
       const res = await toast.promise(promise, {
-        pending: "Uploading book details...",
-        success: "Book details uploaded",
-        error: "Book details upload error"
+        pending: t("pendingUploadBookDetails") as string,
+        success: t("successUploadBookDetails") as string,
+        error: t("errorUploadBookDetails") as string
       });
 
       console.log(res);
@@ -457,16 +451,16 @@ const CreateBook = () => {
         // Upload data to database
         if (tokenId) {
           uploadBookDetails({
-            token_id: tokenId,
+            tokenId: tokenId,
             description: data.description,
             languages: data.languages,
             genres: data.genres,
             version: data.version,
-            max_supply: data.maxSupply,
-            external_link: data.externalLink,
-            total_pages: data.totalPages,
+            maxSupply: data.maxSupply,
+            externalLink: data.externalLink,
+            totalPages: data.totalPages,
             keywords: data.keywords,
-            publishing_time: data.publishingTime
+            publishingTime: data.publishingTime
           });
         }
 
@@ -507,13 +501,13 @@ const CreateBook = () => {
   return (
     <>
       <Head>
-        <title>Create book by author - NFT Bookstore</title>
+        <title>{t("titlePage")}</title>
         <meta name="description" content="The world's first NFT Bookstore" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer titles={["Create", "your book"]}>
+        <ContentContainer titles={[t("titleContent1"), t("titleContent2")]}>
           <Box
             component="section"
             sx={{ width: "100%", maxWidth: "720px" }}
@@ -534,14 +528,14 @@ const CreateBook = () => {
                 {activeStep === steps.length ? (
                   <>
                     <Typography sx={{ mt: 2, mb: 1 }}>
-                      All steps completed - you&apos;re finished
+                      {t("messageFinish1") as string}
                     </Typography>
                     <StyledButton
                       onClick={() => {
                         router.push("/account/bookshelf/created-book");
                       }}
                     >
-                      my created book
+                      {t("messageFinish2") as string}
                     </StyledButton>
                   </>
                 ) : (
@@ -563,7 +557,7 @@ const CreateBook = () => {
                             onClick={handleBack}
                             sx={{ mr: 1 }}
                           >
-                            Back
+                            {t("back") as string}
                           </Button>
                           {activeStep === steps.length - 1 ? (
                             <Button
@@ -571,7 +565,7 @@ const CreateBook = () => {
                               color="primary"
                               onClick={handleSubmit(onSubmit)}
                             >
-                              Create
+                              {t("create") as string}
                             </Button>
                           ) : (
                             <Button
@@ -579,7 +573,7 @@ const CreateBook = () => {
                               color="primary"
                               onClick={handleSubmit(onSubmit)}
                             >
-                              Next
+                              {t("next") as string}
                             </Button>
                           )}
                         </Box>
@@ -597,7 +591,7 @@ const CreateBook = () => {
             severity="success"
             sx={{ width: "100%" }}
           >
-            Your book is successfully created!
+            {t("messageSuccessCreated") as string}
           </Alert>
         </Snackbar>
       </main>
@@ -606,3 +600,15 @@ const CreateBook = () => {
 };
 
 export default CreateBook;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, [
+        "navbar",
+        "footer",
+        "createBook"
+      ]))
+    }
+  };
+}

@@ -1,3 +1,4 @@
+import { toCamel } from "@utils/nomalizer";
 import axios from "axios";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -50,7 +51,7 @@ export default async function handler(
       return res.json({
         success: true,
         message: "Get bookDetail successfully.",
-        data: { ...bookDetail, languages, genres }
+        data: { ...toCamel(bookDetail), languages, genres }
       });
     } else {
       return res.json({

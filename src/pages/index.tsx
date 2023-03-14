@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { Box, Stack } from "@mui/material";
 
 import DisplayBox from "@ui/Home/DisplayBox";
@@ -10,17 +12,9 @@ import { useRouter } from "next/router";
 import images from "@/assets/images";
 import { StyledButton } from "@/styles/components/Button";
 
-export async function getStaticProps({ locale }: any) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["home"]))
-      // Will be passed to the page component as props
-    }
-  };
-}
-
 export default function Home() {
   const router = useRouter();
+
   return (
     <Box>
       <Head>
@@ -97,4 +91,13 @@ export default function Home() {
       </main>
     </Box>
   );
+}
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer", "home"]))
+      // Will be passed to the page component as props
+    }
+  };
 }

@@ -24,6 +24,14 @@ type ComponentWithPageLayout = AppProps & {
   };
 };
 
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+    }
+  };
+}
+
 function App({ Component, pageProps }: ComponentWithPageLayout) {
   const router = useRouter();
   const app = useRef();

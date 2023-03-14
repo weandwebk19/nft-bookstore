@@ -18,6 +18,7 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 // import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { List as CustomList } from "@shared/List";
 import { StyledButton } from "@styles/components/Button";
+import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
 
 import { ListItemProps } from "@/types/list";
@@ -40,6 +41,8 @@ const WalletBar = ({
   account,
   disconnect
 }: WalletBarProps) => {
+  const { t } = useTranslation();
+
   const createList: ListItemProps[] = [
     {
       type: "button",
@@ -109,7 +112,7 @@ const WalletBar = ({
             label={truncate(account, 6, -4)}
             variant="outlined"
           />
-          <Tooltip title="Account menu">
+          <Tooltip title={t("navbar:toolTip_accountMenu")}>
             <IconButton onClick={handleAccountMenuClick}>
               <Avatar alt="Remy Sharp" src="" />
             </IconButton>
@@ -181,7 +184,7 @@ const WalletBar = ({
             <CustomList items={createList} />
           </Menu>
         </Box>
-        {/* <Tooltip title="Shopping bag">
+        {/* <Tooltip title={t("navbar:toolTip_shoppingBag")}>
           <IconButton>
             <Badge badgeContent={3} color="secondary">
               <ShoppingBagOutlinedIcon color="primary" />
@@ -206,7 +209,7 @@ const WalletBar = ({
             }
           }}
         >
-          Connect wallet
+          {t("navbar:connectWallet")}
         </StyledButton>
         <IconButton
           onClick={() => {
