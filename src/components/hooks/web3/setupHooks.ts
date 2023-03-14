@@ -1,7 +1,16 @@
 /* eslint-disable prettier/prettier */
 import { Web3Dependencies } from "@_types/hooks";
 
+import { useBookDetail } from ".";
 import { UseAccountHook, hookFactory as createAccountHook } from "./useAccount";
+import {
+  UseBookDetailHook,
+  hookFactory as createBookDetailHook
+} from "./useBookDetail";
+import {
+  UseCreatedBooksHook,
+  hookFactory as createCreatedBooksHook
+} from "./useCreatedBooks";
 import {
   UseListedBooksHook,
   hookFactory as createListedBooksHook
@@ -17,6 +26,8 @@ export type Web3Hooks = {
   useNetwork: UseNetworkHook;
   useListedBooks: UseListedBooksHook;
   useOwnedNfts: UseOwnedNftsHook;
+  useCreatedBooks: UseCreatedBooksHook;
+  useBookDetail: UseBookDetailHook;
 };
 
 export type SetupHooks = {
@@ -28,6 +39,8 @@ export const setupHooks: SetupHooks = (deps) => {
     useAccount: createAccountHook(deps),
     useNetwork: createNetworkHook(deps),
     useListedBooks: createListedBooksHook(deps),
-    useOwnedNfts: createOwnedBooksHook(deps)
+    useOwnedNfts: createOwnedBooksHook(deps),
+    useCreatedBooks: createCreatedBooksHook(deps),
+    useBookDetail: createBookDetailHook(deps)
   };
 };

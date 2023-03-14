@@ -18,9 +18,21 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
     };
 
     const handleComplete = (url: string) => {
-      if (url === router.asPath) {
-        // setTimeout(() => setLoading(false), 0);
+      const baseUrlWithoutLocale = `/${router.locale}`;
+
+      if (router.asPath === "/") {
         setLoading(false);
+      }
+
+      if (url.toString().startsWith(baseUrlWithoutLocale)) {
+        const pathWithoutLocale = url.substring(baseUrlWithoutLocale.length);
+        if (!url && !router.asPath) {
+          setLoading(false);
+        } else if (pathWithoutLocale === router.asPath) {
+          // setTimeout(() => setLoading(false), 0);
+
+          setLoading(false);
+        }
       }
     };
 
@@ -35,8 +47,12 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
     };
   });
 
+  useEffect(() => {
+    setLoading(false);
+  }, [router.locale]);
+
   return (
-    <>
+    <Box sx={{ zIndex: 9999 }}>
       {loading && (
         <Fade in={loading}>
           <div ref={ref as React.RefObject<HTMLDivElement>} className="loader">
@@ -54,7 +70,7 @@ const Loading = forwardRef<HTMLDivElement>((props, ref) => {
           </div>
         </Fade>
       )}
-    </>
+    </Box>
   );
 });
 

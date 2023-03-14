@@ -1,27 +1,75 @@
-/* eslint-disable prettier/prettier */
+import { useCallback, useEffect, useState } from "react";
+
 import { Box, Stack, Typography } from "@mui/material";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import StarIcon from "@mui/icons-material/Star";
 
 import styles from "@styles/BookItem.module.scss";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 import { ListedBook, NftBook } from "@/types/nftBook";
+import { truncate } from "@/utils/truncate";
 
-type BookItemProps = {
-  onClick: () => void;
-} & ListedBook & NftBook;
+// type BookItemProps = {
+//   onClick: () => void;
+// } & ListedBook &
+//   NftBook;
 
-const BookItem = ({meta,
-                  seller,
-                  amount,
-                  price,
-                  author,
-                  onClick }: BookItemProps) => {
+interface BookItemProps {
+  bookCover: string;
+  bookTitle: string;
+  fileType: string;
+  tokenId: string;
+  author: string;
+  onClick: (tokenId: string) => void;
+}
+
+const BookItem = ({
+  bookCover,
+  bookTitle,
+  fileType,
+  tokenId,
+  author,
+  onClick
+}: BookItemProps) => {
+  const [authorName, setAuthorName] = useState();
+  const router = useRouter();
+
+  const handleBookClick = useCallback((tokenId: string) => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (author) {
+          const userRes = await axios.get(`/api/users/wallet/${author}`);
+
+          if (userRes.data.success === true) {
+            setAuthorName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [author]);
+
   return (
     <Stack
       className={styles["book-item"]}
-      onClick={onClick}
+      onClick={() => {
+        onClick(tokenId);
+      }}
       spacing={1}
       sx={{
         "&:hover": {
@@ -37,7 +85,7 @@ const BookItem = ({meta,
             position: "absolute",
             borderRadius: "16px",
             backgroundSize: "cover",
-            backgroundImage: `url(${meta.bookCover})`,
+            backgroundImage: `url(${bookCover})`,
             backgroundRepeat: "no-repeat"
           }
         }
@@ -46,8 +94,8 @@ const BookItem = ({meta,
       <Box
         component="img"
         className={styles["book-item__book-cover"]}
-        src={meta.bookCover}
-        alt={meta.title}
+        src={bookCover}
+        alt={bookTitle}
         sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
       />
       <Box
@@ -66,7 +114,7 @@ const BookItem = ({meta,
         >
           <Stack direction="row">
             <InsertDriveFileIcon fontSize="small" color="disabled" />
-            <Typography variant="caption">{meta.bookFile}</Typography>
+            <Typography variant="caption">{fileType}</Typography>
           </Stack>
 
           {/* {meta.attributes?.map((stat, i) => {
@@ -95,24 +143,22 @@ const BookItem = ({meta,
             variant="h6"
             sx={{ flex: 1 }}
           >
-            {meta.title}
+            {bookTitle}
           </Typography>
           <Typography
             className="text-limit text-limit--1"
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            
-            {seller ? `0x${seller[2]}${seller[3]}${seller[4]}${seller[5]}....${seller.slice(-4)}` :
-                      `0x${author[2]}${author[3]}${author[4]}${author[5]}....${author.slice(-4)}`}
+            {authorName}
           </Typography>
 
-          <Typography
+          {/* <Typography
             className="text-limit text-limit--1"
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            {amount ? `Amount: ${amount}`: ``}
+            {amount ? `Amount: ${amount}` : ``}
           </Typography>
 
           <Typography
@@ -121,7 +167,7 @@ const BookItem = ({meta,
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
             {price ? `Price: ${price} ETH` : ``}
-          </Typography>
+          </Typography> */}
         </Box>
       </Box>
     </Stack>

@@ -1,6 +1,9 @@
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
+
+import DisplayBox from "@/components/ui/borrow/DisplayBox";
 
 const Borrow = () => {
   return (
@@ -12,10 +15,22 @@ const Borrow = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Stack spacing={8}>Borrow</Stack>
+        <Stack spacing={8}>
+          <Box component="section" sx={{ marginTop: "100px" }}>
+            <DisplayBox />
+          </Box>
+        </Stack>
       </main>
     </>
   );
 };
 
 export default Borrow;
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["navbar", "footer", "filter"]))
+    }
+  };
+}

@@ -19,16 +19,18 @@ import LanguageIcon from "@mui/icons-material/Language";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 
+// import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { ListItemProps } from "@_types/list";
 import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
 import { StyledButton } from "@styles/components/Button";
 import { motion } from "framer-motion";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
+import { useLocalStorage } from "@/components/hooks/common";
 import { useAccount } from "@/components/hooks/web3";
 import { ActiveLink } from "@/components/shared/ActiveLink";
 import { DropdownMenu } from "@/components/shared/DropdownMenu";
@@ -69,11 +71,15 @@ interface SyntheticEvent {
 }
 
 const NavBar = () => {
+  const { t } = useTranslation();
+
   const [clientTheme, setClientTheme] = useMyTheme();
+  const [clientLocale, setClientLocale] = useLocalStorage("locale", "en");
 
   const setStoredTheme = useSetMyThemeContext();
 
   const router = useRouter();
+  const { pathname, asPath, query } = router;
   const { account } = useAccount();
   const [address, setAddress] = useState("");
 
@@ -92,7 +98,7 @@ const NavBar = () => {
   const openSettingsMenu = Boolean(anchorSettingsMenu);
 
   const [openLanguage, setOpenLanguage] = useState({
-    currentState: "English",
+    currentState: clientLocale,
     isOpen: true
   });
 
@@ -157,9 +163,16 @@ const NavBar = () => {
   };
 
   const handleLanguageClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const locale = e.currentTarget.innerText.slice(0, 2).toLowerCase();
+    console.log(locale);
+    setClientLocale(locale);
     setOpenLanguage({
       ...openLanguage,
-      currentState: e.currentTarget.innerText.slice(3)
+      currentState: locale
+    });
+
+    router.push({ pathname, query }, asPath, {
+      locale
     });
   };
 
@@ -177,11 +190,11 @@ const NavBar = () => {
   };
 
   const handleCreateListingClick = () => {
-    alert("Create Listing");
+    router.push("/account/bookshelf/owned-books");
   };
 
   const handleCreateRentalClick = () => {
-    alert("Create Rental");
+    router.push("/rental/create");
   };
 
   const handlePublishingClick = () => {
@@ -200,7 +213,7 @@ const NavBar = () => {
     {
       type: "button",
       icon: <HelpOutlineOutlinedIcon color="primary" />,
-      content: "Guide",
+      content: t("navbar:guide") as string,
       onClick: () => {
         console.log("Guide");
       },
@@ -216,12 +229,13 @@ const NavBar = () => {
       type: "dropdown",
       isOpen: openSettingsMenu,
       icon: <Brightness4Icon color="primary" />,
-      content: "Mode",
+      content: t("navbar:mode") as string,
       subList: [
         {
           type: "button",
           icon: <LightModeOutlinedIcon color="primary" />,
-          content: "Light",
+          content: t("navbar:light") as string,
+          value: "light",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
           },
@@ -231,7 +245,8 @@ const NavBar = () => {
         {
           type: "button",
           icon: <DarkModeOutlinedIcon color="primary" />,
-          content: "Dark",
+          content: t("navbar:dark") as string,
+          value: "dark",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
           },
@@ -243,12 +258,13 @@ const NavBar = () => {
     {
       type: "dropdown",
       icon: <LanguageIcon color="primary" />,
-      content: "Language",
+      content: t("navbar:language") as string,
       subList: [
         {
           type: "button",
           icon: "EN",
           content: "English",
+          value: "en",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleLanguageClick(e);
           },
@@ -259,6 +275,7 @@ const NavBar = () => {
           type: "button",
           icon: "VI",
           content: "Tiếng Việt",
+          value: "vi",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleLanguageClick(e);
           },
@@ -270,8 +287,8 @@ const NavBar = () => {
   ];
 
   const pages = [
-    { name: "About Us", href: "/about", current: false },
-    { name: "Contact", href: "/contact", current: false }
+    { name: t("navbar:about"), href: "/about", current: false },
+    { name: t("navbar:contact"), href: "/contact", current: false }
   ];
 
   const bookStoreList: ListItemProps[] = [
@@ -279,7 +296,7 @@ const NavBar = () => {
       type: "link",
       href: "/publishing",
       icon: null,
-      content: "Publishing",
+      content: t("navbar:publishing") as string,
       onClick: () => handlePublishingClick(),
       disabled: false,
       subList: []
@@ -288,7 +305,7 @@ const NavBar = () => {
       type: "link",
       href: "/trade-in",
       icon: null,
-      content: "Trade-in",
+      content: t("navbar:trade-in") as string,
       onClick: () => handleTradeInClick(),
       disabled: false,
       subList: []
@@ -297,7 +314,7 @@ const NavBar = () => {
       type: "link",
       href: "/borrow",
       icon: null,
-      content: "Borrow",
+      content: t("navbar:borrow") as string,
       onClick: () => handleBorrowClick(),
       disabled: false,
       subList: []
@@ -320,19 +337,19 @@ const NavBar = () => {
           type: "divider",
           subList: []
         },
-    account.data
-      ? {
-          type: "button",
-          icon: <ShoppingBagOutlinedIcon color="primary" />,
-          content: "Shopping Bag",
-          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
-          disabled: false,
-          subList: []
-        }
-      : {
-          type: "divider",
-          subList: []
-        },
+    // account.data
+    //   ? {
+    //       type: "button",
+    //       icon: <ShoppingBagOutlinedIcon color="primary" />,
+    //       content: t("navbar:shoppingBag") as string,
+    //       onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
+    //       disabled: false,
+    //       subList: []
+    //     }
+    //   : {
+    //       type: "divider",
+    //       subList: []
+    //     },
     {
       type: "divider",
       content: "",
@@ -365,25 +382,25 @@ const NavBar = () => {
     {
       type: "button",
       icon: null,
-      content: "Publish a Book",
+      content: t("navbar:newBook") as string,
       onClick: () => handlePublishABookClick(),
       disabled: false,
       subList: [],
-      href: "/author/publishing"
+      href: "/author/create"
     },
     {
       type: "button",
       icon: null,
-      content: "Create Listing",
+      content: t("navbar:createListing") as string,
       onClick: () => handleCreateListingClick(),
       disabled: false,
       subList: [],
-      href: "/account/create-listing"
+      href: "/account/owned-books"
     },
     {
       type: "button",
       icon: null,
-      content: "Create Rental",
+      content: t("navbar:createRental") as string,
       onClick: () => handleCreateRentalClick(),
       disabled: false,
       subList: [],
@@ -478,9 +495,9 @@ const NavBar = () => {
                 ))}
                 <Box sx={{ mr: 2 }}>
                   <DropdownMenu
-                    tooltipTitle="Marketplace"
+                    tooltipTitle={t("navbar:toolTip_bookstore") as string}
                     buttonVariant="outlined"
-                    buttonName="Book store"
+                    buttonName={t("navbar:bookstore")}
                     items={bookStoreList}
                   />
                 </Box>
@@ -488,9 +505,9 @@ const NavBar = () => {
                 {account.data && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
-                      tooltipTitle="Open Listing/Renting"
+                      tooltipTitle={t("navbar:toolTip_create") as string}
                       buttonVariant="contained"
-                      buttonName="Create"
+                      buttonName={t("navbar:create")}
                       items={createList}
                     />
                   </Box>
@@ -527,7 +544,7 @@ const NavBar = () => {
                 </IconButton>
               </Tooltip> */}
 
-                <Tooltip title="App settings">
+                <Tooltip title={t("navbar:toolTip_appSettings")}>
                   <IconButton
                     onClick={handleSettingsMenuClick}
                     sx={{

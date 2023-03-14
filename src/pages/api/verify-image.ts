@@ -12,6 +12,14 @@ import {
   withSession
 } from "./utils";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "50mb"
+    }
+  }
+};
+
 export default withSession(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
     console.log("verfiy-image");

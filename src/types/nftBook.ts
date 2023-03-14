@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export type PricingHistory = {
   highest: number;
   lowest: number;
@@ -31,25 +33,26 @@ export type NftBookAttribute = {
 };
 
 export type BookInfo = {
-  token_id: string;
-  contract_address?: string;
+  tokenId: string;
+  contractAddress?: string;
   description: string;
   languages: string[];
   genres: (keyof typeof BookGenres)[];
   version: number | string;
-  max_supply: number;
-  external_link?: string;
-  total_pages?: number;
+  maxSupply: number;
+  externalLink?: string;
+  totalPages?: number;
   keywords?: string;
-  publishing_time?: Date;
+  publishingTime?: Date;
 };
 
 export type NftBookDetails = {
   bookId: string;
-  registered: number;
-  openDate?: Date;
-  endDate?: Date;
-} & BookInfo;
+  nftCore: NftBookCore; // Data from smartcontract
+  listedCore?: ListedBookCore; // Data from smartcontract
+  meta: NftBookMeta; // Data from metadata
+  info: BookInfo; // Data from database
+};
 
 export type NftBookMeta = {
   title: string;
@@ -85,7 +88,8 @@ export type NftBook = {
 export type NftListedBook = {
   meta: NftBookMeta;
   details?: NftBookDetails;
-} & ListedBookCore;
+} & ListedBookCore &
+  NftBookCore;
 
 export type PinataRes = {
   IpfsHash: string;

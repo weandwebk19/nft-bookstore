@@ -1,9 +1,17 @@
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Divider, Stack } from "@mui/material";
+import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
 
+import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
+import SelectAllOutlinedIcon from "@mui/icons-material/SelectAllOutlined";
+
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { faBorderAll, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
@@ -19,9 +27,11 @@ import {
   TreeViewController
 } from "../FormController";
 
+config.autoAddCss = false;
+
 const schema = yup
   .object({
-    genre: yup.string(),
+    genre: yup.array(yup.string()),
     title: yup.string(),
     author: yup.string(),
     rating: yup.number(),
@@ -29,15 +39,6 @@ const schema = yup
     priceRange: yup.array(yup.number())
   })
   .required();
-
-const labels: { [index: string | number]: string } = {
-  0: "all ratings",
-  1: "from 1 star",
-  2: "from 2 stars",
-  3: "from 3 stars",
-  4: "from 4 stars",
-  5: "from 5 stars"
-};
 
 const languages: any[] = [];
 
@@ -51,12 +52,8 @@ for (const [propertyKey, propertyValue] of Object.entries(Language)) {
 const MIN_PRICE = 0;
 const MAX_PRICE = 10;
 
-function getLabelText(value: number) {
-  return `${value} Star${value !== 1 ? "s" : ""}, ${labels[value]}`;
-}
-
 const defaultValues = {
-  genre: "",
+  genre: [],
   title: "",
   author: "",
   rating: 3,
@@ -65,6 +62,8 @@ const defaultValues = {
 };
 
 const FilterBar = () => {
+  const { t } = useTranslation("filter");
+
   const genres = useGenres();
   const languages = useLanguages();
 
@@ -75,11 +74,33 @@ const FilterBar = () => {
     mode: "all"
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setValue } = methods;
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
   };
+
+  const handleResetGenres = () => {
+    setValue("genre", [], { shouldValidate: true });
+  };
+  const handleSelectAllGenres = () => {
+    const data: any[] = genres?.data || [];
+    let valueGenres: any[] = data?.map((item: any) => item._id);
+    setValue("genre", valueGenres as never[], { shouldValidate: true });
+  };
+
+  const labels: { [index: string | number]: string } = {
+    0: t("rating0Star") as string,
+    1: t("rating1Star") as string,
+    2: t("rating2Star") as string,
+    3: t("rating3Star") as string,
+    4: t("rating4Star") as string,
+    5: t("rating5Star") as string
+  };
+
+  function getLabelText(value: number) {
+    return `${value} Star${value !== 1 ? "s" : ""}, ${labels[value]}`;
+  }
 
   return (
     <FormProvider {...methods}>
@@ -90,23 +111,48 @@ const FilterBar = () => {
         sx={{ marginTop: 4 }}
         className={styles["filter-bar"]}
       >
-        <FormGroup label="Genres">
+        <FormGroup
+          label={
+            <Stack
+              direction={{ xs: "row" }}
+              spacing={{ xs: 2 }}
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              {t("genres")}
+              <Stack direction={{ xs: "row" }}>
+                <Tooltip title={t("tooltip_reset") as string}>
+                  <IconButton onClick={handleResetGenres}>
+                    <RestartAltOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t("tooltip_selectAll") as string}>
+                  <IconButton onClick={handleSelectAllGenres}>
+                    <SelectAllOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Stack>
+          }
+        >
           {genres.isLoading && "Loading..."}
           {genres.error &&
             "Oops! There was a problem loading genres \n Try refresh the page."}
           <TreeViewController name="genre" items={genres.data} />
         </FormGroup>
-        <FormGroup label="Search book">
+        <FormGroup label={t("searchBook") as string}>
           <InputController name="title" />
         </FormGroup>
-        <FormGroup label="Rating">
+        <FormGroup label={t("rating") as string}>
           <RatingController
             name="rating"
             getLabelText={getLabelText}
             labels={labels}
           />
         </FormGroup>
-        <FormGroup label="Price">
+        <FormGroup label={t("price") as string}>
           <RangeSliderController
             name="priceRange"
             min={MIN_PRICE}
@@ -114,10 +160,10 @@ const FilterBar = () => {
             step={0.5}
           />
         </FormGroup>
-        <FormGroup label="Search by author">
+        <FormGroup label={t("searchByAuthor") as string}>
           <InputController name="author" />
         </FormGroup>
-        <FormGroup label="Languages support">
+        <FormGroup label={t("languagesSupport") as string}>
           <SelectController
             name="language"
             items={languages.data}
@@ -129,7 +175,7 @@ const FilterBar = () => {
           type="submit"
           onClick={handleSubmit(onSubmit)}
         >
-          Apply
+          {t("apply") as string}
         </StyledButton>
       </Stack>
     </FormProvider>

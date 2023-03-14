@@ -4,6 +4,7 @@ export type ListItemProps = {
   type: ListItemType;
   icon?: JSX.Element | string | null;
   content?: string;
+  value?: string;
   onClick?: (a: any) => void;
   disabled?: boolean;
   subList: ListDropdownItemProps[];

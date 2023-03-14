@@ -1,30 +1,38 @@
 import { Grid } from "@mui/material";
 
-import { NftBook } from "@/types/nftBook";
-
 import { BookItem } from "../BookItem";
 
 interface BookListProps {
-  bookList: NftBook[];
-  onClick: (tokenId: number | string) => void;
+  xs?: number;
+  sm?: number;
+  md?: number;
+  lg?: number;
+  variant?: string;
+  bookList: any[];
+  onClick: (tokenId: string) => void;
+  actionable?: boolean;
+  buttons?: React.ReactNode;
 }
 
-const BookList = ({ bookList, onClick }: BookListProps) => {
+const BookList = ({
+  xs = 4,
+  sm = 4,
+  md = 3,
+  lg = 4,
+  bookList,
+  onClick
+}: BookListProps) => {
   return (
     <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>
-      {bookList.map((book) => (
-        <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={4}>
+      {bookList?.map((book) => (
+        <Grid item key={book.tokenId} xs={xs} sm={sm} md={md} lg={lg}>
           <BookItem
-            tokenId={book.tokenId}
-            author={book.author}
-            balance={book.balance}
-            meta={book.meta}
-            seller=""
-            price={0}
-            amount={0}
-            onClick={() => {
-              onClick(book.tokenId);
-            }}
+            tokenId={book?.tokenId}
+            bookCover={book?.meta.data?.bookCover || book?.meta.bookCover}
+            bookTitle={book?.meta.data?.title || book?.meta.title}
+            fileType={book?.meta.data?.fileType || book?.meta.fileType}
+            author={book?.meta.data?.author || book?.seller}
+            onClick={onClick}
           />
         </Grid>
       ))}

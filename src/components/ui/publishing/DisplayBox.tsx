@@ -5,21 +5,23 @@ import { Box, Grid, Stack } from "@mui/material";
 
 import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
-import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
+import axios from "axios";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
+import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList } from "@/mocks";
+import { book, bookList, bookList2 } from "@/mocks";
 import {
   BookGenres,
   ListedBook,
   NftBook,
   NftBookAttribute,
-  NftBookDetails
+  NftBookDetails,
+  NftListedBook
 } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
@@ -27,12 +29,18 @@ const DisplayBox: FunctionComponent = () => {
 
   const { listedBooks } = useListedBooks();
 
-  console.log("nftBooks: ", listedBooks);
-
   const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
   };
 
+  // console.log("nftBooks: ", listedBooks.data);
   return (
     <Box>
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
@@ -53,13 +61,8 @@ const DisplayBox: FunctionComponent = () => {
               amount={0}
             />
 
-            <ContentPaper isPaginate={true} title={<>Publishing books</>}>
-              <Grid
-                container
-                spacing={3}
-                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
-              >
-                {listedBooks.data?.map((book: ListedBook) => (
+            <ContentPaper isPaginate={true} title="Publishing books">
+              {/* {listedBooks.data?.map((book: ListedBook) => (
                   <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
                     <BookItem
                       tokenId={book.tokenId}
@@ -74,30 +77,17 @@ const DisplayBox: FunctionComponent = () => {
                       }}
                     />
                   </Grid>
-                ))}
-                {/* {bookList.map((book) => (
-                  <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
-                  >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
                 ))} */}
-              </Grid>
-              <BookList bookList={bookList} onClick={handleBookClick} />
+              {listedBooks.isLoading && "Putting books on the shelves..."}
+
+              {listedBooks.data && (
+                <BookList
+                  bookList={listedBooks.data as NftListedBook[]}
+                  onClick={handleBookClick}
+                />
+              )}
+
+              {!listedBooks.data && <FallbackNode />}
             </ContentPaper>
           </Stack>
         </Grid>

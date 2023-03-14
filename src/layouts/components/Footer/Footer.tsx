@@ -11,6 +11,7 @@ import {
 
 import { styled } from "@mui/system";
 import styles from "@styles/Footer.module.scss";
+import { useTranslation } from "next-i18next";
 import Link from "next/link";
 
 import images from "@/assets/images";
@@ -21,78 +22,78 @@ const StyledTypography = styled(Typography)(({}) => ({
     opacity: 0.7
   }
 }));
-
 const Footer = () => {
+  const { t } = useTranslation("footer");
+
   const footerItems = [
     {
-      content: "Our store",
+      content: t("store") as string,
       subList: [
         {
-          content: "Explore",
+          content: t("explore") as string,
           url: "/"
         },
         {
-          content: "Trade-in",
+          content: t("trade-in") as string,
           url: "/"
         },
         {
-          content: "Borrow",
+          content: t("borrow") as string,
           url: "/borrow"
         },
         {
-          content: "Publish a book",
+          content: t("publishBook") as string,
           url: "/"
         }
       ]
     },
     {
-      content: "My account",
+      content: t("account") as string,
       subList: [
         {
-          content: "Profile",
+          content: t("profile") as string,
           url: "/profile"
         },
         {
-          content: "Watchlist",
+          content: t("watchlist") as string,
           url: "/watchlist"
         },
         {
-          content: "Favorites",
+          content: t("favorites") as string,
           url: "/favorites"
         },
         {
-          content: "My bookshelf",
+          content: t("my_bookshelf") as string,
           url: "/"
         }
       ]
     },
     {
-      content: "Blog",
+      content: t("blog") as string,
       subList: []
     },
     {
-      content: "Contact us",
+      content: t("contact") as string,
       subList: []
     },
     {
-      content: "Stats",
+      content: t("stats") as string,
       subList: [
         {
-          content: "Author ranking",
+          content: t("authorRanking") as string,
           url: "/"
         },
         {
-          content: "User ranking",
+          content: t("userRanking") as string,
           url: "/"
         },
         {
-          content: "Book ranking",
+          content: t("bookRanking") as string,
           url: "/"
         }
       ]
     }
   ];
-
   return (
     <Box className={styles.footer}>
       <Grid
@@ -119,18 +120,7 @@ const Footer = () => {
             <Typography variant="h5" className={styles.footer__description}>
               NFT Bookstore
             </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                fontSize: "16px",
-                lineHeight: "20px",
-                fontWeight: 400,
-                userSelect: "text"
-              }}
-            >
-              The first and biggest digital bookstore for NFT books in the
-              world. Purchase, sell, and find unique digital books.
-            </Typography>
+            <Typography>{t("info") as string}</Typography>
           </Box>
         </Grid>
         <Grid item xs={4} md={16} className="footer__category">
@@ -215,7 +205,7 @@ const Footer = () => {
                 fontWeight: 400
               }}
             >
-              Privacy Policy
+              {t("privacyPolicy")}
             </StyledTypography>
           </Link>
           <Link
@@ -232,7 +222,7 @@ const Footer = () => {
                 fontWeight: 400
               }}
             >
-              Term of Service
+              {t("termOfService")}
             </StyledTypography>
           </Link>
         </Box>
@@ -240,5 +230,4 @@ const Footer = () => {
     </Box>
   );
 };
-
 export default Footer;

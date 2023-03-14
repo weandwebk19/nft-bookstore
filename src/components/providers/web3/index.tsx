@@ -28,8 +28,8 @@ const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
     //create new account
     let response = await axios
       .post("/api/users/create", {
-        address: ethereum.selectedAddress,
-        username: "Anonymous"
+        wallet_address: ethereum.selectedAddress,
+        fullname: "Anonymous"
       })
       .catch((e) => {
         console.log(e);
