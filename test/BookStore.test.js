@@ -292,6 +292,10 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have 20 rented items and 20 listed items for account[0]", async () => {
+<<<<<<< HEAD
+      const totalUntradeable = await _contract.getAmountOfAllTypeBooksUntradeable(2, accounts[0]);
+      assert.equal(totalUntradeable, 40, "Total Unsellable is invalid");
+=======
       const totalUnsellable = await _contract.getAmountOfAllTypeBooksUnsellable(
         2,
         accounts[0]
@@ -302,6 +306,7 @@ contract("BookStore", (accounts) => {
       );
       assert.equal(totalUnsellable, 40, "Total Unsellable is invalid");
       assert.equal(totalUnRentable, 40, "Total Unrentable is invalid");
+>>>>>>> development
     });
 
     it("should have one rented items for renter", async () => {
@@ -467,22 +472,12 @@ contract("BookStore", (accounts) => {
         assert(error, "Set amount listed tokens and rented tokens are wrong");
       }
 
-      const amountOwnedBooks = await _contract.getBalanceOfOwnerBook(2, {
-        from: accounts[0]
-      });
-      assert.equal(
-        amountOwnedBooks.toString(),
-        80,
-        "Total Unsellable of account[0] is invalid"
-      );
+      const amountOwnedBooks = await _contract.getBalanceOfOwnerBook(2, {from: accounts[0]});
+      assert.equal(amountOwnedBooks.toString(), 80, "Total Unsellable of account[0] is invalid");
 
-      const amountBooksUnsellable =
-        await _contract.getAmountOfAllTypeBooksUnsellable(2, accounts[0]);
-      assert.equal(
-        amountBooksUnsellable.toString(),
-        20,
-        "Total Unsellable of account[0] is invalid"
-      );
+
+      const amountBooksUntradeable = await _contract.getAmountOfAllTypeBooksUntradeable(2, accounts[0]);
+      assert.equal(amountBooksUntradeable.toString(), 20, "Total Untradeable of account[0] is invalid");
 
       const amountBooksUnrentable =
         await _contract.getAmountOfAllTypeBooksUnrentable(2, accounts[1]);
@@ -566,8 +561,6 @@ contract("BookStore", (accounts) => {
       );
     });
 
-    // Test in incomplete
-
     it("should update amount of borrowed books", async () => {
       let ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
         from: accounts[1]
@@ -616,4 +609,24 @@ contract("BookStore", (accounts) => {
       );
     });
   });
+<<<<<<< HEAD
+
+  describe("Recall Borrowed Books", () => {
+
+
+    it("accounts[0] can not recall borrowed book from accounts[1]", async () => {
+      try {
+        const res = await _contract.recallBorrowedBooks(2, accounts[0], accounts[1], {
+          from: accounts[0]
+        });
+      } catch (error) {
+        console.log(error);
+        assert(error, "Set timelocks for function is wrong");
+      }
+    });
+
+  });
+
+=======
+>>>>>>> development
 });

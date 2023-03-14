@@ -2,8 +2,13 @@
 pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract RentedBookStorage {
+import "./Timelock.sol";
+
+
+contract BookTemporary is TimeLock {
   using Counters for Counters.Counter;
+
+  address public bookTemporaryAddress = address(this);
 
   struct RentedBook {
     uint256 tokenId;
@@ -281,6 +286,39 @@ contract RentedBookStorage {
     return borrowedBooks;
   }
 
+  function _updateTimelock(uint tokenId,
+                           uint value, 
+                           address renter, 
+                           address borrower, 
+                           uint endTime) private returns(bool) {
+    bytes32 txId = getTxId(bookTemporaryAddress,
+                           value, 
+                           "_recallBorrowedBooks(uint, address, address)", 
+                           abi.encodePacked(tokenId, renter, borrower), 
+                           endTime);
+     
+    return update(txId,
+                  bookTemporaryAddress,
+                  value, 
+                  "_recallBorrowedBooks(uint, address, address)", 
+                  abi.encodePacked(tokenId, renter, borrower), 
+                  endTime);
+  
+  }
+
+  function _queueTimelock(uint tokenId,
+                          uint value, 
+                          address renter, 
+                          address borrower, 
+                          uint endTime) private {
+
+    queue(bookTemporaryAddress,
+          value, 
+          "_recallBorrowedBook(uint, address, address)", 
+          abi.encodePacked(tokenId, renter, borrower), 
+          endTime);
+  }
+
   function borrowRentedBooks(uint256 tokenId,
                             address renter,
                             uint256 amount,
@@ -320,11 +358,20 @@ contract RentedBookStorage {
                                           startTime,
                                           endTime);
 
-          //TODO: need add and remove(if needed) one event!
-          if (borrowedBook.amount >= amount) {
-            return totalPrice;
+          if (_updateTimelock(tokenId,
+                              0,  
+                              borrowedBook.renter, 
+                              borrowedBook.borrower, 
+                              borrowedBook.endTime)) {
+            
+            if (borrowedBook.amount >= amount) {
+              return totalPrice;
+            } else {
+              amount -= borrowedBook.amount;
+            }
+
           } else {
-            amount = amount - borrowedBook.amount;
+            return 0;
           }
 
         } else {
@@ -333,7 +380,7 @@ contract RentedBookStorage {
       } else {
         require(amount <= rentedBook.amount && amount > 0,
                "Amount of Rented Book is invalid");
-          // TODO: need add one event!
+        _queueTimelock(tokenId, 0, renter, borrower, endTime);
         _createBorrowedBook(tokenId,
                             renter,
                             price, 
@@ -363,6 +410,35 @@ contract RentedBookStorage {
     }
 
     return books;
+  }
+
+
+  // Return Borrowed Books to Renter (or Owner)
+
+  function _recallBorrowedBooks(uint tokenId, 
+                               address renter, 
+                               address borrower) private returns(bool) {
+    uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
+
+    if(idBorrowedBook != 0) {
+      _removeItemFromAllBorrowedBooks(tokenId, renter, borrower);
+      return true;
+    }
+
+    return false;                     
+  }
+
+  function excRecallBorrowedBooks(uint tokenId, 
+                               address renter, 
+                               address borrower,
+                               uint endTime) public returns(bytes memory) {          
+    // bytes memory data = abi.encodeWithSignature("_recallBorrowedBooks(uint,address,address)", tokenId, renter, borrower);
+    // (uint256 value, string memory func) = (0, "_recallBorrowedBooks");
+    // uint256 timestamp = endTime;
+    // bytes memory res = execute(bookTemporaryAddress, value, func, data, timestamp);
+
+
+    return new bytes(0);                     
   }
 
 }
