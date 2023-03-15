@@ -31,7 +31,7 @@
   "termsOfService2": "Term and conditions",
   "privacyPolicy1": "I have read and accept",
   "privacyPolicy2": "Privacy Policy",
-  "messageFinish1": "All steps completed - you're finished",
+  "messageFinish1": "All steps completed - you're finished.",
   "messageFinish2": "my created book",
   "messageSuccessCreated": "Your book is successfully created!",
   "pendingUploadBookFile": "Uploading Book File",
@@ -74,5 +74,6 @@
   "textError16": "The pages must be greater than or equal 0",
   "textError17": "Please enter the page number of your book",
   "textError18": "You must accept the terms and conditions",
-  "textError19": "You must accept the privacy policy"
+  "textError19": "You must accept the privacy policy",
+  "textError20": "Please enter the pages of your book as numeric value"
 }

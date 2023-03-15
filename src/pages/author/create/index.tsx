@@ -198,6 +198,7 @@ const CreateBook = () => {
         }),
       pages: yup
         .number()
+        .typeError(t("textError20") as string)
         .min(0, `${t("textError16") as string}`)
         .required(t("textError17") as string),
       keywords: yup.string()
@@ -425,7 +426,7 @@ const CreateBook = () => {
     }
   };
 
-  const { handleSubmit, trigger } = methods;
+  const { handleSubmit, trigger, getValues } = methods;
   const onSubmit = (data: any) => {
     console.log(data);
     if (activeStep === 1) {
@@ -532,7 +533,7 @@ const CreateBook = () => {
                     </Typography>
                     <StyledButton
                       onClick={() => {
-                        router.push("/account/bookshelf/created-book");
+                        router.push("/account/bookshelf/created-books");
                       }}
                     >
                       {t("messageFinish2") as string}
