@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { BookInfo } from "@/types/nftBook";
+import { toSnake } from "@/utils/nomalizer";
 
 import clientPromise from "../../../lib/mongodb";
 
@@ -18,55 +19,27 @@ export default async function handler(
   try {
     const client = await clientPromise;
     const db = client.db("NftBookStore");
-    const {
-      tokenId,
-      description,
-      externalLink,
-      version,
-      maxSupply,
-      genres,
-      languages,
-      totalPages,
-      keywords,
-      publishingTime
-    }: BookInfo = req.body;
+    const bookInfo: BookInfo = req.body.bookInfo;
 
     // Insert book into database
-    const newBooks = await db.collection("books").insertOne({
-      token_id: tokenId,
-      description,
-      external_link: externalLink,
-      version,
-      max_supply: maxSupply,
-      total_pages: totalPages,
-      keywords,
-      publishing_time: publishingTime
-    });
+    const newBooks = await db.collection("books").insertOne(toSnake(bookInfo));
 
     const newBookId: ObjectId = newBooks.insertedId;
 
     // Insert languages into database
-    languages.map(async (language) => {
-      const languageDetail = await db
-        .collection("languages")
-        .findOne({ language });
-      if (languageDetail) {
-        db.collection("book_languages").insertOne({
-          language_id: languageDetail._id,
-          book_id: newBookId
-        });
-      }
+    bookInfo?.languages.map(async (language) => {
+      db.collection("book_languages").insertOne({
+        language_id: new ObjectId(language),
+        book_id: newBookId
+      });
     });
 
     // Insert genres into database
-    genres.map(async (genre) => {
-      const genreDetail = await db.collection("genres").findOne({ genre });
-      if (genreDetail) {
-        db.collection("book_genres").insertOne({
-          genre_id: genreDetail._id,
-          book_id: newBookId
-        });
-      }
+    bookInfo?.genres.map(async (genre) => {
+      db.collection("book_genres").insertOne({
+        genre_id: new ObjectId(genre),
+        book_id: newBookId
+      });
     });
 
     return res.json({

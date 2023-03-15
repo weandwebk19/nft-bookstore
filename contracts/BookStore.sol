@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+// pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.17;
+
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./ListedBookStorage.sol";
-import "./RentedBookStorage.sol";
+import "./BookTemporary.sol";
 
-contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookStorage {
+contract BookStore is ERC1155URIStorage, Ownable {
   using Counters for Counters.Counter;
 
   struct NFTBook {
@@ -23,7 +25,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
   );
 
   ListedBookStorage private _listedBookStorage;
-  RentedBookStorage private _rentedBookStorage;
+  BookTemporary private _bookTemporary;
 
   uint MAX_BALANCE = 500;
   uint MIN_TIME = 604800; // Rental period is at least one week
@@ -39,11 +41,11 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
 
 
   constructor(ListedBookStorage  listedBookStorage,
-               RentedBookStorage rentedBookStorage)
+               BookTemporary bookTemporary)
     ERC1155("https://example.com/api/{id}.json") {
 
     _listedBookStorage = listedBookStorage;
-    _rentedBookStorage = rentedBookStorage;
+    _bookTemporary = bookTemporary;
 
   }
 
@@ -66,6 +68,14 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     // Set new URI to the token
     _setURI(tokenId, tokenURI);
     _usedTokenURIs[tokenURI] = true;
+  }
+
+  function isListed(uint tokenId) public view returns (bool) {
+    return _listedBookStorage.isListed(tokenId);
+  }
+
+  function isRented(uint tokenId) public view returns (bool) {
+    return _bookTemporary.isRented(tokenId);
   }
 
   function _beforeTokenTransfer(
@@ -197,7 +207,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
   function getCreatedNFTBooks() public view returns (NFTBook[] memory) {
     uint ownedItemsCount = getTotalOwnedToken();
     uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
-    uint ownedRentedBookCount = _rentedBookStorage.getTotalOwnedRentedBook(msg.sender);
+    uint ownedRentedBookCount = _bookTemporary.getTotalOwnedRentedBook(msg.sender);
     uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
 
     NFTBook[] memory books = new NFTBook[](length);
@@ -206,7 +216,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
       if(_listedBookStorage.isListed(tokenId) == false 
-        && _rentedBookStorage.isRented(tokenId) == false) {
+        && _bookTemporary.isRented(tokenId) == false) {
         NFTBook memory book = _idToNFTBook[tokenId];
         books[currentIndex] = book;
         currentIndex += 1;
@@ -220,15 +230,15 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     return _totalOwnedToken[msg.sender];
   }
 
-  function getOwnedRentedBooks() public view returns (RentedBookStorage.RentedBook[] memory) {
-    uint ownedRentedBookCount = _rentedBookStorage.getTotalOwnedRentedBook(msg.sender);
+  function getOwnedRentedBooks() public view returns (BookTemporary.RentedBook[] memory) {
+    uint ownedRentedBookCount = _bookTemporary.getTotalOwnedRentedBook(msg.sender);
     uint ownedItemsCount = getTotalOwnedToken();
-    RentedBookStorage.RentedBook[] memory books = new RentedBookStorage.RentedBook[](ownedRentedBookCount);
+    BookTemporary.RentedBook[] memory books = new BookTemporary.RentedBook[](ownedRentedBookCount);
 
     uint currentIndex = 0;
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
-      RentedBookStorage.RentedBook memory book = _rentedBookStorage.getRentedBook(tokenId, msg.sender);
+      BookTemporary.RentedBook memory book = _bookTemporary.getRentedBook(tokenId, msg.sender);
       if (book.tokenId != 0 &&
           book.renter != address(0)) {
 
@@ -240,26 +250,21 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     return books;
   }
 
-  function getOwnedBorrowedBooks() public view returns (RentedBookStorage.BorrowedBook[] memory) {
-    RentedBookStorage.BorrowedBook[] memory borrowedBooks = 
-                                    _rentedBookStorage.getOwnedBorrowedBooks(msg.sender);
+  function getOwnedBorrowedBooks() public view returns (BookTemporary.BorrowedBook[] memory) {
+    BookTemporary.BorrowedBook[] memory borrowedBooks = 
+                                    _bookTemporary.getOwnedBorrowedBooks(msg.sender);
     
     require(borrowedBooks.length == 
-            _rentedBookStorage.getTotalOwnedBorrowedBook(msg.sender),
+            _bookTemporary.getTotalOwnedBorrowedBook(msg.sender),
             "Length of owned borrowed books is invalid");
       
     return borrowedBooks;
   }
 
-  function getAmountOfAllTypeBooksUnsellable(uint256 tokenId, address owner) public view returns(uint) {
+  function getAmountOfAllTypeBooksUntradeable(uint256 tokenId, address owner) public view returns(uint) {
     return _listedBookStorage.getAmountOfListedBooks(tokenId, owner) +
-          _rentedBookStorage.getAmountOfRentedBooks(tokenId, owner) + 
-          _rentedBookStorage.getAmountOfBorrowedBooks(tokenId, owner);
-  }
-
-  function getAmountOfAllTypeBooksUnrentable(uint256 tokenId, address owner) public view returns(uint) {
-    return _listedBookStorage.getAmountOfListedBooks(tokenId, owner) +
-          _rentedBookStorage.getAmountOfRentedBooks(tokenId, owner);
+          _bookTemporary.getAmountOfRentedBooks(tokenId, owner) + 
+          _bookTemporary.getAmountOfBorrowedBooks(tokenId, owner);
   }
 
   function sellBooks(uint256 tokenId,
@@ -267,7 +272,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooksUnsellable(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
+    require(getAmountOfAllTypeBooksUntradeable(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
           "You don't have enough books to sell");
     require(msg.value == listingPrice,
            "Price must be equal to listing price");
@@ -279,13 +284,13 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooksUnrentable(tokenId, msg.sender) +
+    require(getAmountOfAllTypeBooksUntradeable(tokenId, msg.sender) +
            amount <= ERC1155.balanceOf(msg.sender, tokenId) &&
            amount > 0,
           "You don't have enough books to sell");
     require(msg.value == rentingPrice,
            "Price must be equal to renting price");
-    _rentedBookStorage.rentRentedBooks(tokenId, msg.sender, price, amount);
+    _bookTemporary.rentRentedBooks(tokenId, msg.sender, price, amount);
 
   }
 
@@ -312,7 +317,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     require(renter == msg.sender,
           "You are not the renter of this token");
     
-    _rentedBookStorage.updateRentedBookFromRenting(tokenId,
+    _bookTemporary.updateRentedBookFromRenting(tokenId,
                                                   newPrice,
                                                   newAmount,
                                                   renter);
@@ -322,8 +327,8 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     return _listedBookStorage.getAllListedBooks();
   }
 
-  function getAllBooksOnRenting() public view returns (RentedBookStorage.RentedBook[] memory) {
-    return _rentedBookStorage.getAllRentedBooks();
+  function getAllBooksOnRenting() public view returns (BookTemporary.RentedBook[] memory) {
+    return _bookTemporary.getAllRentedBooks();
   }
 
   function buyBooks(uint256 tokenId, address seller, uint256 amount) public payable {
@@ -345,7 +350,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
 
     uint startTime = block.timestamp;
     uint endTime = startTime + rentalDuration;
-    uint256 totalPrice = _rentedBookStorage.borrowRentedBooks(tokenId,
+    uint256 totalPrice = _bookTemporary.borrowRentedBooks(tokenId,
                                                            renter, 
                                                            amount, 
                                                            price,
@@ -361,5 +366,22 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
            "Book execution failed");
     }
   }
+
+  function recallBorrowedBooks(uint tokenId, 
+                               address renter, 
+                               address borrower) public returns(bytes memory) {
+    require(renter == msg.sender, "You cannot take this book back, because you are not the renter");
+    // BookTemporary.BorrowedBook memory borrowedBook = 
+    //               _bookTemporary.getBorrowedBook(tokenId, renter, borrower);  
+    // bytes memory res = _bookTemporary.excRecallBorrowedBooks(tokenId, 
+    //                                                          renter, 
+    //                                                          borrower, 
+    //                                                          borrowedBook.endTime);
+
+    return new bytes(0);                 
+  }
+
+
+
 
 }

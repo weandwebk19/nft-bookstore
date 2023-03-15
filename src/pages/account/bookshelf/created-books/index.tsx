@@ -15,7 +15,6 @@ import { FilterBar } from "@/components/shared/FilterBar";
 const CreatedBooks = () => {
   const { nfts } = useCreatedBooks();
   const router = useRouter();
-  console.log("nfts", nfts);
   const createdBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
@@ -69,6 +68,7 @@ const CreatedBooks = () => {
                           buttons={
                             <>
                               <SellButton
+                                tokenId={book?.tokenId}
                                 title={book?.meta.title}
                                 bookCover={book?.meta.bookCover}
                                 author={book?.author}

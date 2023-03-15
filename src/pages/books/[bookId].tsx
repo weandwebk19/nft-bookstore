@@ -26,12 +26,12 @@ const useIsomorphicLayoutEffect =
 gsap.registerPlugin(ScrollTrigger);
 
 const BookDetail = () => {
-  const [isSelled, setIsSelled] = useState<boolean>(false);
   const bookDetailsRef = useRef(null);
   const tl = useRef<any>();
   const router = useRouter();
   const { bookId } = router.query;
   const { bookDetail } = useBookDetail(bookId as string);
+  console.log("bookDetail", bookDetail);
 
   useIsomorphicLayoutEffect(() => {
     const ctx = gsap.context(() => {

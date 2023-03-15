@@ -8,9 +8,11 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useWeb3 } from "@/components/providers/web3";
 import { StyledButton } from "@/styles/components/Button";
 
 import { NumericStepperController } from "../../FormController";
@@ -23,9 +25,9 @@ interface BookBriefingProps {
   bookTitle: string;
   author: string;
   authorName: string;
-  contractAddress: string;
+  contractAddress: string | undefined;
   description: string;
-  price: number;
+  price: number | undefined;
   isOpenForSale?: boolean;
   isOpenForTradeIn?: boolean;
   isOpenForBorrow?: boolean;
@@ -42,7 +44,8 @@ const schema = yup
 const defaultValues = {
   tokenId: -1,
   seller: "",
-  amount: 1
+  amount: 1,
+  price: 0
 };
 
 const BookBriefing = ({
@@ -64,16 +67,33 @@ const BookBriefing = ({
     resolver: yupResolver(schema),
     mode: "all"
   });
+  const { ethereum, contract } = useWeb3();
 
   useEffect(() => {
     setValue("tokenId", tokenId);
     setValue("seller", author);
-  }, []);
+    setValue("price", price!);
+  }, [tokenId, author, price]);
 
   const { handleSubmit, setValue } = methods;
 
   const onSubmit = async (data: any) => {
     console.log(data);
+    // try {
+    //   const tx = await contract?.buyBooks(tokenId, data.seller, data.amount, {
+    //     value: ethers.utils.parseEther(data.price.toString())
+    //   });
+
+    //   const receipt: any = await toast.promise(tx!.wait(), {
+    //     pending: "Minting NftBook Token",
+    //     success: "NftBook has ben created",
+    //     error: "Minting error"
+    //   });
+
+    //   console.log("receipt", receipt);
+    // } catch (e: any) {
+    //   console.error(e.message);
+    // }
   };
 
   return (
@@ -160,7 +180,7 @@ const BookBriefing = ({
             </StyledButton>
           )}
           {/* Countdown [dep] */}
-          {!isOpenForSale && (
+          {isOpenForSale && (
             <>
               <Stack>
                 <Typography variant="label" mb={1}>
@@ -177,14 +197,14 @@ const BookBriefing = ({
 
               {/* Price [dep] */}
               <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="h4">{price} ETH</Typography>
+                <Typography variant="h4">{price?.toString()} ETH</Typography>
                 <Typography>(0.59489412 USD)</Typography>
               </Stack>
             </>
           )}
           {/* "Buy now" button [dep] / "Add to watchlist" button */}
           <Stack direction="row" spacing={2}>
-            {!isOpenForSale && (
+            {isOpenForSale && (
               <StyledButton
                 customVariant="primary"
                 type="submit"

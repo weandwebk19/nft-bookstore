@@ -48,7 +48,7 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
               animate="animateState"
               exit="exitState"
               className="base-page-size"
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
               variants={{
                 initialState: {
                   opacity: 0,
