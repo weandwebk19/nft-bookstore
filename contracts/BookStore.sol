@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ListedBookStorage.sol";
 import "./BookTemporary.sol";
 
-contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookStorage {
+contract BookStore is ERC1155URIStorage, Ownable {
   using Counters for Counters.Counter;
 
   struct NFTBook {
@@ -68,6 +68,14 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     // Set new URI to the token
     _setURI(tokenId, tokenURI);
     _usedTokenURIs[tokenURI] = true;
+  }
+
+  function isListed(uint tokenId) public view returns (bool) {
+    return _listedBookStorage.isListed(tokenId);
+  }
+
+  function isRented(uint tokenId) public view returns (bool) {
+    return _bookTemporary.isRented(tokenId);
   }
 
   function _beforeTokenTransfer(
@@ -199,7 +207,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
   function getCreatedNFTBooks() public view returns (NFTBook[] memory) {
     uint ownedItemsCount = getTotalOwnedToken();
     uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
-    uint ownedRentedBookCount = _rentedBookStorage.getTotalOwnedRentedBook(msg.sender);
+    uint ownedRentedBookCount = _bookTemporary.getTotalOwnedRentedBook(msg.sender);
     uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
 
     NFTBook[] memory books = new NFTBook[](length);
@@ -208,7 +216,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
       if(_listedBookStorage.isListed(tokenId) == false 
-        && _rentedBookStorage.isRented(tokenId) == false) {
+        && _bookTemporary.isRented(tokenId) == false) {
         NFTBook memory book = _idToNFTBook[tokenId];
         books[currentIndex] = book;
         currentIndex += 1;

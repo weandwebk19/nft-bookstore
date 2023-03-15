@@ -12,6 +12,7 @@ import {
   pinataSecretApiKey,
   pinataUnpinApiKey,
   pinataUnpinSecretApiKey,
+  setURI,
   withSession
 } from "../utils";
 
@@ -84,12 +85,14 @@ export default withSession(
       try {
         const nftUri: string = req.body.nftUri as string;
         const data: any = req.body.data;
+        const tokenId: number = req.body.tokenId;
 
         await addressCheckMiddleware(req, res);
 
         const content = await getContent(nftUri);
         const newContent = updateContent(content, data);
         const jsonRes = await uploadMetadata(newContent);
+        setURI(tokenId, jsonRes);
         deleteFile(nftUri);
 
         return res.status(200).send(jsonRes);

@@ -41,7 +41,7 @@ type BookInfoProps = {
 const BookInfo = ({ bookDetail }: BookInfoProps) => {
   const [authorName, setAuthorName] = useState<string>("");
   const isPublished = bookDetail?.listedCore ? true : false;
-  const isSelled = bookDetail?.nftCore?.balance > 0 ? false : true;
+  const isSelled = bookDetail?.nftCore?.quantity > 0 ? false : true;
 
   useEffect(() => {
     (async () => {
@@ -71,7 +71,7 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
         bookTitle={bookDetail?.meta.title}
         author={bookDetail?.nftCore.author}
         authorName={authorName}
-        contractAddress={bookDetail?.info.contract_address}
+        contractAddress={bookDetail?.info.contractAddress}
         description={bookDetail?.info.description}
         bookSample={bookDetail?.meta.bookSample}
         price={bookDetail?.listedCore?.price}
@@ -80,16 +80,16 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
       <BookDetail
         bookId={bookDetail?.bookId}
         fileType={bookDetail?.meta.fileType}
-        totalPages={bookDetail?.info.total_pages}
+        totalPages={bookDetail?.info.totalPages}
         languages={bookDetail?.info.languages}
         genres={bookDetail?.info.genres}
-        version={bookDetail?.info.version}
-        maxSupply={bookDetail?.info.max_supply}
-        publishingTime={bookDetail?.info.publishing_time}
+        version={bookDetail?.meta.version}
+        maxSupply={bookDetail?.meta.quantity}
+        publishingTime={bookDetail?.info.publishingTime}
         owners={
-          bookDetail?.listedCore
-            ? bookDetail?.listedCore.seller
-            : bookDetail?.nftCore.author
+          bookDetail?.listedCore !== null
+            ? bookDetail?.listedCore?.seller
+            : bookDetail?.meta.author
         }
       />
     </Stack>

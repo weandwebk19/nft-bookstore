@@ -7,7 +7,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { NftBook, NftBookDetails } from "@/types/nftBook";
+import { BookInfo, NftBook, NftBookDetails } from "@/types/nftBook";
 
 // type UseBookDetailResponse = {
 //   listNft: (tokenId: number, price: number) => Promise<void>;
@@ -26,19 +26,26 @@ export const hookFactory: BookDetailHookFactory =
         const bookInfo = await (
           await axios.get(`/api/books/${bookId}`)
         ).data?.data;
-        const coreNftBook = await contract!.getNftBook(bookInfo?.token_id);
+        const coreNftBook = await contract!.getNftBook(bookInfo?.tokenId);
         let listedNftBook = null;
-        if (seller) {
-          listedNftBook = await contract!.getListedBook(
-            bookInfo?.token_id,
-            seller
-          );
+        if ((await contract!.isListed(bookInfo?.tokenId)) === true) {
+          if (seller) {
+            listedNftBook = await contract!.getListedBook(
+              bookInfo?.tokenId,
+              seller
+            );
+          } else {
+            listedNftBook = await contract!.getListedBook(
+              bookInfo?.tokenId,
+              coreNftBook?.author
+            );
+          }
         }
-        const tokenURI = await contract!.uri(bookInfo?.token_id);
+        const tokenURI = await contract!.uri(bookInfo?.tokenId);
         const meta = await (await fetch(tokenURI)).json();
 
         return {
-          bookId: bookInfo?._id.toString(),
+          bookId: bookId,
           nftCore: coreNftBook,
           listedCore: listedNftBook,
           meta: meta,
