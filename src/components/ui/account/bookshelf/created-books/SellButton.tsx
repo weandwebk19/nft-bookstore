@@ -1,22 +1,27 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { sellBooks } from "@/lib/contracts/bookStoreContractUtil";
 import { StyledButton } from "@/styles/components/Button";
 
 interface SellButtonProps {
   title: string;
   bookCover: string;
   author: string;
+  tokenId: number;
 }
 
 const schema = yup
@@ -37,8 +42,9 @@ const defaultValues = {
   amount: 1
 };
 
-const SellButton = ({ bookCover, title, author }: SellButtonProps) => {
+const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
   const [authorName, setAuthorName] = useState();
+  const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -62,6 +68,26 @@ const SellButton = ({ bookCover, title, author }: SellButtonProps) => {
 
   const onSubmit = async (data: any) => {
     console.log(data);
+    try {
+      const tx = await contract?.sellBooks(
+        tokenId,
+        ethers.utils.parseEther(data.price.toString()),
+        data.amount,
+        {
+          value: ethers.utils.parseEther((0.025).toString())
+        }
+      );
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Minting NftBook Token",
+        success: "NftBook has ben created",
+        error: "Minting error"
+      });
+
+      console.log("receipt", receipt);
+    } catch (e: any) {
+      console.error(e.message);
+    }
   };
 
   useEffect(() => {

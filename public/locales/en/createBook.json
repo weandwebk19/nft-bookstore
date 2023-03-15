@@ -71,7 +71,7 @@
   "textError13": "The max supply must be less than or equal",
   "textError14": "Please enter your book genres",
   "textError15": "Please enter your book languages",
-  "textError16": "The pages must be greater than or equal 0",
+  "textError16": "The total pages must be greater than or equal 0",
   "textError17": "Please enter the page number of your book",
   "textError18": "You must accept the terms and conditions",
   "textError19": "You must accept the privacy policy",

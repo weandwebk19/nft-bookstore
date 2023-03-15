@@ -1,11 +1,11 @@
+import { EthersContractContextV5 } from "ethereum-abi-types-generator";
 import {
-  ContractTransaction,
-  ContractInterface,
   BytesLike as Arrayish,
   BigNumber,
-  BigNumberish
+  BigNumberish,
+  ContractInterface,
+  ContractTransaction
 } from "ethers";
-import { EthersContractContextV5 } from "ethereum-abi-types-generator";
 
 export type ContractContext = EthersContractContextV5<
   BookStoreContract,
@@ -217,23 +217,9 @@ export interface ListedbookResponse {
   amount: BigNumber;
   3: BigNumber;
 }
-export interface RentedbookResponse {
-  tokenId: BigNumber;
-  0: BigNumber;
-  renter: string;
-  1: string;
-  price: BigNumber;
-  2: BigNumber;
-  amount: BigNumber;
-  3: BigNumber;
-}
-export interface NftbookResponse {
-  tokenId: BigNumber;
-  0: BigNumber;
-  author: string;
-  1: string;
-  balance: BigNumber;
-  2: BigNumber;
+export interface RemoveItemFromAllListedBooksRequest {
+  tokenId: BigNumberish;
+  seller: string;
 }
 export interface BookStoreContract {
   /**

@@ -476,12 +476,12 @@ contract("BookStore", (accounts) => {
         "Total Unsellable of account[0] is invalid"
       );
 
-      const amountBooksUnsellable =
-        await _contract.getAmountOfAllTypeBooksUnsellable(2, accounts[0]);
+      const amountBooksUntradeable =
+        await _contract.getAmountOfAllTypeBooksUntradeable(2, accounts[0]);
       assert.equal(
-        amountBooksUnsellable.toString(),
+        amountBooksUntradeable.toString(),
         20,
-        "Total Unsellable of account[0] is invalid"
+        "Total Untradeable of account[0] is invalid"
       );
 
       const amountBooksUnrentable =
@@ -565,8 +565,6 @@ contract("BookStore", (accounts) => {
         "Invalid end time of borrowed Books"
       );
     });
-
-    // Test in incomplete
 
     it("should update amount of borrowed books", async () => {
       let ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({

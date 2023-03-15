@@ -23,7 +23,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useNetwork } from "@/components/hooks/web3";
+import { useAccount, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
@@ -59,10 +59,10 @@ const defaultValues = {
   // Step 3
   externalLink: "",
   version: "",
-  maxSupply: MINIMUM_SUPPLY,
+  quantity: MINIMUM_SUPPLY,
   genres: [],
   languages: [],
-  pages: 1,
+  totalPages: 1,
   keywords: "",
 
   // Final step
@@ -75,7 +75,11 @@ const ALLOWED_FIELDS = [
   "bookFile",
   "bookCover",
   "bookSample",
-  "fileType"
+  "fileType",
+  "version",
+  "author",
+  "quantity",
+  "createdAt"
 ];
 
 const CreateBook = () => {
@@ -86,7 +90,10 @@ const CreateBook = () => {
   const { ethereum, contract } = useWeb3();
   const { network } = useNetwork();
   const [nftURI, setNftURI] = useState("");
-  const [hasURI, setHasURI] = useState(false);
+  // const [hasURI, setHasURI] = useState(false);
+  const [bookFileLink, setBookFileLink] = useState("");
+  const [bookCoverLink, setBookCoverLink] = useState("");
+  const [bookSampleLink, setBookSampleLink] = useState("");
 
   const steps = [
     t("titleStep1") as string,
@@ -175,8 +182,8 @@ const CreateBook = () => {
     // validate for step3 (Book details)
     yup.object({
       externalLink: yup.string(),
-      version: yup.string().required(t("textError9") as string),
-      maxSupply: yup
+      version: yup.string().required("Please enter your book version"),
+      quantity: yup
         .number()
         .typeError(t("textError10") as string)
         .required(t("textError11") as string)
@@ -196,7 +203,7 @@ const CreateBook = () => {
           if (arr && (arr as any).length !== 0) return true;
           return false;
         }),
-      pages: yup
+      totalPages: yup
         .number()
         .typeError(t("textError20") as string)
         .min(0, `${t("textError16") as string}`)
@@ -276,6 +283,7 @@ const CreateBook = () => {
         const data = res.data as PinataRes;
 
         const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+        setBookSampleLink(link);
         return link;
       } catch (e: any) {
         console.error(e.message);
@@ -309,6 +317,7 @@ const CreateBook = () => {
         const data = res.data as PinataRes;
 
         const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+        setBookFileLink(link);
         return link;
       } catch (e: any) {
         console.error(e.message);
@@ -341,6 +350,7 @@ const CreateBook = () => {
         const data = res.data as PinataRes;
 
         const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+        setBookCoverLink(link);
         return link;
       } catch (e: any) {
         console.error(e.message);
@@ -352,11 +362,10 @@ const CreateBook = () => {
   const uploadMetadata = async (nftBookMeta: NftBookMeta) => {
     try {
       const { signedData, account } = await getSignedData();
-
       const promise = axios.post("/api/verify", {
         address: account,
         signature: signedData,
-        nftBook: nftBookMeta
+        nftBook: { ...nftBookMeta, author: account }
       });
 
       const res = await toast.promise(promise, {
@@ -412,7 +421,7 @@ const CreateBook = () => {
 
   const uploadBookDetails = async (bookInfo: BookInfo) => {
     try {
-      const promise = axios.post("/api/books/create", bookInfo);
+      const promise = axios.post("/api/books/create", { bookInfo });
 
       const res = await toast.promise(promise, {
         pending: t("pendingUploadBookDetails") as string,
@@ -431,38 +440,47 @@ const CreateBook = () => {
     console.log(data);
     if (activeStep === 1) {
       (async () => {
-        const bookCoverLink = await uploadBookCover(data.bookCover[0]);
-        const bookFileLink = await uploadBookFile(data.bookFile[0]);
-        const bookSampleLink = await uploadBookSample(data.bookSample[0]);
+        await uploadBookCover(data.bookCover[0]);
+        await uploadBookFile(data.bookFile[0]);
+        await uploadBookSample(data.bookSample[0]);
+      })();
+    } else if (activeStep === 2) {
+      (async () => {
         // Upload metadata to pinata
-        const metadataLink = await uploadMetadata({
-          title: data.title,
-          bookCover: bookCoverLink,
-          bookFile: bookFileLink,
-          bookSample: bookSampleLink,
-          fileType: data.fileType
-        });
+        if (bookCoverLink !== "" && bookFileLink !== "") {
+          uploadMetadata({
+            title: data.title,
+            bookCover: bookCoverLink,
+            bookFile: bookFileLink,
+            bookSample: bookSampleLink,
+            fileType: data.fileType,
+            version: data.version,
+            author: "",
+            quantity: data.quantity,
+            createdAt: new Date().toString()
+          });
+        }
       })();
     } else if (activeStep === 3) {
       (async () => {
-        // Mint book
-        const tokenId = await createNFTBook(nftURI, data.maxSupply);
-        console.log("Creating book", tokenId);
+        if (nftURI !== "") {
+          // Mint book
+          const tokenId = await createNFTBook(nftURI, data.quantity);
+          console.log("Creating book", tokenId);
 
-        // Upload data to database
-        if (tokenId) {
-          uploadBookDetails({
-            tokenId: tokenId,
-            description: data.description,
-            languages: data.languages,
-            genres: data.genres,
-            version: data.version,
-            maxSupply: data.maxSupply,
-            externalLink: data.externalLink,
-            totalPages: data.totalPages,
-            keywords: data.keywords,
-            publishingTime: data.publishingTime
-          });
+          // Upload data to database
+          if (tokenId) {
+            uploadBookDetails({
+              tokenId: tokenId,
+              description: data.description,
+              languages: data.languages,
+              genres: data.genres,
+              externalLink: data.externalLink,
+              totalPages: data.totalPages,
+              keywords: data.keywords,
+              publishingTime: data.publishingTime
+            });
+          }
         }
 
         setOpen(true);
