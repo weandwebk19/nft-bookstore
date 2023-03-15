@@ -3,12 +3,12 @@ import { Grid, Stack, Typography } from "@mui/material";
 interface BookDetailProps {
   bookId: string;
   fileType: string;
-  totalPages: number;
+  totalPages: number | undefined;
   languages: string[];
   genres: string[];
   version: string | number;
   maxSupply: number;
-  publishingTime: Date;
+  publishingTime: Date | undefined;
   owners: string | string[];
 }
 

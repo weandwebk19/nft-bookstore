@@ -33,13 +33,11 @@ export type NftBookAttribute = {
 };
 
 export type BookInfo = {
-  tokenId: string;
+  tokenId: number;
   contractAddress?: string;
   description: string;
   languages: string[];
   genres: (keyof typeof BookGenres)[];
-  version: number | string;
-  maxSupply: number;
   externalLink?: string;
   totalPages?: number;
   keywords?: string;
@@ -60,16 +58,20 @@ export type NftBookMeta = {
   bookCover: string;
   bookSample: string;
   fileType: string;
+  version: string;
+  author: string;
+  quantity: number;
+  createdAt: string;
 };
 
 export type NftBookCore = {
-  tokenId: number | string;
+  tokenId: number;
   author: string;
-  balance: number;
+  quantity: number;
 };
 
 export type ListedBookCore = {
-  tokenId: number | string;
+  tokenId: number;
   seller: string;
   price: number;
   amount: number;
@@ -77,17 +79,17 @@ export type ListedBookCore = {
 
 export type ListedBook = {
   meta: NftBookMeta;
-  details?: NftBookDetails;
+  // details?: NftBookDetails;
 } & ListedBookCore;
 
 export type NftBook = {
   meta: NftBookMeta;
-  details?: NftBookDetails;
+  // details?: NftBookDetails;
 } & NftBookCore;
 
 export type NftListedBook = {
   meta: NftBookMeta;
-  details?: NftBookDetails;
+  // details?: NftBookDetails;
 } & ListedBookCore &
   NftBookCore;
 

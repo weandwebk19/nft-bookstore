@@ -61,11 +61,11 @@ contract BookTemporary is TimeLock {
 
  function isRented(uint tokenId) public view returns (bool) {
     uint idRentedBook = getIdRentedBook(tokenId, msg.sender);
-    if(idRentedBook < 0) {
-      return false;
+    if(idRentedBook > 0) {
+      return true;
     }
     else {
-      return true;
+      return false;
     }
   }
 
