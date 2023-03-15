@@ -36,7 +36,7 @@ const DisplayBox: FunctionComponent = () => {
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
-            <ContentPaper isPaginate={true} title="Open-for-borrow books">
+            {/* <ContentPaper isPaginate={true} title="Open-for-borrow books">
               {listedBooks.isLoading && "Putting books on the shelves..."}
 
               {listedBooks.data && (
@@ -44,7 +44,7 @@ const DisplayBox: FunctionComponent = () => {
               )}
 
               {!listedBooks.data && <FallbackNode />}
-            </ContentPaper>
+            </ContentPaper> */}
           </Stack>
         </Grid>
         <Grid item xs={4} sm={3} md={3}>

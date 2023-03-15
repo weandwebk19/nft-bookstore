@@ -62,7 +62,7 @@ const RangeSliderController = ({
       {...rest}
       render={({ field, fieldState: { invalid, error } }) => (
         <RangeSlider
-          {...field}
+          // {...field}
           value={priceRange}
           min={min}
           max={max}

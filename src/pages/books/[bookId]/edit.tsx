@@ -551,7 +551,7 @@ const BookDetailEdit = () => {
                     </Typography>
                     <StyledButton
                       onClick={() => {
-                        router.push("/account/bookshelf/created-book");
+                        router.push("/account/bookshelf/created-books");
                       }}
                     >
                       my created book

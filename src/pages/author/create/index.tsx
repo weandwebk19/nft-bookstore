@@ -532,7 +532,7 @@ const CreateBook = () => {
                     </Typography>
                     <StyledButton
                       onClick={() => {
-                        router.push("/account/bookshelf/created-book");
+                        router.push("/account/bookshelf/created-books");
                       }}
                     >
                       {t("messageFinish2") as string}

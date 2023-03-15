@@ -8,7 +8,7 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
-interface BookItemProps {
+interface ActionableBookItemProps {
   bookCover: string;
   title: string;
   fileType: string;
@@ -18,7 +18,7 @@ interface BookItemProps {
   buttons?: React.ReactNode;
 }
 
-const BookCard = ({
+const ActionableBookItem = ({
   bookCover,
   title,
   fileType,
@@ -26,7 +26,7 @@ const BookCard = ({
   author,
   onClick,
   buttons
-}: BookItemProps) => {
+}: ActionableBookItemProps) => {
   const theme = useTheme();
   const [authorName, setAuthorName] = useState();
 
@@ -99,4 +99,4 @@ const BookCard = ({
   );
 };
 
-export default BookCard;
+export default ActionableBookItem;

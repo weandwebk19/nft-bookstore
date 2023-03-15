@@ -1,5 +1,3 @@
-import { memo } from "react";
-
 import { Box, Grid, Slider, Stack, TextField } from "@mui/material";
 
 function valuetext(value: number) {
@@ -96,4 +94,4 @@ const RangeSlider = ({
   );
 };
 
-export default memo(RangeSlider);
+export default RangeSlider;

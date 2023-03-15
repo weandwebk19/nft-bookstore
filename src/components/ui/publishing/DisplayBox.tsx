@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 
-import { Box, Grid, Stack } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 
 import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
@@ -9,20 +9,14 @@ import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
-import { BookList } from "@/components/shared/BookList";
+import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList, bookList2 } from "@/mocks";
-import {
-  BookGenres,
-  ListedBook,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails,
-  NftListedBook
-} from "@/types/nftBook";
+import { book } from "@/mocks";
+
+import AddToWatchListButton from "./AddToWatchListButton";
+import BookmarkButton from "./BookmarkButton";
+import BuyButton from "./BuyButton";
 
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
@@ -40,7 +34,6 @@ const DisplayBox: FunctionComponent = () => {
     })();
   };
 
-  // console.log("nftBooks: ", listedBooks.data);
   return (
     <Box>
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
@@ -78,7 +71,7 @@ const DisplayBox: FunctionComponent = () => {
                     />
                   </Grid>
                 ))} */}
-              {listedBooks.isLoading && "Putting books on the shelves..."}
+              {/* {listedBooks.isLoading && "Putting books on the shelves..."}
 
               {listedBooks.data && (
                 <BookList
@@ -87,7 +80,67 @@ const DisplayBox: FunctionComponent = () => {
                 />
               )}
 
-              {!listedBooks.data && <FallbackNode />}
+              {!listedBooks.data && <FallbackNode />} */}
+
+              {(() => {
+                if (listedBooks.isLoading) {
+                  return (
+                    <Typography>Putting books on the shelves...</Typography>
+                  );
+                } else if (
+                  listedBooks?.data?.length === 0 ||
+                  listedBooks.error
+                ) {
+                  return <FallbackNode />;
+                }
+                return (
+                  <Grid
+                    container
+                    spacing={3}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                  >
+                    {/* Can not call BookList component, since the BookCard component has
+                  `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
+                  title, bookCover, author,... */}
+
+                    {listedBooks?.data?.map((book) => {
+                      return (
+                        <Grid
+                          item
+                          key={book.tokenId}
+                          xs={4}
+                          sm={8}
+                          md={6}
+                          lg={6}
+                        >
+                          <OwnableBookItem
+                            price={book?.price}
+                            tokenId={book?.tokenId}
+                            bookCover={book?.meta.bookCover}
+                            title={book?.meta.title}
+                            fileType={book?.meta.fileType}
+                            author={book?.seller}
+                            onClick={handleBookClick}
+                            buttons={
+                              <>
+                                <BuyButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.seller}
+                                  price={book?.price}
+                                />
+                                <BookmarkButton />
+                                <AddToWatchListButton />
+                              </>
+                            }
+                          />
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                );
+              })()}
             </ContentPaper>
           </Stack>
         </Grid>

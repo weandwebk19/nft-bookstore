@@ -3,37 +3,28 @@ import { useCallback, useEffect, useState } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import StarIcon from "@mui/icons-material/Star";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-import { ListedBook, NftBook } from "@/types/nftBook";
-import { truncate } from "@/utils/truncate";
-
-// type BookItemProps = {
-//   onClick: () => void;
-// } & ListedBook &
-//   NftBook;
-
-interface BookItemProps {
+interface DisplayBookItemProps {
   bookCover: string;
-  bookTitle: string;
+  title: string;
   fileType: string;
   tokenId: string;
   author: string;
   onClick: (tokenId: string) => void;
 }
 
-const BookItem = ({
+const DisplayBookItem = ({
   bookCover,
-  bookTitle,
+  title,
   fileType,
   tokenId,
   author,
   onClick
-}: BookItemProps) => {
+}: DisplayBookItemProps) => {
   const [authorName, setAuthorName] = useState();
   const router = useRouter();
 
@@ -95,7 +86,7 @@ const BookItem = ({
         component="img"
         className={styles["book-item__book-cover"]}
         src={bookCover}
-        alt={bookTitle}
+        alt={title}
         sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
       />
       <Box
@@ -143,7 +134,7 @@ const BookItem = ({
             variant="h6"
             sx={{ flex: 1 }}
           >
-            {bookTitle}
+            {title}
           </Typography>
           <Typography
             className="text-limit text-limit--1"
@@ -174,4 +165,4 @@ const BookItem = ({
   );
 };
 
-export default BookItem;
+export default DisplayBookItem;
