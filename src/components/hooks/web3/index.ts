@@ -46,6 +46,15 @@ export const useCreatedBooks = () => {
   };
 };
 
+export const useOwnedListedBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedListedBooks();
+
+  return {
+    nfts: swrRes
+  };
+};
+
 export const useBookDetail = (bookId: string, seller?: string) => {
   const hooks = useHooks();
   const swrRes = hooks.useBookDetail(bookId, seller);
