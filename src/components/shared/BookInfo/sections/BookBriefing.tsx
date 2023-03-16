@@ -22,12 +22,12 @@ import { TimerGroup } from "../../TimerGroup";
 interface BookBriefingProps {
   tokenId: number;
   bookSample?: string;
-  bookTitle: string;
+  title: string;
   author: string;
   authorName: string;
   contractAddress: string | undefined;
   description: string;
-  price: number | undefined;
+  price?: number;
   isOpenForSale?: boolean;
   isOpenForTradeIn?: boolean;
   isOpenForBorrow?: boolean;
@@ -51,7 +51,7 @@ const defaultValues = {
 const BookBriefing = ({
   tokenId,
   bookSample,
-  bookTitle,
+  title,
   author,
   authorName,
   contractAddress,
@@ -101,7 +101,7 @@ const BookBriefing = ({
       <form>
         <Stack spacing={3}>
           {/* Title */}
-          <Typography variant="h2">{bookTitle}</Typography>
+          <Typography variant="h2">{title}</Typography>
 
           {/* Attributes */}
           {/* {!isSold && (

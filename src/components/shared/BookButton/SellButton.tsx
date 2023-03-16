@@ -115,12 +115,11 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
               <Stack>
-                <Box
-                  component="img"
-                  className={styles["book-item__book-cover"]}
+                <Image
                   src={bookCover}
                   alt={title}
-                  sx={{ width: "100%" }}
+                  sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
+                  className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{authorName}</Typography>

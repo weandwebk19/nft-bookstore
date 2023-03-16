@@ -41,10 +41,10 @@ const Hero = () => {
               src={images.stackedLogo}
               mb={3}
               sx={{
-                maxWidth: "385px",
                 filter: cssFilter(`${theme.palette.primary.main}`)
               }}
             />
+
             {/* <Typography variant="body1">
               {translate.home.hero.subtitle1}
             </Typography>

@@ -74,6 +74,7 @@ const OwnedBooks = () => {
                           buttons={
                             <>
                               <SellButton
+                                tokenId={book?.tokenId}
                                 title={book?.meta.title}
                                 bookCover={book?.meta.bookCover}
                                 author={book?.author}

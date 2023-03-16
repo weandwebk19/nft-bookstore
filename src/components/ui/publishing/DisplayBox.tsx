@@ -34,54 +34,33 @@ const DisplayBox: FunctionComponent = () => {
     })();
   };
 
+  // should be replaced with the newest book that has been published
+  const firstBook = listedBooks?.data?.[0];
+
   return (
     <Box>
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
             {/* Book Banner */}
-            <BookBanner
-              meta={book.meta}
-              details={book.details}
-              tokenId={book.tokenId}
-              author={book.author}
-              price={book.price}
-              onClick={() => {
-                alert(book.meta.title);
-              }}
-              balance={0}
-              seller={""}
-              amount={0}
-            />
+            {firstBook && (
+              <BookBanner
+                tokenId={firstBook?.tokenId}
+                title={firstBook?.meta.title}
+                author={firstBook?.seller}
+                bookCover={firstBook?.meta.bookCover}
+                fileType={firstBook?.meta.fileType}
+                //  description={firstBook?.info.description}
+                //  price={firstBook?.price}
+                //  genres={}
+                //  languages={}
+                onClick={() => {
+                  alert(book.meta.title);
+                }}
+              />
+            )}
 
             <ContentPaper isPaginate={true} title="Publishing books">
-              {/* {listedBooks.data?.map((book: ListedBook) => (
-                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
-                    <BookItem
-                      tokenId={book.tokenId}
-                      seller={book.seller}
-                      amount={book.amount}
-                      price={book.price}
-                      meta={book.meta}
-                      author=""
-                      balance={0}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))} */}
-              {/* {listedBooks.isLoading && "Putting books on the shelves..."}
-
-              {listedBooks.data && (
-                <BookList
-                  bookList={listedBooks.data as NftListedBook[]}
-                  onClick={handleBookClick}
-                />
-              )}
-
-              {!listedBooks.data && <FallbackNode />} */}
-
               {(() => {
                 if (listedBooks.isLoading) {
                   return (

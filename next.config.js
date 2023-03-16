@@ -21,8 +21,11 @@ const nextConfig = {
     config.resolve.fallback = { fs: false };
 
     return config;
-  }
+  },
   // react: { useSuspense: false }
+  images: {
+    domains: ["gateway.pinata.cloud", "res.cloudinary.com"]
+  }
 };
 
 module.exports = nextConfig;

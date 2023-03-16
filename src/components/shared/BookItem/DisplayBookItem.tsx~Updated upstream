@@ -8,15 +8,27 @@ import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useRouter } from "next/router";
 
+<<<<<<< Updated upstream:src/components/shared/BookItem/DisplayBookItem.tsx
+interface DisplayBookItemProps {
+=======
+import { ListedBook, NftBook } from "@/types/nftBook";
+import { truncate } from "@/utils/truncate";
+
 import { Image } from "../Image";
 
-interface DisplayBookItemProps {
+// type BookItemProps = {
+//   onClick: () => void;
+// } & ListedBook &
+//   NftBook;
+
+interface BookItemProps {
+>>>>>>> Stashed changes:src/components/shared/BookItem/BookItem.tsx
   bookCover: string;
   title: string;
   fileType: string;
-  tokenId: number;
+  tokenId: string;
   author: string;
-  onClick: (tokenId: number) => void;
+  onClick: (tokenId: string) => void;
 }
 
 const DisplayBookItem = ({
@@ -85,10 +97,15 @@ const DisplayBookItem = ({
       }}
     >
       <Image
+        className={styles["book-item__book-cover"]}
+        sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
         src={bookCover}
+<<<<<<< Updated upstream:src/components/shared/BookItem/DisplayBookItem.tsx
         alt={title}
         sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
-        className={styles["book-item__book-cover"]}
+=======
+        alt={bookTitle}
+>>>>>>> Stashed changes:src/components/shared/BookItem/BookItem.tsx
       />
       <Box
         sx={{

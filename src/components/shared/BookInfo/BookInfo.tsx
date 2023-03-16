@@ -68,7 +68,7 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
         isOpenForSale={isPublished}
         isOpenForTradeIn={false}
         isOpenForBorrow={false}
-        bookTitle={bookDetail?.meta.title}
+        title={bookDetail?.meta.title}
         author={bookDetail?.nftCore.author}
         authorName={authorName}
         contractAddress={bookDetail?.info.contractAddress}

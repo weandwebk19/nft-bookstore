@@ -22,6 +22,7 @@ import * as yup from "yup";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
 import Step1 from "./steps/Step1";
@@ -193,12 +194,11 @@ const BuyButton = ({
               direction={{ xs: "column", sm: "row" }}
               spacing={{ xs: 1, sm: 2, md: 4 }}
             >
-              <Box
-                component="img"
-                className={styles["book-item__book-cover"]}
+              <Image
                 src={bookCover}
                 alt={title}
-                sx={{ width: "100px" }}
+                sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
+                className={styles["book-item__book-cover"]}
               />
               <Box>
                 <Typography variant="h5">{title}</Typography>

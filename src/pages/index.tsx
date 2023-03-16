@@ -5,18 +5,20 @@ import { Box, Stack } from "@mui/material";
 import DisplayBox from "@ui/Home/DisplayBox";
 import Hero from "@ui/Home/Hero";
 import MainProduct from "@ui/Home/MainProduct";
+import { CldImage } from "next-cloudinary";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
 import { StyledButton } from "@/styles/components/Button";
 
 export default function Home() {
   const router = useRouter();
 
+  const imageCloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
   return (
-    <Box>
+    <>
       <Head>
         <title>NFT Bookstore</title>
         <meta name="description" content="The world's first NFT Bookstore" />
@@ -72,10 +74,22 @@ export default function Home() {
                 alignItems: "center"
               }}
             >
-              <Box
+              {/* <Box
                 component="img"
                 src={images.gradient1}
                 alt=""
+                className="portrait"
+              /> */}
+              <CldImage
+                src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628696/nft_bookstore/img/gradient1_osuxrc.jpg`}
+                alt="gradient"
+                fill
+                style={{
+                  width: "100%",
+                  left: "50%",
+                  top: "50%",
+                  objectFit: "cover"
+                }}
                 className="portrait"
               />
               <StyledButton
@@ -89,7 +103,7 @@ export default function Home() {
           </Box>
         </Stack>
       </main>
-    </Box>
+    </>
   );
 }
 

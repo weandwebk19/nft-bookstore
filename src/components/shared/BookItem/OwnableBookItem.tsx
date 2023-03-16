@@ -8,13 +8,15 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
+import { Image } from "../Image";
+
 interface OwnableBookItemProps {
   bookCover: string;
   title: string;
   fileType: string;
-  tokenId: string;
+  tokenId: number;
   author: string;
-  onClick: (tokenId: string) => void;
+  onClick: (tokenId: number) => void;
   price: number;
   buttons: React.ReactNode;
 }
@@ -80,12 +82,11 @@ const OwnableBookItem = ({
           onClick(tokenId);
         }}
       >
-        <Box
-          component="img"
-          className={styles["book-item__book-cover"]}
+        <Image
           src={bookCover}
           alt={title}
           sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
+          className={styles["book-item__book-cover"]}
         />
         <Box
           sx={{
