@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ListedBookStorage.sol";
 import "./BookTemporary.sol";
 
-contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookStorage {
+contract BookStore is ERC1155URIStorage, Ownable {
   using Counters for Counters.Counter;
 
   struct NFTBook {
@@ -199,7 +199,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
   function getCreatedNFTBooks() public view returns (NFTBook[] memory) {
     uint ownedItemsCount = getTotalOwnedToken();
     uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
-    uint ownedRentedBookCount = _rentedBookStorage.getTotalOwnedRentedBook(msg.sender);
+    uint ownedRentedBookCount = _bookTemporary.getTotalOwnedRentedBook(msg.sender);
     uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
 
     NFTBook[] memory books = new NFTBook[](length);
@@ -208,7 +208,7 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
       if(_listedBookStorage.isListed(tokenId) == false 
-        && _rentedBookStorage.isRented(tokenId) == false) {
+        && _bookTemporary.isRented(tokenId) == false) {
         NFTBook memory book = _idToNFTBook[tokenId];
         books[currentIndex] = book;
         currentIndex += 1;
@@ -359,21 +359,19 @@ contract BookStore is ERC1155URIStorage, Ownable, ListedBookStorage, RentedBookS
     }
   }
 
+  // Return true if success, owthersise return false
   function recallBorrowedBooks(uint tokenId, 
                                address renter, 
-                               address borrower) public returns(bytes memory) {
+                               address borrower) public {
     require(renter == msg.sender, "You cannot take this book back, because you are not the renter");
-    // BookTemporary.BorrowedBook memory borrowedBook = 
-    //               _bookTemporary.getBorrowedBook(tokenId, renter, borrower);  
-    // bytes memory res = _bookTemporary.excRecallBorrowedBooks(tokenId, 
-    //                                                          renter, 
-    //                                                          borrower, 
-    //                                                          borrowedBook.endTime);
-
-    return new bytes(0);                 
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                  _bookTemporary.getBorrowedBook(tokenId, renter, borrower);
+    if(borrowedBook.tokenId != 0) {
+      _bookTemporary.excRecallBorrowedBooks(tokenId, 
+                                            renter, 
+                                            borrower,
+                                            borrowedBook.endTime);
+    }            
   }
-
-
-
 
 }
