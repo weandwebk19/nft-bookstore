@@ -12,7 +12,7 @@ interface BookItemProps {
   bookCover: string;
   title: string;
   fileType: string;
-  tokenId: string;
+  tokenId: number;
   author: string;
   onClick: (tokenId: string) => void;
   buttons?: React.ReactNode;

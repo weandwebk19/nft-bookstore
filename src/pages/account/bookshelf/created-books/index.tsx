@@ -19,7 +19,6 @@ import SellButton from "@/components/ui/account/bookshelf/created-books/SellButt
 const CreatedBooks = () => {
   const { nfts } = useCreatedBooks();
   const router = useRouter();
-  console.log("nfts", nfts);
   const createdBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
@@ -69,16 +68,17 @@ const CreatedBooks = () => {
                       >
                         <BookCard
                           tokenId={book?.tokenId}
-                          bookCover={book?.meta.data.bookCover}
-                          title={book?.meta.data.title}
-                          fileType={book?.meta.data.fileType}
+                          bookCover={book?.meta.bookCover}
+                          title={book?.meta.title}
+                          fileType={book?.meta.fileType}
                           author={book?.author}
                           onClick={handleBookClick}
                           buttons={
                             <>
                               <SellButton
-                                title={book?.meta.data.title}
-                                bookCover={book?.meta.data.bookCover}
+                                tokenId={book?.tokenId}
+                                title={book?.meta.title}
+                                bookCover={book?.meta.bookCover}
                                 author={book?.author}
                               />
                               <EditButton tokenId={book?.tokenId} />

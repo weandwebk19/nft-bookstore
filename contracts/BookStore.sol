@@ -70,6 +70,14 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _usedTokenURIs[tokenURI] = true;
   }
 
+  function isListed(uint tokenId) public view returns (bool) {
+    return _listedBookStorage.isListed(tokenId);
+  }
+
+  function isRented(uint tokenId) public view returns (bool) {
+    return _bookTemporary.isRented(tokenId);
+  }
+
   function _beforeTokenTransfer(
         address operator,
         address from,

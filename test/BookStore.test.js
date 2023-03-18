@@ -462,9 +462,14 @@ contract("BookStore", (accounts) => {
         assert(error, "Set amount listed tokens and rented tokens are wrong");
       }
 
-      const amountOwnedBooks = await _contract.getBalanceOfOwnerBook(2, {from: accounts[0]});
-      assert.equal(amountOwnedBooks.toString(), 80, "Total Unsellable of account[0] is invalid");
-
+      const amountOwnedBooks = await _contract.getBalanceOfOwnerBook(2, {
+        from: accounts[0]
+      });
+      assert.equal(
+        amountOwnedBooks.toString(),
+        80,
+        "Total Unsellable of account[0] is invalid"
+      );
 
       const amountBooksUntradable1 = await _contract.getAmountOfAllTypeBooksUntradeable(2, accounts[0]);
       assert.equal(amountBooksUntradable1.toString(), 20, "Total Untradeable of account[0] is invalid");
