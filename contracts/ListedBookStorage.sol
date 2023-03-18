@@ -27,11 +27,11 @@ contract ListedBookStorage {
 
   function isListed(uint tokenId) public view returns (bool) {
     uint idListedBook = getIdListedBook(tokenId, msg.sender);
-    if(idListedBook < 0) {
-      return false;
+    if(idListedBook > 0) {
+      return true;
     }
     else {
-      return true;
+      return false;
     }
   }
 

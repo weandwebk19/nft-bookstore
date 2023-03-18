@@ -10,7 +10,7 @@ import useSWR from "swr";
 import { NftBook } from "@/types/nftBook";
 
 type UseCreatedBooksResponse = {
-  listNft: (tokenId: number, price: number) => Promise<void>;
+  // listNft: (tokenId: number, price: number) => Promise<void>;
 };
 
 type CreatedBooksHookFactory = CryptoHookFactory<
@@ -32,14 +32,18 @@ export const hookFactory: CreatedBooksHookFactory =
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
           const tokenURI = await contract!.uri(item.tokenId);
-          const meta = await (
+          const metaRes = await (
             await axios.get(`/api/pinata/metadata?uri=${tokenURI}`)
           ).data;
+          let meta = null;
+          if (metaRes.success === true) {
+            meta = metaRes.data;
+          }
 
           nfts.push({
-            tokenId: item.tokenId.toNumber(),
-            author: item.author,
-            balance: item.balance.toNumber(),
+            tokenId: item?.tokenId?.toNumber(),
+            author: item?.author,
+            quantity: item?.quantity?.toNumber(),
             meta
           });
         }
