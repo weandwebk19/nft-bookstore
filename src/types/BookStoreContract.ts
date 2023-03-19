@@ -217,24 +217,9 @@ export interface ListedbookResponse {
   amount: BigNumber;
   3: BigNumber;
 }
-export interface RentedbookResponse {
-  tokenId: BigNumber;
-  0: BigNumber;
-  renter: string;
-  1: string;
-  price: BigNumber;
-  2: BigNumber;
-  amount: BigNumber;
-  3: BigNumber;
-}
-export interface NftbookResponse {
-  quantity: BigNumber;
-  tokenId: BigNumber;
-  0: BigNumber;
-  author: string;
-  1: string;
-  balance: BigNumber;
-  2: BigNumber;
+export interface RemoveItemFromAllListedBooksRequest {
+  tokenId: BigNumberish;
+  seller: string;
 }
 export interface BookStoreContract {
   /**

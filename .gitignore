@@ -41,6 +41,8 @@ next-env.d.ts
 # history
 .history
 
+.vscode/
+
 # dependencies
 public/contracts/
 
