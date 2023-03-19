@@ -25,10 +25,10 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-import Step1 from "./steps/Step1";
-import Step2 from "./steps/Step2";
+import Step1 from "../../ui/borrow/steps/Step1";
+import Step2 from "../../ui/borrow/steps/Step2";
 
-interface BuyButtonProps {
+interface RentButtonProps {
   tokenId: number;
   title: string;
   bookCover: string;
@@ -41,24 +41,29 @@ const schema = yup
     amount: yup
       .number()
       .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
+      .typeError("Amount must be a number"),
+    rentalDays: yup
+      .number()
+      .min(1, `The day must be higher than 0.`)
+      .typeError("Rental days must be a number")
   })
   .required();
 
 const defaultValues = {
   price: 0,
   amount: 1,
+  rentalDay: 1,
   seller: "",
   tokenId: -1
 };
 
-const BuyButton = ({
+const RentButton = ({
   tokenId,
   bookCover,
   title,
   author,
   price
-}: BuyButtonProps) => {
+}: RentButtonProps) => {
   const router = useRouter();
   const [authorName, setAuthorName] = useState();
 
@@ -138,57 +143,15 @@ const BuyButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Buy now
+        Rent now
       </Button>
 
       <Dialog
-        title="Buy book"
+        title="Rent book"
         open={openBookCard}
         onClose={handleBookCardClose}
       >
         <FormProvider {...methods}>
-          {/* <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
-            <Grid item md={4}>
-              <Stack>
-                <Box
-                  component="img"
-                  className={styles["book-item__book-cover"]}
-                  src={bookCover}
-                  alt={title}
-                  sx={{ width: "100%" }}
-                />
-                <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
-              </Stack>
-            </Grid>
-            <Grid item md={8}>
-              <Stack
-                spacing={3}
-                sx={{
-                  mb: 5
-                }}
-              >
-                <FormGroup label="Listing price" required>
-                  <InputController name="price" type="number" />
-                </FormGroup>
-                <FormGroup label="Amount" required>
-                  <InputController name="amount" type="number" />
-                </FormGroup>
-              </Stack>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <StyledButton
-                  customVariant="secondary"
-                  sx={{ mr: 2 }}
-                  onClick={handleBookCardClose}
-                >
-                  Cancel
-                </StyledButton>
-                <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start selling
-                </StyledButton>
-              </Box>
-            </Grid>
-          </Grid> */}
           <Stack spacing={3}>
             <Stack
               direction={{ xs: "column", sm: "row" }}
@@ -221,14 +184,14 @@ const BuyButton = ({
                 {activeStep === steps.length ? (
                   <>
                     <Typography sx={{ mt: 2, mb: 1 }}>
-                      Successfully purchased! Checkout your new book...
+                      Successfully rented!
                     </Typography>
                     <StyledButton
                       onClick={() => {
                         router.push("/account/bookshelf/owned-books");
                       }}
                     >
-                      My owned books
+                      My rented books
                     </StyledButton>
                   </>
                 ) : (
@@ -278,4 +241,4 @@ const BuyButton = ({
   );
 };
 
-export default BuyButton;
+export default RentButton;

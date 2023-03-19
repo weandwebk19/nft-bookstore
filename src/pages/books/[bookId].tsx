@@ -31,6 +31,7 @@ const BookDetail = () => {
   const router = useRouter();
   const { bookId } = router.query;
   const { bookDetail } = useBookDetail(bookId as string);
+
   console.log("bookDetail", bookDetail);
 
   useIsomorphicLayoutEffect(() => {

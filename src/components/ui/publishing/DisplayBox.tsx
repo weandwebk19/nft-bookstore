@@ -9,14 +9,15 @@ import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
 import { useRouter } from "next/router";
 
+import {
+  AddToWatchlistButton,
+  BookmarkButton
+} from "@/components/shared/BookButton";
+import BuyButton from "@/components/shared/BookButton/BuyButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { book } from "@/mocks";
-
-import AddToWatchListButton from "./AddToWatchListButton";
-import BookmarkButton from "./BookmarkButton";
-import BuyButton from "./BuyButton";
 
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
@@ -110,7 +111,7 @@ const DisplayBox: FunctionComponent = () => {
                                   price={book?.price}
                                 />
                                 <BookmarkButton />
-                                <AddToWatchListButton />
+                                <AddToWatchlistButton isLastInButtonGroup />
                               </>
                             }
                           />

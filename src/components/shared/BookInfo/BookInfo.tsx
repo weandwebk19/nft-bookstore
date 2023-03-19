@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import {
@@ -28,6 +28,7 @@ import { StyledButton } from "@/styles/components/Button";
 import { NftBook } from "@/types/nftBook";
 import { NftBookDetails } from "@/types/nftBook";
 
+import { BreadCrumbs } from "../BreadCrumbs";
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
 import { Timer } from "../Timer";
@@ -40,8 +41,27 @@ type BookInfoProps = {
 
 const BookInfo = ({ bookDetail }: BookInfoProps) => {
   const [authorName, setAuthorName] = useState<string>("");
+  const isOpenForSale = bookDetail?.listedCore ? true : false;
+  const isOpenForTradeIn = false;
+  const isOpenForBorrow = false;
   const isPublished = bookDetail?.listedCore ? true : false;
-  const isSelled = bookDetail?.nftCore?.quantity > 0 ? false : true;
+  const isSold = bookDetail?.nftCore?.quantity > 0 ? false : true;
+
+  const breadCrumbs: any[] = useMemo(() => {
+    if (isPublished) {
+      return [
+        {
+          content: "Trade-in",
+          href: "/trade-in"
+        },
+        {
+          content: bookDetail?.meta.title,
+          href: `/books/${bookDetail?.bookId}`
+        }
+      ];
+    }
+    return [];
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -63,11 +83,13 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
 
   return (
     <Stack>
+      <BreadCrumbs breadCrumbs={breadCrumbs} />
       <BookBriefing
         tokenId={bookDetail?.nftCore.tokenId}
-        isOpenForSale={isPublished}
-        isOpenForTradeIn={false}
-        isOpenForBorrow={false}
+        isOpenForSale={isOpenForSale}
+        isOpenForTradeIn={isOpenForTradeIn}
+        isOpenForBorrow={isOpenForBorrow}
+        isSold={isSold}
         title={bookDetail?.meta.title}
         author={bookDetail?.nftCore.author}
         authorName={authorName}

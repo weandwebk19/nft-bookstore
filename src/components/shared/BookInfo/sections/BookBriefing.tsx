@@ -31,6 +31,7 @@ interface BookBriefingProps {
   isOpenForSale?: boolean;
   isOpenForTradeIn?: boolean;
   isOpenForBorrow?: boolean;
+  isSold?: boolean;
 }
 
 const schema = yup
@@ -59,7 +60,8 @@ const BookBriefing = ({
   price,
   isOpenForSale = false,
   isOpenForTradeIn,
-  isOpenForBorrow
+  isOpenForBorrow,
+  isSold
 }: BookBriefingProps) => {
   const methods = useForm({
     shouldUnregister: false,
@@ -186,7 +188,7 @@ const BookBriefing = ({
                 <Typography variant="label" mb={1}>
                   Registration closes in:
                 </Typography>
-                <TimerGroup endDate="2023/03/12" />
+                {/* <TimerGroup endDate="2023/03/12" /> */}
               </Stack>
 
               {/* Numeric Stepper [dep] */}
@@ -196,10 +198,12 @@ const BookBriefing = ({
               />
 
               {/* Price [dep] */}
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="h4">{price?.toString()} ETH</Typography>
-                <Typography>(0.59489412 USD)</Typography>
-              </Stack>
+              {!isSold && (
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="h4">{price?.toString()} ETH</Typography>
+                  <Typography>(0.59489412 USD)</Typography>
+                </Stack>
+              )}
             </>
           )}
           {/* "Buy now" button [dep] / "Add to watchlist" button */}
