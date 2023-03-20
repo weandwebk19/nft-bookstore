@@ -4,6 +4,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
 
+import { getMetadata } from "../utils";
+
 // axiosRetry(axios, {
 //   retries: 3,
 //   retryDelay: axiosRetry.exponentialDelay
@@ -16,16 +18,11 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const nftUri: string = req.query.uri as string;
-      const nftRes = await axios.get(nftUri, {
-        headers: {
-          Accept: "text/plain"
-        },
-        timeout: 20000
-      });
+      const data = await getMetadata(nftUri);
       return res.status(200).json({
         success: true,
         message: "Get metadata from pinata successfully.",
-        data: nftRes.data
+        data
       });
     } catch (e: any) {
       console.error("e", e);

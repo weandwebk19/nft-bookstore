@@ -1,5 +1,4 @@
 import { toCamel } from "@utils/nomalizer";
-import axios from "axios";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 

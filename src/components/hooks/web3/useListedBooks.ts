@@ -32,7 +32,7 @@ export const hookFactory: ListedBooksHookFactory =
 
         for (let i = 0; i < coreListedBooks.length; i++) {
           const listedBook = coreListedBooks[i];
-          const nftBook = await contract!.getNftBook(listedBook.tokenId);
+          // const nftBook = await contract!.getNftBook(listedBook.tokenId);
           const tokenURI = await contract!.uri(listedBook.tokenId);
           const metaRes = await fetch(tokenURI);
           const meta = await metaRes.json();

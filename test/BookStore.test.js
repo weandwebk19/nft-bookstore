@@ -56,6 +56,13 @@ contract("BookStore", (accounts) => {
       assert.equal(nftItem.author, accounts[0], "Author is not account[0]");
     });
 
+    it("should have not listed", async () => {
+      const isListed = await _contract.isListed(1, accounts[0], {
+        from: accounts[0]
+      });
+      assert.equal(isListed, false, "It has been listed.");
+    });
+
     it("should have a created books", async () => {
       const nftBooks = await _contract.getCreatedNFTBooks({
         from: accounts[0]
@@ -112,6 +119,13 @@ contract("BookStore", (accounts) => {
         1,
         "Invalid length of owned listed Books"
       );
+    });
+
+    it("should have been listed", async () => {
+      const isListed = await _contract.isListed(1, accounts[0], {
+        from: accounts[0]
+      });
+      assert.equal(isListed, true, "It has not been listed.");
     });
 
     it("should not have created books", async () => {

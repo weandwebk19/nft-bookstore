@@ -70,12 +70,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _usedTokenURIs[tokenURI] = true;
   }
 
-  function isListed(uint tokenId) public view returns (bool) {
-    return _listedBookStorage.isListed(tokenId);
+  function isListed(uint tokenId, address seller) public view returns (bool) {
+    return _listedBookStorage.isListed(tokenId, seller);
   }
 
-  function isRented(uint tokenId) public view returns (bool) {
-    return _bookTemporary.isRented(tokenId);
+  function isRented(uint tokenId, address renter) public view returns (bool) {
+    return _bookTemporary.isRented(tokenId, renter);
   }
 
   function _beforeTokenTransfer(
@@ -215,8 +215,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint currentIndex = 0;
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
-      if(_listedBookStorage.isListed(tokenId) == false 
-        && _bookTemporary.isRented(tokenId) == false) {
+      if(_listedBookStorage.isListed(tokenId, msg.sender) == false 
+        && _bookTemporary.isRented(tokenId, msg.sender) == false) {
         NFTBook memory book = _idToNFTBook[tokenId];
         books[currentIndex] = book;
         currentIndex += 1;

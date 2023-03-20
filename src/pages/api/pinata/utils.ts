@@ -1,10 +1,12 @@
 import { BookStoreContract } from "@_types/BookStoreContract";
+import pinataSDK from "@pinata/sdk";
+import axios from "axios";
 import * as util from "ethereumjs-util";
 import { ethers } from "ethers";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session, withIronSession } from "next-iron-session";
 
-import contract from "../../../public/contracts/BookStore.json";
+import contract from "../../../../public/contracts/BookStore.json";
 
 const NETWORKS = {
   "5777": "Ganache"
@@ -83,4 +85,27 @@ export const setURI = async (tokenId: number, tokenURI: string) => {
 
     resolve("Set URI successfully.");
   });
+};
+
+export const getMetadata = async (nftUri: string) => {
+  const nftRes = await axios.get(nftUri, {
+    headers: {
+      Accept: "text/plain"
+    },
+    timeout: 20000
+  });
+
+  const data = nftRes.data;
+  return data;
+};
+
+export const deleteFile = async (nftUri: string) => {
+  try {
+    const pinata = new pinataSDK(pinataUnpinApiKey, pinataUnpinSecretApiKey);
+    const jsonRes = await pinata.unpin(nftUri);
+
+    return jsonRes;
+  } catch (e) {
+    return e;
+  }
 };

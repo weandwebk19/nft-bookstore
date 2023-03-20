@@ -22,7 +22,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useNetwork } from "@/components/hooks/web3";
+import { useBookDetail, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
@@ -38,6 +38,8 @@ const Book = () => {
   const formRef = useRef<any>();
   const { ethereum, contract } = useWeb3();
   const { network } = useNetwork();
+  const { bookDetail } = useBookDetail("641176f75f96e076121d2a49");
+  console.log("bookDetail", bookDetail);
 
   const getSignedData = async () => {
     const messageToSign = await axios.get("/api/verify");
@@ -63,7 +65,7 @@ const Book = () => {
       (async () => {
         const { signedData, account } = await getSignedData();
 
-        const promise = axios.post("/api/pinata/update-metadata", {
+        const promise = axios.post("/api/pinata/metadata/update", {
           address: account,
           signature: signedData
           // nftBook: nftBookMeta

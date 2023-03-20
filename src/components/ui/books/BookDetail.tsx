@@ -12,7 +12,6 @@ import {
 import axios from "axios";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
@@ -29,9 +28,9 @@ const BookDetail = () => {
   const bookDetailsRef = useRef(null);
   const tl = useRef<any>();
   const router = useRouter();
-  const { bookId } = router.query;
-  const { bookDetail } = useBookDetail(bookId as string);
-  console.log("bookDetail", bookDetail);
+  const { bookId, seller } = router.query;
+  const { bookDetail } = useBookDetail(bookId as string, seller as string);
+  // console.log("bookDetail", bookDetail);
 
   useIsomorphicLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -162,21 +161,3 @@ const BookDetail = () => {
 BookDetail.PageLayout = SplitScreenLayout;
 
 export default BookDetail;
-
-export async function getStaticProps({ locale }: any) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
-    }
-  };
-}
-
-export const getStaticPaths = () => {
-  return {
-    paths: [
-      { params: { bookId: "1" }, locale: "en" },
-      { params: { bookId: "2" }, locale: "vi" }
-    ],
-    fallback: true
-  };
-};

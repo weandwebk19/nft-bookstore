@@ -41,11 +41,11 @@ const Step3 = () => {
               <InputController name="version" />
             </FormGroup>
             <FormGroup
-              label={t("maxSupply") as string}
+              label={t("quantity") as string}
               required
               className={styles["form__formGroup-half"]}
             >
-              <InputController name="maxSupply" />
+              <InputController name="quantity" />
             </FormGroup>
           </Stack>
           <FormGroup label={t("genres") as string} required>
@@ -60,7 +60,7 @@ const Step3 = () => {
               required
               className={styles["form__formGroup-half"]}
             >
-              <InputController name="pages" />
+              <InputController name="totalPages" />
             </FormGroup>
             <FormGroup
               label={t("keywords") as string}

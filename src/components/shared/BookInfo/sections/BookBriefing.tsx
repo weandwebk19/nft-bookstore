@@ -9,6 +9,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ethers } from "ethers";
+import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
@@ -57,7 +58,7 @@ const BookBriefing = ({
   contractAddress,
   description,
   price,
-  isOpenForSale = false,
+  isOpenForSale,
   isOpenForTradeIn,
   isOpenForBorrow
 }: BookBriefingProps) => {
@@ -69,6 +70,7 @@ const BookBriefing = ({
   });
   const { ethereum, contract } = useWeb3();
 
+  // console.log("isOpenForSale", isOpenForSale);
   useEffect(() => {
     setValue("tokenId", tokenId);
     setValue("seller", author);
@@ -173,7 +175,7 @@ const BookBriefing = ({
               customVariant="secondary"
               size="small"
               onClick={() => {
-                alert(`book sample link:\n ${bookSample}`);
+                redirect(bookSample);
               }}
             >
               Read sample
