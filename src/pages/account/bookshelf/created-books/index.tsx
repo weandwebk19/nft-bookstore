@@ -1,6 +1,3 @@
-/* eslint-disable prettier/prettier */
-import { useEffect, useState } from "react";
-
 import { Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -9,12 +6,11 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
 import { useCreatedBooks } from "@/components/hooks/web3";
-import { BookCard } from "@/components/shared/BookCard";
+import { EditButton, SellButton } from "@/components/shared/BookButton";
+import { ActionableBookItem } from "@/components/shared/BookItem";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import EditButton from "@/components/ui/account/bookshelf/created-books/EditButton";
-import SellButton from "@/components/ui/account/bookshelf/created-books/SellButton";
 
 const CreatedBooks = () => {
   const { nfts } = useCreatedBooks();
@@ -52,10 +48,6 @@ const CreatedBooks = () => {
                   spacing={3}
                   columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                 >
-                  {/* Can not call BookList component, since the BookCard component has
-                  `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
-                  title, bookCover, author,... */}
-
                   {createdBooks!.map((book) => {
                     return (
                       <Grid
@@ -66,7 +58,7 @@ const CreatedBooks = () => {
                         md={6}
                         lg={12}
                       >
-                        <BookCard
+                        <ActionableBookItem
                           tokenId={book?.tokenId}
                           bookCover={book?.meta.bookCover}
                           title={book?.meta.title}

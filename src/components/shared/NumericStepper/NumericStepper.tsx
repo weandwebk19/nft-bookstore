@@ -25,7 +25,7 @@ const NumericStepper = ({
     <>
       <TextField
         sx={{ maxWidth: 160 }}
-        type="number"
+        type="tel"
         value={value}
         onChange={onChange}
         InputProps={{

@@ -367,21 +367,19 @@ contract BookStore is ERC1155URIStorage, Ownable {
     }
   }
 
+  // Return true if success, owthersise return false
   function recallBorrowedBooks(uint tokenId, 
                                address renter, 
-                               address borrower) public returns(bytes memory) {
+                               address borrower) public {
     require(renter == msg.sender, "You cannot take this book back, because you are not the renter");
-    // BookTemporary.BorrowedBook memory borrowedBook = 
-    //               _bookTemporary.getBorrowedBook(tokenId, renter, borrower);  
-    // bytes memory res = _bookTemporary.excRecallBorrowedBooks(tokenId, 
-    //                                                          renter, 
-    //                                                          borrower, 
-    //                                                          borrowedBook.endTime);
-
-    return new bytes(0);                 
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                  _bookTemporary.getBorrowedBook(tokenId, renter, borrower);
+    if(borrowedBook.tokenId != 0) {
+      _bookTemporary.excRecallBorrowedBooks(tokenId, 
+                                            renter, 
+                                            borrower,
+                                            borrowedBook.endTime);
+    }            
   }
-
-
-
 
 }
