@@ -1,7 +1,16 @@
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
-import { IconButton, Link, Stack, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  Link,
+  Stack,
+  Tooltip,
+  Typography
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import BookmarkAddOutlinedIcon from "@mui/icons-material/BookmarkAddOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -9,24 +18,23 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ethers } from "ethers";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { useWeb3 } from "@/components/providers/web3";
+import { NumericStepperController } from "@/components/shared/FormController";
+import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
 
-import { NumericStepperController } from "../../FormController";
-import { ReadMore } from "../../ReadMore";
-import { TimerGroup } from "../../TimerGroup";
-
 interface BookBriefingProps {
+  bookCover: string;
   tokenId: number;
   bookSample?: string;
   title: string;
   author: string;
   authorName: string;
   contractAddress: string | undefined;
-  description: string;
   price?: number;
   isOpenForSale?: boolean;
   isOpenForTradeIn?: boolean;
@@ -50,19 +58,21 @@ const defaultValues = {
 };
 
 const BookBriefing = ({
+  bookCover,
   tokenId,
   bookSample,
   title,
   author,
   authorName,
   contractAddress,
-  description,
   price,
   isOpenForSale = false,
   isOpenForTradeIn,
   isOpenForBorrow,
   isSold
 }: BookBriefingProps) => {
+  const theme = useTheme();
+
   const methods = useForm({
     shouldUnregister: false,
     defaultValues,
@@ -100,149 +110,182 @@ const BookBriefing = ({
 
   return (
     <FormProvider {...methods}>
-      <form>
-        <Stack spacing={3}>
-          {/* Title */}
-          <Typography variant="h2">{title}</Typography>
+      <Box
+        className="hide-scrollbar"
+        sx={{
+          border: `1px solid ${theme.palette.primary.main}`,
+          position: "sticky",
+          top: 64,
 
-          {/* Attributes */}
-          {/* {!isSold && (
-        <Stack direction="row" spacing={2}>
-          {meta?.attributes.map((stat, i) => {
-            switch (stat.statType) {
-              case "views":
-                return (
-                  <Stack key={stat.statType} direction="row" spacing={0.5}>
-                    <VisibilityOutlinedIcon color="primary" />
-                    <Typography>{`${stat.value} ${stat.statType}`}</Typography>
-                  </Stack>
-                );
-              case "owners":
-                return (
-                  <Stack key={stat.statType} direction="row" spacing={0.5}>
-                    <PeopleAltOutlinedIcon color="primary" />
-                    <Typography>{`${stat.value} ${stat.statType}`}</Typography>
-                  </Stack>
-                );
-              default:
-                return "";
-            }
-          })}
-        </Stack>
-      )} */}
-
-          {/* Author */}
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography>By</Typography>
-            <Link href="#">
-              <Typography variant="h6" color="secondary">
-                {authorName}
-              </Typography>
-            </Link>
-          </Stack>
-          {/* Contract address */}
-          <Stack>
-            <Typography variant="label" mb={1}>
-              Contract address:
-            </Typography>
-            <Link href="#">{contractAddress}</Link>
-          </Stack>
-          {/* Description */}
-          <Stack sx={{ maxWidth: "500px" }}>
-            <Typography variant="label" mb={1}>
-              Description:
-            </Typography>
-            {/* <>
-              {details?.desc.split("\n").map((paragraph, i) => (
-                <Typography key={i} gutterBottom>
-                  {paragraph}
-                </Typography>
-              ))}
-            </> */}
-            {/* <ReadMore>{details!.desc}</ReadMore> */}
-
-            <ReadMore>
-              {description?.split("\n").map((paragraph, i) => (
-                <Typography key={i} gutterBottom>
-                  {paragraph}
-                </Typography>
-              ))}
-            </ReadMore>
-          </Stack>
-          {/* Read sample */}
-          {bookSample && (
-            <StyledButton
-              customVariant="secondary"
-              size="small"
-              onClick={() => {
-                alert(`book sample link:\n ${bookSample}`);
-              }}
-            >
-              Read sample
-            </StyledButton>
-          )}
-          {/* Countdown [dep] */}
-          {isOpenForSale && (
-            <>
-              <Stack>
-                <Typography variant="label" mb={1}>
-                  Registration closes in:
-                </Typography>
-                {/* <TimerGroup endDate="2023/03/12" /> */}
-              </Stack>
-
-              {/* Numeric Stepper [dep] */}
-              <NumericStepperController
-                name="amount"
-                defaultValue={defaultValues.amount}
-              />
-
-              {/* Price [dep] */}
-              {!isSold && (
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography variant="h4">{price?.toString()} ETH</Typography>
-                  <Typography>(0.59489412 USD)</Typography>
-                </Stack>
-              )}
-            </>
-          )}
-          {/* "Buy now" button [dep] / "Add to watchlist" button */}
-          <Stack direction="row" spacing={2}>
-            {isOpenForSale && (
-              <StyledButton
-                customVariant="primary"
-                type="submit"
-                onClick={handleSubmit(onSubmit)}
+          overflowY: { sm: "scroll" },
+          height: { sm: "90vh" }
+        }}
+      >
+        <Grid
+          container
+          columns={{ xs: 4, sm: 5, md: 5 }}
+          sx={{ borderBottom: "1px solid" }}
+        >
+          <Grid item xs={4} sm={5} md={3}>
+            <Box sx={{ height: "60vh" }}>
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  position: "relative",
+                  borderRight: "1px solid"
+                }}
               >
-                Buy now
+                {/* Attributes */}
+
+                {/* <Stack direction="row" spacing={2}>
+                  {meta?.attributes.map((stat, i) => {
+                    switch (stat.statType) {
+                      case "views":
+                        return (
+                          <Stack
+                            key={stat.statType}
+                            direction="row"
+                            spacing={0.5}
+                          >
+                            <VisibilityOutlinedIcon color="primary" />
+                            <Typography>{`${stat.value} ${stat.statType}`}</Typography>
+                          </Stack>
+                        );
+                      case "owners":
+                        return (
+                          <Stack
+                            key={stat.statType}
+                            direction="row"
+                            spacing={0.5}
+                          >
+                            <PeopleAltOutlinedIcon color="primary" />
+                            <Typography>{`${stat.value} ${stat.statType}`}</Typography>
+                          </Stack>
+                        );
+                      default:
+                        return "";
+                    }
+                  })}
+                </Stack> */}
+
+                <Image
+                  alt={title}
+                  src={bookCover}
+                  fill
+                  style={{
+                    objectFit: "cover"
+                  }}
+                />
+              </div>
+            </Box>
+          </Grid>
+          <Grid item xs={4} sm={5} md={2} sx={{ p: 3 }}>
+            <Stack justifyContent="space-between" sx={{ height: "100%" }}>
+              <Stack>
+                <Stack sx={{ flexWrap: "wrap" }}>
+                  <Typography variant="label" mb={1}>
+                    Contract address:
+                  </Typography>
+                  <Box sx={{ wordWrap: "break-word", width: "100%" }}>
+                    <Link href="#">{contractAddress}</Link>
+                  </Box>
+                </Stack>
+              </Stack>
+              <StyledButton
+                customVariant="secondary"
+                sx={{ width: "100%" }}
+                onClick={() => {
+                  alert(`book sample link:\n ${bookSample}`);
+                }}
+              >
+                Read sample
               </StyledButton>
-            )}
-            <StyledButton customVariant="secondary">
-              + Add to watchlist
-            </StyledButton>
-            <Tooltip title="Add to favorites">
-              <IconButton>
-                <BookmarkAddOutlinedIcon color="primary" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-          {/* Trade-in/Borrow navigate */}
-          <Stack>
-            {isOpenForBorrow && (
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography>You don’t want to own this book?</Typography>
-                <Link href="books">Go to borrow</Link>
+            </Stack>
+          </Grid>
+        </Grid>
+        <Box sx={{ height: "30vh", p: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+              justifyContent: "space-between"
+            }}
+          >
+            <Box>
+              <Stack spacing={1}>
+                {/* Title */}
+                <Typography variant="h4">{title}</Typography>
               </Stack>
-            )}
-            {isOpenForTradeIn && (
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography>This book is open for trade</Typography>
-                <Link href="#">Go to trade-in</Link>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography>By</Typography>
+                <Link href="#">
+                  <Typography variant="h6" color="secondary">
+                    {authorName}
+                  </Typography>
+                </Link>
               </Stack>
-            )}
-          </Stack>
-        </Stack>
-      </form>
+            </Box>
+            <Stack spacing={3}>
+              {isOpenForSale && (
+                <>
+                  {/* Numeric Stepper [dep] */}
+                  <NumericStepperController
+                    name="amount"
+                    defaultValue={defaultValues.amount}
+                  />
+
+                  {/* Price [dep] */}
+                  {!isSold && (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography variant="h4">
+                        {price?.toString()} ETH
+                      </Typography>
+                      <Typography>(0.59489412 USD)</Typography>
+                    </Stack>
+                  )}
+                </>
+              )}
+              {/* "Buy now" button [dep] / "Add to watchlist" button */}
+              <Stack direction="row" spacing={2}>
+                {isOpenForSale && (
+                  <StyledButton
+                    customVariant="primary"
+                    type="submit"
+                    onClick={handleSubmit(onSubmit)}
+                  >
+                    Buy now
+                  </StyledButton>
+                )}
+                <StyledButton customVariant="secondary">
+                  + Add to watchlist
+                </StyledButton>
+                <Tooltip title="Add to favorites">
+                  <IconButton>
+                    <BookmarkAddOutlinedIcon color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+              {/* Trade-in/Borrow navigate */}
+              <Stack>
+                {isOpenForBorrow && (
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Typography>You don’t want to own this book?</Typography>
+                    <Link href="books">Go to borrow</Link>
+                  </Stack>
+                )}
+                {isOpenForTradeIn && (
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Typography>This book is open for trade</Typography>
+                    <Link href="#">Go to trade-in</Link>
+                  </Stack>
+                )}
+              </Stack>
+            </Stack>
+          </Box>
+        </Box>
+      </Box>
     </FormProvider>
   );
 };

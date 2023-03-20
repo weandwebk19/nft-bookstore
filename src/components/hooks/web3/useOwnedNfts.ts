@@ -36,7 +36,7 @@ export const hookFactory: OwnedNftsHookFactory =
           nfts.push({
             tokenId: item.tokenId.toNumber(),
             author: item.author,
-            balance: item.balance.toNumber(),
+            quantity: item.balance.toNumber(),
             meta
           });
         }

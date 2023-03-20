@@ -11,7 +11,7 @@ const DefaultLayout = ({ children }: DefaultLayoutProps) => {
     <>
       <NavBar />
       <Box sx={{ minHeight: "100vh" }}>
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ pt: 8 }}>
           <Box className="content">{children}</Box>
         </Container>
       </Box>
