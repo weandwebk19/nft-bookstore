@@ -164,7 +164,6 @@ const NavBar = () => {
 
   const handleLanguageClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const locale = e.currentTarget.innerText.slice(0, 2).toLowerCase();
-    console.log(locale);
     setClientLocale(locale);
     setOpenLanguage({
       ...openLanguage,
@@ -176,13 +175,13 @@ const NavBar = () => {
     });
   };
 
-  const handleModeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const currentTheme = e.currentTarget.innerText;
+  const handleModeClick = (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    const currentTheme = e.currentTarget.dataset.value;
     setOpenMode({
       ...openMode,
       currentState: currentTheme
     });
-    setStoredTheme(currentTheme.toLowerCase());
+    setStoredTheme(currentTheme!.toLowerCase());
   };
 
   const handlePublishABookClick = () => {

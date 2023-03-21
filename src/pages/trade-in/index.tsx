@@ -3,7 +3,15 @@ import { Box, Stack } from "@mui/material";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
+import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import DisplayBox from "@/components/ui/trade-in/DisplayBox";
+
+const breadCrumbs = [
+  {
+    content: "Trade-in",
+    href: "/trade-in"
+  }
+];
 
 const TradeIn = () => {
   return (
@@ -16,7 +24,10 @@ const TradeIn = () => {
       </Head>
       <main>
         <Stack spacing={8}>
-          <Box component="section" sx={{ marginTop: "100px" }}>
+          <Box component="section">
+            <Box sx={{ mb: 3 }}>
+              <BreadCrumbs breadCrumbs={breadCrumbs} />
+            </Box>
             <DisplayBox />
           </Box>
         </Stack>

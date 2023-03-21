@@ -6,14 +6,16 @@ import axios from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
-import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
-import { BookCard } from "@/components/shared/BookCard";
+import { useOwnedNfts } from "@/components/hooks/web3";
+import {
+  LeaseButton,
+  ReadButton,
+  SellButton
+} from "@/components/shared/BookButton";
+import { ActionableBookItem } from "@/components/shared/BookItem";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import LeaseButton from "@/components/ui/account/bookshelf/owned-books/LeaseButton";
-import ReadButton from "@/components/ui/account/bookshelf/owned-books/ReadButton";
-import SellButton from "@/components/ui/account/bookshelf/owned-books/SellButton";
 
 const OwnedBooks = () => {
   const { nfts } = useOwnedNfts();
@@ -52,10 +54,6 @@ const OwnedBooks = () => {
                   spacing={3}
                   columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                 >
-                  {/* Can not call BookList component, since the BookCard component has
-                  `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
-                  title, bookCover, author,... */}
-
                   {ownedBooks!.map((book) => {
                     return (
                       <Grid
@@ -66,23 +64,24 @@ const OwnedBooks = () => {
                         md={6}
                         lg={12}
                       >
-                        <BookCard
+                        <ActionableBookItem
                           tokenId={book?.tokenId}
-                          bookCover={book?.meta.data.bookCover}
-                          title={book?.meta.data.title}
-                          fileType={book?.meta.data.fileType}
+                          bookCover={book?.meta.bookCover}
+                          title={book?.meta.title}
+                          fileType={book?.meta.fileType}
                           author={book?.author}
                           onClick={handleBookClick}
                           buttons={
                             <>
                               <SellButton
-                                title={book?.meta.data.title}
-                                bookCover={book?.meta.data.bookCover}
+                                tokenId={book?.tokenId}
+                                title={book?.meta.title}
+                                bookCover={book?.meta.bookCover}
                                 author={book?.author}
                               />
                               <LeaseButton
-                                title={book?.meta.data.title}
-                                bookCover={book?.meta.data.bookCover}
+                                title={book?.meta.title}
+                                bookCover={book?.meta.bookCover}
                                 author={book?.author}
                               />
                               <ReadButton tokenId={book?.tokenId} />

@@ -1,37 +1,20 @@
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+
+import { Box, Grid, Stack, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+
+import axios from "axios";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  InputAdornment,
-  Link as MUILink,
-  Stack,
-  Typography
-} from "@mui/material";
-import TextField from "@mui/material/TextField";
-
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-
-import { yupResolver } from "@hookform/resolvers/yup";
-import axios from "axios";
-import Link from "next/link";
-import * as yup from "yup";
-
-import { useCountdown } from "@/components/hooks/common";
-import { book2 } from "@/mocks";
-import { StyledButton } from "@/styles/components/Button";
-import { NftBook } from "@/types/nftBook";
+  BookBriefing,
+  BookDetail
+} from "@/components/shared/BookInfo/sections";
+import BookPricingHistory from "@/components/shared/BookInfo/sections/BookPricingHistory";
+import { BookList } from "@/components/shared/BookList";
+import { ReadMore } from "@/components/shared/ReadMore";
+import { bookList } from "@/mocks";
 import { NftBookDetails } from "@/types/nftBook";
-
-import { FormGroup } from "../FormGroup";
-import { ReadMore } from "../ReadMore";
-import { Timer } from "../Timer";
-import { BookBriefing, BookDetail } from "./sections";
 
 type BookInfoProps = {
   onClick?: () => void;
@@ -39,9 +22,35 @@ type BookInfoProps = {
 };
 
 const BookInfo = ({ bookDetail }: BookInfoProps) => {
+  const theme = useTheme();
+
   const [authorName, setAuthorName] = useState<string>("");
-  const isPublished = bookDetail?.listedCore ? true : false;
-  const isSelled = bookDetail?.nftCore?.quantity > 0 ? false : true;
+  const isOpenForSale = bookDetail?.listedCore ? true : false;
+  const isOpenForTradeIn = false;
+  const isOpenForBorrow = false;
+  const isSold = bookDetail?.nftCore?.quantity > 0 ? false : true;
+  console.log(bookDetail);
+  const [isPublishedState, setIsPublishedState] = useState(false);
+
+  useEffect(() => {
+    setIsPublishedState(bookDetail?.listedCore ? true : false);
+  }, [bookDetail?.listedCore]);
+
+  const breadCrumbs: any[] = useMemo(() => {
+    if (isPublishedState) {
+      return [
+        {
+          content: "Publishing",
+          href: "/publishing"
+        },
+        {
+          content: bookDetail?.meta.title,
+          href: `/books/${bookDetail?.bookId}`
+        }
+      ];
+    }
+    return [];
+  }, [bookDetail]);
 
   useEffect(() => {
     (async () => {
@@ -62,245 +71,135 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
   }, [bookDetail]);
 
   return (
-    <Stack>
-      <BookBriefing
-        tokenId={bookDetail?.nftCore.tokenId}
-        isOpenForSale={isPublished}
-        isOpenForTradeIn={false}
-        isOpenForBorrow={false}
-        bookTitle={bookDetail?.meta.title}
-        author={bookDetail?.nftCore.author}
-        authorName={authorName}
-        contractAddress={bookDetail?.info.contractAddress}
-        description={bookDetail?.info.description}
-        bookSample={bookDetail?.meta.bookSample}
-        price={bookDetail?.listedCore?.price}
-      />
-      <Divider sx={{ my: 6 }} />
-      <BookDetail
-        bookId={bookDetail?.bookId}
-        fileType={bookDetail?.meta.fileType}
-        totalPages={bookDetail?.info.totalPages}
-        languages={bookDetail?.info.languages}
-        genres={bookDetail?.info.genres}
-        version={bookDetail?.meta.version}
-        maxSupply={bookDetail?.meta.quantity}
-        publishingTime={bookDetail?.info.publishingTime}
-        owners={
-          bookDetail?.listedCore !== null
-            ? bookDetail?.listedCore?.seller
-            : bookDetail?.meta.author
-        }
-      />
-    </Stack>
-    // <>
-    //       {isPublished && !isSelled && (
-    //         <Stack direction="row" spacing={2}>
-    //           <StyledButton customVariant="secondary">Edit book</StyledButton>
-    //           {isListed ? (
-    //             <StyledButton customVariant="primary" onClick={() => {}}>
-    //               Edit listing
-    //             </StyledButton>
-    //           ) : (
-    //             <StyledButton
-    //               customVariant="primary"
-    //               onClick={() => setIsSelled(true)}
-    //             >
-    //               Sell
-    //             </StyledButton>
-    //           )}
-    //         </Stack>
-    //       )}
+    <Box>
+      <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
+        <Grid item xs={4} sm={4} md={5}>
+          <BookBriefing
+            bookCover={bookDetail?.meta.bookCover}
+            tokenId={bookDetail?.nftCore.tokenId}
+            isOpenForSale={isOpenForSale}
+            isOpenForTradeIn={isOpenForTradeIn}
+            isOpenForBorrow={isOpenForBorrow}
+            isSold={isSold}
+            title={bookDetail?.meta.title}
+            author={bookDetail?.nftCore.author}
+            authorName={authorName}
+            contractAddress={bookDetail?.info.contractAddress}
+            bookSample={bookDetail?.meta.bookSample}
+            price={bookDetail?.listedCore?.price}
+          />
+        </Grid>
+        <Grid item xs={4} sm={4} md={7} sx={{ pl: { sm: "0 !important" } }}>
+          <Box
+            sx={{
+              p: 3,
+              borderBottom: `1px solid ${theme.palette.primary.main}`,
+              borderTop: `1px solid ${theme.palette.primary.main}`,
+              borderRight: `1px solid ${theme.palette.primary.main}`,
+              borderLeft: {
+                xs: `1px solid ${theme.palette.primary.main}`,
+                sm: 0
+              }
+            }}
+          >
+            {/* Description */}
+            <Stack sx={{ maxWidth: "500px" }}>
+              <Typography variant="label" mb={1}>
+                Description:
+              </Typography>
+              {/* <>
+              {details?.desc.split("\n").map((paragraph, i) => (
+                <Typography key={i} gutterBottom>
+                  {paragraph}
+                </Typography>
+              ))}
+            </> */}
+              {/* <ReadMore>{details!.desc}</ReadMore> */}
 
-    //       {isPublished && isSelled && (
-    //         <>
-    //           <Stack direction="column" spacing={2}>
-    //             <FormGroup label="Listing price" required>
-    //               <Controller
-    //                 name="listingPrice"
-    //                 control={control}
-    //                 render={({ field }) => {
-    //                   return (
-    //                     <TextField
-    //                       id="listingPrice"
-    //                       type="number"
-    //                       fullWidth
-    //                       InputProps={{
-    //                         endAdornment: (
-    //                           <InputAdornment position="end">
-    //                             ETH
-    //                           </InputAdornment>
-    //                         )
-    //                       }}
-    //                       error={!!errors.listingPrice?.message}
-    //                       {...field}
-    //                     />
-    //                   );
-    //                 }}
-    //               />
-    //             </FormGroup>
-    //             <FormGroup label="Quantity" required>
-    //               <Controller
-    //                 name="quantity"
-    //                 control={control}
-    //                 render={({ field }) => {
-    //                   return (
-    //                     <TextField
-    //                       id="quantity"
-    //                       type="number"
-    //                       fullWidth
-    //                       error={!!errors.quantity?.message}
-    //                       {...field}
-    //                     />
-    //                   );
-    //                 }}
-    //               />
-    //             </FormGroup>
-    //           </Stack>
-
-    //           <Stack direction="row" spacing={2}>
-    //             <StyledButton
-    //               customVariant="secondary"
-    //               onClick={() => setIsSelled(false)}
-    //             >
-    //               Cancel
-    //             </StyledButton>
-    //             <StyledButton
-    //               customVariant="primary"
-    //               type="submit"
-    //               onClick={handleSubmit(onSubmitSeller)}
-    //             >
-    //               Start listing
-    //             </StyledButton>
-    //           </Stack>
-    //         </>
-    //       )}
-    //     </Stack>
-    //   </Box>
-
-    //   {!isSelled && (
-    //     <>
-    //       <Divider sx={{ my: 6 }} />
-
-    //       <Stack component="section">
-    //         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
-    //           <Grid item xs={4} sm={8} md={6}>
-    //             {/* Nft book details */}
-    //             <Stack spacing={2}>
-    //               <Typography variant="h5" mb={1}>
-    //                 NFT Book details
-    //               </Typography>
-
-    //               {/* Book id */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Book ID:</Typography>
-    //                 <Typography>#{details?.bookId}</Typography>
-    //               </Stack>
-
-    //               {/* Book id */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">File:</Typography>
-    //                 <Typography>{meta?.file}</Typography>
-    //               </Stack>
-
-    //               {/* № page */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">№ pages:</Typography>
-    //                 <Typography>{details?.pages}</Typography>
-    //               </Stack>
-
-    //               {/* Write in Language */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Languages:</Typography>
-    //                 <Typography>{details?.language.join(" | ")}</Typography>
-    //               </Stack>
-
-    //               {/* Genres */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Genres:</Typography>
-    //                 <Typography>{details?.genres.join(" | ")}</Typography>
-    //               </Stack>
-
-    //               {/* Edition version */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Edition version:</Typography>
-    //                 <Typography>{details?.editionVersion}</Typography>
-    //               </Stack>
-
-    //               {/* Max supply */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Max supply:</Typography>
-    //                 <Typography>{details?.maxSupply}</Typography>
-    //               </Stack>
-
-    //               {/* Owners */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Owners:</Typography>
-    //                 <Typography>
-    //                   {
-    //                     meta?.attributes.find(
-    //                       (attr) => attr.statType === "owners"
-    //                     )?.value
-    //                   }
-    //                 </Typography>
-    //               </Stack>
-
-    //               {/* Open on */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">
-    //                   Open publication on:
-    //                 </Typography>
-    //                 <Typography>
-    //                   {details?.openDate.toLocaleDateString("en-US")}
-    //                 </Typography>
-    //               </Stack>
-
-    //               {/* End on */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">End publication on:</Typography>
-    //                 <Typography>
-    //                   {details?.endDate.toLocaleDateString("en-US")}
-    //                 </Typography>
-    //               </Stack>
-    //             </Stack>
-    //           </Grid>
-    //           <Grid item xs={4} sm={8} md={6}>
-    //             <Stack spacing={2}>
-    //               {/* Sale / rental pricing history */}
-    //               <Typography variant="h5" mb={1}>
-    //                 Sale pricing history
-    //               </Typography>
-
-    //               {/* Highest */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Highest:</Typography>
-    //                 <Typography>0.5 ETH</Typography>
-    //               </Stack>
-
-    //               {/* Lowest */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Lowest:</Typography>
-    //                 <Typography>0.5 ETH</Typography>
-    //               </Stack>
-
-    //               {/* Average */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Average:</Typography>
-    //                 <Typography>0.5 ETH</Typography>
-    //               </Stack>
-
-    //               {/* Lasted */}
-    //               <Stack direction="row" spacing={1}>
-    //                 <Typography variant="label">Lasted:</Typography>
-    //                 <Typography>0.5 ETH</Typography>
-    //               </Stack>
-    //             </Stack>
-    //           </Grid>
-    //         </Grid>
-    //       </Stack>
-    //     </>
-    //   )}
-    // </>
+              <ReadMore>
+                {bookDetail?.info.description
+                  ?.split("\n")
+                  .map((paragraph, i) => (
+                    <Typography key={i} gutterBottom>
+                      {paragraph}
+                    </Typography>
+                  ))}
+              </ReadMore>
+            </Stack>
+          </Box>
+          <Box>
+            <Grid
+              container
+              columns={{ xs: 4, sm: 7, md: 7 }}
+              sx={{
+                borderBottom: `1px solid ${theme.palette.primary.main}`,
+                borderRight: { sm: `1px solid ${theme.palette.primary.main}` },
+                borderLeft: {
+                  xs: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0
+                }
+              }}
+            >
+              <Grid
+                item
+                xs={4}
+                sm={7}
+                md={4}
+                sx={{
+                  borderRight: {
+                    md: `1px solid ${theme.palette.primary.main}`,
+                    sm: 0,
+                    xs: `1px solid ${theme.palette.primary.main}`
+                  },
+                  borderBottom: {
+                    xs: `1px solid ${theme.palette.primary.main}`,
+                    sm: 0
+                  }
+                }}
+                p={3}
+              >
+                <BookDetail
+                  bookId={bookDetail?.bookId}
+                  fileType={bookDetail?.meta.fileType}
+                  totalPages={bookDetail?.info.totalPages}
+                  languages={bookDetail?.info.languages}
+                  genres={bookDetail?.info.genres}
+                  version={bookDetail?.meta.version}
+                  maxSupply={bookDetail?.meta.quantity}
+                  publishingTime={bookDetail?.info.publishingTime}
+                  owners={
+                    bookDetail?.listedCore !== null
+                      ? bookDetail?.listedCore?.seller
+                      : bookDetail?.meta.author
+                  }
+                />
+              </Grid>
+              <Grid
+                item
+                xs={4}
+                sm={8}
+                md={3}
+                p={3}
+                sx={{
+                  borderRight: {
+                    xs: `1px solid ${theme.palette.primary.main}`,
+                    sm: 0
+                  }
+                }}
+              >
+                <BookPricingHistory />
+              </Grid>
+            </Grid>
+          </Box>
+          <Box p={3}>
+            <Typography variant="h5" gutterBottom>
+              You may love
+            </Typography>
+            <BookList bookList={bookList} />
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

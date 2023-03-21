@@ -13,8 +13,6 @@ const images = {
   gradient1: require("@/assets/images/gradient1.jpg").default.src,
   loading: require("@/assets/images/loading.gif").default.src,
   genre2: require("@/assets/images/genre2.svg").default.src,
-  artPhotography: require("@/assets/images/book-genres/art-photography.svg")
-    .default.src,
   heroImg: require("@/assets/images/hero-img.jpg").default.src
 };
 

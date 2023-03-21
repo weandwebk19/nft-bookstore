@@ -16,7 +16,7 @@ const Author = () => {
       </Head>
       <main>
         <Stack spacing={8}>
-          <Box component="section" sx={{ marginTop: "100px" }}>
+          <Box component="section">
             <DisplayBox />
           </Box>
         </Stack>
