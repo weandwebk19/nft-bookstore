@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { FunctionComponent } from "react";
+import { FunctionComponent, useState } from "react";
 
-import { Box, Grid, Stack } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 
 import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
@@ -9,20 +9,15 @@ import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
-import { BookList } from "@/components/shared/BookList";
+import {
+  AddToWatchlistButton,
+  BookmarkButton
+} from "@/components/shared/BookButton";
+import BuyButton from "@/components/shared/BookButton/BuyButton";
+import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList, bookList2 } from "@/mocks";
-import {
-  BookGenres,
-  ListedBook,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails,
-  NftListedBook
-} from "@/types/nftBook";
+import { book } from "@/mocks";
 
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
@@ -40,54 +35,92 @@ const DisplayBox: FunctionComponent = () => {
     })();
   };
 
-  // console.log("nftBooks: ", listedBooks.data);
+  // should be replaced with the newest book that has been published
+  const firstBook = listedBooks?.data?.[0];
+
   return (
     <Box>
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
             {/* Book Banner */}
-            <BookBanner
-              meta={book.meta}
-              details={book.details}
-              tokenId={book.tokenId}
-              author={book.author}
-              price={book.price}
-              onClick={() => {
-                alert(book.meta.title);
-              }}
-              balance={0}
-              seller={""}
-              amount={0}
-            />
+            {firstBook && (
+              <BookBanner
+                tokenId={firstBook?.tokenId}
+                title={firstBook?.meta.title}
+                author={firstBook?.seller}
+                bookCover={firstBook?.meta.bookCover}
+                fileType={firstBook?.meta.fileType}
+                //  description={firstBook?.info.description}
+                //  price={firstBook?.price}
+                //  genres={}
+                //  languages={}
+                onClick={() => {
+                  alert(book.meta.title);
+                }}
+              />
+            )}
 
             <ContentPaper isPaginate={true} title="Publishing books">
-              {/* {listedBooks.data?.map((book: ListedBook) => (
-                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
-                    <BookItem
-                      tokenId={book.tokenId}
-                      seller={book.seller}
-                      amount={book.amount}
-                      price={book.price}
-                      meta={book.meta}
-                      author=""
-                      balance={0}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
+              {(() => {
+                if (listedBooks.isLoading) {
+                  return (
+                    <Typography>Putting books on the shelves...</Typography>
+                  );
+                } else if (
+                  listedBooks?.data?.length === 0 ||
+                  listedBooks.error
+                ) {
+                  return <FallbackNode />;
+                }
+                return (
+                  <Grid
+                    container
+                    spacing={3}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                  >
+                    {/* Can not call BookList component, since the BookCard component has
+                  `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
+                  title, bookCover, author,... */}
+
+                    {listedBooks?.data?.map((book) => {
+                      return (
+                        <Grid
+                          item
+                          key={book.tokenId}
+                          xs={4}
+                          sm={8}
+                          md={6}
+                          lg={6}
+                        >
+                          <OwnableBookItem
+                            price={book?.price}
+                            tokenId={book?.tokenId}
+                            bookCover={book?.meta.bookCover}
+                            title={book?.meta.title}
+                            fileType={book?.meta.fileType}
+                            author={book?.seller}
+                            onClick={handleBookClick}
+                            buttons={
+                              <>
+                                <BuyButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.seller}
+                                  price={book?.price}
+                                />
+                                <BookmarkButton />
+                                <AddToWatchlistButton isLastInButtonGroup />
+                              </>
+                            }
+                          />
+                        </Grid>
+                      );
+                    })}
                   </Grid>
-                ))} */}
-              {listedBooks.isLoading && "Putting books on the shelves..."}
-
-              {listedBooks.data && (
-                <BookList
-                  bookList={listedBooks.data as NftListedBook[]}
-                  onClick={handleBookClick}
-                />
-              )}
-
-              {!listedBooks.data && <FallbackNode />}
+                );
+              })()}
             </ContentPaper>
           </Stack>
         </Grid>

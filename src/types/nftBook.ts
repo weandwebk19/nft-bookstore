@@ -37,7 +37,7 @@ export type BookInfo = {
   contractAddress?: string;
   description: string;
   languages: string[];
-  genres: (keyof typeof BookGenres)[];
+  genres: string[];
   externalLink?: string;
   totalPages?: number;
   keywords?: string;

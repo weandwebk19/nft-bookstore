@@ -1,4 +1,4 @@
-import { Grid, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 
 interface BookDetailProps {
   bookId: string;
@@ -24,7 +24,7 @@ const BookDetail = ({
   owners
 }: BookDetailProps) => {
   return (
-    <Grid item xs={4} sm={8} md={6}>
+    <>
       {/* Nft book details */}
       <Stack spacing={2}>
         <Typography variant="h5" mb={1}>
@@ -86,9 +86,11 @@ const BookDetail = ({
         </Stack>
 
         {/* Owners */}
-        <Stack direction="row" spacing={1}>
+        <Stack spacing={1}>
           <Typography variant="label">Owners:</Typography>
-          <Typography>{owners}</Typography>
+          <Box sx={{ wordWrap: "break-word", width: "100%" }}>
+            <Typography>{owners}</Typography>
+          </Box>
         </Stack>
 
         {/* Open on */}
@@ -105,7 +107,7 @@ const BookDetail = ({
           </Typography>
         </Stack> */}
       </Stack>
-    </Grid>
+    </>
   );
 };
 

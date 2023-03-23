@@ -1,4 +1,5 @@
 import {
+  Box,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -8,14 +9,17 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import { StyledCard } from "@styles/components/Card";
+import { CldImage } from "next-cloudinary";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { ContentContainer } from "@/components/shared/ContentContainer";
+import { Image } from "@/components/shared/Image";
 
 const MainProduct = () => {
   const { t } = useTranslation("home");
+  const imageCloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
   const router = useRouter();
 
@@ -34,11 +38,27 @@ const MainProduct = () => {
             }}
           >
             <CardMedia
-              component="img"
-              height="300"
-              image={images.product1}
-              alt="green iguana"
-            />
+              sx={{
+                height: "300px"
+              }}
+            >
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "100%",
+                  position: "relative"
+                }}
+              >
+                <CldImage
+                  src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628695/nft_bookstore/img/product1_ixtr9a.jpg`}
+                  alt="publishing"
+                  fill
+                  style={{
+                    objectFit: "cover"
+                  }}
+                />
+              </Box>
+            </CardMedia>
             <CardContent sx={{ minHeight: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
                 {t("publishing") as string}
@@ -64,11 +84,27 @@ const MainProduct = () => {
               </Typography>
             </CardContent>
             <CardMedia
-              component="img"
-              height="300"
-              image={images.product2}
-              alt="green iguana"
-            />
+              sx={{
+                height: "300px"
+              }}
+            >
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "100%",
+                  position: "relative"
+                }}
+              >
+                <CldImage
+                  src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628696/nft_bookstore/img/product2_yfv14w.jpg`}
+                  alt="trade-in"
+                  fill
+                  style={{
+                    objectFit: "cover"
+                  }}
+                />
+              </Box>
+            </CardMedia>
           </CardActionArea>
         </StyledCard>
         <StyledCard customVariant="dome" sx={{ m: 2 }}>
@@ -78,12 +114,28 @@ const MainProduct = () => {
             }}
           >
             <CardMedia
-              component="img"
-              height="300"
-              image={images.product3}
-              alt="green iguana"
-            />
-            <CardContent sx={{ minHeight: 215 }}>
+              sx={{
+                height: "300px"
+              }}
+            >
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "100%",
+                  position: "relative"
+                }}
+              >
+                <CldImage
+                  src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628696/nft_bookstore/img/product3_e05rs7.jpg`}
+                  alt="borrow"
+                  fill
+                  style={{
+                    objectFit: "cover"
+                  }}
+                />
+              </Box>
+            </CardMedia>
+            <CardContent sx={{ height: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
                 {t("borrow") as string}
               </Typography>

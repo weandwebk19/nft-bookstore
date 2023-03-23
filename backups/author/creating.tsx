@@ -971,3 +971,4 @@
 // };
 
 // export default AuthorPublishing;
+export {};
