@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+// Timelock is a contract that helps us in delaying a transaction with a specific time
 contract TimeLock {
     error AlreadyQueuedError(bytes32 txId);
     error TimestampNotInRangeError(uint blockTimestamp, uint timestamp);
@@ -39,13 +40,13 @@ contract TimeLock {
      * @param _data ABI encoded data send.
      * @param _timestamp Timestamp after which the transaction can be executed.
      */
-    function queue(
+    function _queue(
         address _owner,
         uint _value,
         string memory _func,
         bytes memory _data,
         uint _timestamp
-    ) public returns (bytes32 txId) {
+    ) internal returns (bytes32 txId) {
         txId = getTxId(_owner, _value, _func, _data, _timestamp);
         if (queued[txId]) {
             revert AlreadyQueuedError(txId);
@@ -64,14 +65,14 @@ contract TimeLock {
         emit Queue(txId, _owner, _value, _func, _data, _timestamp);
     }
 
-    function update(
+    function _update(
         bytes32 txId,
         address _newOwner,
         uint _newvalue,
         string memory _newFunc,
         bytes memory _newData,
         uint _newTimestamp
-    ) public returns(bool) {
+    ) internal returns(bool) {
         if (queued[txId]) {
 
             if (
@@ -91,30 +92,30 @@ contract TimeLock {
 
     }
 
-    function execute(
+    function isExecute(
         address _owner,
         uint _value,
         string memory _func,
         bytes memory _data,
         uint _timestamp
-    ) public {
+    ) public returns(bool) {
         bytes32 txId = getTxId(_owner, _value, _func, _data, _timestamp);
 
         if (!queued[txId]) {
-            require(false, "Not Queued Error");
+            return false;
             // revert NotQueuedError(txId);
         }
 
         // ----|-------------------|-------
         //  block.timestamp    timestamp 
         if (block.timestamp < _timestamp) {
-            require(false, "Timestamp Not In Range Error");
+            return false;
             // revert TimestampNotInRangeError(block.timestamp, _timestamp);
 
         }
 
         queued[txId] = false;
-
+        return true;
     }
 
     function cancel(bytes32 _txId) public {

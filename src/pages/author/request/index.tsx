@@ -81,13 +81,29 @@ const schema = yup.object().shape({
         }, 0);
       }
 
-      console.log("file:", file);
-      console.log("fileSize:", fileSize);
-      console.log("MAXIMUM_ATTACHMENTS_SIZE:", MAXIMUM_ATTACHMENTS_SIZE);
-
       return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
     }),
   backDocument: yup
+    .mixed()
+    .required("File is required")
+    .test("required", "You need to provide a file", (file) => {
+      if (file && (file as any).length !== 0) return true;
+      return false;
+    })
+    .test("multipleFiles", "One file only can be provided.", (file) => {
+      return (file as any).length <= 1;
+    })
+    .test("fileSize", "The file is too large", (file) => {
+      let fileSize;
+      if ((file as any).length > 0) {
+        fileSize = (file as any).reduce((total: number, current: any) => {
+          return total + current.size;
+        }, 0);
+      }
+
+      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
+    }),
+  picture: yup
     .mixed()
     .required("File is required")
     .test("required", "You need to provide a file", (file) => {
@@ -122,7 +138,8 @@ const defaultValues = {
   linkedIn: "",
   instagram: "",
   frontDocument: "",
-  backDocument: ""
+  backDocument: "",
+  picture: ""
 };
 
 const AuthorRequest = () => {
@@ -146,7 +163,7 @@ const AuthorRequest = () => {
     setValue
   } = methods;
 
-  console.log("errors:", errors);
+  // console.log("errors:", errors);
 
   const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
     console.log("e.target.files:", e.target.files);
@@ -155,33 +172,15 @@ const AuthorRequest = () => {
       return;
     }
 
-    // const file = e.target.files[0];
-    // const buffer = await file.arrayBuffer();
-    // const bytes = new Uint8Array(buffer);
-    // console.log("click");
-  };
-
-  const getSignedData = async () => {
-    const messageToSign = await axios.get("/api/verify");
-    const accounts = (await ethereum?.request({
-      method: "eth_requestAccounts"
-    })) as string[];
-    const account = accounts[0];
-
-    const signedData = await ethereum?.request({
-      method: "personal_sign",
-      params: [
-        JSON.stringify(messageToSign.data),
-        account,
-        messageToSign.data.id
-      ]
-    });
-
-    return { signedData, account };
+    setValue("picture", e.target.files[0]);
   };
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
+    // (async () => {
+    //   const res = await axios.post("/api/author/request", { authorInfo: data });
+    //   console.log("res:", res);
+    // })();
   };
 
   return (

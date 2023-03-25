@@ -8,7 +8,7 @@ import axios from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
-import { useAccount, useOwnedNfts } from "@/components/hooks/web3";
+import { useAccount, useOwnedListedBooks } from "@/components/hooks/web3";
 import { BookList } from "@/components/shared/BookList";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
@@ -17,7 +17,8 @@ import { StyledButton } from "@/styles/components/Button";
 
 const ListingBooks = () => {
   // *Replace my-listing-books-hook here*
-  const { nfts } = useOwnedNfts();
+  const { nfts } = useOwnedListedBooks();
+  console.log("nfts", nfts);
   const [ownedBooks, setOwnedBooks] = useState<any[]>([]);
   const router = useRouter();
 
@@ -36,7 +37,7 @@ const ListingBooks = () => {
 
   useEffect(() => {
     if (nfts.data?.length !== 0) {
-      const res = nfts.data?.filter((nft) => nft.author !== account.data);
+      const res = nfts.data?.filter((nft: any) => nft.author !== account.data);
       if (res) setOwnedBooks(res);
     }
   }, [nfts.data, account.data]);
@@ -56,10 +57,10 @@ const ListingBooks = () => {
                       <Typography>You haven&apos;t sell any book.</Typography>
                       <StyledButton
                         onClick={() => {
-                          router.push("/account/bookshelf/owned-books");
+                          router.push("/account/bookshelf/created-books");
                         }}
                       >
-                        My owned books
+                        My created books
                       </StyledButton>
                     </Stack>
                   </FallbackNode>

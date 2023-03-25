@@ -1,5 +1,4 @@
 import { NftBookMeta } from "@_types/nftBook";
-import pinataSDK from "@pinata/sdk";
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
@@ -14,7 +13,8 @@ import {
   pinataUnpinSecretApiKey,
   setURI,
   withSession
-} from "../utils";
+} from "../../utils";
+import { deleteFile, getMetadata } from "../../utils";
 
 /* 
 To update an existing metadata file we need to follow following steps:
@@ -23,20 +23,6 @@ To update an existing metadata file we need to follow following steps:
 3. Upload new metadata file to pinata 
 4. Update tokenURI of NFT.
 5. Delete old metadata file  */
-
-const getContent = async (hash: string) => {
-  const nftUri = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${hash}`;
-  console.log("nftUri", nftUri);
-  const nftRes = await axios.get(nftUri, {
-    headers: {
-      Accept: "text/plain"
-    },
-    timeout: 20000
-  });
-
-  const data = nftRes.data;
-  return data;
-};
 
 const updateContent = (oldData: any, updateData: any) => {
   const newData = { ...oldData, ...updateData };
@@ -67,41 +53,42 @@ const uploadMetadata = async (content: any) => {
   }
 };
 
-const deleteFile = async (hash: string) => {
-  try {
-    const pinata = new pinataSDK(pinataUnpinApiKey, pinataUnpinSecretApiKey);
-    const jsonRes = await pinata.unpin(hash);
-
-    return jsonRes;
-  } catch (e) {
-    return e;
-  }
-};
-
 export default withSession(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
     console.log("Update metadata");
-    if (req.method === "POST") {
+    if (req.method === "PUT" || req.method === "PATCH") {
       try {
-        const nftUri: string = req.body.nftUri as string;
+        const nftUri: string = req.query.nftUri as string;
         const data: any = req.body.data;
         const tokenId: number = req.body.tokenId;
 
         await addressCheckMiddleware(req, res);
 
-        const content = await getContent(nftUri);
+        const content = await getMetadata(nftUri);
         const newContent = updateContent(content, data);
         const jsonRes = await uploadMetadata(newContent);
         setURI(tokenId, jsonRes);
         deleteFile(nftUri);
 
-        return res.status(200).send(jsonRes);
+        return res.status(200).json({
+          message: "Delete successfully",
+          success: true,
+          data: jsonRes
+        });
       } catch (err) {
         console.log("err", err);
-        return res.status(422).send(err);
+        return res.status(422).json({
+          message: "Delete successfully",
+          success: true,
+          data: err
+        });
       }
     } else {
-      return res.status(400).json({ message: "Invalid api route" });
+      return res.status(400).json({
+        message: "Invalid api route",
+        success: false,
+        data: null
+      });
     }
   }
 );

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import {
   Box,
@@ -16,9 +17,11 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -61,6 +64,7 @@ const BuyButton = ({
 }: BuyButtonProps) => {
   const router = useRouter();
   const [authorName, setAuthorName] = useState();
+  const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -113,6 +117,26 @@ const BuyButton = ({
 
   const onSubmit = async (data: any) => {
     console.log(data);
+    try {
+      const tx = await contract?.buyBooks(
+        ethers.utils.parseEther(tokenId.toString()),
+        data.seller,
+        ethers.utils.parseEther(data.amount.toString()),
+        {
+          value: ethers.utils.parseEther(data.price.toString())
+        }
+      );
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Buy NftBook Token",
+        success: "NftBook has ben bought",
+        error: "Buy error"
+      });
+
+      console.log("receipt", receipt);
+    } catch (e: any) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {

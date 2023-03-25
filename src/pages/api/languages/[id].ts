@@ -1,7 +1,6 @@
+import clientPromise from "@lib/mongodb";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import clientPromise from "../../../lib/mongodb";
 
 type ResponseData = {
   success: boolean;

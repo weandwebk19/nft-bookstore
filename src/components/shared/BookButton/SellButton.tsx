@@ -14,8 +14,9 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
-import { sellBooks } from "@/lib/contracts/bookStoreContractUtil";
 import { StyledButton } from "@/styles/components/Button";
+
+import { Image } from "../Image";
 
 interface SellButtonProps {
   title: string;
@@ -79,9 +80,9 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
       );
 
       const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Minting NftBook Token",
-        success: "NftBook has ben created",
-        error: "Minting error"
+        pending: "Sell NftBook Token",
+        success: "NftBook has ben sold",
+        error: "Sell error"
       });
 
       console.log("receipt", receipt);
