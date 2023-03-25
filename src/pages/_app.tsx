@@ -4,10 +4,13 @@ import { Box, CssBaseline } from "@mui/material";
 
 import "@styles/GlobalStyles/GlobalStyles.scss";
 import { AnimatePresence, motion } from "framer-motion";
+import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
+import { WagmiConfig, chain, configureChains, createClient } from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
 
 import { Web3Provider } from "@/components/providers";
 import { Loading } from "@/components/shared/Loading";
@@ -32,6 +35,16 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
+export const { chains, provider } = configureChains(
+  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, chain.goerli],
+  [publicProvider()]
+);
+
+const client = createClient({
+  autoConnect: true,
+  provider
+});
+
 function App({ Component, pageProps }: ComponentWithPageLayout) {
   const router = useRouter();
   const app = useRef();
@@ -39,44 +52,48 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
   return (
     <Box ref={app}>
       <Web3Provider>
-        <MyThemeContextProvider>
-          <CssBaseline />
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={router.route}
-              initial="initialState"
-              animate="animateState"
-              exit="exitState"
-              className="base-page-size"
-              transition={{ duration: 0.2 }}
-              variants={{
-                initialState: {
-                  opacity: 0,
-                  clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
-                },
-                animateState: {
-                  opacity: 1,
-                  clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
-                },
-                exitState: {
-                  clipPath: "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
-                }
-              }}
-            >
-              <Loading />
+        <WagmiConfig client={client}>
+          <SessionProvider session={pageProps.session} refetchInterval={0}>
+            <MyThemeContextProvider>
+              <CssBaseline />
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={router.route}
+                  initial="initialState"
+                  animate="animateState"
+                  exit="exitState"
+                  className="base-page-size"
+                  transition={{ duration: 0.2 }}
+                  variants={{
+                    initialState: {
+                      opacity: 0,
+                      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
+                    },
+                    animateState: {
+                      opacity: 1,
+                      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
+                    },
+                    exitState: {
+                      clipPath: "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
+                    }
+                  }}
+                >
+                  <Loading />
 
-              {Component.PageLayout ? (
-                <Component.PageLayout>
-                  <Component {...pageProps} />
-                </Component.PageLayout>
-              ) : (
-                <DefaultLayout>
-                  <Component {...pageProps} />
-                </DefaultLayout>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </MyThemeContextProvider>
+                  {Component.PageLayout ? (
+                    <Component.PageLayout>
+                      <Component {...pageProps} />
+                    </Component.PageLayout>
+                  ) : (
+                    <DefaultLayout>
+                      <Component {...pageProps} />
+                    </DefaultLayout>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </MyThemeContextProvider>
+          </SessionProvider>
+        </WagmiConfig>
       </Web3Provider>
     </Box>
   );

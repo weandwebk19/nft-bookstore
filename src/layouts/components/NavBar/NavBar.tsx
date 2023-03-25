@@ -25,10 +25,19 @@ import { ListItemProps } from "@_types/list";
 import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
-import { StyledButton } from "@styles/components/Button";
 import { motion } from "framer-motion";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+import { SiweMessage } from "siwe";
+import {
+  useConnect,
+  useDisconnect,
+  useNetwork,
+  useSignMessage,
+  useAccount as useWagmiAccount
+} from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
 import { useLocalStorage } from "@/components/hooks/common";
 import { useAccount } from "@/components/hooks/web3";
@@ -72,20 +81,89 @@ interface SyntheticEvent {
 
 const NavBar = () => {
   const { t } = useTranslation();
+  const router = useRouter();
+
+  const { disconnect } = useDisconnect();
+
+  const { data: session, status } = useSession();
+  console.log(session);
+
+  const { signMessageAsync } = useSignMessage();
+
+  const { chain } = useNetwork();
+  const { connect: wagmiConnect } = useConnect({
+    connector: new InjectedConnector()
+  });
+  const { address: wagmiAddress, isConnected } = useWagmiAccount();
+  const [address, setAddress] = useState(wagmiAddress as string);
+
+  useEffect(() => {
+    if (wagmiAddress) {
+      setAddress(wagmiAddress);
+    }
+  }, [wagmiAddress]);
+
+  const handleLogin = async () => {
+    try {
+      const callbackUrl =
+        (router.query?.callbackUrl as string) ?? router.pathname ?? "/";
+
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: wagmiAddress,
+        statement: "Sign in with Ethereum to NFT Bookstore.",
+        uri: window.location.origin,
+        version: "1",
+        chainId: chain?.id,
+        nonce: await getCsrfToken()
+      });
+      console.log("message", message);
+      const signature = await signMessageAsync({
+        message: message.prepareMessage()
+      });
+      console.log("signature", signature);
+
+      const result = await signIn("credentials", {
+        message: JSON.stringify(message),
+        redirect: false,
+        signature,
+        callbackUrl
+      });
+
+      if (result?.error) {
+        console.error(result.error);
+      } else {
+        router.push(callbackUrl);
+      }
+    } catch (error) {
+      // window.alert(error);
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    // console.log("handleLogin");
+    console.log("wagmiAddress", wagmiAddress);
+    if (isConnected && !session) {
+      handleLogin();
+    }
+  }, [isConnected, wagmiAddress]);
 
   const [clientTheme, setClientTheme] = useMyTheme();
   const [clientLocale, setClientLocale] = useLocalStorage("locale", "en");
 
   const setStoredTheme = useSetMyThemeContext();
 
-  const router = useRouter();
   const { pathname, asPath, query } = router;
   const { account } = useAccount();
-  const [address, setAddress] = useState("");
 
-  useEffect(() => {
-    account.data && setAddress(truncate(account.data, 6, -4));
-  }, [account]);
+  // useEffect(() => {
+  //   account.data && setAddress(truncate(account.data, 6, -4));
+  // }, [account]);
+
+  // useEffect(() => {
+  //   wagmiAddress && setAddress(truncate(wagmiAddress, 6, -4));
+  // }, [wagmiAddress]);
 
   const [anchorAccountMenu, setAnchorAccountMenu] = useState<Element | null>(
     null
@@ -321,7 +399,7 @@ const NavBar = () => {
   ];
 
   const navItems: ListItemProps[] = [
-    account.data
+    session
       ? {
           type: "button",
           icon: <Avatar alt="Remy Sharp" src="" />,
@@ -501,7 +579,7 @@ const NavBar = () => {
                   />
                 </Box>
 
-                {account.data && (
+                {session && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
                       tooltipTitle={t("navbar:toolTip_create") as string}
@@ -517,15 +595,18 @@ const NavBar = () => {
                 <WalletBar
                   isInstalled={account.isInstalled}
                   isLoading={account.isLoading}
-                  connect={account.connect}
-                  account={account.data}
-                  disconnect={account.disconnect}
+                  connect={wagmiConnect}
+                  // account={account.data}
+                  account={wagmiAddress}
+                  disconnect={disconnect}
+                  handleLogin={handleLogin}
+                  isConnected={isConnected}
                 />
                 <AccountMenu
-                  account={account.data}
+                  account={wagmiAddress}
                   open={openAccountMenu}
                   onClose={handleAccountMenuClose}
-                  disconnect={account.disconnect}
+                  disconnect={disconnect}
                 />
                 {/* <Tooltip title="Toggle theme">
                 <IconButton
@@ -608,5 +689,13 @@ const NavBar = () => {
     </motion.div>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  return {
+    props: {
+      csrfToken: await getCsrfToken(context)
+    }
+  };
+}
 
 export default NavBar;
