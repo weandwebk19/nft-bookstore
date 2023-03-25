@@ -1,10 +1,9 @@
+import clientPromise from "@lib/mongodb";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { BookInfo } from "@/types/nftBook";
 import { toSnake } from "@/utils/nomalizer";
-
-import clientPromise from "../../../lib/mongodb";
 
 type ResponseData = {
   success: boolean;

@@ -37,17 +37,27 @@ export const hookFactory: BookDetailHookFactory =
           sellerDefault
         );
         if (isListed === true) {
-          const listedNftBook = await contract!.getListedBook(
-            bookInfo?.tokenId,
-            sellerDefault
-          );
-          return {
-            bookId: bookId,
-            nftCore: toNumber(coreNftBook),
-            listedCore: toNumber(listedNftBook),
-            meta: meta,
-            info: bookInfo
-          };
+          try {
+            const listedNftBook = await contract!.getListedBook(
+              bookInfo?.tokenId,
+              sellerDefault
+            );
+            const { price, tokenId, seller, amount } = listedNftBook;
+            return {
+              bookId: bookId,
+              nftCore: toNumber(coreNftBook),
+              listedCore: toNumber({
+                tokenId,
+                seller,
+                amount,
+                price: ethers.utils.formatEther(price)
+              }),
+              meta: meta,
+              info: bookInfo
+            };
+          } catch (error) {
+            console.error(error);
+          }
         } else {
           return {
             bookId: bookId,

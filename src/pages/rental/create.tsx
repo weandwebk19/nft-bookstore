@@ -34,15 +34,15 @@ import {
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 
+import { deleteFile } from "../api/pinata/utils";
+
 const Book = () => {
   const formRef = useRef<any>();
   const { ethereum, contract } = useWeb3();
   const { network } = useNetwork();
-  const { bookDetail } = useBookDetail("641176f75f96e076121d2a49");
-  console.log("bookDetail", bookDetail);
 
   const getSignedData = async () => {
-    const messageToSign = await axios.get("/api/verify");
+    const messageToSign = await axios.get("/api/metadata/verify");
     const accounts = (await ethereum?.request({
       method: "eth_requestAccounts"
     })) as string[];
@@ -61,15 +61,14 @@ const Book = () => {
   };
 
   const handleSubmit = () => {
-    try {
-      (async () => {
-        const { signedData, account } = await getSignedData();
+    // try {
+    (async () => {
+      try {
+        // const { signedData, account } = await getSignedData();
 
-        const promise = axios.post("/api/pinata/metadata/update", {
-          address: account,
-          signature: signedData
-          // nftBook: nftBookMeta
-        });
+        const promise = axios.get(
+          "/api/pinata/metadata/QmZVdqdj5Z4u1f5BT6RDqkufz8FRSERuEyYYt3wY4q9baY/delete"
+        );
 
         const res = await toast.promise(promise, {
           pending: "Uploading metadata",
@@ -78,12 +77,15 @@ const Book = () => {
         });
 
         const data = res.data as PinataRes;
-        // const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
         console.log("data", data);
-      })();
-    } catch (e: any) {
-      console.error(e.message);
-    }
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+    // } catch (e: any) {
+    //   console.error(e);
+    // }
     return "";
   };
   return (

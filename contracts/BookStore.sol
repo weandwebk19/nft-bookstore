@@ -138,6 +138,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _idToNFTBook[tokenId];
   }
 
+  function getListedBook(uint tokenId, address seller) public view returns (ListedBookStorage.ListedBook memory) {
+    return _listedBookStorage.getListedBook(tokenId, seller);
+  }
+
   function isTokenURIExist(string memory tokenURI) public view returns (bool) {
     return _usedTokenURIs[tokenURI];
   }
@@ -209,20 +213,20 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
     uint ownedRentedBookCount = _bookTemporary.getTotalOwnedRentedBook(msg.sender);
     uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
-
-    NFTBook[] memory books = new NFTBook[](length);
-
-    uint currentIndex = 0;
-    for (uint i = 0; i < ownedItemsCount; i++) {
-      uint tokenId = _ownedTokens[msg.sender][i];
-      if(_listedBookStorage.isListed(tokenId, msg.sender) == false 
-        && _bookTemporary.isRented(tokenId, msg.sender) == false) {
-        NFTBook memory book = _idToNFTBook[tokenId];
-        books[currentIndex] = book;
-        currentIndex += 1;
+    NFTBook[] memory books;
+    if(length > 0) {
+      books = new NFTBook[](length);
+      uint currentIndex = 0;
+      for (uint i = 0; i < ownedItemsCount; i++) {
+        uint tokenId = _ownedTokens[msg.sender][i];
+        if(_listedBookStorage.isListed(tokenId, msg.sender) == false 
+          && _bookTemporary.isRented(tokenId, msg.sender) == false) {
+          NFTBook memory book = _idToNFTBook[tokenId];
+          books[currentIndex] = book;
+          currentIndex += 1;
+        }
       }
     }
-
     return books;
   }
 

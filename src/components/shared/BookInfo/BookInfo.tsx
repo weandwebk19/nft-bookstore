@@ -28,8 +28,10 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
   const isOpenForSale = bookDetail?.listedCore ? true : false;
   const isOpenForTradeIn = false;
   const isOpenForBorrow = false;
-  const isSold = bookDetail?.nftCore?.quantity > 0 ? false : true;
-  console.log(bookDetail);
+  const isSold =
+    bookDetail?.listedCore?.amount && bookDetail?.listedCore?.amount > 0
+      ? false
+      : true;
   const [isPublishedState, setIsPublishedState] = useState(false);
 
   useEffect(() => {

@@ -1,18 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
 
-import { addressCheckMiddleware, withSession } from "../utils";
-import { deleteFile } from "../utils";
+import { addressCheckMiddleware, withSession } from "../../utils";
+import { deleteFile } from "../../utils";
 
 export default withSession(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
     console.log("Delete metadata");
     if (req.method === "DELETE") {
       try {
-        const nftUri: string = req.body.nftUri as string;
+        const cid: string = req.query.cid as string;
 
         await addressCheckMiddleware(req, res);
-        const jsonRes = await deleteFile(nftUri);
+        const jsonRes = await deleteFile(cid);
 
         return res.status(200).json({
           message: "Delete successfully",

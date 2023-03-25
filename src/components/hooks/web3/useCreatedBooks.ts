@@ -33,7 +33,7 @@ export const hookFactory: CreatedBooksHookFactory =
           const item = coreNfts[i];
           const tokenURI = await contract!.uri(item.tokenId);
           const metaRes = await (
-            await axios.get(`/api/pinata/metadata?uri=${tokenURI}`)
+            await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
           ).data;
           let meta = null;
           if (metaRes.success === true) {

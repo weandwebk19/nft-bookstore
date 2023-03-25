@@ -1,8 +1,7 @@
+import clientPromise from "@lib/mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
-
-import clientPromise from "../../../../../lib/mongodb";
 
 export default async function handler(
   req: NextApiRequest,

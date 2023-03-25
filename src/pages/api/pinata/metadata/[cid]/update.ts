@@ -13,8 +13,8 @@ import {
   pinataUnpinSecretApiKey,
   setURI,
   withSession
-} from "../utils";
-import { deleteFile, getMetadata } from "../utils";
+} from "../../utils";
+import { deleteFile, getMetadata } from "../../utils";
 
 /* 
 To update an existing metadata file we need to follow following steps:
@@ -58,7 +58,7 @@ export default withSession(
     console.log("Update metadata");
     if (req.method === "PUT" || req.method === "PATCH") {
       try {
-        const nftUri: string = req.body.nftUri as string;
+        const nftUri: string = req.query.nftUri as string;
         const data: any = req.body.data;
         const tokenId: number = req.body.tokenId;
 

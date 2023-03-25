@@ -17,7 +17,7 @@ export default async function handler(
 ) {
   if (req.method === "GET") {
     try {
-      const nftUri: string = req.query.uri as string;
+      const nftUri: string = req.query.nftUri as string;
       const data = await getMetadata(nftUri);
       return res.status(200).json({
         success: true,
