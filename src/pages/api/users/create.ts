@@ -1,8 +1,7 @@
+import clientPromise from "@lib/mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
-
-import clientPromise from "../../../lib/mongodb";
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,6 +25,10 @@ export default async function handler(
           data: null
         });
       } else {
+        db.collection("users").createIndex(
+          { wallet_address: 1 },
+          { unique: true }
+        );
         const newAccount = await db
           .collection("users")
           .insertOne({ wallet_address, fullname });
@@ -38,7 +41,6 @@ export default async function handler(
       }
     } catch (e: any) {
       console.error(e);
-      throw new Error(e).message;
     }
   } else {
     return res.status(400).json({

@@ -30,7 +30,7 @@ export const hookFactory: OwnedNftsHookFactory =
           const item = coreNfts[i];
           const tokenURI = await contract!.uri(item.tokenId);
           const meta = await (
-            await axios.get(`/api/pinata/metadata?uri=${tokenURI}`)
+            await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
           ).data.data;
 
           nfts.push({

@@ -23,11 +23,11 @@ const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
 
   const { listedBooks } = useListedBooks();
+  console.log("listedBooks", listedBooks);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);

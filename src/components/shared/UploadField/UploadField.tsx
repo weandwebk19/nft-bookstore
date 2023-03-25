@@ -38,7 +38,14 @@ const UploadField = ({
   const theme = useTheme();
 
   return (
-    <Dropzone multiple={multiple} onDrop={onChange}>
+    <Dropzone
+      multiple={multiple}
+      onDrop={(acceptedFiles: File[]) => {
+        console.log("acceptedFiles:", acceptedFiles);
+        onChange(acceptedFiles[0]);
+        // onChange(acceptedFiles);
+      }}
+    >
       {({ getRootProps, getInputProps, isDragActive }) => (
         <Box
           {...getRootProps()}

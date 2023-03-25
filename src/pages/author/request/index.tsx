@@ -41,6 +41,7 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
+const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/gif", "image/png"];
 
 const schema = yup.object().shape({
   pseudonym: yup.string().required("Please enter your pseudonym"),
@@ -63,50 +64,76 @@ const schema = yup.object().shape({
   linkedIn: yup.string(),
   instagram: yup.string(),
 
-  frontDocument: yup
-    .mixed()
-    .required("File is required")
-    .test("required", "You need to provide a file", (file) => {
-      if (file && (file as any).length !== 0) return true;
-      return false;
-    })
-    .test("multipleFiles", "One file only can be provided.", (file) => {
-      return (file as any).length <= 1;
-    })
-    .test("fileSize", "The file is too large", (file) => {
-      let fileSize;
-      if ((file as any).length > 0) {
-        fileSize = (file as any).reduce((total: number, current: any) => {
-          return total + current.size;
-        }, 0);
-      }
+  frontDocument: yup.mixed().required("File is required"),
+  // .test("required", "You need to provide a file", (file) => {
+  //   if (file && (file as any).length !== 0) return true;
+  //   return false;
+  // })
+  // .test("multipleFiles", "One file only can be provided.", (file) => {
+  //   return (file as any).length <= 1;
+  // })
+  // .test("fileSize", "The file is too large", (file) => {
+  //   let fileSize;
+  //   if ((file as any).length > 0) {
+  //     fileSize = (file as any).reduce((total: number, current: any) => {
+  //       return total + current.size;
+  //     }, 0);
+  //   }
 
-      console.log("file:", file);
-      console.log("fileSize:", fileSize);
-      console.log("MAXIMUM_ATTACHMENTS_SIZE:", MAXIMUM_ATTACHMENTS_SIZE);
-
-      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-    }),
+  //   return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
+  // })
   backDocument: yup
     .mixed()
     .required("File is required")
     .test("required", "You need to provide a file", (file) => {
-      if (file && (file as any).length !== 0) return true;
+      // if (file && (file as any).length !== 0) return true;
+      if (file) return true;
       return false;
     })
-    .test("multipleFiles", "One file only can be provided.", (file) => {
-      return (file as any).length <= 1;
-    })
-    .test("fileSize", "The file is too large", (file) => {
-      let fileSize;
-      if ((file as any).length > 0) {
-        fileSize = (file as any).reduce((total: number, current: any) => {
-          return total + current.size;
-        }, 0);
-      }
+    // .test("multipleFiles", "One file only can be provided.", (file) => {
+    //   return (file as any).length <= 1;
+    // })
+    .test("fileSize", "The file is too large", (file: File) => {
+      console.log("file:", file);
 
-      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
+      // let fileSize;
+      // if ((file as any).length > 0) {
+      //   fileSize = (file as any).reduce((total: number, current: any) => {
+      //     return total + current.size;
+      //   }, 0);
+      // }
+
+      return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+
+      //   return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
     })
+    .test("fileFormat", "Unsupported Format", (file: File) => {
+      console.log("file:", file);
+      console.log("file.type:", file.type);
+
+      // return file && SUPPORTED_FORMATS.includes(file.type);
+      return true;
+    })
+  // picture: yup
+  //   .mixed()
+  //   .required("File is required")
+  //   .test("required", "You need to provide a file", (file) => {
+  //     if (file && (file as any).length !== 0) return true;
+  //     return false;
+  //   })
+  //   .test("multipleFiles", "One file only can be provided.", (file) => {
+  //     return (file as any).length <= 1;
+  //   })
+  //   .test("fileSize", "The file is too large", (file) => {
+  //     let fileSize;
+  //     if ((file as any).length > 0) {
+  //       fileSize = (file as any).reduce((total: number, current: any) => {
+  //         return total + current.size;
+  //       }, 0);
+  //     }
+
+  //     return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
+  //   })
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -122,7 +149,8 @@ const defaultValues = {
   linkedIn: "",
   instagram: "",
   frontDocument: "",
-  backDocument: ""
+  backDocument: "",
+  picture: ""
 };
 
 const AuthorRequest = () => {
@@ -155,33 +183,15 @@ const AuthorRequest = () => {
       return;
     }
 
-    // const file = e.target.files[0];
-    // const buffer = await file.arrayBuffer();
-    // const bytes = new Uint8Array(buffer);
-    // console.log("click");
-  };
-
-  const getSignedData = async () => {
-    const messageToSign = await axios.get("/api/verify");
-    const accounts = (await ethereum?.request({
-      method: "eth_requestAccounts"
-    })) as string[];
-    const account = accounts[0];
-
-    const signedData = await ethereum?.request({
-      method: "personal_sign",
-      params: [
-        JSON.stringify(messageToSign.data),
-        account,
-        messageToSign.data.id
-      ]
-    });
-
-    return { signedData, account };
+    setValue("picture", e.target.files[0]);
   };
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
+    // (async () => {
+    //   const res = await axios.post("/api/author/request", { authorInfo: data });
+    //   console.log("res:", res);
+    // })();
   };
 
   return (
@@ -210,6 +220,7 @@ const AuthorRequest = () => {
                   <ContentGroup
                     title="Upload your photo"
                     desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+                    classTitle="required"
                   >
                     <Stack
                       direction={{ xs: "column", sm: "column", md: "row" }}

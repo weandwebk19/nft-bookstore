@@ -11,3 +11,18 @@ export const toSnake = (data: any) => {
   }
   return SnakecaseKeys(data, { deep: true });
 };
+
+export const toNumber = (data?: any) => {
+  if (!data) {
+    return data;
+  }
+  if (typeof data === "object") {
+    let result = { ...data };
+    for (const key in data) {
+      if (data[key]._isBigNumber === true) {
+        result[key] = data[key].toNumber();
+      }
+    }
+    return result;
+  }
+};
