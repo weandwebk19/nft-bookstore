@@ -4,9 +4,10 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 import "./Timelock.sol";
 import "./ExtendTime.sol";
+import "./SharedBookStorage.sol";
 
 
-contract BookTemporary is TimeLock, ExtendTime {
+contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
   using Counters for Counters.Counter;
 
   struct RentedBook {
@@ -58,8 +59,8 @@ contract BookTemporary is TimeLock, ExtendTime {
   mapping(uint => BorrowedBook) private _idToBorrowedBook; // (ID -> BorrowedBook))
   Counters.Counter private _borrowedBooks;
 
- function isRented(uint tokenId, address renter) public view returns (bool) {
-    uint idRentedBook = getIdRentedBook(tokenId, renter);
+  function isRented(uint tokenId) public view returns (bool) {
+    uint idRentedBook = getIdRentedBook(tokenId, msg.sender);
     if(idRentedBook > 0) {
       return true;
     }
@@ -71,6 +72,10 @@ contract BookTemporary is TimeLock, ExtendTime {
   function getRentedBook(uint tokenId, address renter) public view returns (RentedBook memory) {
     uint idRentedBook = getIdRentedBook(tokenId, renter);
     return _idToRentedBook[idRentedBook];
+  }
+
+  function getRentedBookFromId(uint id) public view returns (RentedBook memory) {
+    return _idToRentedBook[id];
   }
 
   function getTotalOwnedRentedBook(address renter) public view returns(uint) {
@@ -88,9 +93,14 @@ contract BookTemporary is TimeLock, ExtendTime {
   function getBorrowedBook(uint tokenId, 
                            address renter,
                            address borrower) 
-  public view returns (BorrowedBook memory) {
+                           public view returns (BorrowedBook memory) {
     uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
     return _idToBorrowedBook[idBorrowedBook];
+  }
+
+  function getBorrowedBookFromId(uint id) 
+                           public view returns (BorrowedBook memory) {
+    return _idToBorrowedBook[id];
   }
 
   function getTotalOwnedBorrowedBook(address borrower) public view returns(uint) {
@@ -437,10 +447,21 @@ contract BookTemporary is TimeLock, ExtendTime {
                                address renter, 
                                address borrower) private returns(bool) {
     BorrowedBook memory borrowedBook = getBorrowedBook(tokenId, renter, borrower);
+    uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
 
     if(borrowedBook.tokenId != 0) {
       _removeItemFromAllBorrowedBooks(tokenId, renter, borrower);
-      uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
+
+      // uint idBookOnSharing = getIdBookOnSharing(idBorrowedBook, borrowedBook.borrower);
+      // if (idBookOnSharing != 0) {
+      //   removeBooksOnSharing(idBorrowedBook, borrowedBook.borrower);
+      // }
+
+      // uint idSharedBook = getIdSharedBook(idBorrowedBook, borrowedBook.borrower);
+      // if (idSharedBook != 0) {
+      //   SharedBook memory sharedBook = getSharedBooks(idSharedBook);
+      //   removeSharedBooks(idBorrowedBook, sharedBook.sharedPer);
+      // }
 
       // Remove respone of borrowed books on extending if needed
       if(idBorrowedBook != 0) {
@@ -475,16 +496,67 @@ contract BookTemporary is TimeLock, ExtendTime {
       for (uint i = 1; i <= _borrowedBooks.current(); i++) {
         BorrowedBook memory book = _idToBorrowedBook[i];
         if (book.renter == renter && 
-                excRecallBorrowedBooks(book.tokenId,
-                                       book.renter, 
-                                       book.borrower, 
-                                       book.endTime)) {
-          total++;                         
+            excRecallBorrowedBooks(book.tokenId,
+                                   book.renter, 
+                                   book.borrower, 
+                                   book.endTime)) {
+
+          total++;     
+
         }
       }
     }
     return total;
   }
 
+  function getAmountOAllfBooksOnSharing(uint tokenId, address owner) public view returns(uint) {
+    uint idBorrowedBook;
+    uint totalBook = 0;
+
+    for(uint i = 1; i <= _borrowedBooks.current(); i++) {
+      BorrowedBook memory book = _idToBorrowedBook[i];
+      if (book.borrower == owner && book.tokenId == tokenId) {
+        idBorrowedBook = getIdBorrowedBook(tokenId, book.renter, owner);
+        totalBook += getAmountOfBooksOnSharing(idBorrowedBook, owner);
+      }
+    }
+     
+    return totalBook;
+  }
+
+  function getAmountOAllfSharedBooks(uint tokenId, address owner) public view returns(uint) {
+    uint idBorrowedBook;
+    uint totalBook = 0;
+
+    for(uint i = 1; i <= _borrowedBooks.current(); i++) {
+      BorrowedBook memory book = _idToBorrowedBook[i];
+      if (book.tokenId == tokenId) {
+        idBorrowedBook = getIdBorrowedBook(tokenId, book.renter, book.borrower);
+        totalBook += getAmountOfSharedBooks(idBorrowedBook, owner);
+      }
+    }
+     
+    return totalBook;
+  }
+
+  function takeBooksOnSharingAndUpdateBorrowedBook(uint idBorrowedBook, 
+                                                   address sharer, 
+                                                   address sender,
+                                                   uint amount) public payable returns(uint) {
+    
+    uint price = takeBooksOnSharing(idBorrowedBook, sharer, sender, amount);
+
+
+    BorrowedBook memory borrowedBook = getBorrowedBookFromId(idBorrowedBook);
+    if (_idToBorrowedBook[idBorrowedBook].amount == 0) {
+      _removeItemFromAllBorrowedBooks(borrowedBook.tokenId, 
+                                      borrowedBook.renter, 
+                                      borrowedBook.borrower);
+    } else {
+      _idToBorrowedBook[idBorrowedBook].amount -= amount;
+      _amountOwnedBorrowedBooks[sharer][borrowedBook.tokenId] -= amount;
+    }
+    return price;
+  }
 
 }
