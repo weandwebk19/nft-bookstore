@@ -1,10 +1,9 @@
+import clientPromise from "@lib/mongodb";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { BookInfo } from "@/types/nftBook";
 import { toSnake } from "@/utils/nomalizer";
-
-import clientPromise from "../../../lib/mongodb";
 
 type ResponseData = {
   success: boolean;
@@ -20,14 +19,18 @@ export default async function handler(
     const client = await clientPromise;
     const db = client.db("NftBookStore");
     const bookInfo: BookInfo = req.body.bookInfo;
+    const { languages, genres, ...rest } = bookInfo;
+
+    // Create index to ensure that tokenId is unique
+    db.collection("books").createIndex({ token_id: 1 }, { unique: true });
 
     // Insert book into database
-    const newBooks = await db.collection("books").insertOne(toSnake(bookInfo));
+    const newBooks = await db.collection("books").insertOne(toSnake(rest));
 
     const newBookId: ObjectId = newBooks.insertedId;
 
     // Insert languages into database
-    bookInfo?.languages.map(async (language) => {
+    languages.map(async (language) => {
       db.collection("book_languages").insertOne({
         language_id: new ObjectId(language),
         book_id: newBookId
@@ -35,7 +38,7 @@ export default async function handler(
     });
 
     // Insert genres into database
-    bookInfo?.genres.map(async (genre) => {
+    genres.map(async (genre) => {
       db.collection("book_genres").insertOne({
         genre_id: new ObjectId(genre),
         book_id: newBookId

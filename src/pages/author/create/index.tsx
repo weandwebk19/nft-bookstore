@@ -33,6 +33,7 @@ import {
   Step2,
   Step3
 } from "@/components/ui/author/create/steps";
+import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 
@@ -86,6 +87,7 @@ const CreateBook = () => {
   const { t } = useTranslation("createBook");
 
   const [activeStep, setActiveStep] = useState(0);
+  const [isSigning, setIsSigning] = useState(false);
   const formRef = useRef<any>();
   const { ethereum, contract } = useWeb3();
   const { network } = useNetwork();
@@ -241,7 +243,7 @@ const CreateBook = () => {
   };
 
   const getSignedData = async () => {
-    const messageToSign = await axios.get("/api/verify");
+    const messageToSign = await axios.get("/api/pinata/verify");
     const accounts = (await ethereum?.request({
       method: "eth_requestAccounts"
     })) as string[];
@@ -264,30 +266,30 @@ const CreateBook = () => {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
 
-      try {
-        const { signedData, account } = await getSignedData();
-        const promise = axios.post("/api/verify-file", {
-          address: account,
-          signature: signedData,
-          bytes,
-          contentType: file.type,
-          fileName: file.name.replace(/\.[^/.]+$/, "")
-        });
+      // try {
+      const { signedData, account } = await getSignedData();
+      const promise = axios.post("/api/pinata/verify-file", {
+        address: account,
+        signature: signedData,
+        bytes,
+        contentType: file.type,
+        fileName: file.name.replace(/\.[^/.]+$/, "")
+      });
 
-        const res = await toast.promise(promise, {
-          pending: t("pendingUploadBookSample") as string,
-          success: t("successUploadBookSample") as string,
-          error: t("errorUploadBookSample") as string
-        });
+      const res = await toast.promise(promise, {
+        pending: t("pendingUploadBookSample") as string,
+        success: t("successUploadBookSample") as string,
+        error: t("errorUploadBookSample") as string
+      });
 
-        const data = res.data as PinataRes;
+      const data = res.data as PinataRes;
 
-        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
-        setBookSampleLink(link);
-        return link;
-      } catch (e: any) {
-        console.error(e.message);
-      }
+      const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+      setBookSampleLink(link);
+      return link;
+      // } catch (e: any) {
+      //   console.error(e.message);
+      // }
     }
     return "";
   };
@@ -297,31 +299,31 @@ const CreateBook = () => {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
 
-      try {
-        const { signedData, account } = await getSignedData();
+      // try {
+      const { signedData, account } = await getSignedData();
 
-        const promise = axios.post("/api/verify-file", {
-          address: account,
-          signature: signedData,
-          bytes,
-          contentType: file.type,
-          fileName: file.name.replace(/\.[^/.]+$/, "")
-        });
+      const promise = axios.post("/api/pinata/verify-file", {
+        address: account,
+        signature: signedData,
+        bytes,
+        contentType: file.type,
+        fileName: file.name.replace(/\.[^/.]+$/, "")
+      });
 
-        const res = await toast.promise(promise, {
-          pending: t("pendingUploadBookFile") as string,
-          success: t("successUploadBookFile") as string,
-          error: t("errorUploadBookFile") as string
-        });
+      const res = await toast.promise(promise, {
+        pending: t("pendingUploadBookFile") as string,
+        success: t("successUploadBookFile") as string,
+        error: t("errorUploadBookFile") as string
+      });
 
-        const data = res.data as PinataRes;
+      const data = res.data as PinataRes;
 
-        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
-        setBookFileLink(link);
-        return link;
-      } catch (e: any) {
-        console.error(e.message);
-      }
+      const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+      setBookFileLink(link);
+      return link;
+      // } catch (e: any) {
+      //   console.error(e.message);
+      // }
     }
     return "";
   };
@@ -331,162 +333,202 @@ const CreateBook = () => {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
 
-      try {
-        const { signedData, account } = await getSignedData();
-        const promise = axios.post("/api/verify-image", {
-          address: account,
-          signature: signedData,
-          bytes,
-          contentType: file.type,
-          fileName: file.name.replace(/\.[^/.]+$/, "")
-        });
+      // try {
+      const { signedData, account } = await getSignedData();
+      const promise = axios.post("/api/pinata/verify-image", {
+        address: account,
+        signature: signedData,
+        bytes,
+        contentType: file.type,
+        fileName: file.name.replace(/\.[^/.]+$/, "")
+      });
 
-        const res = await toast.promise(promise, {
-          pending: t("pendingUploadBookCover") as string,
-          success: t("successUploadBookCover") as string,
-          error: t("errorUploadBookCover") as string
-        });
+      const res = await toast.promise(promise, {
+        pending: t("pendingUploadBookCover") as string,
+        success: t("successUploadBookCover") as string,
+        error: t("errorUploadBookCover") as string
+      });
 
-        const data = res.data as PinataRes;
+      const data = res.data as PinataRes;
 
-        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
-        setBookCoverLink(link);
-        return link;
-      } catch (e: any) {
-        console.error(e.message);
-      }
+      const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+      setBookCoverLink(link);
+      return link;
+      // } catch (e: any) {
+      //   console.error(e.message);
+      // }
     }
     return "";
   };
 
   const uploadMetadata = async (nftBookMeta: NftBookMeta) => {
-    try {
-      const { signedData, account } = await getSignedData();
-      const promise = axios.post("/api/verify", {
-        address: account,
-        signature: signedData,
-        nftBook: { ...nftBookMeta, author: account }
-      });
+    // try {
+    const { signedData, account } = await getSignedData();
+    const promise = axios.post("/api/pinata/verify", {
+      address: account,
+      signature: signedData,
+      nftBook: { ...nftBookMeta, author: account }
+    });
 
-      const res = await toast.promise(promise, {
-        pending: t("pendingUploadMetadata") as string,
-        success: t("successUploadMetadata") as string,
-        error: t("errorUploadMetadata") as string
-      });
+    const res = await toast.promise(promise, {
+      pending: t("pendingUploadMetadata") as string,
+      success: t("successUploadMetadata") as string,
+      error: t("errorUploadMetadata") as string
+    });
 
-      const data = res.data as PinataRes;
-      const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
-      setNftURI(link);
-      return link;
-    } catch (e: any) {
-      console.error(e.message);
-    }
+    const data = res.data as PinataRes;
+    const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+    setNftURI(link);
+    return link;
+    // } catch (e: any) {
+    //   console.error(e.message);
+    // }
     return "";
   };
 
-  const createNFTBook = async (nftUri: string, amount: number) => {
-    try {
-      console.log("nftUri", nftUri);
-      const nftRes = await axios.get(`/api/pinata/metadata?uri=${nftUri}`);
-      // const nftRes = await axios.get(nftURI);
-      console.log("nftRes", nftRes);
-      if (nftRes.data.success === true) {
-        const content = nftRes.data.data;
+  const createNFTBook = async (nftUri: string, quantity: number) => {
+    // try {
+    console.log("nftUri", nftUri);
+    const nftRes = await axios.get(`/api/pinata/metadata?nftUri=${nftUri}`);
+    console.log("nftRes", nftRes);
+    if (nftRes.data.success === true) {
+      const content = nftRes.data.data;
 
-        Object.keys(content).forEach((key) => {
-          if (!ALLOWED_FIELDS.includes(key)) {
-            throw new Error(t("invalidJson") as string);
-          }
-        });
+      Object.keys(content).forEach((key) => {
+        if (!ALLOWED_FIELDS.includes(key)) {
+          throw new Error(t("invalidJson") as string);
+        }
+      });
 
-        const tx = await contract?.mintBook(nftUri, amount, {
-          value: ethers.utils.parseEther((0.025).toString())
-        });
+      const tx = await contract?.mintBook(nftUri, quantity, {
+        value: ethers.utils.parseEther((0.025).toString())
+      });
 
-        const receipt: any = await toast.promise(tx!.wait(), {
-          pending: t("pendingMintingToken") as string,
-          success: t("successMintingToken") as string,
-          error: t("errorMintingToken") as string
-        });
-        const tokenId = receipt.events
-          .find((x: any) => x.event == "NFTBookCreated")
-          .args.tokenId.toNumber();
-        // const contractAddress = receipt.contractAdress;
-        return tokenId;
-      }
-    } catch (e: any) {
-      console.error(e.message);
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: t("pendingMintingToken") as string,
+        success: t("successMintingToken") as string,
+        error: t("errorMintingToken") as string
+      });
+      console.log("receipt", receipt);
+      const tokenId = receipt.events
+        .find((x: any) => x.event == "NFTBookCreated")
+        .args.tokenId.toNumber();
+      // const contractAddress = receipt.contractAdress;
+      return tokenId;
     }
+    // } catch (e: any) {
+    //   console.error(e.message);
+    // }
   };
 
   const uploadBookDetails = async (bookInfo: BookInfo) => {
-    try {
-      const promise = axios.post("/api/books/create", { bookInfo });
+    // try {
+    const promise = axios.post("/api/books/create", { bookInfo });
 
-      const res = await toast.promise(promise, {
-        pending: t("pendingUploadBookDetails") as string,
-        success: t("successUploadBookDetails") as string,
-        error: t("errorUploadBookDetails") as string
-      });
-
-      console.log(res);
-    } catch (e: any) {
-      console.error(e.message);
-    }
+    const res = await toast.promise(promise, {
+      pending: t("pendingUploadBookDetails") as string,
+      success: t("successUploadBookDetails") as string,
+      error: t("errorUploadBookDetails") as string
+    });
+    return res;
+    // } catch (e: any) {
+    //   console.error(e.message);
+    // }
   };
 
   const { handleSubmit, trigger, getValues } = methods;
   const onSubmit = (data: any) => {
     console.log(data);
-    if (activeStep === 1) {
-      (async () => {
-        await uploadBookCover(data.bookCover[0]);
-        await uploadBookFile(data.bookFile[0]);
-        await uploadBookSample(data.bookSample[0]);
-      })();
-    } else if (activeStep === 2) {
-      (async () => {
-        // Upload metadata to pinata
-        if (bookCoverLink !== "" && bookFileLink !== "") {
-          uploadMetadata({
-            title: data.title,
-            bookCover: bookCoverLink,
-            bookFile: bookFileLink,
-            bookSample: bookSampleLink,
-            fileType: data.fileType,
-            version: data.version,
-            author: "",
-            quantity: data.quantity,
-            createdAt: new Date().toString()
-          });
-        }
-      })();
-    } else if (activeStep === 3) {
-      (async () => {
-        if (nftURI !== "") {
-          // Mint book
-          const tokenId = await createNFTBook(nftURI, data.quantity);
-          console.log("Creating book", tokenId);
+    try {
+      if (activeStep === 1) {
+        (async () => {
+          setIsSigning(true);
+          const bookCoverRes = await uploadBookCover(data.bookCover[0]);
+          const bookFileRes = await uploadBookFile(data.bookFile[0]);
+          const bookSampleRes = await uploadBookSample(data.bookSample[0]);
 
-          // Upload data to database
-          if (tokenId) {
-            uploadBookDetails({
-              tokenId: tokenId,
-              description: data.description,
-              languages: data.languages,
-              genres: data.genres,
-              externalLink: data.externalLink,
-              totalPages: data.totalPages,
-              keywords: data.keywords,
-              publishingTime: data.publishingTime
-            });
+          if (
+            bookCoverRes &&
+            bookFileRes &&
+            (!data.bookSample[0] || bookSampleRes)
+          ) {
+            setIsSigning(false);
+            handleNext();
           }
-        }
+        })();
+      } else if (activeStep === 2) {
+        (async () => {
+          // Upload metadata to pinata
+          if (bookCoverLink !== "" && bookFileLink !== "") {
+            setIsSigning(true);
+            const nftUriRes = await uploadMetadata({
+              title: data.title,
+              bookCover: bookCoverLink,
+              bookFile: bookFileLink,
+              bookSample: bookSampleLink,
+              fileType: data.fileType,
+              version: data.version,
+              author: "",
+              quantity: data.quantity,
+              createdAt: new Date().toString()
+            });
+            if (nftUriRes) {
+              setIsSigning(false);
+              handleNext();
+            }
+          }
+        })();
+      } else if (activeStep === 3) {
+        (async () => {
+          if (nftURI !== "") {
+            setIsSigning(true);
+            // Mint book
+            const tokenId = await createNFTBook(nftURI, data.quantity);
+            console.log("Creating book", tokenId);
 
-        setOpen(true);
+            // Upload data to database
+            if (tokenId) {
+              const detailRes = await uploadBookDetails({
+                tokenId: tokenId,
+                description: data.description,
+                languages: data.languages,
+                genres: data.genres,
+                externalLink: data.externalLink,
+                totalPages: data.totalPages,
+                keywords: data.keywords,
+                publishingTime: data.publishingTime
+              });
+              if (detailRes) {
+                setIsSigning(false);
+                setOpen(true);
+                handleNext();
+              }
+            }
+          }
+        })();
+      } else {
+        handleNext();
+      }
+    } catch (error) {
+      console.log("error", error);
+
+      (async () => {
+        // Remove all data from pinata
+        if (bookCoverLink !== "") {
+          const res = await deleteFile(bookCoverLink);
+          console.log("res", res);
+        }
+        if (bookFileLink !== "") {
+          deleteFile(bookFileLink);
+        }
+        if (bookSampleLink !== "") {
+          deleteFile(bookSampleLink);
+        }
+        if (nftURI !== "") {
+          deleteFile(nftURI);
+        }
       })();
     }
-    handleNext();
   };
 
   const handleNext = async () => {
@@ -544,7 +586,71 @@ const CreateBook = () => {
               </Stepper>
 
               <div style={{ minHeight: "50%" }}>
-                {activeStep === steps.length ? (
+                {(() => {
+                  if (isSigning === true) {
+                    return <SigningContractStep />;
+                  } else if (activeStep === steps.length) {
+                    return (
+                      <>
+                        <Typography sx={{ mt: 2, mb: 1 }}>
+                          {t("messageFinish1") as string}
+                        </Typography>
+                        <StyledButton
+                          onClick={() => {
+                            router.push("/account/bookshelf/created-books");
+                          }}
+                        >
+                          {t("messageFinish2") as string}
+                        </StyledButton>
+                      </>
+                    );
+                  } else {
+                    return (
+                      <>
+                        <FormProvider {...methods}>
+                          <form>
+                            <Box my={2} sx={{ minHeight: "25vh" }}>
+                              {getStepContent()}
+                            </Box>
+
+                            <Box
+                              display="flex"
+                              justifyContent="center"
+                              style={{ paddingTop: "5vh" }}
+                            >
+                              <Button
+                                color="inherit"
+                                disabled={activeStep === 0}
+                                onClick={handleBack}
+                                sx={{ mr: 1 }}
+                              >
+                                {t("back") as string}
+                              </Button>
+                              {activeStep === steps.length - 1 ? (
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={handleSubmit(onSubmit)}
+                                >
+                                  {t("create") as string}
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={handleSubmit(onSubmit)}
+                                >
+                                  {t("next") as string}
+                                </Button>
+                              )}
+                            </Box>
+                          </form>
+                        </FormProvider>
+                      </>
+                    );
+                  }
+                })()}
+                {/* {activeStep === steps.length ? (
                   <>
                     <Typography sx={{ mt: 2, mb: 1 }}>
                       {t("messageFinish1") as string}
@@ -599,7 +705,7 @@ const CreateBook = () => {
                       </form>
                     </FormProvider>
                   </>
-                )}
+                )} */}
               </div>
             </Paper>
           </Box>

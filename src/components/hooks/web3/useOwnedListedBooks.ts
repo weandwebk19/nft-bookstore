@@ -7,27 +7,20 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { NftBook } from "@/types/nftBook";
+import { ListedBook } from "@/types/nftBook";
 
-type UseCreatedBooksResponse = {
-  // listNft: (tokenId: number, price: number) => Promise<void>;
-};
+type OwnedListedBooksHookFactory = CryptoHookFactory<ListedBook[]>;
 
-type CreatedBooksHookFactory = CryptoHookFactory<
-  NftBook[],
-  UseCreatedBooksResponse
->;
+export type UseOwnedListedBooksHook = ReturnType<OwnedListedBooksHookFactory>;
 
-export type UseCreatedBooksHook = ReturnType<CreatedBooksHookFactory>;
-
-export const hookFactory: CreatedBooksHookFactory =
+export const hookFactory: OwnedListedBooksHookFactory =
   ({ contract }) =>
   () => {
     const { data, ...swr } = useSWR(
-      contract ? "web3/useCreatedBooks" : null,
+      contract ? "web3/useOwnedListedBooks" : null,
       async () => {
-        const nfts = [] as NftBook[];
-        const coreNfts = await contract!.getCreatedNFTBooks();
+        const nfts = [] as ListedBook[];
+        const coreNfts = await contract!.getOwnedListedBooks();
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
@@ -39,13 +32,17 @@ export const hookFactory: CreatedBooksHookFactory =
           if (metaRes.success === true) {
             meta = metaRes.data;
           }
-
-          nfts.push({
-            tokenId: item?.tokenId?.toNumber(),
-            author: item?.author,
-            quantity: item?.quantity?.toNumber(),
-            meta
-          });
+          try {
+            nfts.push({
+              tokenId: item?.tokenId?.toNumber(),
+              seller: item?.seller,
+              amount: item?.amount?.toNumber(),
+              price: parseInt(ethers.utils.formatEther(item?.price)),
+              meta
+            });
+          } catch (err) {
+            console.log(err);
+          }
         }
         return nfts;
       }

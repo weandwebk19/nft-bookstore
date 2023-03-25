@@ -8,6 +8,7 @@ import { ethers } from "ethers";
 import useSWR from "swr";
 
 import { BookInfo, NftBook, NftBookDetails } from "@/types/nftBook";
+import { toNumber } from "@/utils/nomalizer";
 
 // type UseBookDetailResponse = {
 //   listNft: (tokenId: number, price: number) => Promise<void>;
@@ -27,30 +28,45 @@ export const hookFactory: BookDetailHookFactory =
           await axios.get(`/api/books/${bookId}`)
         ).data?.data;
         const coreNftBook = await contract!.getNftBook(bookInfo?.tokenId);
-        let listedNftBook = null;
-        if ((await contract!.isListed(bookInfo?.tokenId)) === true) {
-          if (seller) {
-            listedNftBook = await contract!.getListedBook(
-              bookInfo?.tokenId,
-              seller
-            );
-          } else {
-            listedNftBook = await contract!.getListedBook(
-              bookInfo?.tokenId,
-              coreNftBook?.author
-            );
-          }
-        }
         const tokenURI = await contract!.uri(bookInfo?.tokenId);
         const meta = await (await fetch(tokenURI)).json();
 
-        return {
-          bookId: bookId,
-          nftCore: coreNftBook,
-          listedCore: listedNftBook,
-          meta: meta,
-          info: bookInfo
-        };
+        const sellerDefault = seller ? seller : coreNftBook?.author;
+        const isListed = await contract!.isListed(
+          bookInfo?.tokenId,
+          sellerDefault
+        );
+        if (isListed === true) {
+          try {
+            const listedNftBook = await contract!.getListedBook(
+              bookInfo?.tokenId,
+              sellerDefault
+            );
+            const { price, tokenId, seller, amount } = listedNftBook;
+            return {
+              bookId: bookId,
+              nftCore: toNumber(coreNftBook),
+              listedCore: toNumber({
+                tokenId,
+                seller,
+                amount,
+                price: ethers.utils.formatEther(price)
+              }),
+              meta: meta,
+              info: bookInfo
+            };
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          return {
+            bookId: bookId,
+            nftCore: toNumber(coreNftBook),
+            listedCore: null,
+            meta: meta,
+            info: bookInfo
+          };
+        }
       }
     );
 
