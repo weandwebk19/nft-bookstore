@@ -17,12 +17,11 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ethers } from "ethers";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useWeb3 } from "@/components/providers/web3";
 import { NumericStepperController } from "@/components/shared/FormController";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
@@ -66,7 +65,7 @@ const BookBriefing = ({
   authorName,
   contractAddress,
   price,
-  isOpenForSale = false,
+  isOpenForSale,
   isOpenForTradeIn,
   isOpenForBorrow,
   isSold
@@ -79,7 +78,6 @@ const BookBriefing = ({
     resolver: yupResolver(schema),
     mode: "all"
   });
-  const { ethereum, contract } = useWeb3();
 
   useEffect(() => {
     setValue("tokenId", tokenId);
@@ -89,24 +87,7 @@ const BookBriefing = ({
 
   const { handleSubmit, setValue } = methods;
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
-    // try {
-    //   const tx = await contract?.buyBooks(tokenId, data.seller, data.amount, {
-    //     value: ethers.utils.parseEther(data.price.toString())
-    //   });
-
-    //   const receipt: any = await toast.promise(tx!.wait(), {
-    //     pending: "Minting NftBook Token",
-    //     success: "NftBook has ben created",
-    //     error: "Minting error"
-    //   });
-
-    //   console.log("receipt", receipt);
-    // } catch (e: any) {
-    //   console.error(e.message);
-    // }
-  };
+  const onSubmit = async (data: any) => {};
 
   return (
     <FormProvider {...methods}>
@@ -192,15 +173,17 @@ const BookBriefing = ({
                   </Box>
                 </Stack>
               </Stack>
-              <StyledButton
-                customVariant="secondary"
-                sx={{ width: "100%" }}
-                onClick={() => {
-                  alert(`book sample link:\n ${bookSample}`);
-                }}
-              >
-                Read sample
-              </StyledButton>
+              {bookSample !== "" && (
+                <StyledButton
+                  customVariant="secondary"
+                  sx={{ width: "100%" }}
+                  onClick={() => {
+                    redirect(bookSample!);
+                  }}
+                >
+                  Read sample
+                </StyledButton>
+              )}
             </Stack>
           </Grid>
         </Grid>
@@ -242,7 +225,7 @@ const BookBriefing = ({
                       <Typography variant="h4">
                         {price?.toString()} ETH
                       </Typography>
-                      <Typography>(0.59489412 USD)</Typography>
+                      {/* <Typography>(0.59489412 USD)</Typography> */}
                     </Stack>
                   )}
                 </>
