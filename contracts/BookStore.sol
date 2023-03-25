@@ -371,19 +371,103 @@ contract BookStore is ERC1155URIStorage, Ownable {
     }
   }
 
+  function getAllBorrowedBooks() public view returns (BookTemporary.BorrowedBook[] memory) {
+    return _bookTemporary.getAllBorrowedBooks();
+  }
+
+  //Make a request to extend the rental period and wait for their owner to approve your request
+  function requestExtendTimeOfBorrowedBooks(uint256 tokenId,
+                                            address renter,
+                                            uint extendedTime) public {
+                                              
+    require(renter != address(0) && msg.sender != address(0), "Address is invalid");
+    require(renter != msg.sender , "You can not renew with yourself");
+    require(extendedTime >= MIN_TIME, "Extended time is invalid");
+
+    _bookTemporary.requestExtendTimeOfBorrowedBooks(tokenId, 
+                                                    renter, 
+                                                    extendedTime, 
+                                                    msg.sender);
+  }
+
+  // If borrowed book exist, only update extended time. Owthersise, do nothing
+  function updateRequestExtendTimeOfBorrowedBooks(uint256 tokenId,
+                                                  address renter,
+                                                  uint newExtendedTime) public {
+                                              
+    require(renter != address(0) && msg.sender != address(0), "Address is invalid");
+    require(renter != msg.sender , "You can not renew with yourself");
+    require(newExtendedTime >= MIN_TIME, "Extended time is invalid");
+
+    _bookTemporary.updateRequestExtendTimeOfBorrowedBooks(tokenId,
+                                                          renter, 
+                                                          newExtendedTime, 
+                                                          msg.sender);
+  }
+
+  function doAcceptRequest(uint idBorrowedBook, 
+                           address borrower,
+                           bool isAccept) public returns(bool){
+
+    return _bookTemporary.doAcceptRequestAndCreateResponse(idBorrowedBook, 
+                                                           borrower, 
+                                                           msg.sender, 
+                                                           isAccept);
+  }
+
+  function transferForSendedRequest(uint id, 
+                                    address renter, 
+                                    bool isExtend) public payable {
+    require(renter != msg.sender, "You cannot make this transaction with yourself");
+    uint totalPrice = _bookTemporary.transferForSendedRequest(id, 
+                                                              renter, 
+                                                              msg.sender, 
+                                                              block.timestamp, 
+                                                              isExtend);
+
+    if (totalPrice > 0) {
+      require(msg.value == totalPrice, "Total price is invalid");
+      payable(renter).transfer(totalPrice);
+    }
+  }
+
+  function getAllOwnedRequestsOnExtending() public view 
+                                    returns(BookTemporary.Request[] memory) {
+    require(msg.sender != address(0), "Address is invalid");
+    return _bookTemporary.getAllOwnedRequest(msg.sender);
+  }
+
+  function getAllOwnedResponsesOnExtending() public view 
+                                    returns(BookTemporary.Response[] memory) {
+    require(msg.sender != address(0), "Address is invalid");
+    return _bookTemporary.getAllOwnedResponse(msg.sender);
+  }
+
   // Return true if success, owthersise return false
   function recallBorrowedBooks(uint tokenId, 
                                address renter, 
-                               address borrower) public {
+                               address borrower) public returns(bool) {
     require(renter == msg.sender, "You cannot take this book back, because you are not the renter");
     BookTemporary.BorrowedBook memory borrowedBook = 
                   _bookTemporary.getBorrowedBook(tokenId, renter, borrower);
+    bool res = false;
     if(borrowedBook.tokenId != 0) {
-      _bookTemporary.excRecallBorrowedBooks(tokenId, 
+      res = _bookTemporary.excRecallBorrowedBooks(tokenId, 
                                             renter, 
                                             borrower,
                                             borrowedBook.endTime);
-    }            
+      if(res) {
+        _safeTransferFrom(borrower, msg.sender, tokenId, borrowedBook.amount, "");
+      }
+    } 
+    return res;           
+  }
+
+  // Return total of borrowed books which is recalled, if total equal 0, 
+  // you do not have any recallable books. Needed automate this function with Chainlink
+  function recallAllBorrowedBooks() public returns(uint) {
+    require(address(0) != msg.sender, "Your's address is invalid");
+    return _bookTemporary.excRecallAllBorrowedBooks(msg.sender);           
   }
 
 }

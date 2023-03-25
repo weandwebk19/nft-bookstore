@@ -3,9 +3,10 @@ pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 import "./Timelock.sol";
+import "./ExtendTime.sol";
 
 
-contract BookTemporary is TimeLock {
+contract BookTemporary is TimeLock, ExtendTime {
   using Counters for Counters.Counter;
 
   struct RentedBook {
@@ -236,31 +237,13 @@ contract BookTemporary is TimeLock {
     }
   }
 
-
-  function _updateBorrowedBookFromBorrowing(uint256 tokenId,
-                                      address renter,
-                                      address borrower,
-                                      uint newPrice,
-                                      uint256 newAmount,
-                                      uint newStartTime,
-                                      uint newEndTime) private {
-    uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
-    require(idBorrowedBook != 0,
-          "Your book are not on sale");
-    require(_idToBorrowedBook[idBorrowedBook].renter == renter,
-          "Addredd of renter invalid");
-    
-    _idToBorrowedBook[idBorrowedBook].price = newPrice;
+  // Only update time 
+  function _updateBorrowedBookFromBorrowing(uint idBorrowedBook,
+                                            uint newStartTime,
+                                            uint newEndTime) private {
     _idToBorrowedBook[idBorrowedBook].startTime = newStartTime;
     _idToBorrowedBook[idBorrowedBook].endTime = newEndTime;
 
-    if (newAmount != 0) {
-      uint balance = newAmount - _idToBorrowedBook[idBorrowedBook].amount;
-      _idToBorrowedBook[idBorrowedBook].amount = newAmount;
-      _amountOwnedBorrowedBooks[borrower][tokenId] += balance;
-    } else {
-      _removeItemFromAllBorrowedBooks(tokenId, renter, borrower);
-    }
   }
 
 
@@ -295,7 +278,7 @@ contract BookTemporary is TimeLock {
                            abi.encodePacked(tokenId,renter,borrower), 
                            endTime);
      
-    return update(txId,
+    return _update(txId,
                   renter,
                   value, 
                   "_recallBorrowedBooks(uint,address,address)", 
@@ -309,7 +292,7 @@ contract BookTemporary is TimeLock {
                           address renter, 
                           address borrower, 
                           uint endTime) private {
-    queue(renter,
+    _queue(renter,
           value, 
           "_recallBorrowedBooks(uint,address,address)", 
           abi.encodePacked(tokenId, renter, borrower), 
@@ -350,24 +333,98 @@ contract BookTemporary is TimeLock {
     return 0;
   }
 
+  function requestExtendTimeOfBorrowedBooks(uint256 tokenId,
+                                            address renter,
+                                            uint extendedTime,
+                                            address borrower) public {
+    uint id = getIdBorrowedBook(tokenId, renter, borrower);
+    require(id != 0, "This borrowed book does not exist");
+    _createRequest(id, extendedTime, borrower, renter);                     
+  }
 
-  // function extendTimeOfBorrowedBooks(uint256 tokenId,
-  //                           address renter,
-  //                           uint256 amount,
-  //                           uint256 price,
-  //                           uint startTime,
-  //                           uint endTime,
-  //                           address borrower,
-  //                           uint256 value) public payable returns(uint256) {
+  function updateRequestExtendTimeOfBorrowedBooks(uint256 tokenId,
+                                                  address renter,
+                                                  uint newExtendedTime,
+                                                  address borrower) public {
+    uint id = getIdBorrowedBook(tokenId, renter, borrower);
+    require(id != 0, "This borrowed book does not exist");
+    _updateTimeOfRequest(id, newExtendedTime, borrower, renter);
+  }
 
-  // }
+  function doAcceptRequestAndCreateResponse(uint id, 
+                                            address borrower, 
+                                            address renter,
+                                            bool isAccept) public returns(bool) {
+    require(id != 0,
+          "Your book are not on borrowing");
+    require(_idToBorrowedBook[id].borrower == borrower,
+          "Address of borrower invalid");                      
+    require(_idToBorrowedBook[id].renter == renter,
+          "Address of renter invalid");
+
+    // If the owner approves the request, it set status of request isAccept is true and return extended time,
+    // otherwise, this request will be deleted.
+    uint extendTime = getExtendedTimeOfRequest(id, borrower, renter);
+    if (isAccept) {
+
+      if (extendTime == 0) {
+        return false;
+      }
+
+      _setAcceptionForRequest(id, borrower, renter);
+      _createResponse(id, extendTime, renter, borrower);
+
+    } else {
+      _cancelRequest(id, borrower, renter);
+    }
+
+    return isAccept;
+
+  }
+
+  function transferForSendedRequest(uint id, 
+                                    address renter, 
+                                    address borrower,
+                                    uint currentTime, 
+                                    bool isExtend) public payable returns(uint) {
+    require(isResponseExist(id, renter, borrower), "You do not have this response");
+    require(isAcceptRequest(id, borrower, renter), "Request is invalid for transfer");
+    uint extendTime = 0;
+    // Agree to pay for this transaction
+    if (isExtend) {
+      extendTime = getExtendedTimeOfRequest(id, borrower, renter);
+      uint startTime = currentTime;
+      uint endTime;
+
+      //======|==============|================|==========
+      //  BB.startTime    current Time     BB.endTime
+      if(currentTime <= _idToBorrowedBook[id].endTime) {
+        endTime = _idToBorrowedBook[id].endTime + extendTime;
+      } else {
+        endTime = currentTime + extendTime;
+      }
+
+      _updateBorrowedBookFromBorrowing(id, startTime, endTime);
+    }
+    // Cancle Req + Res for this transaction
+    _cancelRequest(id, borrower, renter);
+    _cancelResponse(id, renter, borrower);
+    uint totalPrice = _idToBorrowedBook[id].price *
+                     _idToBorrowedBook[id].amount * 
+                     extendTime / 604800;
+    return totalPrice;
+  }
+
 
   function getAllBorrowedBooks() public view returns (BorrowedBook[] memory) {
-    BorrowedBook[] memory books = new BorrowedBook[](_borrowedBooks.current());
+    BorrowedBook[] memory books;
+    if (_borrowedBooks.current() > 0) {
+      books = new BorrowedBook[](_borrowedBooks.current());
 
-    for (uint i = 1; i <= _borrowedBooks.current(); i++) {
-      BorrowedBook memory book = _idToBorrowedBook[i];
-      books[i - 1] = book;
+      for (uint i = 1; i <= _borrowedBooks.current(); i++) {
+        BorrowedBook memory book = _idToBorrowedBook[i];
+        books[i - 1] = book;
+      }
     }
 
     return books;
@@ -378,24 +435,56 @@ contract BookTemporary is TimeLock {
 
   function _recallBorrowedBooks(uint tokenId, 
                                address renter, 
-                               address borrower) private {
+                               address borrower) private returns(bool) {
     BorrowedBook memory borrowedBook = getBorrowedBook(tokenId, renter, borrower);
 
     if(borrowedBook.tokenId != 0) {
       _removeItemFromAllBorrowedBooks(tokenId, renter, borrower);
+      uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
+
+      // Remove respone of borrowed books on extending if needed
+      if(idBorrowedBook != 0) {
+        if (isResponseExist(idBorrowedBook, renter, borrower)) {
+          _cancelResponse(idBorrowedBook, renter, borrower);
+        }
+      }
+
+      return true;
     }
+    return false;
   }
 
   function excRecallBorrowedBooks(uint tokenId, 
                                   address renter, 
                                   address borrower,
-                                  uint endTime) public {
+                                  uint endTime) public returns(bool) {
     bytes memory data = abi.encodePacked(tokenId, renter, borrower);
     string memory func = "_recallBorrowedBooks(uint,address,address)";
     uint value = 0;
-    execute(renter, value, func, data, endTime);
-    _recallBorrowedBooks(tokenId, renter, borrower);
+    if (isExecute(renter, value, func, data, endTime)) {
+      return _recallBorrowedBooks(tokenId, renter, borrower);
+    }
 
+    return false;
   }
+
+  function excRecallAllBorrowedBooks(address renter) public returns(uint) {
+    uint total = 0;
+    if (_borrowedBooks.current() > 0) {
+
+      for (uint i = 1; i <= _borrowedBooks.current(); i++) {
+        BorrowedBook memory book = _idToBorrowedBook[i];
+        if (book.renter == renter && 
+                excRecallBorrowedBooks(book.tokenId,
+                                       book.renter, 
+                                       book.borrower, 
+                                       book.endTime)) {
+          total++;                         
+        }
+      }
+    }
+    return total;
+  }
+
 
 }
