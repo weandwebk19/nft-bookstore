@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Avatar,
-  Badge,
   Box,
   Chip,
   IconButton,
@@ -18,6 +17,8 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 // import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { List as CustomList } from "@shared/List";
 import { StyledButton } from "@styles/components/Button";
+import { getCsrfToken } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
 
@@ -31,7 +32,9 @@ interface WalletBarProps {
   isLoading: boolean;
   account?: string;
   connect(...args: unknown[]): unknown;
+  handleLogin: () => Promise<void>;
   disconnect(...args: unknown[]): unknown;
+  isConnected: boolean;
 }
 
 const WalletBar = ({
@@ -39,9 +42,13 @@ const WalletBar = ({
   isLoading,
   connect,
   account,
-  disconnect
+  handleLogin,
+  disconnect,
+  isConnected
 }: WalletBarProps) => {
   const { t } = useTranslation();
+  const { data, status } = useSession();
+  const [address, setAddress] = useState(data?.address as string);
 
   const createList: ListItemProps[] = [
     {
@@ -96,10 +103,22 @@ const WalletBar = ({
     alert("Create Rental");
   };
 
+  useEffect(() => {
+    if (account) {
+      setAddress(account);
+    }
+  }, [account]);
+
+  useEffect(() => {
+    if (data?.address) {
+      setAddress(data.address);
+    }
+  }, [data]);
+
   if (isLoading)
     return <StyledButton customVariant="secondary">Loading...</StyledButton>;
 
-  if (account)
+  if (data)
     return (
       <Stack direction="row" alignItems="center" sx={{ flexGrow: 0 }}>
         <Stack
@@ -109,7 +128,7 @@ const WalletBar = ({
         >
           <Chip
             avatar={<AdjustIcon />}
-            label={truncate(account, 6, -4)}
+            label={truncate(address ? address : "", 6, -4)}
             variant="outlined"
           />
           <Tooltip title={t("navbar:toolTip_accountMenu")}>
@@ -119,11 +138,15 @@ const WalletBar = ({
           </Tooltip>
         </Stack>
         <AccountMenu
-          account={account}
+          account={address}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
-          disconnect={() => {
+          disconnect={(e: any) => {
+            // e.preventDefault();
             disconnect();
+            signOut({
+              redirect: false
+            });
           }}
         />
         <Box
@@ -200,7 +223,11 @@ const WalletBar = ({
         <StyledButton
           customVariant="primary"
           onClick={() => {
-            connect();
+            if (!isConnected) {
+              connect();
+            } else {
+              handleLogin();
+            }
           }}
           sx={{
             display: {
@@ -213,7 +240,11 @@ const WalletBar = ({
         </StyledButton>
         <IconButton
           onClick={() => {
-            connect();
+            if (!isConnected) {
+              connect();
+            } else {
+              handleLogin();
+            }
           }}
           sx={{
             display: {
@@ -253,3 +284,11 @@ WalletBar.defaultProps = {
 };
 
 export default WalletBar;
+
+export async function getServerSideProps(context: any) {
+  return {
+    props: {
+      csrfToken: await getCsrfToken(context)
+    }
+  };
+}

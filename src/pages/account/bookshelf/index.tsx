@@ -1,6 +1,8 @@
 import { Stack, Typography } from "@mui/material";
 
+import { useSession } from "next-auth/react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -86,14 +88,20 @@ const bottomCategories = [
 ];
 
 const BookShelf = () => {
-  return (
-    <Stack spacing={6}>
-      <ContentContainer titles={["My bookshelf"]}>
-        <Wrapper items={topCategories} itemsInARow={4} />
-        <Wrapper items={bottomCategories} itemsInARow={4} />
-      </ContentContainer>
-    </Stack>
-  );
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  if (status === "unauthenticated") {
+    router.push("/");
+  } else {
+    return (
+      <Stack spacing={6}>
+        <ContentContainer titles={["My bookshelf"]}>
+          <Wrapper items={topCategories} itemsInARow={4} />
+          <Wrapper items={bottomCategories} itemsInARow={4} />
+        </ContentContainer>
+      </Stack>
+    );
+  }
 };
 
 export default BookShelf;

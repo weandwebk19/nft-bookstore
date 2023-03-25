@@ -1,7 +1,9 @@
 import { NftBookMeta } from "@_types/nftBook";
 import axios from "axios";
+import { withIronSessionApiRoute } from "iron-session/next";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
+import { SiweMessage } from "siwe";
 import { v4 as uuidv4 } from "uuid";
 
 import {
@@ -19,6 +21,14 @@ export default withSession(
       try {
         const { body } = req;
         const nftBook = body.nftBook as NftBookMeta;
+        // const siweMessage = new SiweMessage(body.message);
+        // const fields = await siweMessage.validate(body.signature);
+
+        // if (fields.nonce !== req.session.nonce)
+        //   return res.status(422).json({ message: "Invalid nonce." });
+
+        // req.session.siwe = fields;
+        // await req.session.save();
 
         if (!nftBook.title || !nftBook.bookFile || !nftBook.bookCover) {
           return res

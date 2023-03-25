@@ -22,10 +22,12 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
+import SwitchAccountOutlinedIcon from "@mui/icons-material/SwitchAccountOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { Dialog } from "@shared/Dialog";
 import { StyledButton } from "@styles/components/Button";
+import { signOut } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
@@ -84,6 +86,7 @@ const AccountMenu = ({
       content: t("navbar:disconnect") as string,
       onClick: () => {
         disconnect();
+        signOut({ redirect: false });
       }
     }
   ];
@@ -130,7 +133,7 @@ const AccountMenu = ({
               >
                 <Avatar
                   alt="Tho Le"
-                  src="TL"
+                  src=""
                   sx={{
                     width: 56,
                     height: 56,
@@ -156,7 +159,7 @@ const AccountMenu = ({
                 >
                   <Avatar
                     alt="Tho Le"
-                    src="TL"
+                    src=""
                     sx={{
                       width: 56,
                       height: 56,
