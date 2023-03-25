@@ -31,6 +31,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
   uint MIN_TIME = 604800; // Rental period is at least one week
   uint public listingPrice = 0.025 ether;
   uint public rentingPrice = 0.001 ether;
+  uint private sharingPrice = 0.0005 ether;
+
   Counters.Counter private _tokenIds;
 
   mapping (uint => NFTBook) _idToNFTBook;
@@ -57,6 +59,11 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function setRentingPrice(uint newPrice) external onlyOwner {
     require(newPrice > 0, "Price must be at least 1 wei");
     rentingPrice = newPrice;
+  }
+
+  function setSharingPrice(uint newPrice) external onlyOwner {
+    require(newPrice > 0, "Price must be at least 1 wei");
+    sharingPrice = newPrice;
   }
 
   function setTokenUri(uint256 tokenId, string memory tokenURI) external onlyOwner{
@@ -265,18 +272,20 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return borrowedBooks;
   }
 
-  function getAmountOfAllTypeBooksUntradeable(uint256 tokenId, address owner) public view returns(uint) {
-    return _listedBookStorage.getAmountOfListedBooks(tokenId, owner) +
-          _bookTemporary.getAmountOfRentedBooks(tokenId, owner) + 
-          _bookTemporary.getAmountOfBorrowedBooks(tokenId, owner);
+  function getAmountOfAllTypeBooksUntradeable(uint256 tokenId) public view returns(uint) {
+    require(tokenId != 0 && msg.sender != address(0), "Token id and owner is invalid");
+    return _listedBookStorage.getAmountOfListedBooks(tokenId, msg.sender) +
+          _bookTemporary.getAmountOfRentedBooks(tokenId, msg.sender) + 
+          _bookTemporary.getAmountOAllfSharedBooks(tokenId, msg.sender) + 
+          _bookTemporary.getAmountOfBorrowedBooks(tokenId, msg.sender);
   }
-
+  
   function sellBooks(uint256 tokenId,
                     uint price,
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooksUntradeable(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
+    require(getAmountOfAllTypeBooksUntradeable(tokenId) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
           "You don't have enough books to sell");
     require(msg.value == listingPrice,
            "Price must be equal to listing price");
@@ -288,7 +297,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooksUntradeable(tokenId, msg.sender) +
+    require(getAmountOfAllTypeBooksUntradeable(tokenId) +
            amount <= ERC1155.balanceOf(msg.sender, tokenId) &&
            amount > 0,
           "You don't have enough books to sell");
@@ -469,5 +478,86 @@ contract BookStore is ERC1155URIStorage, Ownable {
     require(address(0) != msg.sender, "Your's address is invalid");
     return _bookTemporary.excRecallAllBorrowedBooks(msg.sender);           
   }
+
+  function shareBooks(uint256 idBorrowedBook, 
+                      uint price,
+                      uint256 amount
+                      ) public payable {
+    
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
+
+    require(msg.sender == borrowedBook.borrower, "You do not own this borrowed book");
+    require(msg.value == sharingPrice, "The cost of making this transaction is not valid");
+    require(price > 0, "Price for shared books is invalid");
+    require(amount > 0 && amount <= borrowedBook.amount, "Amount for shared books is invalid");
+
+    _bookTemporary.shareBooks(idBorrowedBook, 
+                              msg.sender, 
+                              price, 
+                              amount);
+  }
+
+  function getAllBooksOnSharing() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    return _bookTemporary.getAllBooksOnSharing();
+  }
+
+  function getAllOwnedBooksOnSharing() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    require(msg.sender != address(0), "Address is invalid");
+    return _bookTemporary.getAllOwnedBooksOnSharing(msg.sender);
+  }
+
+  function getAllSharedBook() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    return _bookTemporary.getAllSharedBook();
+  }
+
+  function getAllOwnedSharedBook() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    require(msg.sender != address(0), "Address is invalid");
+    return _bookTemporary.getAllOwnedSharedBook(msg.sender);
+  }
+
+  function updateBooksOnSharing(uint idBorrowedBook, 
+                                   uint newPrice, 
+                                   uint newAmount) public {
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
+    require(msg.sender == borrowedBook.borrower, "You do not own this borrowed book");
+    require(newPrice > 0, "Price for shared books is invalid");
+    require(newAmount > 0 && newAmount <= borrowedBook.amount, "Amount for shared books is invalid");
+
+    _bookTemporary.updateBooksOnSharing(idBorrowedBook, msg.sender, newPrice, newAmount);
+  }
+
+  function takeBooksOnSharing(uint idBorrowedBook, 
+                              address sharer, 
+                              uint amount) public payable {
+    require(sharer != address(0) && msg.sender != address(0), "Addresses is invalid");
+    require(idBorrowedBook > 0, "Id Borrowed book is invalid");
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                    _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
+    require(sharer == borrowedBook.borrower, "You do not have this borrowed book");
+
+    uint price = _bookTemporary.takeBooksOnSharingAndUpdateBorrowedBook(idBorrowedBook,
+                                                                        sharer,
+                                                                        msg.sender, 
+                                                                        amount);
+    uint tokenId = borrowedBook.tokenId;
+    if (price != 0 && tokenId != 0) {
+      _safeTransferFrom(sharer, msg.sender, tokenId, amount, "");
+      // The amount you pay for this transaction will not depend on the period of borrowing the book,
+      //  the price will be set by the sharer
+      uint totalPrice = price * amount;
+      payable(sharer).transfer(totalPrice);
+    } else {
+      require(false,
+           "Take Books On Sharing execution failed");
+    }
+    
+  }
+  
 
 }
