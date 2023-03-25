@@ -1,8 +1,10 @@
 import { BookStoreContract } from "@_types/BookStoreContract";
 import * as util from "ethereumjs-util";
 import { ethers } from "ethers";
+import { IronSessionOptions } from "iron-session";
+import { ironSession } from "iron-session/express";
+import { withIronSessionApiRoute, withIronSessionSsr } from "iron-session/next";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Session, withIronSession } from "next-iron-session";
 
 import contract from "../../../public/contracts/BookStore.json";
 
@@ -23,14 +25,20 @@ export const pinataUnpinApiKey = process.env.PINATA_UNPIN_API_KEY as string;
 export const pinataUnpinSecretApiKey = process.env
   .PINATA_UNPIN_SECRET_API_KEY as string;
 
-export function withSession(handler: any) {
-  return withIronSession(handler, {
-    password: process.env.SECRET_COOKIE_PASSWORD as string,
-    cookieName: "nft-auth-session",
-    cookieOptions: {
-      secure: process.env.NODE_ENV === "production" ? true : false
-    }
-  });
+const sessionOptions = {
+  cookieName: "userSession",
+  password: process.env.SECRET_COOKIE_PASSWORD,
+  cookieOptions: {
+    secure: process.env.NODE_ENV === "production"
+  }
+} as IronSessionOptions;
+
+export function withSessionSSR(handler: any) {
+  return withIronSessionApiRoute(handler, sessionOptions);
+}
+
+export function withSessionAPI(handler: any) {
+  return withIronSessionApiRoute(handler, sessionOptions);
 }
 
 const url =
@@ -39,11 +47,11 @@ const url =
     : "http://127.0.0.1:7545";
 
 export const addressCheckMiddleware = async (
-  req: NextApiRequest & { session: Session },
+  req: NextApiRequest & { session: any },
   res: NextApiResponse
 ) => {
   return new Promise(async (resolve, reject) => {
-    const message = req.session.get("message-session");
+    const message = req.session["message-session"];
     const provider = new ethers.providers.JsonRpcProvider(url);
     const contract = new ethers.Contract(
       contractAddress,

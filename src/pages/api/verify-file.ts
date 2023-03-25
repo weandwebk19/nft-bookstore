@@ -1,15 +1,15 @@
 import { FileReq } from "@_types/nftBook";
 import axios from "axios";
 import FormData from "form-data";
+import { IronSession } from "iron-session";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Session } from "next-iron-session";
 import { v4 as uuidv4 } from "uuid";
 
 import {
   addressCheckMiddleware,
   pinataApiKey,
   pinataSecretApiKey,
-  withSession
+  withSessionAPI
 } from "./utils";
 
 export const config = {
@@ -20,8 +20,11 @@ export const config = {
   }
 };
 
-export default withSession(
-  async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
+export default withSessionAPI(
+  async (
+    req: NextApiRequest & { session: IronSession },
+    res: NextApiResponse
+  ) => {
     console.log("verify-file");
     if (req.method === "POST") {
       const { bytes, fileName, contentType } = req.body as FileReq;
