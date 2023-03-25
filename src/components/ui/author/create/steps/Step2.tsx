@@ -62,7 +62,7 @@ const Step2 = () => {
             <FormGroup label={t("bookSample") as string}>
               <AttachmentController
                 name="bookSample"
-                multiple={true}
+                // multiple={true}
                 desc={`${t("descAttachment1") as string} ${formatBytes(
                   process.env.NEXT_PUBLIC_MAX_BOOKSAMPLE_SIZE
                 )}`}

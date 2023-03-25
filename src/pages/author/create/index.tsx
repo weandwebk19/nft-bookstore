@@ -41,6 +41,19 @@ const MAX_BOOKFILE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKFILE_SIZE;
 const MAX_BOOKCOVER_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKCOVER_SIZE;
 const MAX_BOOKSAMPLE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKSAMPLE_SIZE;
 
+const SUPPORTED_BOOKFILE_FORMATS = ["application/pdf", "application/epub+zip"];
+const SUPPORTED_BOOKCOVER_FORMATS = [
+  "image/jpg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/svg"
+];
+const SUPPORTED_BOOKSAMPLE_FORMATS = [
+  "application/pdf",
+  "application/epub+zip"
+];
+
 const MINIMUM_SUPPLY = 1;
 const MAXIMUM_SUPPLY = 500;
 
@@ -120,71 +133,45 @@ const CreateBook = () => {
       bookFile: yup
         .mixed()
         .required(t("textError5") as string)
-        .test("required", t("textError6") as string, (file) => {
-          // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
-
-          if (file && (file as any).length !== 0) return true;
+        .test("required", t("textError6") as string, (file: any) => {
+          if (file) return true;
           return false;
         })
-        .test("multipleFiles", t("textError7") as string, (file) => {
-          return (file as any).length <= 1;
+        .test("fileSize", t("textError8") as string, (file: any) => {
+          return file && file?.size <= MAX_BOOKFILE_SIZE!;
         })
-        .test("fileSize", t("textError8") as string, (file) => {
-          //if u want to allow only certain file sizes
-
-          let fileSize;
-          if ((file as any).length > 0) {
-            fileSize = (file as any).reduce((total: number, current: any) => {
-              return total + current.size;
-            }, 0);
-          }
-
-          return file && fileSize <= MAX_BOOKFILE_SIZE!;
+        .test("fileFormat", "Unsupported Format", (file: any) => {
+          return file && SUPPORTED_BOOKFILE_FORMATS.includes(file.type);
         }),
       bookCover: yup
         .mixed()
         .required(t("textError5") as string)
-        .test("required", t("textError6") as string, (file) => {
-          // return file && file.size <-- u can use this if you don't want to allow empty files to be uploaded;
-
-          if (file && (file as any).length !== 0) return true;
+        .test("required", t("textError6") as string, (file: any) => {
+          if (file) return true;
           return false;
         })
-        .test("multipleFiles", t("textError7") as string, (file) => {
-          return (file as any).length <= 1;
+        .test("fileSize", t("textError8") as string, (file: any) => {
+          return file && file?.size <= MAX_BOOKCOVER_SIZE!;
         })
-        .test("fileSize", t("textError8") as string, (file) => {
-          let fileSize;
-          if ((file as any).length > 0) {
-            fileSize = (file as any).reduce((total: number, current: any) => {
-              return total + current.size;
-            }, 0);
-          }
-
-          return file && fileSize <= MAX_BOOKCOVER_SIZE!;
+        .test("fileFormat", t("textError21") as string, (file: any) => {
+          return file && SUPPORTED_BOOKCOVER_FORMATS.includes(file.type);
         }),
-
       bookSample: yup
         .mixed()
-        .test("fileSize", t("textError8") as string, (file) => {
-          // if no file is provided, then pass
+        .test("fileSize", t("textError8") as string, (file: any) => {
           if (!file) return true;
-          // if file is provided, then check for its size
-          let fileSize;
-          if ((file as any).length > 0) {
-            fileSize = (file as any).reduce((total: number, current: any) => {
-              return total + current.size;
-            }, 0);
-          }
-
-          return file && fileSize <= MAX_BOOKSAMPLE_SIZE!;
+          return file && file?.size <= MAX_BOOKSAMPLE_SIZE!;
+        })
+        .test("fileFormat", t("textError21") as string, (file: any) => {
+          if (!file) return true;
+          return file && SUPPORTED_BOOKSAMPLE_FORMATS.includes(file.type);
         })
     }),
 
     // validate for step3 (Book details)
     yup.object({
       externalLink: yup.string(),
-      version: yup.string().required("Please enter your book version"),
+      version: yup.string().required(t("textError9") as string),
       quantity: yup
         .number()
         .typeError(t("textError10") as string)
@@ -443,10 +430,9 @@ const CreateBook = () => {
       if (activeStep === 1) {
         (async () => {
           setIsSigning(true);
-          const bookCoverRes = await uploadBookCover(data.bookCover[0]);
-          const bookFileRes = await uploadBookFile(data.bookFile[0]);
-          const bookSampleRes = await uploadBookSample(data.bookSample[0]);
-
+          const bookCoverRes = await uploadBookCover(data.bookCover);
+          const bookFileRes = await uploadBookFile(data.bookFile);
+          const bookSampleRes = await uploadBookSample(data.bookSample);
           if (
             bookCoverRes &&
             bookFileRes &&

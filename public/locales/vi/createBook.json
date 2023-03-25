@@ -75,5 +75,6 @@
   "textError17": "Vui lòng nhập số trang của cuốn sách",
   "textError18": "Bạn phải chấp nhận các điều khoản và điều kiện",
   "textError19": "Bạn phải chấp nhận chính sách quyền riêng tư",
-  "textError20": "Vui lòng nhập số trang sách dưới dạng giá trị số"
+  "textError20": "Vui lòng nhập số trang sách dưới dạng giá trị số",
+  "textError21": "Định dạng không được hỗ trợ"
 }

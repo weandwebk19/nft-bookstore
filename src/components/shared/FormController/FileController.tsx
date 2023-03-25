@@ -1,0 +1,55 @@
+import { Controller, useFormContext } from "react-hook-form";
+
+import { TextField } from "@mui/material";
+
+interface FileControllerProps {
+  type?: string;
+  label?: string;
+  name: string;
+  defaultValue?: string;
+  onChange?: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  InputProps?: object;
+}
+
+const FileController = ({
+  type,
+  label,
+  name,
+  defaultValue,
+  onChange,
+  InputProps,
+  ...rest
+}: FileControllerProps) => {
+  const { control, setValue } = useFormContext();
+
+  return (
+    <Controller
+      {...rest}
+      render={({ field: { value, ...field } }) => (
+        <>
+          <TextField
+            type="file"
+            label={label}
+            // error={invalid}
+            InputProps={InputProps}
+            inputProps={{
+              accept: "image/jpg, image/jpeg, image/gif, image/png"
+            }}
+            sx={{ display: "none" }}
+            {...field}
+            onChange={(e) => {
+              field.onChange(e.target.files[0]);
+            }}
+          />
+        </>
+      )}
+      name={name}
+      control={control}
+      defaultValue={defaultValue}
+    />
+  );
+};
+
+export default FileController;

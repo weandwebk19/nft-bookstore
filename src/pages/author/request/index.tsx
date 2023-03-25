@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 import {
   Box,
+  FormHelperText,
   IconButton,
   InputAdornment,
   Link,
@@ -37,11 +38,18 @@ import {
   InputController,
   TextAreaController
 } from "@/components/shared/FormController";
+import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
-const SUPPORTED_FORMATS = ["image/jpg", "image/jpeg", "image/gif", "image/png"];
+const SUPPORTED_FORMATS = [
+  "image/jpg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/svg"
+];
 
 const schema = yup.object().shape({
   pseudonym: yup.string().required("Please enter your pseudonym"),
@@ -63,77 +71,45 @@ const schema = yup.object().shape({
   twitter: yup.string(),
   linkedIn: yup.string(),
   instagram: yup.string(),
-
-  frontDocument: yup.mixed().required("File is required"),
-  // .test("required", "You need to provide a file", (file) => {
-  //   if (file && (file as any).length !== 0) return true;
-  //   return false;
-  // })
-  // .test("multipleFiles", "One file only can be provided.", (file) => {
-  //   return (file as any).length <= 1;
-  // })
-  // .test("fileSize", "The file is too large", (file) => {
-  //   let fileSize;
-  //   if ((file as any).length > 0) {
-  //     fileSize = (file as any).reduce((total: number, current: any) => {
-  //       return total + current.size;
-  //     }, 0);
-  //   }
-
-  //   return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-  // })
-  backDocument: yup
+  frontDocument: yup
     .mixed()
     .required("File is required")
-    .test("required", "You need to provide a file", (file) => {
-      // if (file && (file as any).length !== 0) return true;
+    .test("required", "You need to provide a file", (file: any) => {
       if (file) return true;
       return false;
     })
-    // .test("multipleFiles", "One file only can be provided.", (file) => {
-    //   return (file as any).length <= 1;
-    // })
-    .test("fileSize", "The file is too large", (file: File) => {
-      console.log("file:", file);
-
-      // let fileSize;
-      // if ((file as any).length > 0) {
-      //   fileSize = (file as any).reduce((total: number, current: any) => {
-      //     return total + current.size;
-      //   }, 0);
-      // }
-
+    .test("fileSize", "The file is too large", (file: any) => {
       return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
-
-      //   return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
     })
-    .test("fileFormat", "Unsupported Format", (file: File) => {
-      console.log("file:", file);
-      console.log("file.type:", file.type);
-
-      // return file && SUPPORTED_FORMATS.includes(file.type);
-      return true;
+    .test("fileFormat", "Unsupported Format", (file: any) => {
+      return file && SUPPORTED_FORMATS.includes(file.type);
+    }),
+  backDocument: yup
+    .mixed()
+    .required("File is required")
+    .test("required", "You need to provide a file", (file: any) => {
+      if (file) return true;
+      return false;
     })
-  // picture: yup
-  //   .mixed()
-  //   .required("File is required")
-  //   .test("required", "You need to provide a file", (file) => {
-  //     if (file && (file as any).length !== 0) return true;
-  //     return false;
-  //   })
-  //   .test("multipleFiles", "One file only can be provided.", (file) => {
-  //     return (file as any).length <= 1;
-  //   })
-  //   .test("fileSize", "The file is too large", (file) => {
-  //     let fileSize;
-  //     if ((file as any).length > 0) {
-  //       fileSize = (file as any).reduce((total: number, current: any) => {
-  //         return total + current.size;
-  //       }, 0);
-  //     }
-
-  //     return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-  //   })
+    .test("fileSize", "The file is too large", (file: any) => {
+      return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+    })
+    .test("fileFormat", "Unsupported Format", (file: any) => {
+      return file && SUPPORTED_FORMATS.includes(file.type);
+    }),
+  picture: yup
+    .mixed()
+    .required("Image is required")
+    .test("required", "You need to provide a image", (file: any) => {
+      if (file) return true;
+      return false;
+    })
+    .test("fileSize", "The file is too large", (file: any) => {
+      return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+    })
+    .test("fileFormat", "Unsupported Format", (file: any) => {
+      return file && SUPPORTED_FORMATS.includes(file.type);
+    })
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -171,19 +147,13 @@ const AuthorRequest = () => {
     handleSubmit,
     formState: { errors },
     getValues,
-    setValue
+    setValue,
+    watch
   } = methods;
+  const watchPicture = watch("picture");
 
-  console.log("errors:", errors);
-
-  const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("e.target.files:", e.target.files);
-    if (!e.target.files || e.target.files.length === 0) {
-      console.error("Select a file");
-      return;
-    }
-
-    setValue("picture", e.target.files[0]);
+  const handleRemoveImage = async () => {
+    setValue("picture", "");
   };
 
   const onSubmit = (data: any) => {
@@ -219,7 +189,7 @@ const AuthorRequest = () => {
                 <Stack spacing={6}>
                   <ContentGroup
                     title="Upload your photo"
-                    desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+                    // desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
                     classTitle="required"
                   >
                     <Stack
@@ -255,26 +225,36 @@ const AuthorRequest = () => {
                           }}
                         />
                       )}
+
                       <Stack spacing={3} sx={{ justifyContent: "center" }}>
                         <StyledButton customVariant="primary" component="label">
                           Upload your photo
-                          <input
-                            type="file"
-                            hidden
-                            onChange={handleImage}
-                            accept="image/*"
-                            // accept="image/png, image/jpeg"
-                          />
+                          <FileController name="picture" />
                         </StyledButton>
 
                         <StyledButton
                           customVariant="secondary"
-                          onClick={() => {}}
+                          onClick={handleRemoveImage}
                         >
                           Remove current
                         </StyledButton>
                       </Stack>
                     </Stack>
+                    {!errors.picture && watchPicture && (
+                      <FormHelperText
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {(watchPicture as any)?.name}
+                      </FormHelperText>
+                    )}
+                    {errors && errors.picture && (
+                      <FormHelperText
+                        error
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {errors?.picture?.message}
+                      </FormHelperText>
+                    )}
                   </ContentGroup>
                   <ContentGroup title="Author information">
                     <Stack direction="column" spacing={3}>
@@ -316,11 +296,11 @@ const AuthorRequest = () => {
                         >
                           <AttachmentController
                             name="frontDocument"
-                            desc="File types recommended: JPG, PNG, GIF, SVG. Max size: 100 MB"
+                            desc="File types recommended: JPG, JPEG, PNG, GIF, SVG. Max size: 100 MB"
                           />
                           <AttachmentController
                             name="backDocument"
-                            desc="File types recommended: JPG, PNG, GIF, SVG. Max size: 100 MB"
+                            desc="File types recommended: JPG, JPEG, PNG, GIF, SVG. Max size: 100 MB"
                           />
                         </Stack>
                       </FormGroup>
