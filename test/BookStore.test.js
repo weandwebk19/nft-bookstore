@@ -58,7 +58,7 @@ contract("BookStore", (accounts) => {
     it("should have create NFT item", async () => {
       const nftItem = await _contract.getNftBook(1);
       assert.equal(nftItem.tokenId, 1, "Token id is not 1");
-      assert.equal(nftItem.balance, balance, "Nft balance is not correct");
+      assert.equal(nftItem.quantity, balance, "Nft balance is not correct");
       assert.equal(nftItem.author, accounts[0], "Author is not account[0]");
     });
 
@@ -306,7 +306,9 @@ contract("BookStore", (accounts) => {
 
     it("should have 20 rented items and 20 listed items for account[0]", async () => {
       const totalUntradeable =
-        await _contract.getAmountOfAllTypeBooksUntradeable(2, accounts[0]);
+        await _contract.getAmountOfAllTypeBooksUntradeable(2, {
+          from: accounts[0]
+        });
       assert.equal(totalUntradeable, 40, "Total Unsellable is invalid");
     });
 
@@ -509,7 +511,9 @@ contract("BookStore", (accounts) => {
       );
 
       const amountBooksUntradable1 =
-        await _contract.getAmountOfAllTypeBooksUntradeable(2, accounts[0]);
+        await _contract.getAmountOfAllTypeBooksUntradeable(2, {
+          from: accounts[0]
+        });
       assert.equal(
         amountBooksUntradable1.toString(),
         20,
