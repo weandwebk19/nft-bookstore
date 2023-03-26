@@ -1,10 +1,9 @@
 import { Stack, Typography } from "@mui/material";
 
-import { useSession } from "next-auth/react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
 
 import images from "@/assets/images";
+import withAuth from "@/components/HOC/withAuth";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { Ticket } from "@/components/shared/Ticket";
 import { Wrapper } from "@/components/shared/Wrapper";
@@ -88,23 +87,17 @@ const bottomCategories = [
 ];
 
 const BookShelf = () => {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  if (status === "unauthenticated") {
-    router.push("/");
-  } else {
-    return (
-      <Stack spacing={6}>
-        <ContentContainer titles={["My bookshelf"]}>
-          <Wrapper items={topCategories} itemsInARow={4} />
-          <Wrapper items={bottomCategories} itemsInARow={4} />
-        </ContentContainer>
-      </Stack>
-    );
-  }
+  return (
+    <Stack spacing={6}>
+      <ContentContainer titles={["My bookshelf"]}>
+        <Wrapper items={topCategories} itemsInARow={4} />
+        <Wrapper items={bottomCategories} itemsInARow={4} />
+      </ContentContainer>
+    </Stack>
+  );
 };
 
-export default BookShelf;
+export default withAuth(BookShelf);
 
 export async function getStaticProps({ locale }: any) {
   return {

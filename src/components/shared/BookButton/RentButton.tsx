@@ -52,7 +52,7 @@ const schema = yup
 const defaultValues = {
   price: 0,
   amount: 1,
-  rentalDay: 1,
+  rentalDays: 1,
   seller: "",
   tokenId: -1
 };

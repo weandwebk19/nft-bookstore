@@ -23,6 +23,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import withAuth from "@/components/HOC/withAuth";
 import { useAccount, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -724,7 +725,7 @@ const CreateBook = () => {
   );
 };
 
-export default CreateBook;
+export default withAuth(CreateBook);
 
 export async function getStaticProps({ locale }: any) {
   return {

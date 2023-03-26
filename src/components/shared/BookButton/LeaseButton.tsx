@@ -11,6 +11,7 @@ import * as yup from "yup";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
 interface LeaseButtonProps {

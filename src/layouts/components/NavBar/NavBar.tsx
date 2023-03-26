@@ -86,7 +86,6 @@ const NavBar = () => {
   const { disconnect } = useDisconnect();
 
   const { data: session, status } = useSession();
-  console.log(session);
 
   const { signMessageAsync } = useSignMessage();
 
@@ -117,11 +116,10 @@ const NavBar = () => {
         chainId: chain?.id,
         nonce: await getCsrfToken()
       });
-      console.log("message", message);
+
       const signature = await signMessageAsync({
         message: message.prepareMessage()
       });
-      console.log("signature", signature);
 
       const result = await signIn("credentials", {
         message: JSON.stringify(message),
@@ -142,8 +140,6 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    // console.log("handleLogin");
-    console.log("wagmiAddress", wagmiAddress);
     if (isConnected && !session) {
       handleLogin();
     }

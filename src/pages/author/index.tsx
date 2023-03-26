@@ -3,6 +3,7 @@ import { Box, Stack } from "@mui/material";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
+import withAuth from "@/components/HOC/withAuth";
 import DisplayBox from "@/components/ui/publishing/DisplayBox";
 
 const Author = () => {
@@ -25,7 +26,7 @@ const Author = () => {
   );
 };
 
-export default Author;
+export default withAuth(Author);
 
 export async function getStaticProps({ locale }: any) {
   return {

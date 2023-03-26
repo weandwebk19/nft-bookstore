@@ -28,6 +28,7 @@ import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import withAuth from "@/components/HOC/withAuth";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -474,7 +475,7 @@ const AuthorRequest = () => {
   );
 };
 
-export default AuthorRequest;
+export default withAuth(AuthorRequest);
 
 export async function getStaticProps({ locale }: any) {
   return {

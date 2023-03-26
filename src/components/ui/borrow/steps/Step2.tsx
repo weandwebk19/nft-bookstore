@@ -17,14 +17,21 @@ const Step2 = () => {
   const theme = useTheme();
   return (
     <ContentGroup title="Confirm purchase">
-      {/* Waiting for your signing... */}
-      <FormGroup label="Amount" required>
-        <NumericStepperController name="amount" />
-      </FormGroup>
-      <FormGroup label="Number of rental days" required>
-        <NumericStepperController name="rentalDays" />
-      </FormGroup>
-      <Typography>198 left</Typography>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={{ xs: 1, sm: 2, md: 4 }}
+      >
+        <Box sx={{ width: "100%" }}>
+          <FormGroup label="Amount" required>
+            <NumericStepperController name="amount" />
+          </FormGroup>
+          <Typography>198 left</Typography>
+        </Box>
+        <FormGroup label="Number of rental days" required>
+          <NumericStepperController name="rentalDays" />
+        </FormGroup>
+      </Stack>
+
       {!isSuccess && (
         <>
           <Typography color={`${theme.palette.error.main}`}>
