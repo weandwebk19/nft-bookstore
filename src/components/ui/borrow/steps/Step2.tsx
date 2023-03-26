@@ -12,7 +12,10 @@ import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 
-const Step2 = () => {
+type Step2Props = {
+  supplyAmount: number | undefined;
+};
+const Step2 = ({ supplyAmount }: Step2Props) => {
   const isSuccess = true;
   const theme = useTheme();
   return (
@@ -25,7 +28,7 @@ const Step2 = () => {
           <FormGroup label="Amount" required>
             <NumericStepperController name="amount" />
           </FormGroup>
-          <Typography>198 left</Typography>
+          <Typography>{supplyAmount} left</Typography>
         </Box>
         <FormGroup label="Number of rental days" required>
           <NumericStepperController name="rentalDays" />

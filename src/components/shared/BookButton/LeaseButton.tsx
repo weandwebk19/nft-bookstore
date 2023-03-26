@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -18,6 +21,7 @@ interface LeaseButtonProps {
   title: string;
   bookCover: string;
   author: string;
+  tokenId: number;
 }
 
 const schema = yup
@@ -38,8 +42,14 @@ const defaultValues = {
   amount: 1
 };
 
-const LeaseButton = ({ bookCover, title, author }: LeaseButtonProps) => {
+const LeaseButton = ({
+  bookCover,
+  title,
+  author,
+  tokenId
+}: LeaseButtonProps) => {
   const [authorName, setAuthorName] = useState();
+  const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -62,7 +72,27 @@ const LeaseButton = ({ bookCover, title, author }: LeaseButtonProps) => {
   const { handleSubmit } = methods;
 
   const onSubmit = async (data: any) => {
-    console.log(data);
+    // console.log(data);
+    try {
+      const tx = await contract?.leaseBooks(
+        tokenId,
+        ethers.utils.parseEther(data.price.toString()),
+        data.amount,
+        {
+          value: ethers.utils.parseEther((0.001).toString())
+        }
+      );
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Lease NftBook Token",
+        success: "NftBook has ben sold",
+        error: "Lease error"
+      });
+
+      console.log("receipt", receipt);
+    } catch (e: any) {
+      console.error(e.message);
+    }
   };
 
   useEffect(() => {
@@ -94,12 +124,12 @@ const LeaseButton = ({ bookCover, title, author }: LeaseButtonProps) => {
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
               <Stack>
-                <Image
+                {/* <Image
                   src={bookCover}
                   alt={title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
-                />
+                /> */}
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{authorName}</Typography>
               </Stack>

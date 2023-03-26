@@ -4,6 +4,10 @@ import { Web3Dependencies } from "@_types/hooks";
 import { useBookDetail } from ".";
 import { UseAccountHook, hookFactory as createAccountHook } from "./useAccount";
 import {
+  UseAllLeasingBooksHook,
+  hookFactory as createAllLeasingBooksHook
+} from "./useAllLeasingBooks";
+import {
   UseBookDetailHook,
   hookFactory as createBookDetailHook
 } from "./useBookDetail";
@@ -29,6 +33,7 @@ export type Web3Hooks = {
   useAccount: UseAccountHook;
   useNetwork: UseNetworkHook;
   useListedBooks: UseListedBooksHook;
+  useAllLeasingBooks: UseAllLeasingBooksHook;
   useOwnedNfts: UseOwnedNftsHook;
   useCreatedBooks: UseCreatedBooksHook;
   useOwnedListedBooks: UseOwnedListedBooksHook;
@@ -44,6 +49,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useAccount: createAccountHook(deps),
     useNetwork: createNetworkHook(deps),
     useListedBooks: createListedBooksHook(deps),
+    useAllLeasingBooks: createAllLeasingBooksHook(deps),
     useOwnedNfts: createOwnedBooksHook(deps),
     useCreatedBooks: createCreatedBooksHook(deps),
     useOwnedListedBooks: createOwnedListedBooksHook(deps),

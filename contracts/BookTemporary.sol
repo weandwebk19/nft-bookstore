@@ -59,8 +59,8 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
   mapping(uint => BorrowedBook) private _idToBorrowedBook; // (ID -> BorrowedBook))
   Counters.Counter private _borrowedBooks;
 
-  function isRented(uint tokenId) public view returns (bool) {
-    uint idRentedBook = getIdRentedBook(tokenId, msg.sender);
+  function isRented(uint tokenId, address renter) public view returns (bool) {
+    uint idRentedBook = getIdRentedBook(tokenId, renter);
     if(idRentedBook > 0) {
       return true;
     }
@@ -199,7 +199,7 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     return books;
   }
 
-  function rentRentedBooks(uint256 tokenId, 
+  function leaseRentedBooks(uint256 tokenId, 
                            address renter,
                            uint price,
                            uint256 amount

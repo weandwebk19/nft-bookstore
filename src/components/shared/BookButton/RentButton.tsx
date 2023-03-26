@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 import {
   Box,
@@ -16,14 +17,17 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
+import { daysToSeconds } from "@/utils/timeConvert";
 
 import Step1 from "../../ui/borrow/steps/Step1";
 import Step2 from "../../ui/borrow/steps/Step2";
@@ -32,8 +36,16 @@ interface RentButtonProps {
   tokenId: number;
   title: string;
   bookCover: string;
-  author: string;
+  renter: string;
   price: number;
+  supplyAmount: number;
+  borrowBooks: (
+    tokenId: number,
+    renter: string,
+    price: number,
+    amount: number,
+    rentalDuration: number
+  ) => Promise<void>;
 }
 
 const schema = yup
@@ -50,22 +62,22 @@ const schema = yup
   .required();
 
 const defaultValues = {
-  price: 0,
   amount: 1,
-  rentalDays: 1,
-  seller: "",
-  tokenId: -1
+  rentalDays: 7
 };
 
 const RentButton = ({
   tokenId,
   bookCover,
   title,
-  author,
-  price
+  renter,
+  price,
+  supplyAmount,
+  borrowBooks
 }: RentButtonProps) => {
   const router = useRouter();
-  const [authorName, setAuthorName] = useState();
+  const [renterName, setAuthorName] = useState();
+  const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -79,7 +91,7 @@ const RentButton = ({
       case 0:
         return <Step1 />;
       case 1:
-        return <Step2 />;
+        return <Step2 supplyAmount={supplyAmount} />;
       default:
         return null;
     }
@@ -110,21 +122,20 @@ const RentButton = ({
 
   const { handleSubmit, setValue } = methods;
 
-  useEffect(() => {
-    setValue("price", price);
-    setValue("tokenId", tokenId);
-    setValue("seller", author);
-  }, [price, tokenId, author]);
-
   const onSubmit = async (data: any) => {
-    console.log(data);
+    try {
+      const rentalDuration = daysToSeconds(data.rentalDays);
+      await borrowBooks(tokenId, renter, price, data.amount, rentalDuration);
+    } catch (e: any) {
+      console.error(e.message);
+    }
   };
 
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (renter) {
+          const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
             setAuthorName(userRes.data.data.fullname);
@@ -134,7 +145,7 @@ const RentButton = ({
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [renter]);
 
   return (
     <>
@@ -165,7 +176,7 @@ const RentButton = ({
               />
               <Box>
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
+                <Typography>{renterName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
               </Box>
             </Stack>

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
-import { ListedBook, NftBook } from "@_types/nftBook";
+import { ListedBook } from "@_types/nftBook";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
