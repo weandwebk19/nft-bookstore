@@ -199,7 +199,7 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     return books;
   }
 
-  function rentRentedBooks(uint256 tokenId, 
+  function leaseRentedBooks(uint256 tokenId, 
                            address renter,
                            uint price,
                            uint256 amount

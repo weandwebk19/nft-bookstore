@@ -84,11 +84,12 @@ const OwnedBooks = () => {
                                 author={book?.author}
                               />
                               <LeaseButton
+                                tokenId={book?.tokenId}
                                 title={book?.meta.title}
                                 bookCover={book?.meta.bookCover}
                                 author={book?.author}
                               />
-                              <ReadButton tokenId={book?.tokenId} />
+                              <ReadButton bookFile={book?.meta.bookFile} />
                             </>
                           }
                         />

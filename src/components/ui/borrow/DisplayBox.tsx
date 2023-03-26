@@ -3,7 +3,7 @@ import { FunctionComponent } from "react";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
-import { useListedBooks } from "@hooks/web3";
+import { useAllLeasingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
@@ -33,7 +33,7 @@ import {
 const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
 
-  const { listedBooks } = useListedBooks();
+  const { rentedBooks } = useAllLeasingBooks();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -53,13 +53,13 @@ const DisplayBox: FunctionComponent = () => {
           <Stack spacing={3}>
             <ContentPaper isPaginate={true} title="Rental books">
               {(() => {
-                if (listedBooks.isLoading) {
+                if (rentedBooks.isLoading) {
                   return (
                     <Typography>Putting books on the shelves...</Typography>
                   );
                 } else if (
-                  listedBooks?.data?.length === 0 ||
-                  listedBooks.error
+                  rentedBooks?.data?.length === 0 ||
+                  rentedBooks.error
                 ) {
                   return <FallbackNode />;
                 }
@@ -73,7 +73,7 @@ const DisplayBox: FunctionComponent = () => {
                   `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
                   title, bookCover, author,... */}
 
-                    {listedBooks?.data?.map((book) => {
+                    {rentedBooks?.data?.map((book) => {
                       return (
                         <Grid
                           item
@@ -89,7 +89,7 @@ const DisplayBox: FunctionComponent = () => {
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.seller}
+                            author={book?.meta.author}
                             onClick={handleBookClick}
                             buttons={
                               <>
@@ -97,8 +97,10 @@ const DisplayBox: FunctionComponent = () => {
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  author={book?.seller}
+                                  renter={book?.renter}
                                   price={book?.price}
+                                  supplyAmount={book?.amount}
+                                  borrowBooks={rentedBooks?.borrowBooks}
                                 />
                                 <BookmarkButton />
                                 <AddToWatchlistButton isLastInButtonGroup />

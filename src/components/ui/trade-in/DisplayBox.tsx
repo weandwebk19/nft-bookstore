@@ -86,8 +86,9 @@ const DisplayBox: FunctionComponent = () => {
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  author={book?.seller}
+                                  seller={book?.seller}
                                   price={book?.price}
+                                  supplyAmount={book?.amount}
                                 />
                                 <BookmarkButton />
                                 <AddToWatchlistButton isLastInButtonGroup />

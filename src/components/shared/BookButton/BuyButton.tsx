@@ -35,8 +35,9 @@ interface BuyButtonProps {
   tokenId: number;
   title: string;
   bookCover: string;
-  author: string;
+  seller: string;
   price: number;
+  supplyAmount: number;
 }
 
 const schema = yup
@@ -49,21 +50,19 @@ const schema = yup
   .required();
 
 const defaultValues = {
-  price: 0,
-  amount: 1,
-  seller: "",
-  tokenId: -1
+  amount: 1
 };
 
 const BuyButton = ({
   tokenId,
   bookCover,
   title,
-  author,
-  price
+  seller,
+  price,
+  supplyAmount
 }: BuyButtonProps) => {
   const router = useRouter();
-  const [authorName, setAuthorName] = useState();
+  const [sellerName, setSellerName] = useState();
   const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
@@ -78,7 +77,7 @@ const BuyButton = ({
       case 0:
         return <Step1 />;
       case 1:
-        return <Step2 />;
+        return <Step2 supplyAmount={supplyAmount} />;
       default:
         return null;
     }
@@ -109,28 +108,16 @@ const BuyButton = ({
 
   const { handleSubmit, setValue } = methods;
 
-  useEffect(() => {
-    setValue("price", price);
-    setValue("tokenId", tokenId);
-    setValue("seller", author);
-  }, [price, tokenId, author]);
-
   const onSubmit = async (data: any) => {
-    console.log(data);
     try {
-      const tx = await contract?.buyBooks(
-        ethers.utils.parseEther(tokenId.toString()),
-        data.seller,
-        ethers.utils.parseEther(data.amount.toString()),
-        {
-          value: ethers.utils.parseEther(data.price.toString())
-        }
-      );
+      const tx = await contract?.buyBooks(tokenId, seller, data.amount, {
+        value: ethers.utils.parseEther(price.toString())
+      });
 
       const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Buy NftBook Token",
-        success: "NftBook has ben bought",
-        error: "Buy error"
+        pending: "Processing transaction",
+        success: "Nft is yours! Go to Profile page",
+        error: "Processing error"
       });
 
       console.log("receipt", receipt);
@@ -142,18 +129,18 @@ const BuyButton = ({
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (seller) {
+          const userRes = await axios.get(`/api/users/wallet/${seller}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setSellerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [seller]);
 
   return (
     <>
@@ -182,7 +169,7 @@ const BuyButton = ({
                   sx={{ width: "100%" }}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
+                <Typography>{sellerName}</Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -226,7 +213,7 @@ const BuyButton = ({
               />
               <Box>
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
+                <Typography>{sellerName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
               </Box>
             </Stack>

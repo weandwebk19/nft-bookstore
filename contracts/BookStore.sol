@@ -15,13 +15,13 @@ contract BookStore is ERC1155URIStorage, Ownable {
   struct NFTBook {
     uint256 tokenId;
     address author;
-    uint256 balance;
+    uint256 quantity;
   }
 
   event NFTBookCreated (
     uint256 tokenId,
     address author,
-    uint256 balance
+    uint256 quantity
   );
 
   ListedBookStorage private _listedBookStorage;
@@ -153,12 +153,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _usedTokenURIs[tokenURI];
   }
 
-  function mintBook(string memory tokenURI, uint256 balance)
+  function mintBook(string memory tokenURI, uint256 quantity)
     public payable returns (uint) {
 
     require(!isTokenURIExist(tokenURI),
            "Token URI already exists");
-    require(balance > 0 && balance <= MAX_BALANCE,
+    require(quantity > 0 && quantity <= MAX_BALANCE,
           "The number of books you want to publish is not appropriate");
     require(msg.value == listingPrice,
            "Price must be equal to listing price");
@@ -166,17 +166,17 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _tokenIds.increment();
     uint newTokenId = _tokenIds.current();
 
-    _mint(msg.sender, newTokenId, balance, "");
+    _mint(msg.sender, newTokenId, quantity, "");
     _setURI(newTokenId, tokenURI);
-    _createNftBook(newTokenId, balance);
+    _createNftBook(newTokenId, quantity);
 
     _usedTokenURIs[tokenURI] = true;
     return newTokenId;
   }
 
-  function _createNftBook(uint tokenId, uint256 balance) private {
-    _idToNFTBook[tokenId] = NFTBook(tokenId, msg.sender, balance);
-    emit NFTBookCreated(tokenId, msg.sender, balance);
+  function _createNftBook(uint tokenId, uint256 quantity) private {
+    _idToNFTBook[tokenId] = NFTBook(tokenId, msg.sender, quantity);
+    emit NFTBookCreated(tokenId, msg.sender, quantity);
   }
   
   function isOwnerOfToken(uint tokenId, address owner) public view returns(bool) {
@@ -217,23 +217,18 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   function getCreatedNFTBooks() public view returns (NFTBook[] memory) {
     uint ownedItemsCount = getTotalOwnedToken();
-    uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
-    uint ownedRentedBookCount = _bookTemporary.getTotalOwnedRentedBook(msg.sender);
-    uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
-    NFTBook[] memory books;
-    if(length > 0) {
-      books = new NFTBook[](length);
-      uint currentIndex = 0;
-      for (uint i = 0; i < ownedItemsCount; i++) {
-        uint tokenId = _ownedTokens[msg.sender][i];
-        if(_listedBookStorage.isListed(tokenId, msg.sender) == false 
-          && _bookTemporary.isRented(tokenId, msg.sender) == false) {
-          NFTBook memory book = _idToNFTBook[tokenId];
-          books[currentIndex] = book;
-          currentIndex += 1;
-        }
+    NFTBook[] memory books = new NFTBook[](ownedItemsCount);
+
+    uint currentIndex = 0;
+    for (uint i = 0; i < ownedItemsCount; i++) {
+      uint tokenId = _ownedTokens[msg.sender][i];
+      NFTBook memory book = _idToNFTBook[tokenId];
+      if(book.author == msg.sender) {
+        books[currentIndex] = book;
+        currentIndex += 1;
       }
     }
+
     return books;
   }
 
@@ -292,7 +287,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _listedBookStorage.sellListedBooks(tokenId, price, amount, msg.sender);
   }
 
-  function rentBooks(uint256 tokenId,
+  function leaseBooks(uint256 tokenId,
                     uint price,
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
@@ -303,7 +298,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
           "You don't have enough books to sell");
     require(msg.value == rentingPrice,
            "Price must be equal to renting price");
-    _bookTemporary.rentRentedBooks(tokenId, msg.sender, price, amount);
+    _bookTemporary.leaseRentedBooks(tokenId, msg.sender, price, amount);
 
   }
 
