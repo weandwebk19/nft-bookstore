@@ -38,6 +38,7 @@ interface AccountMenuProps {
   account?: string;
   open: boolean;
   onClose(...args: unknown[]): unknown;
+  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
 }
 
@@ -45,6 +46,7 @@ const AccountMenu = ({
   account,
   open,
   onClose,
+  switchAccount,
   disconnect
 }: AccountMenuProps) => {
   const { t } = useTranslation();
@@ -79,6 +81,13 @@ const AccountMenu = ({
       content: t("navbar:my_bookshelf") as string,
       onClick: () => {
         router.push("/account/bookshelf");
+      }
+    },
+    {
+      icon: <SwitchAccountOutlinedIcon color="primary" fontSize="small" />,
+      content: t("navbar:switchAccount") as string,
+      onClick: () => {
+        switchAccount();
       }
     },
     {

@@ -33,6 +33,7 @@ interface WalletBarProps {
   account?: string;
   connect(...args: unknown[]): unknown;
   handleLogin: () => Promise<void>;
+  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
   isConnected: boolean;
 }
@@ -43,6 +44,7 @@ const WalletBar = ({
   connect,
   account,
   handleLogin,
+  switchAccount,
   disconnect,
   isConnected
 }: WalletBarProps) => {
@@ -141,8 +143,10 @@ const WalletBar = ({
           account={address}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
-          disconnect={(e: any) => {
-            // e.preventDefault();
+          switchAccount={() => {
+            switchAccount();
+          }}
+          disconnect={() => {
             disconnect();
             signOut({
               redirect: false
