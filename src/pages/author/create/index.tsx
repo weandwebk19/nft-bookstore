@@ -249,7 +249,7 @@ const CreateBook = () => {
   };
 
   const uploadBookSample = async (file: File) => {
-    if (file !== undefined) {
+    if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
 
@@ -282,7 +282,7 @@ const CreateBook = () => {
   };
 
   const uploadBookFile = async (file: File) => {
-    if (file !== undefined) {
+    if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
 
@@ -316,7 +316,7 @@ const CreateBook = () => {
   };
 
   const uploadBookCover = async (file: File) => {
-    if (file !== undefined) {
+    if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
 
@@ -426,6 +426,8 @@ const CreateBook = () => {
   const { handleSubmit, trigger, getValues } = methods;
   const onSubmit = (data: any) => {
     console.log(data);
+    console.log("cuoi neee:", activeStep);
+
     try {
       if (activeStep === 1) {
         (async () => {
