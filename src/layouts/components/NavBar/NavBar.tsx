@@ -84,6 +84,7 @@ const NavBar = () => {
   const router = useRouter();
 
   const { disconnect } = useDisconnect();
+  // const { disconnect: switchAccount } = useAccount();
 
   const { data: session, status } = useSession();
 
@@ -594,6 +595,7 @@ const NavBar = () => {
                   connect={wagmiConnect}
                   // account={account.data}
                   account={wagmiAddress}
+                  switchAccount={account.switchAccount}
                   disconnect={disconnect}
                   handleLogin={handleLogin}
                   isConnected={isConnected}
@@ -602,6 +604,7 @@ const NavBar = () => {
                   account={wagmiAddress}
                   open={openAccountMenu}
                   onClose={handleAccountMenuClose}
+                  switchAccount={account.switchAccount}
                   disconnect={disconnect}
                 />
                 {/* <Tooltip title="Toggle theme">
