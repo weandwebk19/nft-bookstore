@@ -1,12 +1,12 @@
-import { ChangeEvent, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
 import {
   Box,
+  FormHelperText,
   IconButton,
   InputAdornment,
   Stack,
-  TextField,
   Typography
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -26,15 +26,26 @@ import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import { useAccount } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
   InputController,
   TextAreaController
 } from "@/components/shared/FormController";
+import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
-import { StyledTextArea } from "@/styles/components/TextField";
+
+const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
+const SUPPORTED_FORMATS = [
+  "image/jpg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/svg"
+];
 
 const schema = yup
   .object({
@@ -49,7 +60,20 @@ const schema = yup
     facebook: yup.string(),
     twitter: yup.string(),
     linkedIn: yup.string(),
-    instagram: yup.string()
+    instagram: yup.string(),
+    picture: yup
+      .mixed()
+      .required("Image is required")
+      .test("required", "You need to provide a image", (file: any) => {
+        if (file) return true;
+        return false;
+      })
+      .test("fileSize", "The file is too large", (file: any) => {
+        return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+      })
+      .test("fileFormat", "Unsupported Format", (file: any) => {
+        return file && SUPPORTED_FORMATS.includes(file.type);
+      })
   })
   .required();
 
@@ -60,14 +84,22 @@ const defaultValues = {
   email: "",
   bio: "",
   website: "",
-  walletAddress: "0x6d5f4vrRafverHKJ561692842xderyb",
+  walletAddress: "",
   facebook: "",
   twitter: "",
   linkedIn: "",
-  instagram: ""
+  instagram: "",
+  picture: ""
 };
 
 const Profile = () => {
+  const { ethereum, contract } = useWeb3();
+  const { account } = useAccount();
+
+  useEffect(() => {
+    setValue("walletAddress", account.data);
+  }, [account.data]);
+
   const methods = useForm<FormData>({
     shouldUnregister: false,
     defaultValues,
@@ -77,29 +109,14 @@ const Profile = () => {
   const {
     handleSubmit,
     formState: { errors },
-    control,
     setValue,
-    getValues
+    getValues,
+    watch
   } = methods;
+  const watchPicture = watch("picture");
 
-  const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    // const file = document.getElementById("profileImage").files[0];
-    // const reader = new FileReader();
-    // reader.readAsDataURL(file);
-    // reader.onloadend = () => {
-    //   setValue("profileImage", reader.result);
-    // };
-    console.log("e.target.value:", e.target.value);
-    console.log("e.target.files:", e.target.files);
-    if (!e.target.files || e.target.files.length === 0) {
-      console.error("Select a file");
-      return;
-    }
-
-    // const file = e.target.files[0];
-    // const buffer = await file.arrayBuffer();
-    // const bytes = new Uint8Array(buffer);
-    // console.log("click");
+  const handleRemoveImage = async () => {
+    setValue("picture", "");
   };
 
   const onSubmit = (data: any) => {
@@ -129,7 +146,7 @@ const Profile = () => {
             <FormProvider {...methods}>
               <form>
                 <Stack spacing={6}>
-                  <ContentGroup title="Upload your photo">
+                  <ContentGroup title="Upload your photo" classTitle="required">
                     <Stack
                       direction={{ xs: "column", sm: "column", md: "row" }}
                       spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
@@ -166,17 +183,32 @@ const Profile = () => {
                       <Stack spacing={3} sx={{ justifyContent: "center" }}>
                         <StyledButton customVariant="primary" component="label">
                           Upload your photo
-                          <input type="file" hidden onChange={handleImage} />
+                          <FileController name="picture" />
                         </StyledButton>
 
                         <StyledButton
                           customVariant="secondary"
-                          onClick={() => {}}
+                          onClick={handleRemoveImage}
                         >
                           Remove current
                         </StyledButton>
                       </Stack>
                     </Stack>
+                    {!errors.picture && watchPicture && (
+                      <FormHelperText
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {(watchPicture as any)?.name}
+                      </FormHelperText>
+                    )}
+                    {errors && errors.picture && (
+                      <FormHelperText
+                        error
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {errors?.picture?.message}
+                      </FormHelperText>
+                    )}
                   </ContentGroup>
                   <ContentGroup title="User information">
                     <Stack direction="column" spacing={3}>

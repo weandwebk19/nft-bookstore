@@ -22,7 +22,7 @@ const FileController = ({
   InputProps,
   ...rest
 }: FileControllerProps) => {
-  const { control, setValue } = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <Controller
@@ -40,7 +40,7 @@ const FileController = ({
             sx={{ display: "none" }}
             {...field}
             onChange={(e) => {
-              field.onChange(e.target.files[0]);
+              field.onChange((e.target as any)?.files[0]);
             }}
           />
         </>
