@@ -25,7 +25,8 @@
   "favorites": "Yêu thích",
   "watchlist": "Danh sách theo dõi",
   "my_bookshelf": "Kệ sách của tôi",
-  "disconnect": "Ngừng kết nối",
+  "switchAccount": "Đổi tài khoản",
+  "disconnect": "Ngắt kết nối",
   "connectWallet": "Kết nối ví",
   "readerAccount": "Tài khoản độc giả",
   "becomeAnAuthor": "Trở thành tác giả"

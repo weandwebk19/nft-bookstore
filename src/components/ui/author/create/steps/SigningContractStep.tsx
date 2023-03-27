@@ -1,7 +1,11 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 const SigningContractStep = () => {
-  return <Typography>Waiting for your signing...</Typography>;
+  return (
+    <Box sx={{ mt: 3 }}>
+      <Typography>Wating for your signing</Typography>
+    </Box>
+  );
 };
 
 export default SigningContractStep;

@@ -64,3 +64,12 @@ export const useBookDetail = (bookId: string, seller?: string) => {
     bookDetail: swrRes
   };
 };
+
+export const useAllLeasingBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useAllLeasingBooks();
+
+  return {
+    rentedBooks: swrRes
+  };
+};

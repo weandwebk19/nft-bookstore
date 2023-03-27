@@ -3,9 +3,11 @@ import { Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
+import withAuth from "@/components/HOC/withAuth";
 import { useOwnedNfts } from "@/components/hooks/web3";
 import {
   LeaseButton,
@@ -18,6 +20,8 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
 const OwnedBooks = () => {
+  const { status } = useSession();
+
   const { nfts } = useOwnedNfts();
   const router = useRouter();
   const ownedBooks = nfts.data;
@@ -80,11 +84,12 @@ const OwnedBooks = () => {
                                 author={book?.author}
                               />
                               <LeaseButton
+                                tokenId={book?.tokenId}
                                 title={book?.meta.title}
                                 bookCover={book?.meta.bookCover}
                                 author={book?.author}
                               />
-                              <ReadButton tokenId={book?.tokenId} />
+                              <ReadButton bookFile={book?.meta.bookFile} />
                             </>
                           }
                         />
@@ -106,7 +111,7 @@ const OwnedBooks = () => {
   );
 };
 
-export default OwnedBooks;
+export default withAuth(OwnedBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {

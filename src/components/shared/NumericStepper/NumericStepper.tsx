@@ -24,7 +24,7 @@ const NumericStepper = ({
   return (
     <>
       <TextField
-        sx={{ maxWidth: 160 }}
+        // sx={{ maxWidth: 160 }}
         type="tel"
         value={value}
         onChange={onChange}

@@ -15,13 +15,13 @@ contract BookStore is ERC1155URIStorage, Ownable {
   struct NFTBook {
     uint256 tokenId;
     address author;
-    uint256 balance;
+    uint256 quantity;
   }
 
   event NFTBookCreated (
     uint256 tokenId,
     address author,
-    uint256 balance
+    uint256 quantity
   );
 
   ListedBookStorage private _listedBookStorage;
@@ -31,6 +31,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
   uint MIN_TIME = 604800; // Rental period is at least one week
   uint public listingPrice = 0.025 ether;
   uint public rentingPrice = 0.001 ether;
+  uint private sharingPrice = 0.0005 ether;
+
   Counters.Counter private _tokenIds;
 
   mapping (uint => NFTBook) _idToNFTBook;
@@ -57,6 +59,11 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function setRentingPrice(uint newPrice) external onlyOwner {
     require(newPrice > 0, "Price must be at least 1 wei");
     rentingPrice = newPrice;
+  }
+
+  function setSharingPrice(uint newPrice) external onlyOwner {
+    require(newPrice > 0, "Price must be at least 1 wei");
+    sharingPrice = newPrice;
   }
 
   function setTokenUri(uint256 tokenId, string memory tokenURI) external onlyOwner{
@@ -146,12 +153,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _usedTokenURIs[tokenURI];
   }
 
-  function mintBook(string memory tokenURI, uint256 balance)
+  function mintBook(string memory tokenURI, uint256 quantity)
     public payable returns (uint) {
 
     require(!isTokenURIExist(tokenURI),
            "Token URI already exists");
-    require(balance > 0 && balance <= MAX_BALANCE,
+    require(quantity > 0 && quantity <= MAX_BALANCE,
           "The number of books you want to publish is not appropriate");
     require(msg.value == listingPrice,
            "Price must be equal to listing price");
@@ -159,17 +166,17 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _tokenIds.increment();
     uint newTokenId = _tokenIds.current();
 
-    _mint(msg.sender, newTokenId, balance, "");
+    _mint(msg.sender, newTokenId, quantity, "");
     _setURI(newTokenId, tokenURI);
-    _createNftBook(newTokenId, balance);
+    _createNftBook(newTokenId, quantity);
 
     _usedTokenURIs[tokenURI] = true;
     return newTokenId;
   }
 
-  function _createNftBook(uint tokenId, uint256 balance) private {
-    _idToNFTBook[tokenId] = NFTBook(tokenId, msg.sender, balance);
-    emit NFTBookCreated(tokenId, msg.sender, balance);
+  function _createNftBook(uint tokenId, uint256 quantity) private {
+    _idToNFTBook[tokenId] = NFTBook(tokenId, msg.sender, quantity);
+    emit NFTBookCreated(tokenId, msg.sender, quantity);
   }
   
   function isOwnerOfToken(uint tokenId, address owner) public view returns(bool) {
@@ -210,23 +217,18 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   function getCreatedNFTBooks() public view returns (NFTBook[] memory) {
     uint ownedItemsCount = getTotalOwnedToken();
-    uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(msg.sender);
-    uint ownedRentedBookCount = _bookTemporary.getTotalOwnedRentedBook(msg.sender);
-    uint length = ownedItemsCount - ownedListedBookCount - ownedRentedBookCount;
-    NFTBook[] memory books;
-    if(length > 0) {
-      books = new NFTBook[](length);
-      uint currentIndex = 0;
-      for (uint i = 0; i < ownedItemsCount; i++) {
-        uint tokenId = _ownedTokens[msg.sender][i];
-        if(_listedBookStorage.isListed(tokenId, msg.sender) == false 
-          && _bookTemporary.isRented(tokenId, msg.sender) == false) {
-          NFTBook memory book = _idToNFTBook[tokenId];
-          books[currentIndex] = book;
-          currentIndex += 1;
-        }
+    NFTBook[] memory books = new NFTBook[](ownedItemsCount);
+
+    uint currentIndex = 0;
+    for (uint i = 0; i < ownedItemsCount; i++) {
+      uint tokenId = _ownedTokens[msg.sender][i];
+      NFTBook memory book = _idToNFTBook[tokenId];
+      if(book.author == msg.sender) {
+        books[currentIndex] = book;
+        currentIndex += 1;
       }
     }
+
     return books;
   }
 
@@ -265,36 +267,38 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return borrowedBooks;
   }
 
-  function getAmountOfAllTypeBooksUntradeable(uint256 tokenId, address owner) public view returns(uint) {
-    return _listedBookStorage.getAmountOfListedBooks(tokenId, owner) +
-          _bookTemporary.getAmountOfRentedBooks(tokenId, owner) + 
-          _bookTemporary.getAmountOfBorrowedBooks(tokenId, owner);
+  function getAmountOfAllTypeBooksUntradeable(uint256 tokenId) public view returns(uint) {
+    require(tokenId != 0 && msg.sender != address(0), "Token id and owner is invalid");
+    return _listedBookStorage.getAmountOfListedBooks(tokenId, msg.sender) +
+          _bookTemporary.getAmountOfRentedBooks(tokenId, msg.sender) + 
+          _bookTemporary.getAmountOAllfSharedBooks(tokenId, msg.sender) + 
+          _bookTemporary.getAmountOfBorrowedBooks(tokenId, msg.sender);
   }
-
+  
   function sellBooks(uint256 tokenId,
                     uint price,
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooksUntradeable(tokenId, msg.sender) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
+    require(getAmountOfAllTypeBooksUntradeable(tokenId) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
           "You don't have enough books to sell");
     require(msg.value == listingPrice,
            "Price must be equal to listing price");
     _listedBookStorage.sellListedBooks(tokenId, price, amount, msg.sender);
   }
 
-  function rentBooks(uint256 tokenId,
+  function leaseBooks(uint256 tokenId,
                     uint price,
                     uint256 amount) public payable {
     require(isOwnerOfToken(tokenId, msg.sender),
           "You are not the owner of this token");
-    require(getAmountOfAllTypeBooksUntradeable(tokenId, msg.sender) +
+    require(getAmountOfAllTypeBooksUntradeable(tokenId) +
            amount <= ERC1155.balanceOf(msg.sender, tokenId) &&
            amount > 0,
           "You don't have enough books to sell");
     require(msg.value == rentingPrice,
            "Price must be equal to renting price");
-    _bookTemporary.rentRentedBooks(tokenId, msg.sender, price, amount);
+    _bookTemporary.leaseRentedBooks(tokenId, msg.sender, price, amount);
 
   }
 
@@ -469,5 +473,86 @@ contract BookStore is ERC1155URIStorage, Ownable {
     require(address(0) != msg.sender, "Your's address is invalid");
     return _bookTemporary.excRecallAllBorrowedBooks(msg.sender);           
   }
+
+  function shareBooks(uint256 idBorrowedBook, 
+                      uint price,
+                      uint256 amount
+                      ) public payable {
+    
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
+
+    require(msg.sender == borrowedBook.borrower, "You do not own this borrowed book");
+    require(msg.value == sharingPrice, "The cost of making this transaction is not valid");
+    require(price > 0, "Price for shared books is invalid");
+    require(amount > 0 && amount <= borrowedBook.amount, "Amount for shared books is invalid");
+
+    _bookTemporary.shareBooks(idBorrowedBook, 
+                              msg.sender, 
+                              price, 
+                              amount);
+  }
+
+  function getAllBooksOnSharing() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    return _bookTemporary.getAllBooksOnSharing();
+  }
+
+  function getAllOwnedBooksOnSharing() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    require(msg.sender != address(0), "Address is invalid");
+    return _bookTemporary.getAllOwnedBooksOnSharing(msg.sender);
+  }
+
+  function getAllSharedBook() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    return _bookTemporary.getAllSharedBook();
+  }
+
+  function getAllOwnedSharedBook() 
+          public view returns (BookTemporary.SharedBook[] memory) {
+    require(msg.sender != address(0), "Address is invalid");
+    return _bookTemporary.getAllOwnedSharedBook(msg.sender);
+  }
+
+  function updateBooksOnSharing(uint idBorrowedBook, 
+                                   uint newPrice, 
+                                   uint newAmount) public {
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
+    require(msg.sender == borrowedBook.borrower, "You do not own this borrowed book");
+    require(newPrice > 0, "Price for shared books is invalid");
+    require(newAmount > 0 && newAmount <= borrowedBook.amount, "Amount for shared books is invalid");
+
+    _bookTemporary.updateBooksOnSharing(idBorrowedBook, msg.sender, newPrice, newAmount);
+  }
+
+  function takeBooksOnSharing(uint idBorrowedBook, 
+                              address sharer, 
+                              uint amount) public payable {
+    require(sharer != address(0) && msg.sender != address(0), "Addresses is invalid");
+    require(idBorrowedBook > 0, "Id Borrowed book is invalid");
+    BookTemporary.BorrowedBook memory borrowedBook = 
+                    _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
+    require(sharer == borrowedBook.borrower, "You do not have this borrowed book");
+
+    uint price = _bookTemporary.takeBooksOnSharingAndUpdateBorrowedBook(idBorrowedBook,
+                                                                        sharer,
+                                                                        msg.sender, 
+                                                                        amount);
+    uint tokenId = borrowedBook.tokenId;
+    if (price != 0 && tokenId != 0) {
+      _safeTransferFrom(sharer, msg.sender, tokenId, amount, "");
+      // The amount you pay for this transaction will not depend on the period of borrowing the book,
+      //  the price will be set by the sharer
+      uint totalPrice = price * amount;
+      payable(sharer).transfer(totalPrice);
+    } else {
+      require(false,
+           "Take Books On Sharing execution failed");
+    }
+    
+  }
+  
 
 }

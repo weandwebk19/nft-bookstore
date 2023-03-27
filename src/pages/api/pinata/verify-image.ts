@@ -1,15 +1,15 @@
 import { FileReq } from "@_types/nftBook";
 import axios from "axios";
 import FormData from "form-data";
+import { IronSession } from "iron-session";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Session } from "next-iron-session";
 import { v4 as uuidv4 } from "uuid";
 
 import {
   addressCheckMiddleware,
   pinataApiKey,
   pinataSecretApiKey,
-  withSession
+  withSessionAPI
 } from "./utils";
 
 export const config = {
@@ -20,8 +20,11 @@ export const config = {
   }
 };
 
-export default withSession(
-  async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
+export default withSessionAPI(
+  async (
+    req: NextApiRequest & { session: IronSession },
+    res: NextApiResponse
+  ) => {
     console.log("verfiy-image");
 
     if (req.method === "POST") {
@@ -54,6 +57,7 @@ export default withSession(
         }
       );
 
+      console.log(req.body);
       return res.status(200).send(fileRes.data);
     } else {
       return res.status(422).send({ message: "Invalid endpoint" });

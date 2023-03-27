@@ -8,7 +8,7 @@ type UseAccountResponse = {
   connect: () => void;
   isLoading: boolean;
   isInstalled: boolean;
-  disconnect: () => void;
+  switchAccount: () => void;
 };
 
 type AccountHookFactory = CryptoHookFactory<string, UseAccountResponse>;
@@ -60,7 +60,7 @@ export const hookFactory: AccountHookFactory =
       }
     };
 
-    const disconnect = async () => {
+    const switchAccount = async () => {
       try {
         ethereum?.request({
           method: "wallet_requestPermissions",
@@ -83,6 +83,6 @@ export const hookFactory: AccountHookFactory =
       isInstalled: ethereum?.isMetaMask || false,
       mutate,
       connect,
-      disconnect
+      switchAccount
     };
   };

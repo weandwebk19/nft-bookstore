@@ -3,6 +3,7 @@ import { Stack, Typography } from "@mui/material";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import images from "@/assets/images";
+import withAuth from "@/components/HOC/withAuth";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { Ticket } from "@/components/shared/Ticket";
 import { Wrapper } from "@/components/shared/Wrapper";
@@ -96,7 +97,7 @@ const BookShelf = () => {
   );
 };
 
-export default BookShelf;
+export default withAuth(BookShelf);
 
 export async function getStaticProps({ locale }: any) {
   return {

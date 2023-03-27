@@ -5,6 +5,7 @@ import axios from "axios";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
 
+import withAuth from "@/components/HOC/withAuth";
 import { useCreatedBooks } from "@/components/hooks/web3";
 import { EditButton, SellButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -95,7 +96,7 @@ const CreatedBooks = () => {
   );
 };
 
-export default CreatedBooks;
+export default withAuth(CreatedBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
