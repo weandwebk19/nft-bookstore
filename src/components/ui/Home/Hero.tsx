@@ -15,6 +15,7 @@ import { alpha, useTheme } from "@mui/material/styles";
 import CodeOutlinedIcon from "@mui/icons-material/CodeOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 
+import Spline from "@splinetool/react-spline";
 import styles from "@styles/Hero.module.scss";
 import { useTranslation } from "next-i18next";
 
@@ -34,6 +35,7 @@ const Hero = () => {
         sx={{
           position: "absolute",
           top: 0,
+          left: 0,
           p: 6
         }}
       >
@@ -68,20 +70,18 @@ const Hero = () => {
           </Stack>
         </Stack>
       </Box>
-      <iframe
-        src="https://my.spline.design/portalcopy-e09f7642debb277b4bfbbcac712fae85/"
-        width="100%"
-        height="100%"
-      ></iframe>
+
+      <Spline scene="https://prod.spline.design/juq9OBGTG4B5Kmx1/scene.splinecode" />
+
       <Box
         sx={{
           position: "absolute",
           bottom: 0,
           width: "100%",
-          height: "60px",
+          height: "12px",
           backgroundColor: `${theme.palette.primary.main}`
         }}
-      ></Box>
+      />
     </Box>
   );
 };
