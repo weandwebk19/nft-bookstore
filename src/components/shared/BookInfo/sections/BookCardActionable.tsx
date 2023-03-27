@@ -5,9 +5,15 @@ import LaunchIcon from "@mui/icons-material/Launch";
 
 interface BookCardActionableProps {
   user?: string;
+  price?: Number;
+  isRenting?: Boolean;
 }
 
-const BookCardActionable = ({ user }: BookCardActionableProps) => {
+const BookCardActionable = ({
+  user,
+  price,
+  isRenting
+}: BookCardActionableProps) => {
   const theme = useTheme();
 
   return (
@@ -65,7 +71,7 @@ const BookCardActionable = ({ user }: BookCardActionableProps) => {
             padding: "12px"
           }}
         >
-          0.46 ETH/day
+          {`${price ? price : 0} ETH${isRenting ? "/day" : ""}`}
           <Typography variant="body1">($0.00...036)</Typography>
         </Box>
       </Box>

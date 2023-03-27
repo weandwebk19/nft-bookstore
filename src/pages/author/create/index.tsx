@@ -414,7 +414,6 @@ const CreateBook = () => {
   const { handleSubmit, trigger, getValues } = methods;
   const onSubmit = (data: any) => {
     console.log(data);
-    console.log("cuoi neee:", activeStep);
 
     try {
       if (activeStep === 1) {
