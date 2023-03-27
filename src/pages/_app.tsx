@@ -9,7 +9,14 @@ import { appWithTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
-import { WagmiConfig, chain, configureChains, createClient } from "wagmi";
+import {
+  WagmiConfig,
+  configureChains,
+  createClient,
+  goerli,
+  mainnet
+} from "wagmi";
+import { polygon } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
 import { Web3Provider } from "@/components/providers";
@@ -36,7 +43,7 @@ export async function getStaticProps({ locale }: any) {
 }
 
 export const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, chain.goerli],
+  [mainnet, polygon, goerli],
   [publicProvider()]
 );
 
