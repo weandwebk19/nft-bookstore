@@ -16,6 +16,8 @@ import { ReadMore } from "@/components/shared/ReadMore";
 import { bookList } from "@/mocks";
 import { NftBookDetails } from "@/types/nftBook";
 
+import BookListActionable from "./sections/BookListActionable";
+
 type BookInfoProps = {
   onClick?: () => void;
   bookDetail: NftBookDetails;
@@ -53,6 +55,34 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
     }
     return [];
   }, [bookDetail]);
+
+  const bookListActionable = [
+    {
+      id: "1",
+      price: 0.75,
+      owner: "Tho Le"
+    },
+    {
+      id: "2",
+      price: 3.54,
+      owner: "Nhat Nguyen"
+    },
+    {
+      id: "3",
+      price: 2.84,
+      owner: "Cao Le"
+    },
+    {
+      id: "4",
+      price: 1.58,
+      owner: "Vinh Tran"
+    },
+    {
+      id: "5",
+      price: 2.33,
+      owner: "Hoa Phan"
+    }
+  ];
 
   useEffect(() => {
     (async () => {
@@ -193,7 +223,38 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
               </Grid>
             </Grid>
           </Box>
-          <Box p={3}>
+          {/* {(isOpenForTradeIn || isOpenForBorrow) && ( */}
+          {(true || isOpenForBorrow) && (
+            <Box
+              sx={{
+                p: 3,
+                borderBottom: `1px solid ${theme.palette.primary.main}`,
+                borderRight: `1px solid ${theme.palette.primary.main}`,
+                borderLeft: {
+                  xs: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0
+                }
+              }}
+            >
+              <BookListActionable
+                isOpenForTradeIn={true}
+                // isOpenForTradeIn={isOpenForTradeIn}
+                isOpenForBorrow={isOpenForBorrow}
+                bookListActionable={bookListActionable}
+              />
+            </Box>
+          )}
+          <Box
+            sx={{
+              p: 3,
+              borderBottom: `1px solid ${theme.palette.primary.main}`,
+              borderRight: `1px solid ${theme.palette.primary.main}`,
+              borderLeft: {
+                xs: `1px solid ${theme.palette.primary.main}`,
+                sm: 0
+              }
+            }}
+          >
             <Typography variant="h5" gutterBottom>
               You may love
             </Typography>

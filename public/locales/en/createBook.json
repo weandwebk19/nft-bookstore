@@ -75,5 +75,6 @@
   "textError17": "Please enter the page number of your book",
   "textError18": "You must accept the terms and conditions",
   "textError19": "You must accept the privacy policy",
-  "textError20": "Please enter the pages of your book as numeric value"
+  "textError20": "Please enter the pages of your book as numeric value",
+  "textError21": "Unsupported format"
 }

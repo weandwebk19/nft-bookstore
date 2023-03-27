@@ -1,9 +1,10 @@
-import { ChangeEvent, useEffect } from "react";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import {
   Box,
+  FormHelperText,
   IconButton,
   InputAdornment,
   Link,
@@ -23,6 +24,7 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/ContentContainer.module.scss";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import * as yup from "yup";
@@ -38,100 +40,25 @@ import {
   InputController,
   TextAreaController
 } from "@/components/shared/FormController";
+import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
+import formatBytes from "@/utils/formatBytes";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
-
-const schema = yup.object().shape({
-  pseudonym: yup.string().required("Please enter your pseudonym"),
-  about: yup.string(),
-  email: yup
-    .string()
-    .required("Please enter your email address")
-    .email("Please enter valid email address"),
-  phoneNumber: yup
-    .string()
-    .required("Please enter your phone number")
-    .matches(
-      /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
-      "Please enter valid phone number"
-    ),
-  website: yup.string(),
-  walletAddress: yup.string(),
-  facebook: yup.string(),
-  twitter: yup.string(),
-  linkedIn: yup.string(),
-  instagram: yup.string(),
-
-  frontDocument: yup
-    .mixed()
-    .required("File is required")
-    .test("required", "You need to provide a file", (file) => {
-      if (file && (file as any).length !== 0) return true;
-      return false;
-    })
-    .test("multipleFiles", "One file only can be provided.", (file) => {
-      return (file as any).length <= 1;
-    })
-    .test("fileSize", "The file is too large", (file) => {
-      let fileSize;
-      if ((file as any).length > 0) {
-        fileSize = (file as any).reduce((total: number, current: any) => {
-          return total + current.size;
-        }, 0);
-      }
-
-      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-    }),
-  backDocument: yup
-    .mixed()
-    .required("File is required")
-    .test("required", "You need to provide a file", (file) => {
-      if (file && (file as any).length !== 0) return true;
-      return false;
-    })
-    .test("multipleFiles", "One file only can be provided.", (file) => {
-      return (file as any).length <= 1;
-    })
-    .test("fileSize", "The file is too large", (file) => {
-      let fileSize;
-      if ((file as any).length > 0) {
-        fileSize = (file as any).reduce((total: number, current: any) => {
-          return total + current.size;
-        }, 0);
-      }
-
-      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-    }),
-  picture: yup
-    .mixed()
-    .required("File is required")
-    .test("required", "You need to provide a file", (file) => {
-      if (file && (file as any).length !== 0) return true;
-      return false;
-    })
-    .test("multipleFiles", "One file only can be provided.", (file) => {
-      return (file as any).length <= 1;
-    })
-    .test("fileSize", "The file is too large", (file) => {
-      let fileSize;
-      if ((file as any).length > 0) {
-        fileSize = (file as any).reduce((total: number, current: any) => {
-          return total + current.size;
-        }, 0);
-      }
-
-      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-    })
-});
-
-type FormData = yup.InferType<typeof schema>;
+const SUPPORTED_FORMATS = [
+  "image/jpg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/svg"
+];
 
 const defaultValues = {
   pseudonym: "",
   about: "",
   email: "",
+  phoneNumber: "",
   website: "",
   walletAddress: "",
   facebook: "",
@@ -144,12 +71,72 @@ const defaultValues = {
 };
 
 const AuthorRequest = () => {
+  const { t } = useTranslation("authorRequest");
   const { ethereum, contract } = useWeb3();
   const { account } = useAccount();
 
-  useEffect(() => {
-    setValue("walletAddress", account.data);
-  }, [account.data]);
+  const schema = yup.object().shape({
+    pseudonym: yup.string().required(t("textError1") as string),
+    about: yup.string(),
+    email: yup
+      .string()
+      .required(t("textError2") as string)
+      .email(t("textError3") as string),
+    phoneNumber: yup
+      .string()
+      .required(t("textError4") as string)
+      .matches(
+        /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
+        t("textError5") as string
+      ),
+    website: yup.string(),
+    walletAddress: yup.string(),
+    facebook: yup.string(),
+    twitter: yup.string(),
+    linkedIn: yup.string(),
+    instagram: yup.string(),
+    frontDocument: yup
+      .mixed()
+      .required(t("textError6") as string)
+      .test("required", t("textError7") as string, (file: any) => {
+        if (file) return true;
+        return false;
+      })
+      .test("fileSize", t("textError8") as string, (file: any) => {
+        return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+      })
+      .test("fileFormat", t("textError12") as string, (file: any) => {
+        return file && SUPPORTED_FORMATS.includes(file.type);
+      }),
+    backDocument: yup
+      .mixed()
+      .required(t("textError6") as string)
+      .test("required", t("textError7") as string, (file: any) => {
+        if (file) return true;
+        return false;
+      })
+      .test("fileSize", t("textError8") as string, (file: any) => {
+        return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+      })
+      .test("fileFormat", t("textError12") as string, (file: any) => {
+        return file && SUPPORTED_FORMATS.includes(file.type);
+      }),
+    picture: yup
+      .mixed()
+      .required(t("textError9") as string)
+      .test("required", t("textError10") as string, (file: any) => {
+        if (file) return true;
+        return false;
+      })
+      .test("fileSize", t("textError11") as string, (file: any) => {
+        return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+      })
+      .test("fileFormat", t("textError12") as string, (file: any) => {
+        return file && SUPPORTED_FORMATS.includes(file.type);
+      })
+  });
+
+  type FormData = yup.InferType<typeof schema>;
 
   const methods = useForm<FormData>({
     shouldUnregister: false,
@@ -161,19 +148,21 @@ const AuthorRequest = () => {
     handleSubmit,
     formState: { errors },
     getValues,
-    setValue
+    setValue,
+    watch,
+    reset
   } = methods;
+  const watchPicture = watch("picture");
 
-  // console.log("errors:", errors);
+  const handleRemoveImage = async () => {
+    setValue("picture", "");
+  };
 
-  const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("e.target.files:", e.target.files);
-    if (!e.target.files || e.target.files.length === 0) {
-      console.error("Select a file");
-      return;
-    }
-
-    setValue("picture", e.target.files[0]);
+  const handleCancel = async () => {
+    reset((formValues) => ({
+      ...defaultValues,
+      walletAddress: formValues.walletAddress
+    }));
   };
 
   const onSubmit = (data: any) => {
@@ -184,16 +173,22 @@ const AuthorRequest = () => {
     // })();
   };
 
+  useEffect(() => {
+    setValue("walletAddress", account.data);
+  }, [account.data]);
+
   return (
     <>
       <Head>
-        <title>Author request - NFT Bookstore</title>
+        <title>{t("titlePage") as string}</title>
         <meta name="description" content="The world's first NFT Bookstore" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer titles={["Make an", "Author request"]}>
+        <ContentContainer
+          titles={[t("titleContent1") as string, t("titleContent2") as string]}
+        >
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Box sx={{ my: 2 }}>
               <Typography
@@ -201,15 +196,16 @@ const AuthorRequest = () => {
                 className="form-label required"
                 sx={{ fontSize: "14px" }}
               >
-                Required
+                {t("required") as string}
               </Typography>
             </Box>
             <FormProvider {...methods}>
               <form>
                 <Stack spacing={6}>
                   <ContentGroup
-                    title="Upload your photo"
-                    desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+                    title={t("titleUpload") as string}
+                    // desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+                    classTitle="required"
                   >
                     <Stack
                       direction={{ xs: "column", sm: "column", md: "row" }}
@@ -244,30 +240,40 @@ const AuthorRequest = () => {
                           }}
                         />
                       )}
+
                       <Stack spacing={3} sx={{ justifyContent: "center" }}>
                         <StyledButton customVariant="primary" component="label">
-                          Upload your photo
-                          <input
-                            type="file"
-                            hidden
-                            onChange={handleImage}
-                            accept="image/*"
-                            // accept="image/png, image/jpeg"
-                          />
+                          {t("uploadPhotoBtn") as string}
+                          <FileController name="picture" />
                         </StyledButton>
 
                         <StyledButton
                           customVariant="secondary"
-                          onClick={() => {}}
+                          onClick={handleRemoveImage}
                         >
-                          Remove current
+                          {t("removeBtn") as string}
                         </StyledButton>
                       </Stack>
                     </Stack>
+                    {!errors.picture && watchPicture && (
+                      <FormHelperText
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {(watchPicture as any)?.name}
+                      </FormHelperText>
+                    )}
+                    {errors && errors.picture && (
+                      <FormHelperText
+                        error
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {errors?.picture?.message}
+                      </FormHelperText>
+                    )}
                   </ContentGroup>
-                  <ContentGroup title="Author information">
+                  <ContentGroup title={t("titleInfo") as string}>
                     <Stack direction="column" spacing={3}>
-                      <FormGroup label="Pseudonym" required>
+                      <FormGroup label={t("pseudonym") as string} required>
                         <InputController name="pseudonym" />
                       </FormGroup>
                       <FormGroup label="More about you">
@@ -278,14 +284,14 @@ const AuthorRequest = () => {
                         spacing={{ xs: 2 }}
                       >
                         <FormGroup
-                          label="Email"
+                          label={t("email") as string}
                           required
                           className={styles["form__group-half"]}
                         >
                           <InputController name="email" />
                         </FormGroup>
                         <FormGroup
-                          label="Phone number"
+                          label={t("phoneNumber") as string}
                           required
                           className={styles["form__group-half"]}
                         >
@@ -297,7 +303,7 @@ const AuthorRequest = () => {
                           />
                         </FormGroup>
                       </Stack>
-                      <FormGroup label="ID Document" required>
+                      <FormGroup label={t("idDocument") as string} required>
                         <Stack
                           direction={{ xs: "column", md: "row" }}
                           spacing={{ xs: 3 }}
@@ -305,22 +311,26 @@ const AuthorRequest = () => {
                         >
                           <AttachmentController
                             name="frontDocument"
-                            desc="File types recommended: JPG, PNG, GIF, SVG. Max size: 100 MB"
+                            desc={`${
+                              t("descAttachment1") as string
+                            } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
                           />
                           <AttachmentController
                             name="backDocument"
-                            desc="File types recommended: JPG, PNG, GIF, SVG. Max size: 100 MB"
+                            desc={`${
+                              t("descAttachment1") as string
+                            } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
                           />
                         </Stack>
                       </FormGroup>
                     </Stack>
                   </ContentGroup>
-                  <ContentGroup title="Social link">
+                  <ContentGroup title={t("titleSocial") as string}>
                     <Stack direction="column" spacing={3}>
-                      <FormGroup label="Website">
+                      <FormGroup label={t("website") as string}>
                         <InputController name="website" />
                       </FormGroup>
-                      <FormGroup label="Wallet address">
+                      <FormGroup label={t("walletAddress") as string}>
                         <InputController
                           name="walletAddress"
                           InputProps={{
@@ -342,7 +352,7 @@ const AuthorRequest = () => {
                           }}
                         />
                       </FormGroup>
-                      <FormGroup label="Social media" />
+                      <FormGroup label={t("socialMedia") as string} />
                       <Stack
                         direction={{ xs: "column", md: "row" }}
                         spacing={{ xs: 2 }}
@@ -440,30 +450,34 @@ const AuthorRequest = () => {
                   >
                     <StyledButton
                       customVariant="secondary"
-                      type="submit"
-                      onClick={() => {}}
+                      onClick={handleCancel}
                     >
-                      Cancel
+                      {t("cancel") as string}
                     </StyledButton>
                     <StyledButton
                       customVariant="primary"
                       type="submit"
                       onClick={handleSubmit(onSubmit)}
                     >
-                      Submit
+                      {t("submit") as string}
                     </StyledButton>
                   </Stack>
                   <Typography
                     sx={{ fontStyle: "italic", mt: "32px !important" }}
                   >
-                    By clicking{" "}
+                    {t("termsAndConditions1") as string}{" "}
                     <b>
-                      <i>Submit</i>
+                      <i>{t("termsAndConditions2") as string}</i>
                     </b>
-                    , you agree to our{" "}
-                    <Link href="/terms-of-service">Terms of Service</Link> and
-                    that you have read our{" "}
-                    <Link href="/term-of-service">Privacy Policy</Link>.
+                    , {t("termsAndConditions3") as string}{" "}
+                    <Link href="/terms-of-service">
+                      {t("termsAndConditions4") as string}
+                    </Link>{" "}
+                    {t("termsAndConditions5") as string}{" "}
+                    <Link href="/term-of-service">
+                      {t("termsAndConditions6") as string}
+                    </Link>
+                    {t("termsAndConditions7") as string}
                   </Typography>
                 </Stack>
               </form>
@@ -480,7 +494,11 @@ export default withAuth(AuthorRequest);
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, [
+        "navbar",
+        "footer",
+        "authorRequest"
+      ]))
     }
   };
 }

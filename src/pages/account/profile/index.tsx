@@ -1,12 +1,12 @@
-import { ChangeEvent, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
 import {
   Box,
+  FormHelperText,
   IconButton,
   InputAdornment,
   Stack,
-  TextField,
   Typography
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -21,53 +21,83 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/ContentContainer.module.scss";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import * as yup from "yup";
 
 import images from "@/assets/images";
+import { useAccount } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
   InputController,
   TextAreaController
 } from "@/components/shared/FormController";
+import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
-import { StyledTextArea } from "@/styles/components/TextField";
 
-const schema = yup
-  .object({
-    userName: yup.string().required("Please enter your username"),
-    email: yup
-      .string()
-      .required("Please enter your email address")
-      .email("Please enter valid email address"),
-    bio: yup.string(),
-    website: yup.string(),
-    walletAddress: yup.string(),
-    facebook: yup.string(),
-    twitter: yup.string(),
-    linkedIn: yup.string(),
-    instagram: yup.string()
-  })
-  .required();
-
-type FormData = yup.InferType<typeof schema>;
+const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
+const SUPPORTED_FORMATS = [
+  "image/jpg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/svg"
+];
 
 const defaultValues = {
   userName: "",
   email: "",
   bio: "",
   website: "",
-  walletAddress: "0x6d5f4vrRafverHKJ561692842xderyb",
+  walletAddress: "",
   facebook: "",
   twitter: "",
   linkedIn: "",
-  instagram: ""
+  instagram: "",
+  picture: ""
 };
 
 const Profile = () => {
+  const { t } = useTranslation("profile");
+  const { ethereum, contract } = useWeb3();
+  const { account } = useAccount();
+
+  const schema = yup
+    .object({
+      userName: yup.string().required(t("textError1") as string),
+      email: yup
+        .string()
+        .required(t("textError2") as string)
+        .email(t("textError3") as string),
+      bio: yup.string(),
+      website: yup.string(),
+      walletAddress: yup.string(),
+      facebook: yup.string(),
+      twitter: yup.string(),
+      linkedIn: yup.string(),
+      instagram: yup.string(),
+      picture: yup
+        .mixed()
+        .required(t("textError4") as string)
+        .test("required", t("textError5") as string, (file: any) => {
+          if (file) return true;
+          return false;
+        })
+        .test("fileSize", t("textError6") as string, (file: any) => {
+          return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+        })
+        .test("fileFormat", t("textError7") as string, (file: any) => {
+          return file && SUPPORTED_FORMATS.includes(file.type);
+        })
+    })
+    .required();
+
+  type FormData = yup.InferType<typeof schema>;
+
   const methods = useForm<FormData>({
     shouldUnregister: false,
     defaultValues,
@@ -77,45 +107,42 @@ const Profile = () => {
   const {
     handleSubmit,
     formState: { errors },
-    control,
     setValue,
-    getValues
+    getValues,
+    watch,
+    reset
   } = methods;
+  const watchPicture = watch("picture");
 
-  const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    // const file = document.getElementById("profileImage").files[0];
-    // const reader = new FileReader();
-    // reader.readAsDataURL(file);
-    // reader.onloadend = () => {
-    //   setValue("profileImage", reader.result);
-    // };
-    console.log("e.target.value:", e.target.value);
-    console.log("e.target.files:", e.target.files);
-    if (!e.target.files || e.target.files.length === 0) {
-      console.error("Select a file");
-      return;
-    }
+  const handleRemoveImage = async () => {
+    setValue("picture", "");
+  };
 
-    // const file = e.target.files[0];
-    // const buffer = await file.arrayBuffer();
-    // const bytes = new Uint8Array(buffer);
-    // console.log("click");
+  const handleCancel = async () => {
+    reset((formValues) => ({
+      ...defaultValues,
+      walletAddress: formValues.walletAddress
+    }));
   };
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
   };
 
+  useEffect(() => {
+    setValue("walletAddress", account.data);
+  }, [account.data]);
+
   return (
     <>
       <Head>
-        <title>Profile - NFT Bookstore</title>
+        <title>{t("titlePage") as string}</title>
         <meta name="description" content="The world's first NFT Bookstore" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer titles={["My Profile"]}>
+        <ContentContainer titles={[t("titleContent1") as string]}>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Box sx={{ my: 2 }}>
               <Typography
@@ -123,13 +150,16 @@ const Profile = () => {
                 className="form-label required"
                 sx={{ fontSize: "14px" }}
               >
-                Required
+                {t("required") as string}
               </Typography>
             </Box>
             <FormProvider {...methods}>
               <form>
                 <Stack spacing={6}>
-                  <ContentGroup title="Upload your photo">
+                  <ContentGroup
+                    title={t("titleUpload") as string}
+                    classTitle="required"
+                  >
                     <Stack
                       direction={{ xs: "column", sm: "column", md: "row" }}
                       spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
@@ -165,51 +195,66 @@ const Profile = () => {
                       )}
                       <Stack spacing={3} sx={{ justifyContent: "center" }}>
                         <StyledButton customVariant="primary" component="label">
-                          Upload your photo
-                          <input type="file" hidden onChange={handleImage} />
+                          {t("uploadPhotoBtn") as string}
+                          <FileController name="picture" />
                         </StyledButton>
 
                         <StyledButton
                           customVariant="secondary"
-                          onClick={() => {}}
+                          onClick={handleRemoveImage}
                         >
-                          Remove current
+                          {t("removeBtn") as string}
                         </StyledButton>
                       </Stack>
                     </Stack>
+                    {!errors.picture && watchPicture && (
+                      <FormHelperText
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {(watchPicture as any)?.name}
+                      </FormHelperText>
+                    )}
+                    {errors && errors.picture && (
+                      <FormHelperText
+                        error
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {errors?.picture?.message}
+                      </FormHelperText>
+                    )}
                   </ContentGroup>
-                  <ContentGroup title="User information">
+                  <ContentGroup title={t("titleInfo") as string}>
                     <Stack direction="column" spacing={3}>
                       <Stack
                         direction={{ xs: "column", md: "row" }}
                         spacing={{ xs: 2 }}
                       >
                         <FormGroup
-                          label="User name"
+                          label={t("username") as string}
                           required
                           className={styles["form__group-half"]}
                         >
                           <InputController name="userName" />
                         </FormGroup>
                         <FormGroup
-                          label="Email"
+                          label={t("email") as string}
                           required
                           className={styles["form__group-half"]}
                         >
                           <InputController name="email" />
                         </FormGroup>
                       </Stack>
-                      <FormGroup label="Bio">
+                      <FormGroup label={t("bio") as string}>
                         <TextAreaController name="bio" />
                       </FormGroup>
                     </Stack>
                   </ContentGroup>
-                  <ContentGroup title="Social link">
+                  <ContentGroup title={t("titleSocial") as string}>
                     <Stack direction="column" spacing={3}>
-                      <FormGroup label="Website">
+                      <FormGroup label={t("website") as string}>
                         <InputController name="website" />
                       </FormGroup>
-                      <FormGroup label="Wallet address">
+                      <FormGroup label={t("walletAddress") as string}>
                         <InputController
                           name="walletAddress"
                           InputProps={{
@@ -231,7 +276,7 @@ const Profile = () => {
                           }}
                         />
                       </FormGroup>
-                      <FormGroup label="Social media" />
+                      <FormGroup label={t("socialMedia") as string} />
                       <Stack
                         direction={{ xs: "column", md: "row" }}
                         spacing={{ xs: 2 }}
@@ -328,17 +373,16 @@ const Profile = () => {
                 >
                   <StyledButton
                     customVariant="secondary"
-                    type="submit"
-                    onClick={() => {}}
+                    onClick={handleCancel}
                   >
-                    Cancel
+                    {t("cancel") as string}
                   </StyledButton>
                   <StyledButton
                     customVariant="primary"
                     type="submit"
                     onClick={handleSubmit(onSubmit)}
                   >
-                    Save changes
+                    {t("saveChanges") as string}
                   </StyledButton>
                 </Stack>
               </form>
@@ -355,7 +399,7 @@ export default Profile;
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, ["navbar", "footer", "profile"]))
     }
   };
 }
