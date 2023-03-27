@@ -16,6 +16,8 @@ import { ReadMore } from "@/components/shared/ReadMore";
 import { bookList } from "@/mocks";
 import { NftBookDetails } from "@/types/nftBook";
 
+import BookCardActionable from "./sections/BookCardActionable";
+
 type BookInfoProps = {
   onClick?: () => void;
   bookDetail: NftBookDetails;
@@ -71,6 +73,8 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
       }
     })();
   }, [bookDetail]);
+
+  let numberArray = [1, 2, 3, 4, 5, 6, 7];
 
   return (
     <Box>
@@ -191,6 +195,32 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
               >
                 <BookPricingHistory />
               </Grid>
+            </Grid>
+          </Box>
+          <Box
+            sx={{
+              p: 3,
+              borderBottom: `1px solid ${theme.palette.primary.main}`,
+              borderRight: `1px solid ${theme.palette.primary.main}`,
+              borderLeft: {
+                xs: `1px solid ${theme.palette.primary.main}`,
+                sm: 0
+              }
+            }}
+          >
+            <Typography variant="h5" gutterBottom>
+              Listings
+            </Typography>
+            <Grid
+              container
+              spacing={3}
+              columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+            >
+              {numberArray.map((x) => (
+                <Grid key={x} item xs={4} sm={8} md={6} lg={12}>
+                  <BookCardActionable user="Tho Le" />
+                </Grid>
+              ))}
             </Grid>
           </Box>
           <Box p={3}>
