@@ -509,30 +509,13 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     return total;
   }
 
-  function getAmountOAllfBooksOnSharing(uint tokenId, address owner) public view returns(uint) {
-    uint idBorrowedBook;
+  function getAmountOfAllfBooksOnSharing(uint tokenId, address owner) public view returns(uint) {
     uint totalBook = 0;
 
     for(uint i = 1; i <= _borrowedBooks.current(); i++) {
       BorrowedBook memory book = _idToBorrowedBook[i];
       if (book.borrower == owner && book.tokenId == tokenId) {
-        idBorrowedBook = getIdBorrowedBook(tokenId, book.renter, owner);
-        totalBook += getAmountOfBooksOnSharing(idBorrowedBook, owner);
-      }
-    }
-     
-    return totalBook;
-  }
-
-  function getAmountOAllfSharedBooks(uint tokenId, address owner) public view returns(uint) {
-    uint idBorrowedBook;
-    uint totalBook = 0;
-
-    for(uint i = 1; i <= _borrowedBooks.current(); i++) {
-      BorrowedBook memory book = _idToBorrowedBook[i];
-      if (book.tokenId == tokenId) {
-        idBorrowedBook = getIdBorrowedBook(tokenId, book.renter, book.borrower);
-        totalBook += getAmountOfSharedBooks(idBorrowedBook, owner);
+        totalBook += getAmountOfBooksOnSharing(tokenId, owner);
       }
     }
      
@@ -544,14 +527,15 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                                                    address sender,
                                                    uint amount) public payable returns(uint) {
     
-    uint price = takeBooksOnSharing(idBorrowedBook, sharer, sender, amount);
-
-
     BorrowedBook memory borrowedBook = getBorrowedBookFromId(idBorrowedBook);
-    if (_idToBorrowedBook[idBorrowedBook].amount == 0) {
-      _removeItemFromAllBorrowedBooks(borrowedBook.tokenId, 
-                                      borrowedBook.renter, 
-                                      borrowedBook.borrower);
+    require(borrowedBook.borrower == sharer, "Address of sharer is invalid");
+    require(borrowedBook.amount >= amount, "Amount is invalid");
+    uint price = takeBooksOnSharing(borrowedBook.tokenId, sharer, sender, amount);
+
+
+    if (_idToBorrowedBook[idBorrowedBook].amount == amount) {
+      _idToBorrowedBook[idBorrowedBook].amount = 0;
+      _amountOwnedBorrowedBooks[sharer][borrowedBook.tokenId] = 0;
     } else {
       _idToBorrowedBook[idBorrowedBook].amount -= amount;
       _amountOwnedBorrowedBooks[sharer][borrowedBook.tokenId] -= amount;
