@@ -26,15 +26,15 @@ const breadCrumbs = [
     href: "/account/bookshelf"
   },
   {
-    content: "Owned books",
-    href: "/account/bookshelf/owned-books"
+    content: "Rental books",
+    href: "/account/bookshelf/rental-books"
   }
 ];
 
-const OwnedBooks = () => {
+const RentalBooks = () => {
   const { nfts } = useOwnedNfts();
   const router = useRouter();
-  const ownedBooks = nfts.data;
+  const rentalBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -55,11 +55,11 @@ const OwnedBooks = () => {
 
       <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
         <Grid item xs={4} sm={8} md={9}>
-          <ContentPaper title="Owned books">
+          <ContentPaper title="Rental books">
             {(() => {
               if (nfts.isLoading) {
                 return <Typography>Putting books on the shelves...</Typography>;
-              } else if (ownedBooks?.length === 0 || nfts.error) {
+              } else if (rentalBooks?.length === 0 || nfts.error) {
                 return (
                   <FallbackNode>
                     <Typography>You haven&apos;t own any book.</Typography>
@@ -72,7 +72,7 @@ const OwnedBooks = () => {
                   spacing={3}
                   columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                 >
-                  {ownedBooks!.map((book) => {
+                  {rentalBooks!.map((book) => {
                     return (
                       <Grid
                         item
@@ -125,7 +125,7 @@ const OwnedBooks = () => {
   );
 };
 
-export default withAuth(OwnedBooks);
+export default withAuth(RentalBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {

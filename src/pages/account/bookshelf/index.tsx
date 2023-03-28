@@ -75,11 +75,11 @@ const bottomCategories = [
     )
   },
   {
-    id: `${preUrl}/books-for-rent`,
+    id: `${preUrl}/leasing-books`,
     component: (
       <Ticket
-        href={`${preUrl}/books-for-rent`}
-        header="Books for rent"
+        href={`${preUrl}/leasing-books`}
+        header="Leasing books"
         image={images.product1}
       />
     )

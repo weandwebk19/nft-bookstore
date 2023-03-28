@@ -1,39 +1,47 @@
 import * as React from "react";
 
-import { Link, Breadcrumbs as MUIBreadcrumbs, Typography } from "@mui/material";
+import {
+  Breadcrumbs as MUIBreadcrumbs,
+  Link as MUILink,
+  Typography
+} from "@mui/material";
 
 import HomeIcon from "@mui/icons-material/Home";
 
-import { useRouter } from "next/router";
+import Link from "next/link";
 
 interface BreadCrumbsProps {
   breadCrumbs: any[];
 }
 
 export default function BreadCrumbs({ breadCrumbs }: BreadCrumbsProps) {
-  const router = useRouter();
-  const currentPath = router.pathname;
-
   return (
     <MUIBreadcrumbs aria-label="breadcrumb" separator="›">
-      <Link
+      <MUILink
+        component={Link}
         href="/"
         underline="hover"
         sx={{ display: "flex", alignItems: "center" }}
       >
         <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
         Home
-      </Link>
-      {breadCrumbs.map((crumb) => {
-        if (crumb.href === currentPath) {
+      </MUILink>
+      {breadCrumbs.map((crumb, i) => {
+        if (i === breadCrumbs.length - 1) {
           return (
-            <Typography key={crumb.href} sx={{ cursor: "default" }}>
+            <Typography
+              key={crumb.href}
+              sx={{
+                cursor: "default"
+              }}
+            >
               {crumb.content}
             </Typography>
           );
         }
         return (
-          <Link
+          <MUILink
+            component={Link}
             key={crumb.href}
             href={crumb.href}
             underline="hover"
@@ -41,7 +49,7 @@ export default function BreadCrumbs({ breadCrumbs }: BreadCrumbsProps) {
           >
             {crumb.icon && crumb.icon}
             {crumb.content}
-          </Link>
+          </MUILink>
         );
       })}
     </MUIBreadcrumbs>

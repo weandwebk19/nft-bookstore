@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -9,9 +9,21 @@ import withAuth from "@/components/HOC/withAuth";
 import { useCreatedBooks } from "@/components/hooks/web3";
 import { EditButton, SellButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
+import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+
+const breadCrumbs = [
+  {
+    content: "Bookshelf",
+    href: "/account/bookshelf"
+  },
+  {
+    content: "Created books",
+    href: "/account/bookshelf/created-books"
+  }
+];
 
 const CreatedBooks = () => {
   const { nfts } = useCreatedBooks();
@@ -29,7 +41,11 @@ const CreatedBooks = () => {
   };
 
   return (
-    <Stack sx={{ pt: 12 }}>
+    <Stack sx={{ pt: 3 }}>
+      <Box sx={{ mb: 3 }}>
+        <BreadCrumbs breadCrumbs={breadCrumbs} />
+      </Box>
+
       <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
         <Grid item xs={4} sm={8} md={9}>
           <ContentPaper title="Created books">

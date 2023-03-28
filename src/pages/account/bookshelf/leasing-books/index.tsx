@@ -23,15 +23,15 @@ const breadCrumbs = [
     href: "/account/bookshelf"
   },
   {
-    content: "Created books",
-    href: "/account/bookshelf/listed-books"
+    content: "Leasing books",
+    href: "/account/bookshelf/leasing-books"
   }
 ];
 
-const ListingBooks = () => {
+const LeasingBooks = () => {
   const { nfts } = useOwnedListedBooks();
   console.log("nfts", nfts);
-  const [ownedBooks, setOwnedBooks] = useState<any[]>([]);
+  const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
   const router = useRouter();
 
   const { account } = useAccount();
@@ -50,7 +50,7 @@ const ListingBooks = () => {
   useEffect(() => {
     if (nfts.data?.length !== 0) {
       const res = nfts.data?.filter((nft: any) => nft.author !== account.data);
-      if (res) setOwnedBooks(res);
+      if (res) setLeasingBooks(res);
     }
   }, [nfts.data, account.data]);
 
@@ -62,28 +62,28 @@ const ListingBooks = () => {
 
       <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
         <Grid item xs={4} sm={8} md={9}>
-          <ContentPaper title="Listing books">
+          <ContentPaper title="Leasing books">
             {(() => {
               if (nfts.isLoading) {
                 return <Typography>Putting books on the shelves...</Typography>;
-              } else if (ownedBooks.length === 0 || nfts.error) {
+              } else if (leasingBooks.length === 0 || nfts.error) {
                 return (
                   <FallbackNode>
                     <Stack spacing={3}>
                       <Typography>You haven&apos;t sell any book.</Typography>
                       <StyledButton
                         onClick={() => {
-                          router.push("/account/bookshelf/created-books");
+                          router.push("/account/bookshelf/owned-books");
                         }}
                       >
-                        My created books
+                        My owned books
                       </StyledButton>
                     </Stack>
                   </FallbackNode>
                 );
               }
               return (
-                <BookList bookList={ownedBooks!} onClick={handleBookClick} />
+                <BookList bookList={leasingBooks!} onClick={handleBookClick} />
               );
             })()}
           </ContentPaper>
@@ -98,7 +98,7 @@ const ListingBooks = () => {
   );
 };
 
-export default withAuth(ListingBooks);
+export default withAuth(LeasingBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {

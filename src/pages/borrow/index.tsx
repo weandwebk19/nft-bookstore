@@ -23,13 +23,15 @@ const Borrow = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Stack spacing={8}>
-          <Box component="section">
-            <Box sx={{ mb: 3 }}>
-              <BreadCrumbs breadCrumbs={breadCrumbs} />
+        <Stack sx={{ pt: 3 }}>
+          <Stack spacing={8}>
+            <Box component="section">
+              <Box sx={{ mb: 3 }}>
+                <BreadCrumbs breadCrumbs={breadCrumbs} />
+              </Box>
+              <DisplayBox />
             </Box>
-            <DisplayBox />
-          </Box>
+          </Stack>
         </Stack>
       </main>
     </>
