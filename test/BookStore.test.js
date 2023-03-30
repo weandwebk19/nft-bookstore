@@ -902,11 +902,11 @@ contract("BookStore", (accounts) => {
   });
 
   describe("Take books on sharing", () => {
-    let ammount = 10;
+    let amount = 10;
     let value = ethers.utils.parseEther("0.11").toString();
 
     before(async () => {
-      await _contract.takeBooksOnSharing(1, accounts[1], ammount, {
+      await _contract.takeBooksOnSharing(1, amount, {
         from: accounts[2],
         value: value
       });
@@ -980,7 +980,7 @@ contract("BookStore", (accounts) => {
 
     it("accounts[2] should not take invalid amount for books on sharing", async () => {
       try {
-        await _contract.takeBooksOnSharing(1, accounts[1], 10, {
+        await _contract.takeBooksOnSharing(1, 10, {
           from: accounts[2]
         });
         assert(true, "Set shared books is wrong");
@@ -993,7 +993,7 @@ contract("BookStore", (accounts) => {
       ammount = 5;
       let value = ethers.utils.parseEther("0.055").toString();
 
-      await _contract.takeBooksOnSharing(1, accounts[1], ammount, {
+      await _contract.takeBooksOnSharing(1, ammount, {
         from: accounts[2],
         value: value
       });
@@ -1025,6 +1025,7 @@ contract("BookStore", (accounts) => {
       const allOwnedSharedBooks = await _contract.getAllOwnedSharedBook({
         from: accounts[2]
       });
+
       assert.equal(allOwnedSharedBooks.length, 1, "No books on sharing");
       assert.equal(
         allOwnedSharedBooks[0].amount.toString(),
@@ -1120,7 +1121,6 @@ contract("BookStore", (accounts) => {
       const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
         from: accounts[1]
       });
-      console.log("ownedBorrowedBooks: ", ownedBorrowedBooks);
       assert.equal(
         ownedBorrowedBooks.length,
         2,
@@ -1140,7 +1140,6 @@ contract("BookStore", (accounts) => {
 
     it("should have 2 borrowed items on borrowing", async () => {
       const allBorrowedBooks = await _contract.getAllBorrowedBooks();
-      console.log("allBorrowedBooks: ", allBorrowedBooks);
       assert.equal(
         allBorrowedBooks.length,
         2,

@@ -7,6 +7,7 @@ contract SharedBookStorage {
 
     struct SharedBook {
         uint256 tokenId;
+        address fromRenter;
         address sharer;
         address  sharedPer;
         uint price; // price / books 
@@ -17,6 +18,7 @@ contract SharedBookStorage {
 
     event SharedBookCreated (
         uint256 tokenId,
+        address fromRenter,
         address sharer,
         address  sharedPer,
         uint price,
@@ -27,16 +29,18 @@ contract SharedBookStorage {
 
     // Variable for Shared Books
 
-    // (tokenId -> (sharer -> ID))
-    mapping (uint => mapping (address => uint)) _allBooksOnSharing;
+    // (hash ID ->  ID Book on sharing)
+    mapping (bytes32 => uint) _allBooksOnSharing;
     // For sharer
     mapping(address => uint) private _totalOwnedBookOnSharing; 
     Counters.Counter private _booksOnSharing;
     mapping(uint => SharedBook) private _idToBookOnSharing; // (ID -> Book on Sharing)
+    mapping(address => mapping(uint => uint)) private _amountOwnedBooksOnSharing;
 
 
-    // (tokenId -> (shared person -> (sharer -> ID)))
-    mapping (uint => mapping (address => mapping (address => uint))) _allSharedBooks;
+
+    // hash ID => ID shared book
+    mapping (bytes32 => uint) _allSharedBooks;
     // For shared person
     mapping(address => uint) private _totalOwnedSharedBook; 
     Counters.Counter private _sharedBooks;
@@ -44,25 +48,53 @@ contract SharedBookStorage {
     // Shared person => (tokenId => amount)
     mapping(address => mapping(uint => uint)) private _amountOwnedSharedBooks;
 
+    function getTotalBookOnSharing() public view returns(uint) {
+        return _booksOnSharing.current();
+    }
 
+    function getHashIdForSharedBook(uint tokenId, 
+                                    address sharer, 
+                                    address sharedPer, 
+                                    uint startTime, 
+                                    uint endTime) public pure returns (bytes32) {
+        return keccak256(abi.encode(tokenId, sharer, sharedPer, startTime, endTime));                                  
+    }
+
+    function getHashIdForBookOnSharing(uint tokenId,
+                                       address fromRenter, 
+                                       address sharer, 
+                                       uint startTime, 
+                                       uint endTime) public pure returns (bytes32) {
+        return keccak256(abi.encode(tokenId, fromRenter, sharer, startTime, endTime));                                  
+    }
     function _createBookForSharing(uint tokenId, 
+                                   address fromRenter,
                                    address sharer, 
                                    uint256 price, 
                                    uint amount, 
                                    uint startTime, 
                                    uint endTime) private {
-
+        bytes32 hashId = getHashIdForBookOnSharing(tokenId,
+                                                   fromRenter,
+                                                   sharer,  
+                                                   startTime, 
+                                                   endTime);
+        require(_allSharedBooks[hashId] == 0, "Shared book is already exist");
         _booksOnSharing.increment();
-        _allBooksOnSharing[tokenId][sharer] = _booksOnSharing.current();
+        
+        _allBooksOnSharing[hashId] = _booksOnSharing.current();
         _idToBookOnSharing[_booksOnSharing.current()] = SharedBook(tokenId,
-                                                                    sharer,
-                                                                    address(0), 
-                                                                    price, 
-                                                                    amount,
-                                                                    startTime,
-                                                                    endTime);
+                                                                   fromRenter,
+                                                                   sharer,
+                                                                   address(0), 
+                                                                   price, 
+                                                                   amount,
+                                                                   startTime,
+                                                                   endTime);
         _totalOwnedBookOnSharing[sharer]++;
+        _amountOwnedBooksOnSharing[sharer][tokenId] += amount;
         emit SharedBookCreated(tokenId,
+                               fromRenter,
                                sharer,
                                address(0), 
                                price, 
@@ -72,16 +104,23 @@ contract SharedBookStorage {
     }
 
     function _createSharedBook(uint tokenId, 
+                               address fromRenter,
                                address sharer, 
                                address sharedPer, 
                                uint256 price, 
                                uint amount,
                                uint startTime,
                                uint endTime) private {
-
+        bytes32 hashId = getHashIdForSharedBook(tokenId,
+                                                sharer, 
+                                                sharedPer, 
+                                                startTime, 
+                                                endTime);
+        require(_allSharedBooks[hashId] == 0, "Shared book is already exist");
         _sharedBooks.increment();
-        _allSharedBooks[tokenId][sharedPer][sharer] = _sharedBooks.current();
+        _allSharedBooks[hashId] = _sharedBooks.current();
         _idToSharedBook[_sharedBooks.current()] = SharedBook(tokenId,
+                                                             fromRenter,
                                                              sharer,
                                                              sharedPer, 
                                                              price, 
@@ -91,6 +130,7 @@ contract SharedBookStorage {
         _totalOwnedSharedBook[sharedPer]++;
         _amountOwnedSharedBooks[sharedPer][tokenId] += amount;
         emit SharedBookCreated(tokenId,
+                               fromRenter,
                                sharer,
                                sharedPer, 
                                price, 
@@ -99,9 +139,18 @@ contract SharedBookStorage {
                                endTime);
     }
 
-    function getIdBookOnSharing(uint tokenId, address sharer) public view returns(uint) {
-        require(tokenId != 0 && sharer != address(0), "Token id and address of you is invalid");
-        uint idBooksOnSharing = _allBooksOnSharing[tokenId][sharer];
+    function getIdBookOnSharing(uint tokenId, 
+                                address fromRenter,
+                                address sharer, 
+                                uint startTime, 
+                                uint endTime) public view returns(uint) {
+        require(tokenId != 0 && sharer != address(0), "Token id and your's address is invalid");
+        bytes32 hashId = getHashIdForBookOnSharing(tokenId,
+                                                   fromRenter, 
+                                                   sharer, 
+                                                   startTime, 
+                                                   endTime);
+        uint idBooksOnSharing = _allBooksOnSharing[hashId];
         if (idBooksOnSharing != 0) {
             if (_idToBookOnSharing[idBooksOnSharing].sharedPer == address(0)) {
                 return idBooksOnSharing;
@@ -112,14 +161,23 @@ contract SharedBookStorage {
 
     function getBooksOnSharing(uint idBooksOnSharing) public view returns(SharedBook memory) {
         require(idBooksOnSharing != 0, "Id of shared book is invalid");
-        require(_idToSharedBook[idBooksOnSharing].sharedPer == address(0),
+        require(_idToBookOnSharing[idBooksOnSharing].sharedPer == address(0),
                  "Shared Book is invalid");
-        return _idToSharedBook[idBooksOnSharing];
+        return _idToBookOnSharing[idBooksOnSharing];
     }
 
-    function getIdSharedBook(uint tokenId, address sharedPer, address sharer) public view returns(uint) {
-        require(tokenId != 0 && sharedPer != address(0), "Token id and address of you is invalid");
-        uint idSharedBook = _allSharedBooks[tokenId][sharedPer][sharer];
+    function getIdSharedBook(uint tokenId, 
+                            address sharedPer, 
+                            address sharer,
+                            uint startTime,
+                            uint endTime) public view returns(uint) {
+        require(tokenId != 0 && sharedPer != address(0), "Token id and your's address is invalid");
+        bytes32 hashId = getHashIdForSharedBook(tokenId, 
+                                                sharer, 
+                                                sharedPer, 
+                                                startTime, 
+                                                endTime);
+        uint idSharedBook = _allSharedBooks[hashId];
         if (idSharedBook != 0) {
             if (_idToSharedBook[idSharedBook].sharedPer != address(0)) {
                 return idSharedBook;
@@ -135,16 +193,17 @@ contract SharedBookStorage {
         return _idToSharedBook[idSharedBook];
     }
 
-    function shareBooks(uint256 tokenId, 
+    function shareBooks(uint256 tokenId,
+                        address fromRenter, 
                         address sharer,
                         uint price,
                         uint256 amount,
                         uint256 startTime,
                         uint256 endTime) public payable {
 
-        uint idBookOnSharing = getIdBookOnSharing(tokenId, sharer);
+        uint idBookOnSharing = getIdBookOnSharing(tokenId, fromRenter, sharer, startTime, endTime);
         require(idBookOnSharing == 0, "Books is existed on sharing");
-        _createBookForSharing(tokenId, sharer, price, amount, startTime, endTime);
+        _createBookForSharing(tokenId, fromRenter, sharer, price, amount, startTime, endTime);
 
     }
 
@@ -217,9 +276,13 @@ contract SharedBookStorage {
     }
 
     function _updateSharedBooksInternal(uint idSharedBook,
+                                        address sharedPer,
+                                        uint tokenId,
                                         uint newPrice,
                                         uint256 newAmount
                                         ) private {
+        require(_idToSharedBook[idSharedBook].tokenId == tokenId, "Token Id is invalid");
+        require(_idToSharedBook[idSharedBook].sharedPer == sharedPer, "Address of sharered person is invalid");
         if(_idToSharedBook[idSharedBook].price != newPrice) {
 
             _idToSharedBook[idSharedBook].price = newPrice;
@@ -227,6 +290,14 @@ contract SharedBookStorage {
         } 
         
         if( _idToSharedBook[idSharedBook].amount != newAmount) {
+            uint balance;
+            if (_idToSharedBook[idSharedBook].amount > newAmount) {
+                balance = _idToSharedBook[idSharedBook].amount - newAmount;
+                _amountOwnedSharedBooks[sharedPer][tokenId] -= balance;
+            } else {
+                balance = newAmount - _idToSharedBook[idSharedBook].amount;
+                _amountOwnedSharedBooks[sharedPer][tokenId] += balance;
+            }
 
             _idToSharedBook[idSharedBook].amount = newAmount;
 
@@ -235,9 +306,13 @@ contract SharedBookStorage {
     }
 
     function _updateBooksOnSharingInternal(uint idBookOnSharing,
+                                           address sharer,
+                                           uint tokenId,
                                            uint newPrice,
                                            uint256 newAmount
                                         ) private {
+        require(_idToBookOnSharing[idBookOnSharing].tokenId == tokenId, "Token Id is invalid");
+        require(_idToBookOnSharing[idBookOnSharing].sharer == sharer, "Address of sharer is invalid");
         if(_idToBookOnSharing[idBookOnSharing].price != newPrice ) {
 
             _idToBookOnSharing[idBookOnSharing].price = newPrice;
@@ -245,121 +320,145 @@ contract SharedBookStorage {
         }
 
         if (_idToBookOnSharing[idBookOnSharing].amount != newAmount) {
-
+            uint balance;
+            if (_idToBookOnSharing[idBookOnSharing].amount > newAmount) {
+                balance = _idToBookOnSharing[idBookOnSharing].amount - newAmount;
+                _amountOwnedBooksOnSharing[sharer][tokenId] -= balance;
+            } else {
+                balance = newAmount - _idToBookOnSharing[idBookOnSharing].amount;
+                _amountOwnedBooksOnSharing[sharer][tokenId] += balance;
+            }
             _idToBookOnSharing[idBookOnSharing].amount = newAmount;
 
         }
 
     }
 
-    function updateBooksOnSharing(uint id, 
-                                  address sharer, 
+    function updateBooksOnSharing(uint idBookOnSharing,
+                                  address sharer,
+                                  uint tokenId,
                                   uint newPrice, 
                                   uint newAmount) public {
 
-        uint idBookOnSharing = getIdBookOnSharing(id, sharer);
         require(idBookOnSharing != 0, "Book is not existed on sharing");
         require(newPrice > 0, "New price is invalid");
         require(newAmount > 0, "New price is invalid");
-        _updateBooksOnSharingInternal(idBookOnSharing, newPrice, newAmount);
+        _updateBooksOnSharingInternal(idBookOnSharing, sharer, tokenId, newPrice, newAmount);
     }
 
-    function _removeBooksOnSharingInternal(uint tokenId,
-                                           address sharer
-                                           ) private {
-        uint idBook = _allBooksOnSharing[tokenId][sharer];
+    function _removeBooksOnSharingInternal(bytes32 hashId) private {
+        uint idBook = _allBooksOnSharing[hashId];
+        require(idBook != 0, "Book on sharing is not exist");
+        SharedBook memory bookOnSharing = _idToBookOnSharing[idBook];
 
         uint lastIdBook = _booksOnSharing.current();
         if (lastIdBook != idBook) {
 
             SharedBook memory lastBook = _idToBookOnSharing[lastIdBook];
-            address lastSharer = lastBook.sharer;
-            uint lastTokenId = lastBook.tokenId;
+            bytes32 lastHashId = getHashIdForBookOnSharing(lastBook.tokenId, 
+                                                           lastBook.fromRenter,
+                                                           lastBook.sharer, 
+                                                           lastBook.startTime, 
+                                                           lastBook.endTime);
 
-            _allBooksOnSharing[lastTokenId][lastSharer] = idBook;
+            _allBooksOnSharing[lastHashId] = idBook;
             _idToBookOnSharing[idBook] = lastBook;
 
         }
 
-        delete _allBooksOnSharing[tokenId][sharer];
+        delete _allBooksOnSharing[hashId];
         delete _idToBookOnSharing[lastIdBook];
 
-        _totalOwnedBookOnSharing[sharer] -= 1;
+        _totalOwnedBookOnSharing[bookOnSharing.sharer] -= 1;
+        _amountOwnedBooksOnSharing[bookOnSharing.sharer][bookOnSharing.tokenId] -= bookOnSharing.amount;
         _booksOnSharing.decrement();
 
     }
 
     function removeBooksOnSharing(uint tokenId,
-                                  address sharer
-                                  ) public {
+                                  address fromRenter,
+                                  address sharer,
+                                  uint startTime,
+                                  uint endTime) public {
         require(tokenId > 0, "Token id is invalid");
         require(sharer != address(0), "Address of sharer is invalid");
 
-        uint idBook = _allBooksOnSharing[tokenId][sharer];
-        require(idBook != 0, "Book is existed on sharing");
+        bytes32 hashId = getHashIdForBookOnSharing(tokenId, 
+                                                   fromRenter,
+                                                   sharer, 
+                                                   startTime, 
+                                                   endTime); 
 
-        _removeBooksOnSharingInternal(tokenId, sharer);
+        _removeBooksOnSharingInternal(hashId);
     }
 
-    function _removeSharedBooksInternal(uint tokenId,
-                                      address owner,
-                                      address sharer) private {
-        uint idBook = _allSharedBooks[tokenId][owner][sharer];
-        uint amount = _idToSharedBook[idBook].amount;
+    function _removeSharedBooksInternal(bytes32 hashId) private {
+        uint idBook = _allSharedBooks[hashId];
+        require(idBook != 0, "Shared book is not exist");
+        SharedBook memory sharedBook = _idToSharedBook[idBook];
 
         uint lastIdBook = _sharedBooks.current();
         if (lastIdBook != idBook) {
 
             SharedBook memory lastBook = _idToSharedBook[lastIdBook];
-            address lastOwner = lastBook.sharedPer;
-            address lastSharer = lastBook.sharer;
-            uint lastTokenId = lastBook.tokenId;
+            bytes32 lastHashId = getHashIdForSharedBook(lastBook.tokenId, 
+                                                        lastBook.sharer, 
+                                                        lastBook.sharedPer, 
+                                                        lastBook.startTime, 
+                                                        lastBook.endTime);
 
-            _allSharedBooks[lastTokenId][lastOwner][lastSharer] = idBook;
+            _allSharedBooks[lastHashId] = idBook;
             _idToSharedBook[idBook] = lastBook;
 
         }
 
-        delete _allSharedBooks[tokenId][owner][sharer];
+        delete _allSharedBooks[hashId];
         delete _idToSharedBook[lastIdBook];
 
-        _totalOwnedBookOnSharing[owner] -= 1;
-        _amountOwnedSharedBooks[owner][tokenId] -= amount;
+        _totalOwnedSharedBook[sharedBook.sharedPer] -= 1;
+        _amountOwnedSharedBooks[sharedBook.sharedPer][sharedBook.tokenId] -= sharedBook.amount;
         _sharedBooks.decrement();
 
     }
 
     function removeSharedBooks(uint tokenId,
                               address owner,
-                              address sharer
+                              address sharer,
+                              uint startTime,
+                              uint endTime
                               ) public {
         require(tokenId > 0, "Token Id is invalid");
         require(owner != address(0), "Address of owner is invalid");
 
-        uint idBook = _allBooksOnSharing[tokenId][owner];
-        require(idBook != 0, "Book is existed on sharing");
-
-        _removeSharedBooksInternal(tokenId, owner, sharer);
+        bytes32 hashId = getHashIdForSharedBook(tokenId, 
+                                                sharer, 
+                                                owner, 
+                                                startTime, 
+                                                endTime); 
+        _removeSharedBooksInternal(hashId);
     }
 
-    function takeBooksOnSharing(uint tokenId, 
-                                address sharer, 
+    function takeBooksOnSharing(uint idBooksOnSharing,
                                 address sender,
                                 uint amount) public payable returns(uint) {
-        require(tokenId > 0, "Token id is invalid");
-        require(sharer != address(0) && sender != address(0), 
+        SharedBook memory booksOnSharing = getBooksOnSharing(idBooksOnSharing);
+        require(booksOnSharing.tokenId > 0, "Token id is invalid");
+        require(booksOnSharing.sharer != address(0) && sender != address(0), 
                 "Address of sharer or sender is invalid");
-        require(sharer != sender, "You may not take books shared by yourself");
-
-        uint idBookOnSharing = _allBooksOnSharing[tokenId][sharer];
-        require(idBookOnSharing != 0, "Book is existed on sharing");    
-        SharedBook memory booksOnSharing = _idToBookOnSharing[idBookOnSharing];
+        require(booksOnSharing.sharer != sender, "You may not take books shared by yourself");
         require(amount <= booksOnSharing.amount && amount > 0,
                      "Amount of books which you want take is invalid");
+        uint tokenId = booksOnSharing.tokenId;
+        address sharer = booksOnSharing.sharer;
 
-        uint idSharedBook = getIdSharedBook(tokenId, sender, sharer);
+        uint idSharedBook = getIdSharedBook(tokenId, 
+                                            sender, 
+                                            sharer, 
+                                            booksOnSharing.startTime, 
+                                            booksOnSharing.endTime);
         if (idSharedBook == 0) {
             _createSharedBook(tokenId,
+                              booksOnSharing.fromRenter,
                               sharer, 
                               sender, 
                               booksOnSharing.price, 
@@ -369,16 +468,26 @@ contract SharedBookStorage {
 
         } else {
             SharedBook memory sharedBooks = _idToSharedBook[idSharedBook];
-            _amountOwnedSharedBooks[sender][tokenId] += amount;
             _updateSharedBooksInternal(idSharedBook, 
+                                       sender,
+                                       tokenId,
                                        booksOnSharing.price, 
                                        sharedBooks.amount + amount);
         }
 
         if (amount == booksOnSharing.amount) {
-            _removeBooksOnSharingInternal(tokenId, sharer);
+            bytes32 hashId = getHashIdForBookOnSharing(tokenId,
+                                                       booksOnSharing.fromRenter,
+                                                       sharer, 
+                                                       booksOnSharing.startTime, 
+                                                       booksOnSharing.endTime); 
+            require(_allBooksOnSharing[hashId] == idBooksOnSharing,
+                     "Hash id of books on sharing is invalid");
+            _removeBooksOnSharingInternal(hashId);
         } else {
-            _updateBooksOnSharingInternal(idBookOnSharing,
+            _updateBooksOnSharingInternal(idBooksOnSharing,
+                                          sharer,
+                                          tokenId,
                                           booksOnSharing.price, 
                                           booksOnSharing.amount - amount);
         }
@@ -387,54 +496,15 @@ contract SharedBookStorage {
         return booksOnSharing.price;
     }
 
-    function getAmountOfBooksOnSharing(uint tokenId,
-                                       address sharer) public view returns(uint) {
-        uint idBooksOnSharing = _allBooksOnSharing[tokenId][sharer];
-        if (idBooksOnSharing != 0) {
-            return _idToBookOnSharing[idBooksOnSharing].amount;
-        }
-
-        return 0;
+    function getAmountOfAllfBooksOnSharing(uint tokenId,
+                                          address owner) public view returns(uint) {
+        return _amountOwnedBooksOnSharing[owner][tokenId];
     }
 
     function getAmountOfAllSharedBooks(uint tokenId,
                                     address owner) public view returns(uint) {
             
         return _amountOwnedSharedBooks[owner][tokenId];
-    }
-
-    function _recallSharedBooksFromSharerInternal(uint tokenId, address sharer) private {
-        uint length = _sharedBooks.current();
-        SharedBook memory sharedBook;
-        for(uint i = 1; i <= length; i++) {
-            sharedBook = _idToSharedBook[i];
-            if (sharedBook.tokenId == tokenId &&
-                 sharedBook.sharer == sharer) {
-                removeSharedBooks(tokenId, sharedBook.sharedPer, sharer);
-            }
-        }
-    }
-
-    function recallSharedBooksFromSharer(uint tokenId, address sharer) public {
-        if (_amountOwnedSharedBooks[sharer][tokenId] > 0) {
-            _recallSharedBooksFromSharerInternal(tokenId, sharer);
-        }
-    }
-
-    function _recallBooksOnSharingFromSharerInternal(uint tokenId, address sharer) private {
-        uint length = _booksOnSharing.current();
-        SharedBook memory sharedBook;
-        for(uint i = 1; i <= length; i++) {
-            sharedBook = _idToBookOnSharing[i];
-            if (sharedBook.tokenId == tokenId &&
-                 sharedBook.sharer == sharer) {
-                removeBooksOnSharing(tokenId, sharer);
-            }
-        }
-    }
-
-    function recallBooksOnSharingFromSharer(uint tokenId, address sharer) public {
-        _recallBooksOnSharingFromSharerInternal(tokenId, sharer);
     }
 
 }

@@ -53,7 +53,6 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
   // These variables will manage which books are borrowed
   // hashId -> id BorrowedBook
   // hashId = hash(tokenId, renter, borrower, startTime, endTime)
-
   mapping (bytes32 => uint) _allBorrowedBook; 
   mapping(address => uint) private _totalOwnedBorrowedBook;
   // Borrower => (tokenId => amount)
@@ -578,36 +577,23 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     return total;
   }
 
-  function getAmountOfAllfBooksOnSharing(uint tokenId, address owner) public view returns(uint) {
-    uint totalBook = 0;
-
-    for(uint i = 1; i <= _borrowedBooks.current(); i++) {
-      BorrowedBook memory book = _idToBorrowedBook[i];
-      if (book.borrower == owner && book.tokenId == tokenId) {
-        totalBook += getAmountOfBooksOnSharing(tokenId, owner);
-      }
-    }
-     
-    return totalBook;
-  }
-
   function takeBooksOnSharingAndUpdateBorrowedBook(uint idBorrowedBook, 
-                                                   address sharer, 
+                                                   uint idBooksOnSharing,
                                                    address sender,
                                                    uint amount) public payable returns(uint) {
     
     BorrowedBook memory borrowedBook = getBorrowedBookFromId(idBorrowedBook);
-    require(borrowedBook.borrower == sharer, "Address of sharer is invalid");
     require(borrowedBook.amount >= amount, "Amount is invalid");
-    uint price = takeBooksOnSharing(borrowedBook.tokenId, sharer, sender, amount);
-
+    uint price = takeBooksOnSharing(idBooksOnSharing,
+                                   sender,
+                                   amount);
 
     if (_idToBorrowedBook[idBorrowedBook].amount == amount) {
       _idToBorrowedBook[idBorrowedBook].amount = 0;
-      _amountOwnedBorrowedBooks[sharer][borrowedBook.tokenId] = 0;
+      _amountOwnedBorrowedBooks[borrowedBook.borrower][borrowedBook.tokenId] = 0;
     } else {
       _idToBorrowedBook[idBorrowedBook].amount -= amount;
-      _amountOwnedBorrowedBooks[sharer][borrowedBook.tokenId] -= amount;
+      _amountOwnedBorrowedBooks[borrowedBook.borrower][borrowedBook.tokenId] -= amount;
     }
     return price;
   }
