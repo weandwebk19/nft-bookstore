@@ -382,6 +382,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
   //Make a request to extend the rental period and wait for their owner to approve your request
   function requestExtendTimeOfBorrowedBooks(uint256 tokenId,
                                             address renter,
+                                            uint startTime,
+                                            uint endTime,
                                             uint extendedTime) public {
                                               
     require(renter != address(0) && msg.sender != address(0), "Address is invalid");
@@ -390,13 +392,17 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
     _bookTemporary.requestExtendTimeOfBorrowedBooks(tokenId, 
                                                     renter, 
-                                                    extendedTime, 
-                                                    msg.sender);
+                                                    msg.sender,
+                                                    startTime,
+                                                    endTime,
+                                                    extendedTime);
   }
 
   // If borrowed book exist, only update extended time. Owthersise, do nothing
   function updateRequestExtendTimeOfBorrowedBooks(uint256 tokenId,
                                                   address renter,
+                                                  uint startTime,
+                                                  uint endTime,
                                                   uint newExtendedTime) public {
                                               
     require(renter != address(0) && msg.sender != address(0), "Address is invalid");
@@ -404,9 +410,11 @@ contract BookStore is ERC1155URIStorage, Ownable {
     require(newExtendedTime >= MIN_TIME, "Extended time is invalid");
 
     _bookTemporary.updateRequestExtendTimeOfBorrowedBooks(tokenId,
-                                                          renter, 
-                                                          newExtendedTime, 
-                                                          msg.sender);
+                                                          renter,  
+                                                          msg.sender,
+                                                          startTime,
+                                                          endTime,
+                                                          newExtendedTime);
   }
 
   function doAcceptRequest(uint idBorrowedBook, 
@@ -450,15 +458,18 @@ contract BookStore is ERC1155URIStorage, Ownable {
   // Return true if success, owthersise return false
   function recallBorrowedBooks(uint tokenId, 
                                address renter, 
-                               address borrower) public returns(bool) {
+                               address borrower,
+                               uint startTime,
+                               uint endTime) public returns(bool) {
     require(renter == msg.sender, "You cannot take this book back, because you are not the renter");
     BookTemporary.BorrowedBook memory borrowedBook = 
-                  _bookTemporary.getBorrowedBook(tokenId, renter, borrower);
+          _bookTemporary.getBorrowedBook(tokenId, renter, borrower, startTime, endTime);
     bool res = false;
     if(borrowedBook.tokenId != 0) {
       res = _bookTemporary.excRecallBorrowedBooks(tokenId, 
                                             renter, 
                                             borrower,
+                                            borrowedBook.startTime,
                                             borrowedBook.endTime);
       if(res) {
         _safeTransferFrom(borrower, msg.sender, tokenId, borrowedBook.amount, "");

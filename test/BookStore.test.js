@@ -549,10 +549,15 @@ contract("BookStore", (accounts) => {
 
   describe("Recall Borrowed Books", () => {
     it("accounts[0] can not recall borrowed book from accounts[1]", async () => {
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
       const res = await _contract.recallBorrowedBooks.call(
         2,
         accounts[0],
         accounts[1],
+        ownedBorrowedBooks[0].startTime,
+        ownedBorrowedBooks[0].endTime,
         {
           from: accounts[0]
         }
@@ -580,9 +585,14 @@ contract("BookStore", (accounts) => {
     const extendedTime = 604800; // add more 1 weeks
 
     before(async () => {
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
       await _contract.requestExtendTimeOfBorrowedBooks(
         2,
         accounts[0],
+        ownedBorrowedBooks[0].startTime,
+        ownedBorrowedBooks[0].endTime,
         extendedTime,
         {
           from: accounts[1]
@@ -607,9 +617,14 @@ contract("BookStore", (accounts) => {
 
     it("should create a already exist Request", async () => {
       try {
+        const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+          from: accounts[1]
+        });
         await _contract.requestExtendTimeOfBorrowedBooks.call(
           2,
           accounts[0],
+          ownedBorrowedBooks[0].startTime,
+          ownedBorrowedBooks[0].endTime,
           extendedTime,
           {
             from: accounts[1]
@@ -622,9 +637,14 @@ contract("BookStore", (accounts) => {
 
     it("update extend time for request of borrowed book id 1 ", async () => {
       const newExtendedTime = 1209600;
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
       await _contract.updateRequestExtendTimeOfBorrowedBooks(
         2,
         accounts[0],
+        ownedBorrowedBooks[0].startTime,
+        ownedBorrowedBooks[0].endTime,
         newExtendedTime,
         {
           from: accounts[1]
@@ -669,9 +689,14 @@ contract("BookStore", (accounts) => {
 
     it("account[0] accept request for extension of time from accounts[1] ", async () => {
       const extendedTime = 604800; // add more 1 weekss
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
       await _contract.requestExtendTimeOfBorrowedBooks(
         2, // TokenId
         accounts[0],
+        ownedBorrowedBooks[0].startTime,
+        ownedBorrowedBooks[0].endTime,
         extendedTime,
         {
           from: accounts[1]
@@ -718,7 +743,7 @@ contract("BookStore", (accounts) => {
 
     // Tested the rejection case and it was successful.
     // This is a test in case the response is accepted
-    it("account[1] accept transfer to accounts[1] for extend time of borrowed books", async () => {
+    it("account[0] accept transfer to accounts[1] for extend time of borrowed books", async () => {
       const extendedTime = 604800; // add more 1 weeks
       const value = ethers.utils.parseEther("0.1").toString();
       const ownedBorrowedBooksBefore = await _contract.getOwnedBorrowedBooks({
@@ -733,6 +758,7 @@ contract("BookStore", (accounts) => {
       const ownedBorrowedBooksAfter = await _contract.getOwnedBorrowedBooks({
         from: accounts[1]
       });
+
       assert(
         ownedBorrowedBooksAfter.length == 1 &&
           ownedBorrowedBooksBefore.length == 1,

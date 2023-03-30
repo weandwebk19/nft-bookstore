@@ -18,7 +18,8 @@ contract TimeLock {
 
     event Cancel(bytes32 indexed txId);
 
-    uint public constant MIN_DELAY = 604800; // 1 weeks
+    uint public constant DELAY_TRANSACTION = 1200; // 30 minutes
+    uint public constant MIN_DELAY = 604800 - DELAY_TRANSACTION; // 1 weeks
 
     // tx id => queued
     mapping(bytes32 => bool) private queued;

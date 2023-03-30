@@ -51,8 +51,10 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
   Counters.Counter private _rentedBooks;
 
   // These variables will manage which books are borrowed
-  // (tokenID -> (renter -> (borrower -> ID)))
-  mapping (uint => mapping(address => mapping (address => uint))) _allBorrowedBook; 
+  // hashId -> id BorrowedBook
+  // hashId = hash(tokenId, renter, borrower, startTime, endTime)
+
+  mapping (bytes32 => uint) _allBorrowedBook; 
   mapping(address => uint) private _totalOwnedBorrowedBook;
   // Borrower => (tokenId => amount)
   mapping(address => mapping(uint => uint)) private _amountOwnedBorrowedBooks;
@@ -90,11 +92,26 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     emit RentedBookCreated(tokenId, renter, price, amount);
   }
 
+
+  function getHashIdForBorrowedBook(uint tokenId, 
+                                    address renter, 
+                                    address borrower, 
+                                    uint startTime, 
+                                    uint endTime) public pure returns (bytes32) {
+    return keccak256(abi.encode(tokenId, renter, borrower, startTime, endTime));                                  
+  }
+
   function getBorrowedBook(uint tokenId, 
                            address renter,
-                           address borrower) 
+                           address borrower,
+                           uint startTime,
+                           uint endTime) 
                            public view returns (BorrowedBook memory) {
-    uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
+    uint idBorrowedBook = getIdBorrowedBook(tokenId, 
+                                            renter, 
+                                            borrower, 
+                                            startTime, 
+                                            endTime);
     return _idToBorrowedBook[idBorrowedBook];
   }
 
@@ -108,14 +125,16 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
   }
 
   function _createBorrowedBook(uint tokenId, 
-                             address renter, 
-                             uint256 price, 
-                             uint amount,
-                             uint startTime,
-                             uint endTime,
-                             address borrower) private {
+                               address renter, 
+                               uint256 price, 
+                               uint amount,
+                               uint startTime,
+                               uint endTime,
+                               address borrower) private {
+    bytes32 hashId = getHashIdForBorrowedBook(tokenId, renter, borrower, startTime, endTime);
+    require(_allBorrowedBook[hashId] == 0, "Borrowed book was already exist");
     _borrowedBooks.increment();
-    _allBorrowedBook[tokenId][renter][borrower] = _borrowedBooks.current();
+    _allBorrowedBook[hashId] = _borrowedBooks.current();
     _idToBorrowedBook[_borrowedBooks.current()] = BorrowedBook(tokenId,
                                                                renter,
                                                                borrower,
@@ -217,40 +236,65 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
 
   // ===================================Borrowing============================================
 
-  function getIdBorrowedBook(uint tokenId, address renter, address borrower) public view returns(uint) {
+  function getIdBorrowedBook(uint tokenId,
+                             address renter, 
+                             address borrower,
+                             uint startTime,
+                             uint endTime) public view returns(uint) {
     require(tokenId != 0 &&
             borrower != address(0) &&
-            renter != address(0), 
+            renter != address(0) &&
+            startTime != 0 &&
+            endTime > startTime, 
             "Token id and address of you is invalid");
-    return _allBorrowedBook[tokenId][renter][borrower];
+
+    bytes32 hashId = getHashIdForBorrowedBook(tokenId, renter, borrower, startTime, endTime);
+    return _allBorrowedBook[hashId];
   }
 
-  function _removeItemFromAllBorrowedBooks(uint tokenId, address renter, address borrower) private {
-    uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
+  function _removeItemFromAllBorrowedBooks(uint tokenId,
+                                          address renter,
+                                          address borrower,
+                                          uint startTime,
+                                          uint endTime) private {
+    uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower, startTime, endTime);
     uint lastIdBorrowedBook = _borrowedBooks.current();
     BorrowedBook memory lastBorrowedBook = _idToBorrowedBook[lastIdBorrowedBook];
     BorrowedBook memory borrowedBook = _idToBorrowedBook[idBorrowedBook];
-    uint lastTokenId = lastBorrowedBook.tokenId;
-    address lastRenter = lastBorrowedBook.renter;
-    address lastBorrower = lastBorrowedBook.renter;
+    bytes32 hashId = getHashIdForBorrowedBook(tokenId, 
+                                              renter,
+                                              borrower,
+                                              startTime,
+                                              endTime);
+
+    bytes32 hashLastId = getHashIdForBorrowedBook(lastBorrowedBook.tokenId, 
+                                                  lastBorrowedBook.renter,
+                                                  lastBorrowedBook.borrower,
+                                                  lastBorrowedBook.startTime,
+                                                  lastBorrowedBook.endTime);
+
     if (idBorrowedBook != 0) {
       if (lastIdBorrowedBook != idBorrowedBook) {
-        _allBorrowedBook[lastTokenId][lastRenter][lastBorrower] = idBorrowedBook;
+        _allBorrowedBook[hashLastId] = idBorrowedBook;
         _idToBorrowedBook[idBorrowedBook] = lastBorrowedBook;
       }
 
       _borrowedBooks.decrement();
       _totalOwnedBorrowedBook[borrower]--;
       _amountOwnedBorrowedBooks[borrower][tokenId] -= borrowedBook.amount;
-      delete _allBorrowedBook[tokenId][renter][borrower];
+      delete _allBorrowedBook[hashId];
       delete _idToBorrowedBook[lastIdBorrowedBook];
     }
   }
 
   // Only update time 
-  function _updateBorrowedBookFromBorrowing(uint idBorrowedBook,
+  function _updateBorrowedBookFromBorrowing(bytes32 oldHashId,
+                                            bytes32 newHashId,
                                             uint newStartTime,
                                             uint newEndTime) private {
+    uint idBorrowedBook = _allBorrowedBook[oldHashId];
+    delete _allBorrowedBook[oldHashId];
+    _allBorrowedBook[newHashId] = idBorrowedBook;
     _idToBorrowedBook[idBorrowedBook].startTime = newStartTime;
     _idToBorrowedBook[idBorrowedBook].endTime = newEndTime;
 
@@ -281,19 +325,20 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                            uint value, 
                            address renter, 
                            address borrower, 
-                           uint endTime) private returns(bool) {
+                           uint oldEndTime,
+                           uint newEndTime) private returns(bool) {
     bytes32 txId = getTxId(renter,
                            value, 
-                           "_recallBorrowedBooks(uint,address,address)", 
+                           "_recallBorrowedBooks(uint)", 
                            abi.encodePacked(tokenId,renter,borrower), 
-                           endTime);
+                           oldEndTime);
      
     return _update(txId,
                   renter,
                   value, 
-                  "_recallBorrowedBooks(uint,address,address)", 
+                  "_recallBorrowedBooks(uint)", 
                   abi.encodePacked(tokenId, renter, borrower), 
-                  endTime);
+                  newEndTime);
   
   }
 
@@ -304,7 +349,7 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                           uint endTime) private {
     _queue(renter,
           value, 
-          "_recallBorrowedBooks(uint,address,address)", 
+          "_recallBorrowedBooks(uint)", 
           abi.encodePacked(tokenId, renter, borrower), 
           endTime);
   }
@@ -345,18 +390,22 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
 
   function requestExtendTimeOfBorrowedBooks(uint256 tokenId,
                                             address renter,
-                                            uint extendedTime,
-                                            address borrower) public {
-    uint id = getIdBorrowedBook(tokenId, renter, borrower);
+                                            address borrower,
+                                            uint startTime,
+                                            uint endTime,
+                                            uint extendedTime) public {
+    uint id = getIdBorrowedBook(tokenId, renter, borrower, startTime, endTime);
     require(id != 0, "This borrowed book does not exist");
     _createRequest(id, extendedTime, borrower, renter);                     
   }
 
   function updateRequestExtendTimeOfBorrowedBooks(uint256 tokenId,
                                                   address renter,
-                                                  uint newExtendedTime,
-                                                  address borrower) public {
-    uint id = getIdBorrowedBook(tokenId, renter, borrower);
+                                                  address borrower,
+                                                  uint startTime,
+                                                  uint endTime,
+                                                  uint newExtendedTime) public {
+    uint id = getIdBorrowedBook(tokenId, renter, borrower, startTime, endTime);
     require(id != 0, "This borrowed book does not exist");
     _updateTimeOfRequest(id, newExtendedTime, borrower, renter);
   }
@@ -400,27 +449,46 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     require(isResponseExist(id, renter, borrower), "You do not have this response");
     require(isAcceptRequest(id, borrower, renter), "Request is invalid for transfer");
     uint extendTime = 0;
+    BorrowedBook memory borrowedBook = _idToBorrowedBook[id];
     // Agree to pay for this transaction
     if (isExtend) {
       extendTime = getExtendedTimeOfRequest(id, borrower, renter);
       uint startTime = currentTime;
       uint endTime;
+      bytes32 oldHashId = getHashIdForBorrowedBook(borrowedBook.tokenId,
+                                                 borrowedBook.renter, 
+                                                 borrowedBook.borrower, 
+                                                 borrowedBook.startTime, 
+                                                 borrowedBook.endTime);
 
       //======|==============|================|==========
       //  BB.startTime    current Time     BB.endTime
-      if(currentTime <= _idToBorrowedBook[id].endTime) {
-        endTime = _idToBorrowedBook[id].endTime + extendTime;
+      if(currentTime <= borrowedBook.endTime) {
+        endTime = borrowedBook.endTime + extendTime;
       } else {
         endTime = currentTime + extendTime;
       }
 
-      _updateBorrowedBookFromBorrowing(id, startTime, endTime);
+      // Update timelock for borrowed Book
+      _updateTimelock(borrowedBook.tokenId,
+                      0, 
+                      borrowedBook.renter, 
+                      borrowedBook.borrower, 
+                      borrowedBook.endTime,
+                      endTime);
+      bytes32 newHashId = getHashIdForBorrowedBook(borrowedBook.tokenId,
+                                                 renter, 
+                                                 borrower, 
+                                                 startTime, 
+                                                 endTime);
+      _updateBorrowedBookFromBorrowing(oldHashId, newHashId, startTime, endTime);
+
     }
     // Cancle Req + Res for this transaction
     _cancelRequest(id, borrower, renter);
     _cancelResponse(id, renter, borrower);
-    uint totalPrice = _idToBorrowedBook[id].price *
-                     _idToBorrowedBook[id].amount * 
+    uint totalPrice = borrowedBook.price *
+                     borrowedBook.amount * 
                      extendTime / 604800;
     return totalPrice;
   }
@@ -443,30 +511,24 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
 
   // Return Borrowed Books to Renter (or Owner)
 
-  function _recallBorrowedBooks(uint tokenId, 
-                               address renter, 
-                               address borrower) private returns(bool) {
-    BorrowedBook memory borrowedBook = getBorrowedBook(tokenId, renter, borrower);
-    uint idBorrowedBook = getIdBorrowedBook(tokenId, renter, borrower);
-
+  function _recallBorrowedBooks(uint idBorrowedBook) private returns(bool) {
+    BorrowedBook memory borrowedBook = getBorrowedBookFromId(idBorrowedBook);
     if(borrowedBook.tokenId != 0) {
-      _removeItemFromAllBorrowedBooks(tokenId, renter, borrower);
 
-      // uint idBookOnSharing = getIdBookOnSharing(idBorrowedBook, borrowedBook.borrower);
-      // if (idBookOnSharing != 0) {
-      //   removeBooksOnSharing(idBorrowedBook, borrowedBook.borrower);
-      // }
-
-      // uint idSharedBook = getIdSharedBook(idBorrowedBook, borrowedBook.borrower);
-      // if (idSharedBook != 0) {
-      //   SharedBook memory sharedBook = getSharedBooks(idSharedBook);
-      //   removeSharedBooks(idBorrowedBook, sharedBook.sharedPer);
-      // }
+      _removeItemFromAllBorrowedBooks(borrowedBook.tokenId, 
+                                      borrowedBook.renter, 
+                                      borrowedBook.borrower,
+                                      borrowedBook.startTime,
+                                      borrowedBook.endTime);
 
       // Remove respone of borrowed books on extending if needed
       if(idBorrowedBook != 0) {
-        if (isResponseExist(idBorrowedBook, renter, borrower)) {
-          _cancelResponse(idBorrowedBook, renter, borrower);
+        if (isResponseExist(idBorrowedBook,
+                           borrowedBook.renter,
+                           borrowedBook.borrower)) {
+          _cancelResponse(idBorrowedBook, 
+                          borrowedBook.renter,
+                          borrowedBook.borrower);
         }
       }
 
@@ -478,12 +540,18 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
   function excRecallBorrowedBooks(uint tokenId, 
                                   address renter, 
                                   address borrower,
+                                  uint startTime,
                                   uint endTime) public returns(bool) {
     bytes memory data = abi.encodePacked(tokenId, renter, borrower);
-    string memory func = "_recallBorrowedBooks(uint,address,address)";
+    string memory func = "_recallBorrowedBooks(uint)";
     uint value = 0;
     if (isExecute(renter, value, func, data, endTime)) {
-      return _recallBorrowedBooks(tokenId, renter, borrower);
+      uint idBorrowedBook = getIdBorrowedBook(tokenId, 
+                                              renter, 
+                                              borrower, 
+                                              startTime, 
+                                              endTime);
+      return _recallBorrowedBooks(idBorrowedBook);
     }
 
     return false;
@@ -498,7 +566,8 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
         if (book.renter == renter && 
             excRecallBorrowedBooks(book.tokenId,
                                    book.renter, 
-                                   book.borrower, 
+                                   book.borrower,
+                                   book.startTime, 
                                    book.endTime)) {
 
           total++;     

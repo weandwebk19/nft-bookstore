@@ -403,4 +403,38 @@ contract SharedBookStorage {
         return _amountOwnedSharedBooks[owner][tokenId];
     }
 
+    function _recallSharedBooksFromSharerInternal(uint tokenId, address sharer) private {
+        uint length = _sharedBooks.current();
+        SharedBook memory sharedBook;
+        for(uint i = 1; i <= length; i++) {
+            sharedBook = _idToSharedBook[i];
+            if (sharedBook.tokenId == tokenId &&
+                 sharedBook.sharer == sharer) {
+                removeSharedBooks(tokenId, sharedBook.sharedPer, sharer);
+            }
+        }
+    }
+
+    function recallSharedBooksFromSharer(uint tokenId, address sharer) public {
+        if (_amountOwnedSharedBooks[sharer][tokenId] > 0) {
+            _recallSharedBooksFromSharerInternal(tokenId, sharer);
+        }
+    }
+
+    function _recallBooksOnSharingFromSharerInternal(uint tokenId, address sharer) private {
+        uint length = _booksOnSharing.current();
+        SharedBook memory sharedBook;
+        for(uint i = 1; i <= length; i++) {
+            sharedBook = _idToBookOnSharing[i];
+            if (sharedBook.tokenId == tokenId &&
+                 sharedBook.sharer == sharer) {
+                removeBooksOnSharing(tokenId, sharer);
+            }
+        }
+    }
+
+    function recallBooksOnSharingFromSharer(uint tokenId, address sharer) public {
+        _recallBooksOnSharingFromSharerInternal(tokenId, sharer);
+    }
+
 }
