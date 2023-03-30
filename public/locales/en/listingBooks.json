@@ -1,0 +1,9 @@
+{
+  "titlePage": "Listing - NFT Bookstore",
+  "listingBooksTitle": "Listing books",
+  "emptyMessage": "You haven't sell any book!",
+  "loadingMessage": "Putting books on the shelves...",
+  "button_createdBooks": "My created books",
+  "breadcrumbs_bookshelf": "Bookshelf",
+  "breadcrumbs_listingBooks": "Listing books"
+}
