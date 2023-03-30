@@ -7,30 +7,21 @@ import { useAllLeasingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
 import {
   AddToWatchlistButton,
   BookmarkButton
 } from "@/components/shared/BookButton";
 import RentButton from "@/components/shared/BookButton/RentButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
-import { BookList } from "@/components/shared/BookList";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList, bookList2 } from "@/mocks";
-import {
-  BookGenres,
-  ListedBook,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails,
-  NftListedBook
-} from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
+  const { t } = useTranslation("borrowBooks");
+
   const router = useRouter();
 
   const { rentedBooks } = useAllLeasingBooks();
@@ -51,11 +42,11 @@ const DisplayBox: FunctionComponent = () => {
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
-            <ContentPaper isPaginate={true} title="Rental books">
+            <ContentPaper isPaginate={true} title={t("borrowBooksTitle")}>
               {(() => {
                 if (rentedBooks.isLoading) {
                   return (
-                    <Typography>Putting books on the shelves...</Typography>
+                    <Typography>{t("loadingMessage") as string}</Typography>
                   );
                 } else if (
                   rentedBooks?.data?.length === 0 ||

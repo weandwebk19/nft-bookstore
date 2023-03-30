@@ -8,6 +8,7 @@ import {
 
 import HomeIcon from "@mui/icons-material/Home";
 
+import { useTranslation } from "next-i18next";
 import Link from "next/link";
 
 interface BreadCrumbsProps {
@@ -15,6 +16,8 @@ interface BreadCrumbsProps {
 }
 
 export default function BreadCrumbs({ breadCrumbs }: BreadCrumbsProps) {
+  const { t } = useTranslation("common");
+
   return (
     <MUIBreadcrumbs aria-label="breadcrumb" separator="›">
       <MUILink
@@ -24,7 +27,7 @@ export default function BreadCrumbs({ breadCrumbs }: BreadCrumbsProps) {
         sx={{ display: "flex", alignItems: "center" }}
       >
         <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-        Home
+        {t("breadcrumbs_home")}
       </MUILink>
       {breadCrumbs.map((crumb, i) => {
         if (i === breadCrumbs.length - 1) {
