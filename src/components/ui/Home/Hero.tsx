@@ -1,3 +1,6 @@
+import { useLayoutEffect, useRef, useState } from "react";
+import React from "react";
+
 import {
   Box,
   Button,
@@ -12,6 +15,7 @@ import { alpha, useTheme } from "@mui/material/styles";
 import CodeOutlinedIcon from "@mui/icons-material/CodeOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 
+import Spline from "@splinetool/react-spline";
 import styles from "@styles/Hero.module.scss";
 import { useTranslation } from "next-i18next";
 
@@ -27,111 +31,57 @@ const Hero = () => {
 
   return (
     <Box className={styles.hero}>
-      <Container>
-        <Grid
-          container
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ display: { xs: "none", sm: "none", md: "flex" } }}
-        >
-          <Stack sx={{ maxWidth: "450px" }}>
-            <Box
-              component="img"
-              src={images.stackedLogo}
-              mb={3}
-              sx={{
-                filter: cssFilter(`${theme.palette.primary.main}`)
-              }}
-            />
-
-            {/* <Typography variant="body1">
-              {translate.home.hero.subtitle1}
-            </Typography>
-            <Typography variant="body1">
-              {translate.home.hero.subtitle2}
-            </Typography>
-            <Typography variant="body1">
-              {translate.home.hero.subtitle3}
-            </Typography> */}
-            <Typography>{t("home:subtitle")}</Typography>
-            <Stack sx={{ mt: 3 }} direction="row" spacing={2}>
-              <StyledButton customVariant="primary">
-                <InsertDriveFileOutlinedIcon sx={{ mr: 1 }} />
-                whitepaper
-              </StyledButton>
-              <StyledButton
-                component={Link}
-                customVariant="secondary"
-                href="https://github.com/weandwebk19/nft-bookstore"
-                target="_blank"
-              >
-                <CodeOutlinedIcon sx={{ mr: 1 }} />
-                github
-              </StyledButton>
-            </Stack>
-          </Stack>
-          <Box>
-            <Box component="img" src={images.heroImg} />
-            <figcaption>
-              Second Hand Stories by David Carmack Lewis, 2003.
-            </figcaption>
-          </Box>
-        </Grid>
-
-        {/* Tablet */}
-        <Box sx={{ display: { sm: "flex", md: "none" } }}>
-          <Box>
-            <Box
-              component="img"
-              src={images.stackedLogo}
-              mb={3}
-              sx={{
-                maxWidth: "385px",
-                filter: cssFilter(`${theme.palette.primary.main}`)
-              }}
-            />
-            <Typography variant="body1">
-              We wants to change the way people read
-            </Typography>
-            <Typography variant="body1">
-              books by making them more accessible and
-            </Typography>
-            <Typography variant="body1">inexpensive for everyone.</Typography>
-            <Stack sx={{ mt: 3 }} direction="row" spacing={2}>
-              <StyledButton customVariant="primary">
-                <InsertDriveFileOutlinedIcon sx={{ mr: 1 }} />
-                whitepaper
-              </StyledButton>
-              <StyledButton
-                component={Link}
-                customVariant="secondary"
-                href="https://github.com/weandwebk19/nft-bookstore"
-                target="_blank"
-              >
-                <CodeOutlinedIcon sx={{ mr: 1 }} />
-                github
-              </StyledButton>
-            </Stack>
-          </Box>
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          p: 6
+        }}
+      >
+        <Stack sx={{ maxWidth: "450px" }}>
           <Box
+            component="img"
+            src={images.stackedLogo}
+            mb={3}
             sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              zIndex: -1,
-              width: "100vw",
-              height: "100%",
-              backgroundImage: `linear-gradient(to right, ${alpha(
-                theme.palette.background.default,
-                0.7
-              )}, rgba(0, 0, 0, 0)), url(${images.heroImg})`,
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "cover"
+              maxWidth: "385px",
+              filter: cssFilter(`${theme.palette.common.white}`)
             }}
           />
-        </Box>
-      </Container>
+          <Typography color={`${theme.palette.common.white}`}>
+            {t("home:subtitle")}
+          </Typography>
+          <Stack sx={{ mt: 3 }} direction="row" spacing={2}>
+            <StyledButton customVariant="primary" customColor="light">
+              <InsertDriveFileOutlinedIcon sx={{ mr: 1 }} />
+              whitepaper
+            </StyledButton>
+            <StyledButton
+              component={Link}
+              customVariant="secondary"
+              customColor="light"
+              href="https://github.com/weandwebk19/nft-bookstore"
+              target="_blank"
+            >
+              <CodeOutlinedIcon sx={{ mr: 1 }} />
+              github
+            </StyledButton>
+          </Stack>
+        </Stack>
+      </Box>
+
+      <Spline scene="https://prod.spline.design/juq9OBGTG4B5Kmx1/scene.splinecode" />
+
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 0,
+          width: "100%",
+          height: "12px",
+          backgroundColor: `${theme.palette.primary.main}`
+        }}
+      />
     </Box>
   );
 };
