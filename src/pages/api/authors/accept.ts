@@ -1,9 +1,11 @@
 import type { AuthorInfo } from "@_types/author";
+import { uploadImage } from "@lib/cloudinary";
 import clientPromise from "@lib/mongodb";
 import { render } from "@react-email/render";
 import AuthorRegistrationSuccess from "@shared/Emails/AuthorRegistrationSuccess";
 import { verify } from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Readable } from "stream";
 
 import { sendEmail } from "../../../lib/email";
 
@@ -18,13 +20,18 @@ export default async function handler(
 
     const authorInfo = verify(hash, process.env.JWT_AUTHOR_KEY!) as AuthorInfo;
 
+    console.log("authorInfo", authorInfo);
+
     if (authorInfo) {
+      // Update user is author
       await db.collection("users").updateOne(
         {
           wallet_address: authorInfo.walletAddress.toLowerCase()
         },
         { $set: { is_author: true } }
       );
+
+      // store author information to the database
       await db
         .collection("authors")
         .createIndex({ wallet_address: 1 }, { unique: true });
