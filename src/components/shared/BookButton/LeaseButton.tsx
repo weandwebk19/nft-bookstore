@@ -124,12 +124,12 @@ const LeaseButton = ({
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
               <Stack>
-                {/* <Image
+                <Image
                   src={bookCover}
                   alt={title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
-                /> */}
+                />
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{authorName}</Typography>
               </Stack>

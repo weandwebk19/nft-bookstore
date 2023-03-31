@@ -4,6 +4,7 @@ type EmailPayload = {
   to: string;
   subject: string;
   html: string;
+  attachments?: Array<object>;
 };
 
 const smtpOptions = {
