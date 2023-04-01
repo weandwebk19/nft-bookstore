@@ -32,6 +32,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   uint public listingPrice = 0.025 ether;
   uint public rentingPrice = 0.001 ether;
   uint private sharingPrice = 0.0005 ether;
+  uint private convertPrice = 0.000005 ether;
 
   Counters.Counter private _tokenIds;
 
@@ -272,6 +273,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _listedBookStorage.getAmountOfListedBooks(tokenId, msg.sender) +
           _bookTemporary.getAmountOfRentedBooks(tokenId, msg.sender) + 
           _bookTemporary.getAmountOfAllSharedBooks(tokenId, msg.sender) + 
+          _bookTemporary.getAmountOfAllBooksOnSharing(tokenId, msg.sender) + 
           _bookTemporary.getAmountOfBorrowedBooks(tokenId, msg.sender);
   }
   
@@ -502,10 +504,13 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _bookTemporary.shareBooks(borrowedBook.tokenId, 
                               borrowedBook.renter,
                               msg.sender, 
+                              borrowedBook.price,
                               price, 
                               amount,
                               borrowedBook.startTime,
                               borrowedBook.endTime);
+
+    _bookTemporary.updateAmountBorrowedBookFromBorrowing(idBorrowedBook, amount, true);
   }
 
   function getAllBooksOnSharing() 
@@ -547,13 +552,30 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
     require(borrowedBook.tokenId != 0, "Token id is invalid");
     require(newPrice > 0, "Price for shared books is invalid");
-    require(newAmount > 0 && newAmount <= borrowedBook.amount, "Amount for shared books is invalid");
+    require(newAmount > 0 && newAmount <= borrowedBook.amount + booksOnSharing.amount,
+             "Amount for shared books is invalid");
+
+    bool isDecrease;
+    uint balance;
+    
+    if (newAmount <= booksOnSharing.amount) {
+      require(false, "Check log");
+      isDecrease = false;
+      balance = booksOnSharing.amount - newAmount;
+    } else {
+      isDecrease = true;
+      balance = newAmount - booksOnSharing.amount;
+    }
 
     _bookTemporary.updateBooksOnSharing(idBooksOnSharing, 
                                         msg.sender, 
                                         borrowedBook.tokenId, 
                                         newPrice, 
                                         newAmount);
+
+    _bookTemporary.updateAmountBorrowedBookFromBorrowing(idBorrowedBook,
+                                                         balance,
+                                                         isDecrease);
   }
 
   function takeBooksOnSharing(uint idBooksOnSharing,  
@@ -562,25 +584,13 @@ contract BookStore is ERC1155URIStorage, Ownable {
     require(idBooksOnSharing > 0, "Id Books on sharing is invalid");
     BookTemporary.SharedBook memory booksOnSharing = 
                       _bookTemporary.getBooksOnSharing(idBooksOnSharing);
-    uint idBorrowedBook = _bookTemporary.getIdBorrowedBook(booksOnSharing.tokenId,
-                                                            booksOnSharing.fromRenter, 
-                                                            booksOnSharing.sharer, 
-                                                            booksOnSharing.startTime, 
-                                                            booksOnSharing.endTime);
-    require (idBorrowedBook != 0, "Borrowed Books for Books on sharing is not exist");
-    BookTemporary.BorrowedBook memory borrowedBook = 
-                    _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
-
-    require(borrowedBook.tokenId != 0, "Token Id is invalid");
     require(booksOnSharing.sharer != address(0), "Address of sharer is invalid");
 
-    uint price = _bookTemporary.takeBooksOnSharingAndUpdateBorrowedBook(idBorrowedBook,
-                                                                        idBooksOnSharing,
-                                                                        msg.sender, 
-                                                                        amount);
-    uint tokenId = borrowedBook.tokenId;
-    if (price != 0 && tokenId != 0) {
-      _safeTransferFrom(booksOnSharing.sharer, msg.sender, tokenId, amount, "");
+    uint price = _bookTemporary.takeBooksOnSharing(idBooksOnSharing,
+                                                   msg.sender, 
+                                                   amount);
+    if (price != 0 && booksOnSharing.tokenId != 0) {
+      _safeTransferFrom(booksOnSharing.sharer, msg.sender, booksOnSharing.tokenId, amount, "");
       // The amount you pay for this transaction will not depend on the period of borrowing the book,
       // the price will be set by the sharer
       uint totalPrice = price * amount;
@@ -592,5 +602,11 @@ contract BookStore is ERC1155URIStorage, Ownable {
     
   }
   
+  function convertBookOnSharingToBorrowedBook(uint idBooksOnSharing, 
+                                              uint amount) public payable {
+    require(address(0) != msg.sender, "Your's address is invalid");
+    require(amount !=0 , "Amount that want convert is invalid");
+    _bookTemporary.convertBookOnSharingToBorrowedBook(idBooksOnSharing, msg.sender, amount);
+  }
 
 }

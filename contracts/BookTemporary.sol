@@ -131,7 +131,9 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                                uint endTime,
                                address borrower) private {
     bytes32 hashId = getHashIdForBorrowedBook(tokenId, renter, borrower, startTime, endTime);
-    require(_allBorrowedBook[hashId] == 0, "Borrowed book was already exist");
+    if (_allBorrowedBook[hashId] != 0) {
+      revert InvalidIdError(_allBorrowedBook[hashId]);
+    }
     _borrowedBooks.increment();
     _allBorrowedBook[hashId] = _borrowedBooks.current();
     _idToBorrowedBook[_borrowedBooks.current()] = BorrowedBook(tokenId,
@@ -144,12 +146,12 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     _totalOwnedBorrowedBook[borrower]++;
     _amountOwnedBorrowedBooks[borrower][tokenId] += amount;
     emit BorrowedBookCreated(tokenId,
-                           renter,
-                           borrower, 
-                           price, 
-                           amount, 
-                           startTime, 
-                           endTime);
+                             renter,
+                             borrower, 
+                             price, 
+                             amount, 
+                             startTime, 
+                             endTime);
   }
 
   // ===================================RENTING============================================
@@ -194,8 +196,9 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                                       uint256 newAmount,
                                       address renter) public {
     uint idRentedBook = getIdRentedBook(tokenId, renter);
-    require(idRentedBook != 0,
-          "Your book are not on sale");
+    if (idRentedBook == 0) {
+      revert InvalidIdError(idRentedBook);
+    }
 
     _idToRentedBook[idRentedBook].price = newPrice;
 
@@ -240,12 +243,13 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                              address borrower,
                              uint startTime,
                              uint endTime) public view returns(uint) {
-    require(tokenId != 0 &&
-            borrower != address(0) &&
-            renter != address(0) &&
-            startTime != 0 &&
-            endTime > startTime, 
-            "Token id and address of you is invalid");
+    if (tokenId == 0 ||
+        borrower == address(0) ||
+        renter == address(0) ||
+        startTime == 0 ||
+        endTime <= startTime) {
+      revert InvalidParamsError();
+    }
 
     bytes32 hashId = getHashIdForBorrowedBook(tokenId, renter, borrower, startTime, endTime);
     return _allBorrowedBook[hashId];
@@ -296,7 +300,28 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     _allBorrowedBook[newHashId] = idBorrowedBook;
     _idToBorrowedBook[idBorrowedBook].startTime = newStartTime;
     _idToBorrowedBook[idBorrowedBook].endTime = newEndTime;
+  }
 
+  function updateAmountBorrowedBookFromBorrowing(uint idBorrowedBook,
+                                                 uint amount, 
+                                                 bool isDecrease) public {
+    BorrowedBook memory borrowedBook = getBorrowedBookFromId(idBorrowedBook);
+    if (borrowedBook.amount >= amount && isDecrease) {
+      _idToBorrowedBook[idBorrowedBook].amount -= amount;
+      if (_idToBorrowedBook[idBorrowedBook].amount == 0) {
+        _removeItemFromAllBorrowedBooks(borrowedBook.tokenId, 
+                                        borrowedBook.renter, 
+                                        borrowedBook.borrower,
+                                        borrowedBook.startTime,
+                                        borrowedBook.endTime);
+      }
+      _amountOwnedBorrowedBooks[borrowedBook.borrower][borrowedBook.tokenId] -= amount;
+    }
+
+    if(!isDecrease) {
+      _idToBorrowedBook[idBorrowedBook].amount += amount;
+      _amountOwnedBorrowedBooks[borrowedBook.borrower][borrowedBook.tokenId] += amount;
+    }
   }
 
 
@@ -365,10 +390,17 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     uint idRentedBook = getIdRentedBook(tokenId, renter);
     if(idRentedBook != 0) {
         uint totalPrice = amount * price * (endTime - startTime) / 604800;
-        require(value == totalPrice, "Value is not Valid");
+
+        if (value != totalPrice) {
+          revert InvalidValueError(value);
+        }
+
         RentedBook memory rentedBook = getRentedBook(tokenId, renter);
-        require(amount <= rentedBook.amount && amount > 0,
-              "Amount of Rented Book is invalid");
+
+        if (amount > rentedBook.amount || amount <= 0) {
+          revert InvalidAmountError(amount);
+        }
+
         _queueTimelock(tokenId, 0, renter, borrower, endTime);
         _createBorrowedBook(tokenId,
                             renter,
@@ -393,8 +425,21 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                                             uint startTime,
                                             uint endTime,
                                             uint extendedTime) public {
+    uint idBooksOnSharing = getIdBookOnSharing(tokenId,
+                                               renter, 
+                                               borrower, 
+                                               startTime, 
+                                               endTime);
+
+    // If this borrowed books is shaing, please it on sharing and act this transaction
+    if (idBooksOnSharing != 0) {
+      revert InvalidIdError(idBooksOnSharing);
+    }
+
     uint id = getIdBorrowedBook(tokenId, renter, borrower, startTime, endTime);
-    require(id != 0, "This borrowed book does not exist");
+    if (id == 0) {
+      revert InvalidIdError(id);
+    }
     _createRequest(id, extendedTime, borrower, renter);                     
   }
 
@@ -413,12 +458,15 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                                             address borrower, 
                                             address renter,
                                             bool isAccept) public returns(bool) {
-    require(id != 0,
-          "Your book are not on borrowing");
-    require(_idToBorrowedBook[id].borrower == borrower,
-          "Address of borrower invalid");                      
-    require(_idToBorrowedBook[id].renter == renter,
-          "Address of renter invalid");
+    if (id == 0) {
+      revert InvalidIdError(id);
+    }
+    if (_idToBorrowedBook[id].borrower != borrower) {
+      revert InvalidAddressError(borrower);
+    }                      
+    if (_idToBorrowedBook[id].renter != renter) {
+      revert InvalidAddressError(renter);
+    } 
 
     // If the owner approves the request, it set status of request isAccept is true and return extended time,
     // otherwise, this request will be deleted.
@@ -445,51 +493,54 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
                                     address borrower,
                                     uint currentTime, 
                                     bool isExtend) public payable returns(uint) {
-    require(isResponseExist(id, renter, borrower), "You do not have this response");
-    require(isAcceptRequest(id, borrower, renter), "Request is invalid for transfer");
-    uint extendTime = 0;
-    BorrowedBook memory borrowedBook = _idToBorrowedBook[id];
-    // Agree to pay for this transaction
-    if (isExtend) {
-      extendTime = getExtendedTimeOfRequest(id, borrower, renter);
-      uint startTime = currentTime;
-      uint endTime;
-      bytes32 oldHashId = getHashIdForBorrowedBook(borrowedBook.tokenId,
-                                                 borrowedBook.renter, 
-                                                 borrowedBook.borrower, 
-                                                 borrowedBook.startTime, 
-                                                 borrowedBook.endTime);
+    if (isResponseExist(id, renter, borrower) && 
+        isAcceptRequest(id, borrower, renter)) {
+      uint extendTime = 0;
+      BorrowedBook memory borrowedBook = _idToBorrowedBook[id];
+      // Agree to pay for this transaction
+      if (isExtend) {
+        extendTime = getExtendedTimeOfRequest(id, borrower, renter);
+        uint startTime = currentTime;
+        uint endTime;
+        bytes32 oldHashId = getHashIdForBorrowedBook(borrowedBook.tokenId,
+                                                  borrowedBook.renter, 
+                                                  borrowedBook.borrower, 
+                                                  borrowedBook.startTime, 
+                                                  borrowedBook.endTime);
 
-      //======|==============|================|==========
-      //  BB.startTime    current Time     BB.endTime
-      if(currentTime <= borrowedBook.endTime) {
-        endTime = borrowedBook.endTime + extendTime;
-      } else {
-        endTime = currentTime + extendTime;
+        //======|==============|================|==========
+        //  BB.startTime    current Time     BB.endTime
+        if(currentTime <= borrowedBook.endTime) {
+          endTime = borrowedBook.endTime + extendTime;
+        } else {
+          endTime = currentTime + extendTime;
+        }
+
+        // Update timelock for borrowed Book
+        _updateTimelock(borrowedBook.tokenId,
+                        0, 
+                        borrowedBook.renter, 
+                        borrowedBook.borrower, 
+                        borrowedBook.endTime,
+                        endTime);
+        bytes32 newHashId = getHashIdForBorrowedBook(borrowedBook.tokenId,
+                                                      renter, 
+                                                      borrower, 
+                                                      startTime, 
+                                                      endTime);
+        _updateBorrowedBookFromBorrowing(oldHashId, newHashId, startTime, endTime);
+
       }
-
-      // Update timelock for borrowed Book
-      _updateTimelock(borrowedBook.tokenId,
-                      0, 
-                      borrowedBook.renter, 
-                      borrowedBook.borrower, 
-                      borrowedBook.endTime,
-                      endTime);
-      bytes32 newHashId = getHashIdForBorrowedBook(borrowedBook.tokenId,
-                                                 renter, 
-                                                 borrower, 
-                                                 startTime, 
-                                                 endTime);
-      _updateBorrowedBookFromBorrowing(oldHashId, newHashId, startTime, endTime);
-
+      // Cancle Req + Res for this transaction
+      _cancelRequest(id, borrower, renter);
+      _cancelResponse(id, renter, borrower);
+      uint totalPrice = borrowedBook.price *
+                      borrowedBook.amount * 
+                      extendTime / 604800;
+      return totalPrice;
     }
-    // Cancle Req + Res for this transaction
-    _cancelRequest(id, borrower, renter);
-    _cancelResponse(id, renter, borrower);
-    uint totalPrice = borrowedBook.price *
-                     borrowedBook.amount * 
-                     extendTime / 604800;
-    return totalPrice;
+
+    return 0;
   }
 
 
@@ -577,25 +628,48 @@ contract BookTemporary is TimeLock, ExtendTime, SharedBookStorage {
     return total;
   }
 
-  function takeBooksOnSharingAndUpdateBorrowedBook(uint idBorrowedBook, 
-                                                   uint idBooksOnSharing,
-                                                   address sender,
-                                                   uint amount) public payable returns(uint) {
-    
-    BorrowedBook memory borrowedBook = getBorrowedBookFromId(idBorrowedBook);
-    require(borrowedBook.amount >= amount, "Amount is invalid");
-    uint price = takeBooksOnSharing(idBooksOnSharing,
-                                   sender,
-                                   amount);
+  function convertBookOnSharingToBorrowedBook(uint idBookOnSharing, 
+                                              address owner, 
+                                              uint amount) public payable {
+    SharedBook memory booksOnSharing = getBooksOnSharing(idBookOnSharing);
 
-    if (_idToBorrowedBook[idBorrowedBook].amount == amount) {
-      _idToBorrowedBook[idBorrowedBook].amount = 0;
-      _amountOwnedBorrowedBooks[borrowedBook.borrower][borrowedBook.tokenId] = 0;
-    } else {
-      _idToBorrowedBook[idBorrowedBook].amount -= amount;
-      _amountOwnedBorrowedBooks[borrowedBook.borrower][borrowedBook.tokenId] -= amount;
+    if (booksOnSharing.sharer != owner) {
+      revert InvalidAddressError(owner);
     }
-    return price;
+    if (booksOnSharing.amount < amount) {
+      revert InvalidAmountError(amount);
+    }
+
+    if (amount == booksOnSharing.amount) {
+      removeBooksOnSharing(booksOnSharing.tokenId,
+                          booksOnSharing.fromRenter,
+                          booksOnSharing.sharer,
+                          booksOnSharing.startTime, 
+                          booksOnSharing.endTime);
+    } else {
+      updateBooksOnSharing(idBookOnSharing,
+                           owner,
+                           booksOnSharing.tokenId,
+                           booksOnSharing.price,
+                           booksOnSharing.amount - amount);
+    }
+    
+    uint idBorrowedBook = getIdBorrowedBook(booksOnSharing.tokenId, 
+                                            booksOnSharing.fromRenter, 
+                                            owner, 
+                                            booksOnSharing.startTime, 
+                                            booksOnSharing.endTime);
+    if (idBorrowedBook == 0) {
+      _createBorrowedBook(booksOnSharing.tokenId,
+                          booksOnSharing.fromRenter,
+                          booksOnSharing.priceOfBB, 
+                          amount, 
+                          booksOnSharing.startTime, 
+                          booksOnSharing.endTime, 
+                          owner);
+    } else {
+      updateAmountBorrowedBookFromBorrowing(idBorrowedBook, amount, false);
+    }
   }
 
 }

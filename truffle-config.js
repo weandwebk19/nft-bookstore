@@ -17,7 +17,7 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true,
-          runs: 100,
+          runs: 50,
         }
       },
       disableSmtChecker: true, // Tắt chuỗi revert

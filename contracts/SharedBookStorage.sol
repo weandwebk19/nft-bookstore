@@ -5,11 +5,22 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract SharedBookStorage {
     using Counters for Counters.Counter;
 
+    error InvalidAddressError(address);
+    error InvalidAmountError(uint);
+    error InvalidIdError(uint);
+    error InvalidValueError(uint);
+    error InvalidParamsError();
+
+    
+    // priceOfBB: Save the price of previously borrowed books.
+    // For the purpose of creating a new borrowed book when convert.
+    // Read func convertBookOnSharingToBorrowedBook to more understand
     struct SharedBook {
         uint256 tokenId;
         address fromRenter;
         address sharer;
         address  sharedPer;
+        uint priceOfBB; 
         uint price; // price / books 
         uint amount;
         uint startTime;
@@ -21,6 +32,7 @@ contract SharedBookStorage {
         address fromRenter,
         address sharer,
         address  sharedPer,
+        uint priceOfBB,
         uint price,
         uint amount,
         uint startTime,
@@ -70,7 +82,8 @@ contract SharedBookStorage {
     function _createBookForSharing(uint tokenId, 
                                    address fromRenter,
                                    address sharer, 
-                                   uint256 price, 
+                                   uint priceOfBB, 
+                                   uint price, 
                                    uint amount, 
                                    uint startTime, 
                                    uint endTime) private {
@@ -79,7 +92,9 @@ contract SharedBookStorage {
                                                    sharer,  
                                                    startTime, 
                                                    endTime);
-        require(_allSharedBooks[hashId] == 0, "Shared book is already exist");
+        if (_allSharedBooks[hashId] != 0) {
+            revert InvalidIdError(_allSharedBooks[hashId]);
+        }
         _booksOnSharing.increment();
         
         _allBooksOnSharing[hashId] = _booksOnSharing.current();
@@ -87,6 +102,7 @@ contract SharedBookStorage {
                                                                    fromRenter,
                                                                    sharer,
                                                                    address(0), 
+                                                                   priceOfBB,
                                                                    price, 
                                                                    amount,
                                                                    startTime,
@@ -97,6 +113,7 @@ contract SharedBookStorage {
                                fromRenter,
                                sharer,
                                address(0), 
+                               priceOfBB,
                                price, 
                                amount,
                                startTime,
@@ -107,6 +124,7 @@ contract SharedBookStorage {
                                address fromRenter,
                                address sharer, 
                                address sharedPer, 
+                               uint priceOfBB,
                                uint256 price, 
                                uint amount,
                                uint startTime,
@@ -116,13 +134,16 @@ contract SharedBookStorage {
                                                 sharedPer, 
                                                 startTime, 
                                                 endTime);
-        require(_allSharedBooks[hashId] == 0, "Shared book is already exist");
+        if (_allSharedBooks[hashId] != 0) {
+            revert InvalidIdError(_allSharedBooks[hashId]);
+        }
         _sharedBooks.increment();
         _allSharedBooks[hashId] = _sharedBooks.current();
         _idToSharedBook[_sharedBooks.current()] = SharedBook(tokenId,
                                                              fromRenter,
                                                              sharer,
                                                              sharedPer, 
+                                                             priceOfBB,
                                                              price, 
                                                              amount,
                                                              startTime,
@@ -133,6 +154,7 @@ contract SharedBookStorage {
                                fromRenter,
                                sharer,
                                sharedPer, 
+                               priceOfBB,
                                price, 
                                amount,
                                startTime,
@@ -144,7 +166,6 @@ contract SharedBookStorage {
                                 address sharer, 
                                 uint startTime, 
                                 uint endTime) public view returns(uint) {
-        require(tokenId != 0 && sharer != address(0), "Token id and your's address is invalid");
         bytes32 hashId = getHashIdForBookOnSharing(tokenId,
                                                    fromRenter, 
                                                    sharer, 
@@ -160,9 +181,12 @@ contract SharedBookStorage {
     }
 
     function getBooksOnSharing(uint idBooksOnSharing) public view returns(SharedBook memory) {
-        require(idBooksOnSharing != 0, "Id of shared book is invalid");
-        require(_idToBookOnSharing[idBooksOnSharing].sharedPer == address(0),
-                 "Shared Book is invalid");
+        if (idBooksOnSharing == 0) {
+            revert InvalidIdError(idBooksOnSharing);
+        } 
+        if (_idToBookOnSharing[idBooksOnSharing].sharedPer != address(0)) {
+            revert InvalidAddressError(_idToBookOnSharing[idBooksOnSharing].sharedPer);
+        }
         return _idToBookOnSharing[idBooksOnSharing];
     }
 
@@ -196,6 +220,7 @@ contract SharedBookStorage {
     function shareBooks(uint256 tokenId,
                         address fromRenter, 
                         address sharer,
+                        uint priceOfBB,
                         uint price,
                         uint256 amount,
                         uint256 startTime,
@@ -203,7 +228,7 @@ contract SharedBookStorage {
 
         uint idBookOnSharing = getIdBookOnSharing(tokenId, fromRenter, sharer, startTime, endTime);
         require(idBookOnSharing == 0, "Books is existed on sharing");
-        _createBookForSharing(tokenId, fromRenter, sharer, price, amount, startTime, endTime);
+        _createBookForSharing(tokenId, fromRenter, sharer, priceOfBB, price, amount, startTime, endTime);
 
     }
 
@@ -461,6 +486,7 @@ contract SharedBookStorage {
                               booksOnSharing.fromRenter,
                               sharer, 
                               sender, 
+                              booksOnSharing.priceOfBB,
                               booksOnSharing.price, 
                               amount, 
                               booksOnSharing.startTime, 
@@ -496,7 +522,7 @@ contract SharedBookStorage {
         return booksOnSharing.price;
     }
 
-    function getAmountOfAllfBooksOnSharing(uint tokenId,
+    function getAmountOfAllBooksOnSharing(uint tokenId,
                                           address owner) public view returns(uint) {
         return _amountOwnedBooksOnSharing[owner][tokenId];
     }

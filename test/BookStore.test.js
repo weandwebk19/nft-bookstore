@@ -13,6 +13,7 @@ contract("BookStore", (accounts) => {
   let _listingPrice = ethers.utils.parseEther("0.025").toString();
   let _rentingPrice = ethers.utils.parseEther("0.001").toString();
   let _sharingPrice = ethers.utils.parseEther("0.0005").toString();
+  let _convertPrice = ethers.utils.parseEther("0.000005").toString();
 
   before(async () => {
     await ListedBookStorage.deployed();
@@ -838,6 +839,22 @@ contract("BookStore", (accounts) => {
         assert(e, "Set books on sharing is wrong");
       }
     });
+
+    it("should not extend time for borrowed books when it is sharing", async () => {
+      try {
+        const extendedTime = 604800; // add more 1 weeks
+        await _contract.requestExtendTimeOfBorrowedBooks(2,
+                                                         accounts[0],
+                                                         ownedBorrowedBooks[0].startTime,
+                                                         ownedBorrowedBooks[0].endTime,
+                                                         extendedTime, {
+                                                          from: accounts[1]
+                                                        });
+        assert(true, "RequestExtendTimeOfBorrowedBooks is wrong");
+      } catch (e) {
+        assert(e, "RequestExtendTimeOfBorrowedBooks is wrong");
+      }
+    })
   });
 
   describe("Update books on sharing", () => {
@@ -848,6 +865,7 @@ contract("BookStore", (accounts) => {
       await _contract.updateBooksOnSharing(1, _newNftPrice, newAmount, {
         from: accounts[1]
       });
+
     });
 
     it("should have one Book on sharing for accounts[1]", async () => {
@@ -894,7 +912,7 @@ contract("BookStore", (accounts) => {
         await _contract.updateBooksOnSharing(1, _newNftPrice, 25, {
           from: accounts[1]
         });
-        assert(true, "Set books on sharing is wrong");
+        assert(false, "Set books on sharing is wrong");
       } catch (e) {
         assert(e, "Set books on sharing is wrong");
       }
@@ -905,7 +923,7 @@ contract("BookStore", (accounts) => {
     let amount = 10;
     let value = ethers.utils.parseEther("0.11").toString();
 
-    before(async () => {
+    before(async () => {;
       await _contract.takeBooksOnSharing(1, amount, {
         from: accounts[2],
         value: value
@@ -1234,6 +1252,61 @@ contract("BookStore", (accounts) => {
         assert(error, "Set amount listed tokens and rented tokens are wrong");
       }
     });
+  });
+
+  describe("Convert Books on sharing to Borrowed book", () => {
+    const amount = 15;
+    const amountOfConvertion = 10;
+    const _nftPrice = ethers.utils.parseEther("0.001").toString();
+
+    before(async () => {
+      await _contract.shareBooks(2, _nftPrice, amount, {
+        from: accounts[1],
+        value: _sharingPrice
+      });
+
+    });
+
+    it("should have one Book on sharing for accounts[1]", async () => {
+      const allBooksOnSharing = await _contract.getAllBooksOnSharing();
+      assert.equal(allBooksOnSharing.length, 1, "No books on sharing");
+      assert.equal(
+        allBooksOnSharing[0].sharer,
+        accounts[1],
+        "Sharer is invalid"
+      );
+      assert.equal(
+        allBooksOnSharing[0].amount.toString(),
+        amount,
+        "Amount of Books on sharing is invalid"
+      );
+    });
+
+    it("should two borrowed books after convert", async () => {
+      await _contract.convertBookOnSharingToBorrowedBook(1, amountOfConvertion, {
+        from: accounts[1],
+        value: _convertPrice
+      });
+
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
+
+      assert.equal(ownedBorrowedBooks.length, 2,  "Length of owned borrowed books is invalid");
+      assert.equal(ownedBorrowedBooks[0].amount, 5,  "Amount of owned borrowed books id 1 is invalid");
+      assert.equal(ownedBorrowedBooks[1].amount, 15,  "Amount of owned borrowed books id 2 is invalid");
+      
+    });
+
+    it("should 5 books on sharing for accounts[1] after convertion", async () => {
+      const allOwnedBooksOnSharing = await _contract.getAllOwnedBooksOnSharing({from: accounts[1]});
+      assert.equal(allOwnedBooksOnSharing.length, 1, "No books on sharing");
+      assert.equal(
+        allOwnedBooksOnSharing[0].amount.toString(),
+        amount - amountOfConvertion,
+        "Amount of Books on sharing is invalid"
+      );
+    })
   });
 
 });
