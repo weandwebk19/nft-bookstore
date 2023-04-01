@@ -1,19 +1,10 @@
 import type { AuthorInfo } from "@_types/author";
+import { sendEmail } from "@lib/email";
 import { render } from "@react-email/render";
 import AuthorRegistrationInitiated from "@shared/Emails/AuthorRegistrationInitiated";
 import AuthorRequestEmail from "@shared/Emails/AuthorRequestEmail";
-import DataURIParser from "datauri/parser";
 import { sign } from "jsonwebtoken";
-import multer from "multer";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import { sendEmail } from "../../../lib/email";
-
-// export const config = {
-//   api: {
-//     bodyParser: false
-//   }
-// };
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,23 +22,6 @@ export default async function handler(
         to: process.env.SMTP_FROM_EMAIL!,
         subject: "[NFT BookStore] - Require become author",
         html: render(AuthorRequestEmail(authorInfo, hash))
-        // attachments: [
-        //   {
-        //     filename: authorInfo.picture.public_id,
-        //     contentType: "image/jpeg",
-        //     path: authorInfo.picture.secure_url
-        //   },
-        //   {
-        //     filename: authorInfo.frontDocument.public_id,
-        //     contentType: "image/jpeg",
-        //     path: authorInfo.frontDocument.secure_url
-        //   },
-        //   {
-        //     filename: authorInfo.backDocument.public_id,
-        //     contentType: "image/jpeg",
-        //     path: authorInfo.backDocument.secure_url
-        //   }
-        // ]
       });
 
       sendEmail({
