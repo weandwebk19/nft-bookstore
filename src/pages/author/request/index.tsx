@@ -74,9 +74,6 @@ const defaultValues = {
 const AuthorRequest = () => {
   const { t } = useTranslation("authorRequest");
   const { account } = useAccount();
-  // preview avatar
-  const [selectedFile, setSelectedFile] = useState();
-  const [avatar, setAvatar] = useState<string>();
 
   const schema = yup.object().shape({
     pseudonym: yup.string().required(t("textError1") as string),
@@ -157,24 +154,6 @@ const AuthorRequest = () => {
   } = methods;
   const watchPicture = watch("picture");
 
-  // preview avatar when changed
-  useEffect(() => {
-    // if (!selectedFile) {
-    //   // setPreview(undefined);
-    //   return;
-    // }
-
-    // const objectUrl = URL.createObjectURL(selectedFile);
-    // setPreview(objectUrl);
-
-    // free memory when ever this component is unmounted
-    return () => {
-      if (avatar) {
-        URL.revokeObjectURL(avatar);
-      }
-    };
-  }, [avatar]);
-
   const handleRemoveImage = async () => {
     setValue("picture", "");
   };
@@ -195,9 +174,6 @@ const AuthorRequest = () => {
         const pictureLink = await uploadImage(picture);
         const frontDocumentLink = await uploadImage(frontDocument);
         const backDocumentLink = await uploadImage(backDocument);
-        // const pictureLink = "";
-        // const frontDocumentLink = "";
-        // const backDocumentLink = "";
 
         const res = await axios.post("/api/authors/request", {
           ...authorInfo,
@@ -276,7 +252,7 @@ const AuthorRequest = () => {
                       ) : (
                         <Avatar
                           alt="Remy Sharp"
-                          src={avatar || ""}
+                          src={""}
                           sx={{
                             display: "flex",
                             maxWidth: "400px",

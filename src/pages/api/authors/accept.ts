@@ -1,13 +1,10 @@
 import type { AuthorInfo } from "@_types/author";
-import { uploadImage } from "@lib/cloudinary";
+import { sendEmail } from "@lib/email";
 import clientPromise from "@lib/mongodb";
 import { render } from "@react-email/render";
 import AuthorRegistrationSuccess from "@shared/Emails/AuthorRegistrationSuccess";
 import { verify } from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Readable } from "stream";
-
-import { sendEmail } from "../../../lib/email";
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,8 +16,6 @@ export default async function handler(
     const hash = req.query.hash as string;
 
     const authorInfo = verify(hash, process.env.JWT_AUTHOR_KEY!) as AuthorInfo;
-
-    console.log("authorInfo", authorInfo);
 
     if (authorInfo) {
       // Update user is author
