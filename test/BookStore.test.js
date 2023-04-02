@@ -594,6 +594,7 @@ contract("BookStore", (accounts) => {
         accounts[0],
         ownedBorrowedBooks[0].startTime,
         ownedBorrowedBooks[0].endTime,
+        ownedBorrowedBooks[0].amount,
         extendedTime,
         {
           from: accounts[1]
@@ -626,6 +627,7 @@ contract("BookStore", (accounts) => {
           accounts[0],
           ownedBorrowedBooks[0].startTime,
           ownedBorrowedBooks[0].endTime,
+          ownedBorrowedBooks[0].amount,
           extendedTime,
           {
             from: accounts[1]
@@ -641,11 +643,12 @@ contract("BookStore", (accounts) => {
       const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
         from: accounts[1]
       });
-      await _contract.updateRequestExtendTimeOfBorrowedBooks(
+      await _contract.updateRequestOfBorrowedBooks(
         2,
         accounts[0],
         ownedBorrowedBooks[0].startTime,
         ownedBorrowedBooks[0].endTime,
+        ownedBorrowedBooks[0].amount,
         newExtendedTime,
         {
           from: accounts[1]
@@ -698,6 +701,7 @@ contract("BookStore", (accounts) => {
         accounts[0],
         ownedBorrowedBooks[0].startTime,
         ownedBorrowedBooks[0].endTime,
+        ownedBorrowedBooks[0].amount,
         extendedTime,
         {
           from: accounts[1]
@@ -1307,6 +1311,61 @@ contract("BookStore", (accounts) => {
         "Amount of Books on sharing is invalid"
       );
     })
+  });
+
+  describe("Extend specify amount for Borrowed Books", () => {
+    const extendedTime = 604800; // add more 1 weeks
+    const extendedAmount = 10; // add more 1 weeks
+    const value = ethers.utils.parseEther("0.05").toString();
+
+    before(async () => {
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
+
+      await _contract.requestExtendTimeOfBorrowedBooks(
+        2,
+        accounts[0],
+        ownedBorrowedBooks[1].startTime,
+        ownedBorrowedBooks[1].endTime,
+        extendedAmount,
+        extendedTime,
+        {
+          from: accounts[1]
+        }
+      );
+
+    });
+
+    it("should three owned borrowed books for accounts[1]", async () => {
+
+      const allReq = await _contract.getAllOwnedRequestsOnExtending({
+        from: accounts[0]
+      });
+
+      await _contract.doAcceptRequest(
+        2, // Id of borrowed book
+        accounts[1],
+        true,
+        {
+          from: accounts[0]
+        }
+      );
+
+      await _contract.transferForSendedRequest(2, accounts[0], true, {
+        from: accounts[1],
+        value: value
+      });
+      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+        from: accounts[1]
+      });
+
+      assert.equal(ownedBorrowedBooks.length, 3, "length of owned borrowed books's list");
+      assert.equal(ownedBorrowedBooks[0].amount, 5, "Amount of borrowed book 1 is invalid");
+      assert.equal(ownedBorrowedBooks[1].amount, 5, "Amount of borrowed book 2 is invalid");
+      assert.equal(ownedBorrowedBooks[2].amount, 10, "Amount of borrowed book 3 is invalid");
+
+    });
   });
 
 });

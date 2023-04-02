@@ -7,11 +7,8 @@ const ExtendTime = artifacts.require("ExtendTime");
 const SharedBookStorage = artifacts.require("SharedBookStorage");
 
 module.exports = function (deployer) {
-  deployer.deploy(ListedBookStorage).then(function() {
-
-    return deployer.deploy(Timelock);
-
-  }).then(function() {
+  deployer.deploy(ListedBookStorage)
+  .then(function() {
 
     return deployer.deploy(ExtendTime);
 
@@ -21,7 +18,11 @@ module.exports = function (deployer) {
 
   }).then(function() {
 
-    return deployer.deploy(BookTemporary);
+    return deployer.deploy(Timelock);
+
+  }).then(function(timelock) {
+
+    return deployer.deploy(BookTemporary, timelock.address);
 
   }).then(function() {
 

@@ -41,13 +41,13 @@ contract TimeLock {
      * @param _data ABI encoded data send.
      * @param _timestamp Timestamp after which the transaction can be executed.
      */
-    function _queue(
+    function queue(
         address _owner,
         uint _value,
         string memory _func,
         bytes memory _data,
         uint _timestamp
-    ) internal returns (bytes32 txId) {
+    ) public returns (bytes32 txId) {
         txId = getTxId(_owner, _value, _func, _data, _timestamp);
         if (queued[txId]) {
             revert AlreadyQueuedError(txId);
@@ -66,14 +66,14 @@ contract TimeLock {
         emit Queue(txId, _owner, _value, _func, _data, _timestamp);
     }
 
-    function _update(
+    function update(
         bytes32 txId,
         address _newOwner,
         uint _newvalue,
         string memory _newFunc,
         bytes memory _newData,
         uint _newTimestamp
-    ) internal returns(bool) {
+    ) public returns(bool) {
         if (queued[txId]) {
 
             if (
@@ -104,15 +104,12 @@ contract TimeLock {
 
         if (!queued[txId]) {
             return false;
-            // revert NotQueuedError(txId);
         }
 
         // ----|-------------------|-------
         //  block.timestamp    timestamp 
         if (block.timestamp < _timestamp) {
             return false;
-            // revert TimestampNotInRangeError(block.timestamp, _timestamp);
-
         }
 
         queued[txId] = false;

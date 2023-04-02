@@ -386,37 +386,40 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                             address renter,
                                             uint startTime,
                                             uint endTime,
+                                            uint extendedAmount,
                                             uint extendedTime) public {
                                               
     require(renter != address(0) && msg.sender != address(0), "Address is invalid");
     require(renter != msg.sender , "You can not renew with yourself");
     require(extendedTime >= MIN_TIME, "Extended time is invalid");
-
     _bookTemporary.requestExtendTimeOfBorrowedBooks(tokenId, 
                                                     renter, 
                                                     msg.sender,
                                                     startTime,
                                                     endTime,
+                                                    extendedAmount,
                                                     extendedTime);
   }
 
   // If borrowed book exist, only update extended time. Owthersise, do nothing
-  function updateRequestExtendTimeOfBorrowedBooks(uint256 tokenId,
-                                                  address renter,
-                                                  uint startTime,
-                                                  uint endTime,
-                                                  uint newExtendedTime) public {
+  function updateRequestOfBorrowedBooks(uint256 tokenId,
+                                        address renter,
+                                        uint startTime,
+                                        uint endTime,
+                                        uint newExtendedAmount,
+                                        uint newExtendedTime) public {
                                               
     require(renter != address(0) && msg.sender != address(0), "Address is invalid");
     require(renter != msg.sender , "You can not renew with yourself");
     require(newExtendedTime >= MIN_TIME, "Extended time is invalid");
 
-    _bookTemporary.updateRequestExtendTimeOfBorrowedBooks(tokenId,
-                                                          renter,  
-                                                          msg.sender,
-                                                          startTime,
-                                                          endTime,
-                                                          newExtendedTime);
+    _bookTemporary.updateRequestOfBorrowedBooks(tokenId,
+                                                renter,  
+                                                msg.sender,
+                                                startTime,
+                                                endTime,
+                                                newExtendedAmount,
+                                                newExtendedTime);
   }
 
   function doAcceptRequest(uint idBorrowedBook, 

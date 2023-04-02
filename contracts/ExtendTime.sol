@@ -20,9 +20,15 @@ pragma solidity ^0.8.17;
 // waits for the owner to approve or not
 contract ExtendTime {
 
+    error AlreadyExistsRequestError(bool);
+    error AlreadyExistsResponseError(bool);
+    error InvalidLengthError(uint);
+    error AlreadyChangedStatusError(bool);
+
     struct Request {
         uint id; // id of Borrowed Books
         uint time; // Extended time
+        uint amount;
         address sender; // Borrower
         bool isAccept;
     }
@@ -30,6 +36,7 @@ contract ExtendTime {
     event CreatedRequest (
         uint id,
         uint time,
+        uint amount,
         address sender,
         bool isAccept
     );
@@ -37,22 +44,24 @@ contract ExtendTime {
     struct Response {
         uint id;
         uint time;
+        uint amount;
         address sender; // Renter
     }
 
     event CreatedResponse (
         uint id,
         uint time,
+        uint amount,
         address sender
     );
 
     // Borrower => index =>  request
-    mapping (address => mapping (uint => Response)) private _responsesOfBorrower;
+    mapping (address => mapping (uint => Response)) private _responses;
     // Borrower => total requests
     mapping (address => uint) private _totalOwnedResponse;
 
     // Renter => index =>  request
-    mapping (address => mapping (uint => Request)) private _requestsOfRenter;
+    mapping (address => mapping (uint => Request)) private _requests;
     // Renter => total requests
     mapping (address => uint) private _totalOwnedRequest;
     
@@ -66,8 +75,8 @@ contract ExtendTime {
         }
 
         for (uint i = 0; i < length; i++) {
-            if (_requestsOfRenter[receiver][i].id == id &&
-                 _requestsOfRenter[receiver][i].sender == sender) {
+            if (_requests[receiver][i].id == id &&
+                 _requests[receiver][i].sender == sender) {
                 return true;
             }
         }
@@ -84,9 +93,9 @@ contract ExtendTime {
         }
 
         for (uint i = 0; i < length; i++) {
-            if (_requestsOfRenter[receiver][i].id == id &&
-                 _requestsOfRenter[receiver][i].sender == sender &&
-                 _requestsOfRenter[receiver][i].isAccept == true) {
+            if (_requests[receiver][i].id == id &&
+                 _requests[receiver][i].sender == sender &&
+                 _requests[receiver][i].isAccept == true) {
                 return true;
             }
         }
@@ -103,8 +112,8 @@ contract ExtendTime {
         }
 
         for (uint i = 0; i < length; i++) {
-            if (_responsesOfBorrower[receiver][i].id == id &&
-                 _responsesOfBorrower[receiver][i].sender == sender) {
+            if (_responses[receiver][i].id == id &&
+                 _responses[receiver][i].sender == sender) {
                 return true;
             }
         }
@@ -113,44 +122,57 @@ contract ExtendTime {
 
     function _createRequest(uint id, 
                            uint time, 
+                           uint amount, 
                            address sender, 
                            address receiver) internal {
-        require(!isRequestExist(id, sender, receiver), "Request is existed");
+        if (isRequestExist(id, sender, receiver)) {
+            revert AlreadyExistsRequestError(true);
+        }
         uint index = _totalOwnedRequest[receiver];
-        _requestsOfRenter[receiver][index] = Request(id, time, sender, false);
+        _requests[receiver][index] = Request(id, time, amount, sender, false);
         _totalOwnedRequest[receiver] += 1;
-        emit CreatedRequest(id, time, sender, false);
+        emit CreatedRequest(id, time, amount, sender, false);
     }
 
     function _createResponse(uint id, 
-                           uint time, 
-                           address sender, 
-                           address receiver) internal {
-        require(!isResponseExist(id, sender, receiver), "Response is existed");
+                             uint time, 
+                             uint amount,
+                             address sender, 
+                             address receiver) internal {
+        if (isResponseExist(id, sender, receiver)) {
+            revert AlreadyExistsResponseError(true);
+        }
         uint index = _totalOwnedResponse[receiver];
-        _responsesOfBorrower[receiver][index] = Response(id, time, sender);
+        _responses[receiver][index] = Response(id, time, amount, sender);
         _totalOwnedResponse[receiver] += 1;
-        emit CreatedResponse(id, time, sender);
+        emit CreatedResponse(id, time, amount, sender);
     }
 
 
-    function _updateTimeOfRequest(uint id, 
-                                 uint newtime, 
-                                 address sender, 
-                                 address receiver) internal {
+    function _updateRequest(uint id, 
+                            uint newAmount,
+                            uint newTime, 
+                            address sender, 
+                            address receiver) internal {
         uint length = _totalOwnedRequest[receiver];
-        require(length > 0, "You don't have any request");
+        if (length == 0) {
+            revert InvalidLengthError(length);
+        }
         Request memory request;
         for (uint i; i < length; i++) {
-            request = _requestsOfRenter[receiver][i];
+            request = _requests[receiver][i];
             if(request.id == id && 
-               request.sender == sender && 
-               newtime > request.time) {
-               _requestsOfRenter[receiver][i].time = newtime;
+               request.sender == sender) {
+               if (newTime > request.time) {
+                  _requests[receiver][i].time = newTime;
+               }
+
+               if (newAmount != request.amount) {
+                  _requests[receiver][i].amount = newAmount;
+               }
                return;
             }
         }
-        require(false, "Updation does not change anything");                          
     }
 
     function _cancelRequest(uint id,  
@@ -158,22 +180,23 @@ contract ExtendTime {
                            address receiver) internal {
 
         uint length = _totalOwnedRequest[receiver];
-        require(length > 0, "You don't have any request");
-        Request memory request;
-        for (uint i; i < length; i++) {
-            request = _requestsOfRenter[receiver][i];
-            if(request.id == id && 
-               request.sender == sender) {
-                uint lastIndex = _totalOwnedRequest[receiver] - 1;
-                Request memory lastRequest = _requestsOfRenter[receiver][lastIndex];
+        if (length != 0) {
+            Request memory request;
+            for (uint i; i < length; i++) {
+                request = _requests[receiver][i];
+                if(request.id == id && 
+                request.sender == sender) {
+                    uint lastIndex = _totalOwnedRequest[receiver] - 1;
+                    Request memory lastRequest = _requests[receiver][lastIndex];
 
-                _requestsOfRenter[receiver][i] = lastRequest;
+                    _requests[receiver][i] = lastRequest;
 
-                delete _requestsOfRenter[receiver][lastIndex];
-                _totalOwnedRequest[receiver] -= 1;
-                return;
-            }
-        }                          
+                    delete _requests[receiver][lastIndex];
+                    _totalOwnedRequest[receiver] -= 1;
+                    return;
+                }
+            }                          
+        }
     }
 
     function _cancelResponse(uint id,  
@@ -181,36 +204,41 @@ contract ExtendTime {
                             address receiver) internal {
 
         uint length = _totalOwnedResponse[receiver];
-        require(length > 0, "You don't have any response");
-        Response memory response;
-        for (uint i; i < length; i++) {
-            response = _responsesOfBorrower[receiver][i];
-            if(response.id == id && 
-               response.sender == sender) {
-                uint lastIndex = _totalOwnedResponse[receiver] - 1;
-                Response memory lastResponse = _responsesOfBorrower[receiver][lastIndex];
+        if (length != 0) {
+            Response memory response;
+            for (uint i; i < length; i++) {
+                response = _responses[receiver][i];
+                if(response.id == id && 
+                response.sender == sender) {
+                    uint lastIndex = _totalOwnedResponse[receiver] - 1;
+                    Response memory lastResponse = _responses[receiver][lastIndex];
 
-                _responsesOfBorrower[receiver][i] = lastResponse;
+                    _responses[receiver][i] = lastResponse;
 
-                delete _responsesOfBorrower[receiver][lastIndex];
-                _totalOwnedResponse[receiver] -= 1;
-                return;
-            }
-        }                          
+                    delete _responses[receiver][lastIndex];
+                    _totalOwnedResponse[receiver] -= 1;
+                    return;
+                }
+            }                          
+        }
     }
 
     function _setAcceptionForRequest(uint id, 
                                     address sender, 
                                     address receiver) internal {
         uint length = _totalOwnedRequest[receiver];
-        require(length > 0, "You don't have any request");
+        if (length == 0) {
+            revert InvalidLengthError(length);
+        }
         Request memory req;
         for (uint i = 0; i < length; i++) {
-            req = _requestsOfRenter[receiver][i];
+            req = _requests[receiver][i];
 
             if(req.sender == sender && req.id == id) {
-                require(!_requestsOfRenter[receiver][i].isAccept, "Status of request is updated");
-                _requestsOfRenter[receiver][i].isAccept = true;
+                if (_requests[receiver][i].isAccept) {
+                    revert AlreadyChangedStatusError(true);
+                }
+                _requests[receiver][i].isAccept = true;
             }
         }                          
     }
@@ -223,12 +251,11 @@ contract ExtendTime {
             Request memory request;
 
             for (uint i = 0; i < length; i++) {
-                request = _requestsOfRenter[receiver][i];
+                request = _requests[receiver][i];
 
                 requests[i] = request;
             }
         }
-
         return requests;
     }
 
@@ -241,7 +268,7 @@ contract ExtendTime {
             Response memory response;
 
             for (uint i = 0; i < length; i++) {
-                response = _responsesOfBorrower[receiver][i];
+                response = _responses[receiver][i];
 
                 responses[i] = response;
             }
@@ -250,21 +277,39 @@ contract ExtendTime {
         return responses;
     }
 
-    function getExtendedTimeOfRequest(uint id, 
-                                    address sender, 
-                                    address receiver) public view returns(uint) {
-        require(isRequestExist(id, sender, receiver), "Request is not existed");
+    function getRequest(uint id, 
+                        address sender, 
+                        address receiver) public view returns(Request memory) {
+        if (!isRequestExist(id, sender, receiver)) {
+            revert AlreadyExistsRequestError(false);
+        }
         uint length = _totalOwnedRequest[receiver];
-        require(length > 0, "You don't have any request");
         Request memory req;
         for (uint i = 0; i < length; i++) {
-            req = _requestsOfRenter[receiver][i];
+            req = _requests[receiver][i];
 
             if(req.sender == sender && req.id == id) {
-                return req.time;
+                return req;
             }
         }
-        return 0;
-        
+        return req; 
+    }
+
+    function getResponse(uint id, 
+                        address sender, 
+                        address receiver) public view returns(Response memory) {
+        if (!isResponseExist(id, sender, receiver)) {
+            revert AlreadyExistsResponseError(false);
+        }
+        uint length = _totalOwnedResponse[receiver];
+        Response memory res;
+        for (uint i = 0; i < length; i++) {
+            res = _responses[receiver][i];
+
+            if(res.sender == sender && res.id == id) {
+                return res;
+            }
+        }
+        return res; 
     }
 }
