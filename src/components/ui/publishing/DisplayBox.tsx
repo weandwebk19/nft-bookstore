@@ -25,7 +25,6 @@ const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
 
   const { listedBooks } = useListedBooks();
-  console.log("listedBooks", listedBooks);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {

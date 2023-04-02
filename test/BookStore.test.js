@@ -75,6 +75,13 @@ contract("BookStore", (accounts) => {
       });
       assert.equal(nftBooks.length, 1, "It has not created book yet.");
     });
+
+    it("amount of used book should equal the first balance.", async () => {
+      const amount = await _contract.getAmountUnUsedBook(1, {
+        from: accounts[0]
+      });
+      assert.equal(amount, balance, "It has not equal the first balance.");
+    });
   });
 
   describe("Set new tokenUri", () => {
@@ -132,6 +139,13 @@ contract("BookStore", (accounts) => {
         from: accounts[0]
       });
       assert.equal(isListed, true, "It has not been listed.");
+    });
+
+    it("amount of used book should be decreased.", async () => {
+      const amountUnUsed = await _contract.getAmountUnUsedBook(1, {
+        from: accounts[0]
+      });
+      assert.equal(amountUnUsed, balance - amount, "It has not decreased.");
     });
   });
 
@@ -310,6 +324,22 @@ contract("BookStore", (accounts) => {
           from: accounts[0]
         });
       assert.equal(totalUntradeable, 40, "Total Unsellable is invalid");
+    });
+
+    it("amount of used book should be decreased.", async () => {
+      const totalUntradeable =
+        await _contract.getAmountOfAllTypeBooksUntradeable(2, {
+          from: accounts[0]
+        });
+
+      const amountUnUsed = await _contract.getAmountUnUsedBook(2, {
+        from: accounts[0]
+      });
+      assert.equal(
+        amountUnUsed,
+        balance - totalUntradeable,
+        "It has not decreased."
+      );
     });
 
     it("should have one rented items for renter", async () => {

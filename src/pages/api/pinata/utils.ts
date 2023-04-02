@@ -1,6 +1,7 @@
 import { BookStoreContract } from "@_types/BookStoreContract";
 import pinataSDK from "@pinata/sdk";
 import axios from "axios";
+import axiosRetry from "axios-retry";
 import * as util from "ethereumjs-util";
 import { ethers } from "ethers";
 import { IronSessionOptions } from "iron-session";
@@ -9,6 +10,17 @@ import { withIronSessionApiRoute, withIronSessionSsr } from "iron-session/next";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import contract from "../../../../public/contracts/BookStore.json";
+
+axiosRetry(axios, {
+  retries: 3, // number of retries
+  retryDelay: (retryCount) => {
+    return retryCount * 2000; // time interval between retries
+  },
+  retryCondition: (error: any) => {
+    // if retry condition is not specified, by default idempotent requests are retried
+    return error!.response!.status === 503;
+  }
+});
 
 const NETWORKS = {
   "5777": "Ganache"
@@ -45,7 +57,7 @@ export function withSessionAPI(handler: any) {
 
 const url =
   process.env.NODE_ENV === "production"
-    ? process.env.INFURA_ROPSTEN_URL
+    ? process.env.BASE_URL
     : "http://127.0.0.1:7545";
 
 export const addressCheckMiddleware = async (
@@ -100,7 +112,7 @@ export const getMetadata = async (nftUri: string) => {
     headers: {
       Accept: "text/plain"
     },
-    timeout: 20000
+    timeout: 150000
   });
 
   const data = nftRes.data;

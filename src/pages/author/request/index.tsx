@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -42,6 +42,7 @@ import {
 } from "@/components/shared/FormController";
 import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { uploadImage } from "@/lib/cloudinary";
 import { StyledButton } from "@/styles/components/Button";
 import formatBytes from "@/utils/formatBytes";
 
@@ -72,8 +73,10 @@ const defaultValues = {
 
 const AuthorRequest = () => {
   const { t } = useTranslation("authorRequest");
-  const { ethereum, contract } = useWeb3();
   const { account } = useAccount();
+  // preview avatar
+  const [selectedFile, setSelectedFile] = useState();
+  const [avatar, setAvatar] = useState<string>();
 
   const schema = yup.object().shape({
     pseudonym: yup.string().required(t("textError1") as string),
@@ -154,6 +157,24 @@ const AuthorRequest = () => {
   } = methods;
   const watchPicture = watch("picture");
 
+  // preview avatar when changed
+  useEffect(() => {
+    // if (!selectedFile) {
+    //   // setPreview(undefined);
+    //   return;
+    // }
+
+    // const objectUrl = URL.createObjectURL(selectedFile);
+    // setPreview(objectUrl);
+
+    // free memory when ever this component is unmounted
+    return () => {
+      if (avatar) {
+        URL.revokeObjectURL(avatar);
+      }
+    };
+  }, [avatar]);
+
   const handleRemoveImage = async () => {
     setValue("picture", "");
   };
@@ -167,10 +188,37 @@ const AuthorRequest = () => {
 
   const onSubmit = (data: any) => {
     console.log("data:", data);
-    // (async () => {
-    //   const res = await axios.post("/api/author/request", { authorInfo: data });
-    //   console.log("res:", res);
-    // })();
+    (async () => {
+      try {
+        const { frontDocument, backDocument, picture, ...authorInfo } = data;
+
+        const pictureLink = await uploadImage(picture);
+        const frontDocumentLink = await uploadImage(frontDocument);
+        const backDocumentLink = await uploadImage(backDocument);
+        // const pictureLink = "";
+        // const frontDocumentLink = "";
+        // const backDocumentLink = "";
+
+        const res = await axios.post("/api/authors/request", {
+          ...authorInfo,
+          frontDocument: {
+            secure_url: frontDocumentLink.secure_url,
+            public_id: frontDocumentLink.public_id
+          },
+          backDocument: {
+            secure_url: backDocumentLink.secure_url,
+            public_id: backDocumentLink.public_id
+          },
+          picture: {
+            secure_url: pictureLink.secure_url,
+            public_id: pictureLink.public_id
+          }
+        });
+        console.log("res:", res);
+      } catch (error) {
+        console.log("error:", error);
+      }
+    })();
   };
 
   useEffect(() => {
@@ -228,7 +276,7 @@ const AuthorRequest = () => {
                       ) : (
                         <Avatar
                           alt="Remy Sharp"
-                          src=""
+                          src={avatar || ""}
                           sx={{
                             display: "flex",
                             maxWidth: "400px",
