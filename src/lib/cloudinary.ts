@@ -1,31 +1,15 @@
-import cloudinary from "cloudinary";
+import axios from "axios";
 
-const fs = require("fs");
+export const uploadImage = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "nft_bookstore");
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+  const res = await axios.post(
+    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    formData
+  );
+  console.log("res.data", res.data);
 
-const uploadImage = async (imagePath: any) => {
-  const options = {
-    use_filename: true,
-    folder: "NftBookStore"
-  };
-
-  try {
-    // Upload the image
-    const result = await cloudinary.v2.uploader.upload(imagePath, options);
-
-    //delete image in local
-    fs.unlinkSync(imagePath);
-
-    //return url
-    return result.url;
-  } catch (error) {
-    console.error(error);
-  }
+  return res.data;
 };
-
-module.exports = uploadImage;

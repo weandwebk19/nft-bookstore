@@ -1,15 +1,8 @@
-import axios from "axios";
-import axiosRetry from "axios-retry";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
 
 import { getMetadata } from "../utils";
-
-// axiosRetry(axios, {
-//   retries: 3,
-//   retryDelay: axiosRetry.exponentialDelay
-// });
 
 export default async function handler(
   req: NextApiRequest,

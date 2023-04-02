@@ -7,7 +7,11 @@ import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useCreatedBooks } from "@/components/hooks/web3";
-import { EditButton, SellButton } from "@/components/shared/BookButton";
+import {
+  EditButton,
+  LeaseButton,
+  SellButton
+} from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
@@ -75,6 +79,12 @@ const CreatedBooks = () => {
                                 author={book?.author}
                               />
                               <EditButton tokenId={book?.tokenId} />
+                              <LeaseButton
+                                tokenId={book?.tokenId}
+                                title={book?.meta.title}
+                                bookCover={book?.meta.bookCover}
+                                author={book?.author}
+                              />
                             </>
                           }
                         />
