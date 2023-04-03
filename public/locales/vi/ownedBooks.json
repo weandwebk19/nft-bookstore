@@ -1,8 +1,8 @@
 {
-  "titlePage": "Sách sỡ hữu - NFT Bookstore",
-  "ownedBooksTitle": "Sách sỡ hữu",
+  "titlePage": "Sách sở hữu - NFT Bookstore",
+  "ownedBooksTitle": "Sách sở hữu",
   "emptyMessage": "Bạn chưa sở hữu quyển sách nào!",
   "loadingMessage": "Đang đặt sách lên kệ...",
   "breadcrumbs_bookshelf": "Kệ sách",
-  "breadcrumbs_ownedBooks": "Sách sỡ hữu"
+  "breadcrumbs_ownedBooks": "Sách sở hữu"
 }

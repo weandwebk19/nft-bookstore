@@ -17,6 +17,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
@@ -70,6 +71,8 @@ const BookBriefing = ({
   isOpenForBorrow,
   isSold
 }: BookBriefingProps) => {
+  const { t } = useTranslation("bookDetail");
+
   const theme = useTheme();
 
   const methods = useForm({
@@ -166,7 +169,7 @@ const BookBriefing = ({
               <Stack>
                 <Stack sx={{ flexWrap: "wrap" }}>
                   <Typography variant="label" mb={1}>
-                    Contract address:
+                    {t("contractAddress")}:
                   </Typography>
                   <Box sx={{ wordWrap: "break-word", width: "100%" }}>
                     <Link href="#">{contractAddress}</Link>
@@ -181,7 +184,7 @@ const BookBriefing = ({
                     redirect(bookSample!);
                   }}
                 >
-                  Read sample
+                  {t("readSample")}
                 </StyledButton>
               )}
             </Stack>
@@ -202,7 +205,7 @@ const BookBriefing = ({
                 <Typography variant="h4">{title}</Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
-                <Typography>By</Typography>
+                <Typography>{t("author")}</Typography>
                 <Link href="#">
                   <Typography variant="h6" color="secondary">
                     {authorName}
@@ -238,11 +241,11 @@ const BookBriefing = ({
                     type="submit"
                     onClick={handleSubmit(onSubmit)}
                   >
-                    Buy now
+                    {t("buyNow")}
                   </StyledButton>
                 )}
                 <StyledButton customVariant="secondary">
-                  + Add to watchlist
+                  {t("addToWatchlist")}
                 </StyledButton>
                 <Tooltip title="Add to favorites">
                   <IconButton>
@@ -252,16 +255,16 @@ const BookBriefing = ({
               </Stack>
               {/* Trade-in/Borrow navigate */}
               <Stack>
-                {isOpenForBorrow && (
+                {!isOpenForBorrow && (
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Typography>You don’t want to own this book?</Typography>
-                    <Link href="books">Go to borrow</Link>
+                    <Typography>{t("borrowMessage")}</Typography>
+                    <Link href="books">{t("goToBorrow")}</Link>
                   </Stack>
                 )}
-                {isOpenForTradeIn && (
+                {!isOpenForTradeIn && (
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Typography>This book is open for trade</Typography>
-                    <Link href="#">Go to trade-in</Link>
+                    <Typography>{t("tradeInMessage")}</Typography>
+                    <Link href="#">{t("goToTradeIn")}</Link>
                   </Stack>
                 )}
               </Stack>

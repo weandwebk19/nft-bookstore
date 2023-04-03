@@ -4,7 +4,7 @@ import { Box, Grid, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import axios from "axios";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
 import {
   BookBriefing,
@@ -24,6 +24,8 @@ type BookInfoProps = {
 };
 
 const BookInfo = ({ bookDetail }: BookInfoProps) => {
+  const { t } = useTranslation("bookDetail");
+
   const theme = useTheme();
 
   const [authorName, setAuthorName] = useState<string>("");
@@ -137,7 +139,7 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
             {/* Description */}
             <Stack sx={{ maxWidth: "500px" }}>
               <Typography variant="label" mb={1}>
-                Description:
+                {t("description")}:
               </Typography>
               {/* <>
               {details?.desc.split("\n").map((paragraph, i) => (
@@ -256,7 +258,7 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
             }}
           >
             <Typography variant="h5" gutterBottom>
-              You may love
+              {t("recommended")}
             </Typography>
             <BookList bookList={bookList} />
           </Box>
