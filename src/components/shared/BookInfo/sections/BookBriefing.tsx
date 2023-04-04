@@ -18,6 +18,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
@@ -46,6 +47,8 @@ interface BookBriefingProps {
 }
 
 const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
+  const { t } = useTranslation("bookDetail");
+
   const theme = useTheme();
   const [authorName, setAuthorName] = useState<string>("");
   const isOpenForSale =

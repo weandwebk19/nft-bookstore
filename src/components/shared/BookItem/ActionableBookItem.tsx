@@ -8,6 +8,8 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
+import { Image } from "../Image";
+
 interface ActionableBookItemProps {
   bookCover: string;
   title: string;
@@ -51,23 +53,41 @@ const ActionableBookItem = ({
       // className={styles["book-item"]}
       sx={{
         backgroundColor: `${theme.palette.background.default}`,
-        borderRadius: "5px"
+        borderRadius: "5px",
+        height: "100%"
       }}
     >
-      <Grid container columns={{ xs: 4, sm: 8, md: 12 }}>
+      <Grid
+        container
+        columns={{ xs: 4, sm: 8, md: 12 }}
+        sx={{
+          height: "100%"
+        }}
+      >
         <Grid
           item
           md={4}
           onClick={() => onClick(tokenId)}
-          sx={{ cursor: "pointer" }}
+          sx={{
+            cursor: "pointer"
+          }}
         >
           <Box
-            component="img"
-            className={styles["book-item__book-cover"]}
-            src={bookCover}
-            alt={title}
-            sx={{ width: "100%", height: "100%" }}
-          />
+            sx={{
+              p: 1,
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Image
+              src={bookCover}
+              alt={title}
+              sx={{ width: "100%", height: "100%" }}
+              className={styles["book-item__book-cover"]}
+            />
+          </Box>
         </Grid>
         <Grid item md={8}>
           <Stack

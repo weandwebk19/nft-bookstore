@@ -4,7 +4,7 @@
   "tooltip_reset": "Đặt lại",
   "tooltip_selectAll": "Chọn tất cả",
   "searchBook": "Tìm kiếm sách",
-  "rating": "Rating",
+  "rating": "Đánh giá",
   "rating0Star": "tất cả đánh giá",
   "rating1Star": "từ 1 sao",
   "rating2Star": "từ 2 sao",
@@ -12,7 +12,7 @@
   "rating4Star": "từ 4 sao",
   "rating5Star": "từ 5 sao",
   "price": "Giá",
-  "searchByAuthor": "Tìm kiếm theo tác giả",
-  "languagesSupport": "Ngôn ngữ hỗ trợ",
+  "searchByAuthor": "Tác giả",
+  "languagesSupport": "Ngôn ngữ",
   "apply": "Áp dụng"
 }

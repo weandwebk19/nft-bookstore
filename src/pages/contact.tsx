@@ -1,9 +1,8 @@
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Box, Button, Grid, TextField } from "@mui/material";
+import { Box, Grid, TextField } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import styles from "@styles/FilterBar.module.scss";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";

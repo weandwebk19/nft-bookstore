@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -8,10 +9,10 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useCreatedBooks } from "@/components/hooks/web3";
+import { useOwnedNfts } from "@/components/hooks/web3";
 import {
-  EditButton,
   LeaseButton,
+  ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -20,8 +21,8 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
-const CreatedBooks = () => {
-  const { t } = useTranslation("createdBooks");
+const RentalBooks = () => {
+  const { t } = useTranslation("rentalBooks");
 
   const breadCrumbs = [
     {
@@ -29,18 +30,19 @@ const CreatedBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_createdBooks") as string,
-      href: "/account/bookshelf/created-books"
+      content: t("breadcrumbs_rentalBooks") as string,
+      href: "/account/bookshelf/rental-books"
     }
   ];
 
-  const { nfts } = useCreatedBooks();
+  const { nfts } = useOwnedNfts();
   const router = useRouter();
-  const createdBooks = nfts.data;
+  const rentalBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
@@ -63,13 +65,13 @@ const CreatedBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title="Created books">
+            <ContentPaper title={t("rentalBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (createdBooks?.length === 0 || nfts.error) {
+                } else if (rentalBooks?.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
                       <Typography>{t("emptyMessage") as string}</Typography>
@@ -82,7 +84,7 @@ const CreatedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {createdBooks!.map((book) => {
+                    {rentalBooks!.map((book) => {
                       return (
                         <Grid
                           item
@@ -107,7 +109,13 @@ const CreatedBooks = () => {
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
                                 />
-                                <EditButton tokenId={book?.tokenId} />
+                                <LeaseButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.author}
+                                />
+                                <ReadButton bookFile={book?.meta.bookFile} />
                               </>
                             }
                           />
@@ -130,7 +138,7 @@ const CreatedBooks = () => {
   );
 };
 
-export default withAuth(CreatedBooks);
+export default withAuth(RentalBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -140,7 +148,7 @@ export async function getStaticProps({ locale }: any) {
         "navbar",
         "footer",
         "filter",
-        "createdBooks"
+        "rentalBooks"
       ]))
     }
   };

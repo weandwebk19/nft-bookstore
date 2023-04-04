@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent } from "react";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
@@ -7,6 +6,7 @@ import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import {
@@ -20,6 +20,8 @@ import { FilterBar } from "@/components/shared/FilterBar";
 import { book } from "@/mocks";
 
 const DisplayBox: FunctionComponent = () => {
+  const { t } = useTranslation("publishingBooks");
+
   const router = useRouter();
 
   const { listedBooks } = useListedBooks();
@@ -60,11 +62,11 @@ const DisplayBox: FunctionComponent = () => {
               />
             )}
 
-            <ContentPaper isPaginate={true} title="Publishing books">
+            <ContentPaper isPaginate={true} title={t("publishingBooksTitle")}>
               {(() => {
                 if (listedBooks.isLoading) {
                   return (
-                    <Typography>Putting books on the shelves...</Typography>
+                    <Typography>{t("loadingMessage") as string}</Typography>
                   );
                 } else if (
                   listedBooks?.data?.length === 0 ||
@@ -78,10 +80,6 @@ const DisplayBox: FunctionComponent = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {/* Can not call BookList component, since the BookCard component has
-                  `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
-                  title, bookCover, author,... */}
-
                     {listedBooks?.data?.map((book) => {
                       return (
                         <Grid

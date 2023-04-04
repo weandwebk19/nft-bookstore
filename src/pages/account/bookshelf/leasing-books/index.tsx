@@ -19,8 +19,8 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { StyledButton } from "@/styles/components/Button";
 
-const ListingBooks = () => {
-  const { t } = useTranslation("listingBooks");
+const LeasingBooks = () => {
+  const { t } = useTranslation("leasingBooks");
 
   const breadCrumbs = [
     {
@@ -28,13 +28,13 @@ const ListingBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_listingBooks") as string,
-      href: "/account/bookshelf/listed-books"
+      content: t("breadcrumbs_leasingBooks") as string,
+      href: "/account/bookshelf/leasing-books"
     }
   ];
-
   const { nfts } = useOwnedListedBooks();
-  const [ownedBooks, setOwnedBooks] = useState<any[]>([]);
+  console.log("nfts", nfts);
+  const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
   const router = useRouter();
 
   const { account } = useAccount();
@@ -53,7 +53,7 @@ const ListingBooks = () => {
   useEffect(() => {
     if (nfts.data?.length !== 0) {
       const res = nfts.data?.filter((nft: any) => nft.author !== account.data);
-      if (res) setOwnedBooks(res);
+      if (res) setLeasingBooks(res);
     }
   }, [nfts.data, account.data]);
 
@@ -72,30 +72,33 @@ const ListingBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("listingBooksTitle")}>
+            <ContentPaper title={t("leasingBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (ownedBooks.length === 0 || nfts.error) {
+                } else if (leasingBooks.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
                       <Stack spacing={3}>
                         <Typography>{t("emptyMessage") as string}</Typography>
                         <StyledButton
                           onClick={() => {
-                            router.push("/account/bookshelf/created-books");
+                            router.push("/account/bookshelf/owned-books");
                           }}
                         >
-                          {t("button_createdBooks")}
+                          {t("button_ownedBooks")}
                         </StyledButton>
                       </Stack>
                     </FallbackNode>
                   );
                 }
                 return (
-                  <BookList bookList={ownedBooks!} onClick={handleBookClick} />
+                  <BookList
+                    bookList={leasingBooks!}
+                    onClick={handleBookClick}
+                  />
                 );
               })()}
             </ContentPaper>
@@ -111,7 +114,7 @@ const ListingBooks = () => {
   );
 };
 
-export default withAuth(ListingBooks);
+export default withAuth(LeasingBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -121,7 +124,7 @@ export async function getStaticProps({ locale }: any) {
         "navbar",
         "footer",
         "filter",
-        "listingBooks"
+        "leasingBooks"
       ]))
     }
   };

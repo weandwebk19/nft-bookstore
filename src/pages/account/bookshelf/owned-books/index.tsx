@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
-import { useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
@@ -15,12 +16,24 @@ import {
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
+import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
 const OwnedBooks = () => {
-  const { status } = useSession();
+  const { t } = useTranslation("ownedBooks");
+
+  const breadCrumbs = [
+    {
+      content: t("breadcrumbs_bookshelf") as string,
+      href: "/account/bookshelf"
+    },
+    {
+      content: t("breadcrumbs_ownedBooks") as string,
+      href: "/account/bookshelf/owned-books"
+    }
+  ];
 
   const { nfts } = useOwnedNfts();
   const router = useRouter();
@@ -38,76 +51,90 @@ const OwnedBooks = () => {
   };
 
   return (
-    <Stack sx={{ pt: 12 }}>
-      <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
-        <Grid item xs={4} sm={8} md={9}>
-          <ContentPaper title="Owned books">
-            {(() => {
-              if (nfts.isLoading) {
-                return <Typography>Putting books on the shelves...</Typography>;
-              } else if (ownedBooks?.length === 0 || nfts.error) {
+    <>
+      <Head>
+        <title>{`${t("titlePage")}`}</title>
+        <meta name="description" content="The world's first NFT Bookstore" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Stack sx={{ pt: 3 }}>
+        <Box sx={{ mb: 3 }}>
+          <BreadCrumbs breadCrumbs={breadCrumbs} />
+        </Box>
+
+        <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
+          <Grid item xs={4} sm={8} md={9}>
+            <ContentPaper title={t("ownedBooksTitle")}>
+              {(() => {
+                if (nfts.isLoading) {
+                  return (
+                    <Typography>{t("loadingMessage") as string}</Typography>
+                  );
+                } else if (ownedBooks?.length === 0 || nfts.error) {
+                  return (
+                    <FallbackNode>
+                      <Typography>{t("emptyMessage") as string}</Typography>
+                    </FallbackNode>
+                  );
+                }
                 return (
-                  <FallbackNode>
-                    <Typography>You haven&apos;t own any book.</Typography>
-                  </FallbackNode>
+                  <Grid
+                    container
+                    spacing={3}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                  >
+                    {ownedBooks!.map((book) => {
+                      return (
+                        <Grid
+                          item
+                          key={book.tokenId}
+                          xs={4}
+                          sm={8}
+                          md={6}
+                          lg={12}
+                        >
+                          <ActionableBookItem
+                            tokenId={book?.tokenId}
+                            bookCover={book?.meta.bookCover}
+                            title={book?.meta.title}
+                            fileType={book?.meta.fileType}
+                            author={book?.author}
+                            onClick={handleBookClick}
+                            buttons={
+                              <>
+                                <SellButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.author}
+                                />
+                                <LeaseButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.author}
+                                />
+                                <ReadButton bookFile={book?.meta.bookFile} />
+                              </>
+                            }
+                          />
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
                 );
-              }
-              return (
-                <Grid
-                  container
-                  spacing={3}
-                  columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
-                >
-                  {ownedBooks!.map((book) => {
-                    return (
-                      <Grid
-                        item
-                        key={book.tokenId}
-                        xs={4}
-                        sm={8}
-                        md={6}
-                        lg={12}
-                      >
-                        <ActionableBookItem
-                          tokenId={book?.tokenId}
-                          bookCover={book?.meta.bookCover}
-                          title={book?.meta.title}
-                          fileType={book?.meta.fileType}
-                          author={book?.author}
-                          onClick={handleBookClick}
-                          buttons={
-                            <>
-                              <SellButton
-                                tokenId={book?.tokenId}
-                                title={book?.meta.title}
-                                bookCover={book?.meta.bookCover}
-                                author={book?.author}
-                              />
-                              <LeaseButton
-                                tokenId={book?.tokenId}
-                                title={book?.meta.title}
-                                bookCover={book?.meta.bookCover}
-                                author={book?.author}
-                              />
-                              <ReadButton bookFile={book?.meta.bookFile} />
-                            </>
-                          }
-                        />
-                      </Grid>
-                    );
-                  })}
-                </Grid>
-              );
-            })()}
-          </ContentPaper>
+              })()}
+            </ContentPaper>
+          </Grid>
+          <Grid item xs={4} sm={8} md={3}>
+            <ContentPaper title="Filter">
+              <FilterBar />
+            </ContentPaper>
+          </Grid>
         </Grid>
-        <Grid item xs={4} sm={8} md={3}>
-          <ContentPaper title="Filter">
-            <FilterBar />
-          </ContentPaper>
-        </Grid>
-      </Grid>
-    </Stack>
+      </Stack>
+    </>
   );
 };
 
@@ -116,7 +143,13 @@ export default withAuth(OwnedBooks);
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer", "filter"]))
+      ...(await serverSideTranslations(locale, [
+        "common",
+        "navbar",
+        "footer",
+        "filter",
+        "ownedBooks"
+      ]))
     }
   };
 }

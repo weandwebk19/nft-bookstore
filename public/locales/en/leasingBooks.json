@@ -1,0 +1,9 @@
+{
+  "titlePage": "Leasing books - NFT Bookstore",
+  "leasingBooksTitle": "Leasing books",
+  "emptyMessage": "You haven't lease any books!",
+  "loadingMessage": "Putting books on the shelves...",
+  "button_ownedBooks": "My owned books",
+  "breadcrumbs_bookshelf": "Bookshelf",
+  "breadcrumbs_leasingBooks": "Leasing books"
+}

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useLayoutEffect, useRef, useState } from "react";
 import React from "react";
 
 import {
@@ -71,6 +71,7 @@ const Hero = () => {
         </Stack>
       </Box>
 
+      <Suspense fallback={<div>Loading...</div>}></Suspense>
       <Spline scene="https://prod.spline.design/juq9OBGTG4B5Kmx1/scene.splinecode" />
 
       <Box

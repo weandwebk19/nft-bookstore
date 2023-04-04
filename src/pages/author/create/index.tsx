@@ -566,8 +566,17 @@ const CreateBook = () => {
                     return <SigningContractStep />;
                   } else if (activeStep === steps.length) {
                     return (
-                      <>
-                        <Typography sx={{ mt: 2, mb: 1 }}>
+                      <Box
+                        sx={{
+                          mt: 3,
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          width: "100%"
+                        }}
+                      >
+                        <Typography sx={{ mt: 2, mb: 3 }}>
                           {t("messageFinish1") as string}
                         </Typography>
                         <StyledButton
@@ -577,7 +586,7 @@ const CreateBook = () => {
                         >
                           {t("messageFinish2") as string}
                         </StyledButton>
-                      </>
+                      </Box>
                     );
                   } else {
                     return (

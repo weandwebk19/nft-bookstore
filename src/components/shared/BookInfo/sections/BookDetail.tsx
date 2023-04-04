@@ -1,5 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 
+import { useTranslation } from "next-i18next";
+
 interface BookDetailProps {
   bookId: string;
   fileType: string;
@@ -23,35 +25,37 @@ const BookDetail = ({
   publishingTime,
   owners
 }: BookDetailProps) => {
+  const { t } = useTranslation("bookDetail");
+
   return (
     <>
       {/* Nft book details */}
       <Stack spacing={2}>
         <Typography variant="h5" mb={1}>
-          NFT Book details
+          {t("nftBookDetail")}
         </Typography>
 
         {/* Book id */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">Book ID:</Typography>
+          <Typography variant="label">{t("bookId")}:</Typography>
           <Typography>#{bookId}</Typography>
         </Stack>
 
         {/* File type */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">File:</Typography>
+          <Typography variant="label">{t("file")}:</Typography>
           <Typography>{fileType}</Typography>
         </Stack>
 
         {/* № page */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">№ pages:</Typography>
+          <Typography variant="label">{t("noPages")}:</Typography>
           <Typography>{totalPages}</Typography>
         </Stack>
 
         {/* Write in Language */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">Languages:</Typography>
+          <Typography variant="label">{t("languages")}:</Typography>
           <Typography>
             {/* {fetchedLanguages.data
               ?.filter((language: any) => languages?.includes(language._id))
@@ -63,7 +67,7 @@ const BookDetail = ({
 
         {/* Genres */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">Genres:</Typography>
+          <Typography variant="label">{t("genres")}:</Typography>
           <Typography>
             {/* {fetchedGenres.data
               ?.filter((genre: any) => genres?.includes(genre._id))
@@ -75,19 +79,19 @@ const BookDetail = ({
 
         {/* Edition version */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">Edition version:</Typography>
+          <Typography variant="label">{t("editionVersion")}:</Typography>
           <Typography>{version}</Typography>
         </Stack>
 
         {/* Max supply */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">Max supply:</Typography>
+          <Typography variant="label">{t("quantity")}:</Typography>
           <Typography>{maxSupply}</Typography>
         </Stack>
 
         {/* Owners */}
         <Stack spacing={1}>
-          <Typography variant="label">Owners:</Typography>
+          <Typography variant="label">{t("owners")}:</Typography>
           <Box sx={{ wordWrap: "break-word", width: "100%" }}>
             <Typography>{owners}</Typography>
           </Box>
@@ -95,7 +99,7 @@ const BookDetail = ({
 
         {/* Open on */}
         <Stack direction="row" spacing={1}>
-          <Typography variant="label">Open publication on:</Typography>
+          <Typography variant="label">{t("publishedDate")}:</Typography>
           <Typography>{publishingTime?.toLocaleDateString("en-US")}</Typography>
         </Stack>
 
