@@ -70,6 +70,14 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
   const onSubmit = async (data: any) => {
     try {
       const listingPrice = await contract!.listingPrice();
+      // const tx = await contract?.sellBooks(
+      //   tokenId,
+      //   ethers.utils.parseEther(data.price.toString()),
+      //   data.amount,
+      //   {
+      //     value: listingPrice
+      //   }
+      // );
       const tx = await contract?.sellBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
@@ -87,7 +95,7 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
 
       console.log("receipt", receipt);
     } catch (e: any) {
-      console.error(e.message);
+      console.error(e);
     }
   };
 

@@ -58,8 +58,6 @@ export const useOwnedListedBooks = () => {
 export const useBookDetail = (bookId: string, seller?: string) => {
   const hooks = useHooks();
   const swrRes = hooks.useBookDetail(bookId, seller);
-
-  console.log(swrRes);
   return {
     bookDetail: swrRes
   };

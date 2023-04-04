@@ -19,7 +19,7 @@ const BookDetail = () => {
   const router = useRouter();
   const { bookId, seller } = router.query;
   const { bookDetail } = useBookDetail(bookId as string, seller as string);
-  console.log("bookDetail", bookDetail);
+  // console.log(bookDetail.data);
 
   return (
     <>
