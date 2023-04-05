@@ -49,3 +49,5 @@ public/contracts/
 .vscode/
 .env.development
 .env.development
+
+yarn.lock
