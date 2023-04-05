@@ -1,0 +1,22 @@
+{
+  "titlePage": "Watchlist - NFT Bookstore",
+  "containerTitle": "My Watchlist",
+  "button_cancel": "Cancel",
+  "button_delete": "Remove",
+  "tooltip_delete": "Remove this",
+  "dialogTitle": "Remove this from your Watchlist",
+  "message": "Are you sure you want to remove this from your watchlist?",
+  "filter": "Filter",
+  "all": "All",
+  "justPublished": "Just published",
+  "waitingForOpen": "Waiting for open",
+  "leasings": "Leasings",
+  "listings": "Listings",
+  "frozen": "Frozen",
+  "id": "ID",
+  "bookCover": "Book cover",
+  "title": "Title",
+  "price": "Price (ETH)",
+  "status": "Status",
+  "action": "Action"
+}

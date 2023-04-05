@@ -108,7 +108,8 @@ const DisplayBox: FunctionComponent = () => {
                                   price={book?.price}
                                   supplyAmount={book?.amount}
                                 />
-                                <BookmarkButton />
+                                {/* Should we need favorites while already have watchlist? */}
+                                {/* <BookmarkButton /> */}
                                 <AddToWatchlistButton isLastInButtonGroup />
                               </>
                             }
