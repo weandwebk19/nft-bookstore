@@ -38,11 +38,11 @@ const BookShelf = () => {
       )
     },
     {
-      id: `${preUrl}/rented-books`,
+      id: `${preUrl}/borrowed-books`,
       component: (
         <Ticket
-          href={`${preUrl}/rented-books`}
-          header={t("rentedBooks") as string}
+          href={`${preUrl}/borrowed-books`}
+          header={t("borrowedBooks") as string}
           image={images.product3}
         />
       )

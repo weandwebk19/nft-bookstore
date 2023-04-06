@@ -74,7 +74,7 @@ const AddToWatchlistButton = ({
   }, [bookId, userInfo.data]);
 
   return (
-    <Tooltip title="Add to watchlist">
+    <Tooltip title={isWatched ? "Remove from watchlist" : "Add to watchlist"}>
       <Button
         onClick={isWatched ? handleRemoveFromWatchlist : handleAddToWatchlist}
         size="small"
@@ -90,7 +90,7 @@ const AddToWatchlistButton = ({
             borderTopRightRadius: 0
           })
         }}
-        // color={isWatched ? "black" : ""}
+        variant={isWatched ? "contained" : "outlined"}
       >
         <PlaylistAddIcon fontSize="small" />
       </Button>
