@@ -1,8 +1,8 @@
 {
-  "titlePage": "Borrowed books - NFT Bookstore",
-  "rentalBooksTitle": "Borrowed books",
+  "titlePage": "Rented books - NFT Bookstore",
+  "rentedBooksTitle": "Rented books",
   "emptyMessage": "You haven't rent any books!",
   "loadingMessage": "Putting books on the shelves...",
   "breadcrumbs_bookshelf": "Bookshelf",
-  "breadcrumbs_rentalBooks": "Borrowed books"
+  "breadcrumbs_rentedBooks": "Rented books"
 }

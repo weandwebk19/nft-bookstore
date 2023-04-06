@@ -1,0 +1,232 @@
+import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+import {
+  Avatar,
+  Box,
+  Grid,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Stack,
+  Typography
+} from "@mui/material";
+
+import { yupResolver } from "@hookform/resolvers/yup";
+import styles from "@styles/BookItem.module.scss";
+import axios from "axios";
+import { ethers } from "ethers";
+import * as yup from "yup";
+
+import { useWeb3 } from "@/components/providers/web3";
+import { Dialog } from "@/components/shared/Dialog";
+import { InputController } from "@/components/shared/FormController";
+import { FormGroup } from "@/components/shared/FormGroup";
+import { StyledButton } from "@/styles/components/Button";
+
+import { Image } from "../Image";
+
+interface RecallButtonProps {
+  title: string;
+  bookCover: string;
+  author: string;
+  tokenId: number;
+}
+
+const schema = yup
+  .object({
+    price: yup
+      .number()
+      .min(0, `The price must be higher than 0.`)
+      .typeError("Price must be a number"),
+    amount: yup
+      .number()
+      .min(1, `The price must be higher than 0.`)
+      .typeError("Amount must be a number")
+  })
+  .required();
+
+const defaultValues = {
+  price: 0,
+  amount: 1
+};
+
+const RecallButton = ({
+  bookCover,
+  title,
+  author,
+  tokenId
+}: RecallButtonProps) => {
+  const [authorName, setAuthorName] = useState();
+  const { ethereum, contract } = useWeb3();
+
+  const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
+  const openBookCard = Boolean(anchorBookCard);
+
+  const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorBookCard(e.currentTarget);
+  };
+
+  const handleBookCardClose = () => {
+    setAnchorBookCard(null);
+  };
+
+  const methods = useForm({
+    shouldUnregister: false,
+    defaultValues,
+    resolver: yupResolver(schema),
+    mode: "all"
+  });
+
+  const { handleSubmit } = methods;
+
+  const onSubmit = async (data: any) => {
+    try {
+      const listingPrice = await contract!.listingPrice();
+      // const tx = await contract?.sellBooks(
+      //   tokenId,
+      //   ethers.utils.parseEther(data.price.toString()),
+      //   data.amount,
+      //   {
+      //     value: listingPrice
+      //   }
+      // );
+      const tx = await contract?.sellBooks(
+        tokenId,
+        ethers.utils.parseEther(data.price.toString()),
+        data.amount,
+        {
+          value: listingPrice
+        }
+      );
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Recall NftBook Token",
+        success: "NftBook has been recalled successfully!",
+        error: "Recall error"
+      });
+
+      console.log("receipt", receipt);
+    } catch (e: any) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (author) {
+          const userRes = await axios.get(`/api/users/wallet/${author}`);
+
+          if (userRes.data.success === true) {
+            setAuthorName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [author]);
+
+  return (
+    <>
+      <StyledButton onClick={handleBookCardClick}>Recall</StyledButton>
+
+      <Dialog title="Recall" open={openBookCard} onClose={handleBookCardClose}>
+        <FormProvider {...methods}>
+          <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
+            <Grid item md={4}>
+              <Stack>
+                <Image
+                  src={bookCover}
+                  alt={title}
+                  sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
+                  className={styles["book-item__book-cover"]}
+                />
+                <Typography variant="h5">{title}</Typography>
+                <Typography>{authorName}</Typography>
+              </Stack>
+            </Grid>
+            <Grid item md={8}>
+              <Stack
+                spacing={3}
+                sx={{
+                  mb: 5
+                }}
+              >
+                <Typography>
+                  These people are in a rental term duration. Are you sure you
+                  want to recall this?
+                </Typography>
+                <List>
+                  <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Avatar
+                        alt="Remy Sharp"
+                        src="/static/images/avatar/1.jpg"
+                      />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary="Tho Le"
+                      secondary={
+                        <>
+                          <Typography
+                            sx={{ display: "inline" }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            2 weeks left.
+                          </Typography>
+                        </>
+                      }
+                    />
+                  </ListItem>
+                  <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Avatar
+                        alt="Remy Sharp"
+                        src="/static/images/avatar/1.jpg"
+                      />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary="Remy Sharp"
+                      secondary={
+                        <>
+                          <Typography
+                            sx={{ display: "inline" }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            1 day left.
+                          </Typography>
+                        </>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Stack>
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <StyledButton
+                  customVariant="secondary"
+                  sx={{ mr: 2 }}
+                  onClick={handleBookCardClose}
+                >
+                  Cancel
+                </StyledButton>
+                <StyledButton onClick={handleSubmit(onSubmit)}>
+                  Recall all
+                </StyledButton>
+              </Box>
+            </Grid>
+          </Grid>
+        </FormProvider>
+      </Dialog>
+    </>
+  );
+};
+
+export default RecallButton;

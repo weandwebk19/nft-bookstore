@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -9,10 +8,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useOwnedBorrowedBooks } from "@/components/hooks/web3";
 import {
+  EditButton,
   LeaseButton,
-  ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -21,8 +19,8 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
-const RentalBooks = () => {
-  const { t } = useTranslation("rentalBooks");
+const SharedBooks = () => {
+  const { t } = useTranslation("sharedBooks");
 
   const breadCrumbs = [
     {
@@ -30,19 +28,16 @@ const RentalBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_rentalBooks") as string,
-      href: "/account/bookshelf/rental-books"
+      content: t("breadcrumbs_sharedBooks") as string,
+      href: "/account/bookshelf/shared-books"
     }
   ];
 
-  const { nfts } = useOwnedBorrowedBooks();
   const router = useRouter();
-  const rentalBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
@@ -65,13 +60,13 @@ const RentalBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("rentalBooksTitle")}>
-              {(() => {
+            <ContentPaper title={t("sharedBooksTitle")}>
+              {/* {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (rentalBooks?.length === 0 || nfts.error) {
+                } else if (sharedBooks?.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
                       <Typography>{t("emptyMessage") as string}</Typography>
@@ -84,7 +79,7 @@ const RentalBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {rentalBooks!.map((book) => {
+                    {sharedBooks!.map((book) => {
                       return (
                         <Grid
                           item
@@ -109,13 +104,7 @@ const RentalBooks = () => {
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
                                 />
-                                <LeaseButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                                <ReadButton bookFile={book?.meta.bookFile} />
+                                <EditButton tokenId={book?.tokenId} />
                               </>
                             }
                           />
@@ -124,7 +113,7 @@ const RentalBooks = () => {
                     })}
                   </Grid>
                 );
-              })()}
+              })()} */}
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
@@ -138,7 +127,7 @@ const RentalBooks = () => {
   );
 };
 
-export default withAuth(RentalBooks);
+export default withAuth(SharedBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -148,7 +137,7 @@ export async function getStaticProps({ locale }: any) {
         "navbar",
         "footer",
         "filter",
-        "rentalBooks"
+        "sharedBooks"
       ]))
     }
   };
