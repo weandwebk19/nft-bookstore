@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Box,
@@ -30,7 +31,7 @@ import {
   Step1,
   Step2,
   Step3
-} from "@/components/ui/author/create/steps";
+} from "@/components/ui/books/create/steps";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 
@@ -604,6 +605,7 @@ const BookDetailEdit = () => {
             </Paper>
           </Box>
         </ContentContainer>
+        <ToastContainer />
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
           <Alert
             onClose={handleClose}

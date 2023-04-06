@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Box,
@@ -33,7 +34,7 @@ import {
   Step1,
   Step2,
   Step3
-} from "@/components/ui/author/create/steps";
+} from "@/components/ui/books/create/steps";
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
@@ -84,18 +85,6 @@ const defaultValues = {
   termsOfService: false,
   privacyPolicy: false
 };
-
-// const ALLOWED_FIELDS = [
-//   "title",
-//   "bookFile",
-//   "bookCover",
-//   "bookSample",
-//   "fileType",
-//   "version",
-//   "author",
-//   "quantity",
-//   "createdAt"
-// ];
 
 const CreateBook = () => {
   const { t } = useTranslation("createBook");
@@ -275,6 +264,9 @@ const CreateBook = () => {
         return link;
       } catch (e: any) {
         console.error(e.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     }
     return "";
@@ -309,6 +301,9 @@ const CreateBook = () => {
         return link;
       } catch (e: any) {
         console.error(e.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     }
     return "";
@@ -342,6 +337,9 @@ const CreateBook = () => {
         return link;
       } catch (e: any) {
         console.error(e.message);
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     }
     return "";
@@ -368,6 +366,9 @@ const CreateBook = () => {
       return link;
     } catch (e: any) {
       console.error(e.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     }
     return "";
   };
@@ -393,6 +394,9 @@ const CreateBook = () => {
       }
     } catch (e: any) {
       console.error(e.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     }
   };
 
@@ -408,6 +412,9 @@ const CreateBook = () => {
       return res;
     } catch (e: any) {
       console.error(e.message);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     }
   };
 
@@ -503,6 +510,9 @@ const CreateBook = () => {
           deleteFile(nftURI);
         }
       })();
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     }
   };
 
@@ -694,6 +704,7 @@ const CreateBook = () => {
             </Paper>
           </Box>
         </ContentContainer>
+        <ToastContainer />
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
           <Alert
             onClose={handleClose}

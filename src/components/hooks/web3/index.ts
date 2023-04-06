@@ -55,6 +55,24 @@ export const useOwnedListedBooks = () => {
   };
 };
 
+export const useOwnedBorrowedBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedBorrowedBooks();
+
+  return {
+    nfts: swrRes
+  };
+};
+
+export const useOwnedRentedBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedRentedBooks();
+
+  return {
+    nfts: swrRes
+  };
+};
+
 export const useBookDetail = (bookId: string, seller?: string) => {
   const hooks = useHooks();
   const swrRes = hooks.useBookDetail(bookId, seller);

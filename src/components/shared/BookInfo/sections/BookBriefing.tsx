@@ -222,7 +222,7 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
               </StyledButton> */}
               <AddToWatchlistButton
                 isFirstInButtonGroup
-                bookId={bookDetail?.bookId!}
+                tokenId={bookDetail?.nftCore.tokenId!}
               />
               <Tooltip title="Add to favorites">
                 <IconButton>

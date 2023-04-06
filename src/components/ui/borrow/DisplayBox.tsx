@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { FunctionComponent } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
@@ -93,8 +95,11 @@ const DisplayBox: FunctionComponent = () => {
                                   supplyAmount={book?.amount}
                                   borrowBooks={rentedBooks?.borrowBooks}
                                 />
-                                {/* <BookmarkButton /> */}
-                                <AddToWatchlistButton isLastInButtonGroup />
+                                <BookmarkButton />
+                                <AddToWatchlistButton
+                                  isLastInButtonGroup
+                                  tokenId={book?.tokenId}
+                                />
                               </>
                             }
                           />
@@ -115,6 +120,7 @@ const DisplayBox: FunctionComponent = () => {
           </Stack>
         </Grid>
       </Grid>
+      <ToastContainer />
     </Box>
   );
 };
