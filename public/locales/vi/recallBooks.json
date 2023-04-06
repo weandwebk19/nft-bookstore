@@ -1,8 +1,8 @@
 {
-  "titlePage": "Sách đang thuê - NFT Bookstore",
-  "rentalBooksTitle": "Sách đang thuê",
+  "titlePage": "Sách trả lại - NFT Bookstore",
+  "recallBooksTitle": "Sách trả lại",
   "emptyMessage": "Bạn chưa thuê quyển sách nào!",
   "loadingMessage": "Đang đặt sách lên kệ...",
   "breadcrumbs_bookshelf": "Kệ sách",
-  "breadcrumbs_rentalBooks": "Sách đang thuê"
+  "breadcrumbs_recallBooks": "Sách trả lại"
 }

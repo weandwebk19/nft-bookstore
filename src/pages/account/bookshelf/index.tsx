@@ -38,36 +38,47 @@ const BookShelf = () => {
       )
     },
     {
-      id: `${preUrl}/rental-books`,
+      id: `${preUrl}/rented-books`,
       component: (
         <Ticket
-          href={`${preUrl}/rental-books`}
-          header={t("rentalBooks") as string}
+          href={`${preUrl}/rented-books`}
+          header={t("rentedBooks") as string}
           image={images.product3}
         />
       )
     },
     {
-      id: "punchline1",
+      id: `${preUrl}/shared-books`,
       component: (
-        <>
-          <Typography variant="h3" sx={{ textAlign: "end" }}>
-            {t("punchline1") as string}
-          </Typography>
-        </>
+        <Ticket
+          href={`${preUrl}/shared-books`}
+          header={t("sharedBooks") as string}
+          image={images.product3}
+        />
       )
     }
   ];
 
   const bottomCategories = [
     {
-      id: "punchline2",
+      id: `${preUrl}/recall-books`,
       component: (
-        <Typography variant="h3">{t("punchline2") as string}</Typography>
+        <Ticket
+          href={`${preUrl}/recall-books`}
+          header={t("recallBooks") as string}
+          image={images.product1}
+        />
       )
     },
     {
-      component: <></>
+      id: `${preUrl}/sharing-books`,
+      component: (
+        <Ticket
+          href={`${preUrl}/sharing-books`}
+          header={t("sharingBooks") as string}
+          image={images.product1}
+        />
+      )
     },
     {
       id: `${preUrl}/listing-books`,
