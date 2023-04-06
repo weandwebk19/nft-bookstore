@@ -60,18 +60,18 @@ const AccountMenu = ({
         router.push("/account/profile");
       }
     },
-    {
-      icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
-      content: t("navbar:favorites") as string,
-      onClick: () => {
-        console.log("Favorites");
-      }
-    },
+    // {
+    //   icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
+    //   content: t("navbar:favorites") as string,
+    //   onClick: () => {
+    //     router.push("/account/favorites");
+    //   }
+    // },
     {
       icon: <VisibilityOutlinedIcon color="primary" fontSize="small" />,
       content: t("navbar:watchlist") as string,
       onClick: () => {
-        console.log("Watchlist");
+        router.push("/account/watchlist");
       }
     },
     {
