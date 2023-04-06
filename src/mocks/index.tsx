@@ -53,6 +53,7 @@ export const bookList: NftBook[] = [
     price: 0.5,
     author: "Markus Zusak",
     isListed: true,
+    endRentalDay: 3,
     meta: {
       title: "To Kill A Mockingbird",
       bookFile: "epub",
@@ -94,6 +95,7 @@ export const bookList: NftBook[] = [
     price: 0.5,
     author: "Khaled Hosseini",
     isListed: true,
+    endRentalDay: 0,
     meta: {
       title: "The Kite Runner",
       bookFile: "epub",
