@@ -93,7 +93,10 @@ const DisplayBox: FunctionComponent = () => {
                                   supplyAmount={book?.amount}
                                 />
                                 <BookmarkButton />
-                                <AddToWatchlistButton isLastInButtonGroup />
+                                <AddToWatchlistButton
+                                  isLastInButtonGroup
+                                  tokenId={book?.tokenId}
+                                />
                               </>
                             }
                           />

@@ -11,7 +11,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useAccount, useOwnedListedBooks } from "@/components/hooks/web3";
+import { useAccount, useOwnedRentedBooks } from "@/components/hooks/web3";
 import { BookList } from "@/components/shared/BookList";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
@@ -32,7 +32,7 @@ const LeasingBooks = () => {
       href: "/account/bookshelf/leasing-books"
     }
   ];
-  const { nfts } = useOwnedListedBooks();
+  const { nfts } = useOwnedRentedBooks();
   console.log("nfts", nfts);
   const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
   const router = useRouter();

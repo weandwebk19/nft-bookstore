@@ -88,6 +88,16 @@ export type RentedBookCore = {
   amount: number;
 };
 
+export type BorrowedBookCore = {
+  tokenId: number;
+  renter: string;
+  borrower: string;
+  price: number;
+  amount: number;
+  startTime: number;
+  endTime: number;
+};
+
 export type ListedBook = {
   meta: NftBookMeta;
 } & ListedBookCore;
@@ -95,6 +105,10 @@ export type ListedBook = {
 export type RentedBook = {
   meta: NftBookMeta;
 } & RentedBookCore;
+
+export type BorrowedBook = {
+  meta: NftBookMeta;
+} & BorrowedBookCore;
 
 export type NftListedBook = {
   meta: NftBookMeta;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Box,
@@ -111,12 +112,12 @@ const BuyButton = ({
   const onSubmit = async (data: any) => {
     try {
       const tx = await contract?.buyBooks(tokenId, seller, data.amount, {
-        value: ethers.utils.parseEther(price.toString())
+        value: ethers.utils.parseEther((price * data.amount).toString())
       });
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Processing transaction",
-        success: "Nft is yours! Go to Profile page",
+        success: "Nft Book is yours! Go to Profile page",
         error: "Processing error"
       });
 
@@ -284,6 +285,7 @@ const BuyButton = ({
             </Stack>
           </Stack>
         </FormProvider>
+        <ToastContainer />
       </Dialog>
     </>
   );

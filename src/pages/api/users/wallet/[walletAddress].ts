@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
+import { toCamel } from "@/utils/nomalizer";
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,7 +22,7 @@ export default async function handler(
       return res.json({
         success: true,
         message: "Get user successfully.",
-        data: user
+        data: toCamel({ ...user, _id: user._id.toString() })
       });
     } else {
       return res.json({
