@@ -4,5 +4,9 @@
   "emptyMessage": "There's nothing here!",
   "loadingMessage": "Putting books on the shelves...",
   "breadcrumbs_bookshelf": "Bookshelf",
-  "breadcrumbs_recallBooks": "Recall"
+  "breadcrumbs_recallBooks": "Recall",
+  "dialogTitle": "Recall all",
+  "message": "Are you sure to recall all the books?",
+  "button_cancel": "Cancel",
+  "button_recall": "Recall"
 }

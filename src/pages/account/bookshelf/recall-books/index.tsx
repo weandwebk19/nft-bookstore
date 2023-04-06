@@ -1,3 +1,5 @@
+import React from "react";
+
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -10,14 +12,17 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import {
   EditButton,
-  LeaseButton,
+  RecallButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
+import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { bookList } from "@/mocks";
+import { StyledButton } from "@/styles/components/Button";
 
 const RecallBooks = () => {
   const { t } = useTranslation("recallBooks");
@@ -35,6 +40,13 @@ const RecallBooks = () => {
 
   const router = useRouter();
 
+  const handleOpenRecallDialogClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorRecallButton(e.currentTarget);
+  };
+
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
@@ -43,6 +55,29 @@ const RecallBooks = () => {
         router.push(`/books/${bookId}`);
       }
     })();
+  };
+
+  const [anchorRecallButton, setAnchorRecallButton] =
+    React.useState<Element | null>(null);
+
+  const openRecallDialog = Boolean(anchorRecallButton);
+
+  const handleRecallClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorRecallButton(null);
+  };
+
+  const handleCancelClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorRecallButton(null);
+  };
+
+  const handleRecallClose = () => {
+    setAnchorRecallButton(null);
   };
 
   return (
@@ -60,26 +95,58 @@ const RecallBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("recallBooksTitle")}>
-              {/* {(() => {
-                if (nfts.isLoading) {
-                  return (
-                    <Typography>{t("loadingMessage") as string}</Typography>
-                  );
-                } else if (recallBooks?.length === 0 || nfts.error) {
-                  return (
-                    <FallbackNode>
-                      <Typography>{t("emptyMessage") as string}</Typography>
-                    </FallbackNode>
-                  );
-                }
+            <ContentPaper
+              title={t("recallBooksTitle")}
+              button={
+                <>
+                  <StyledButton
+                    customVariant="secondary"
+                    onClick={(e) => handleOpenRecallDialogClick(e)}
+                  >
+                    Recall All
+                  </StyledButton>
+                  <Dialog
+                    title={t("dialogTitle") as string}
+                    open={openRecallDialog}
+                    onClose={handleRecallClose}
+                  >
+                    <Stack spacing={3}>
+                      <Typography>{t("message")}</Typography>
+                      <Stack direction="row" spacing={3} justifyContent="end">
+                        <StyledButton
+                          customVariant="secondary"
+                          onClick={(e) => handleCancelClick(e)}
+                        >
+                          {t("button_cancel")}
+                        </StyledButton>
+                        <StyledButton onClick={(e) => handleRecallClick(e)}>
+                          {t("button_recall")}
+                        </StyledButton>
+                      </Stack>
+                    </Stack>
+                  </Dialog>
+                </>
+              }
+            >
+              {(() => {
+                // if (nfts.isLoading) {
+                //   return (
+                //     <Typography>{t("loadingMessage") as string}</Typography>
+                //   );
+                // } else if (recallBooks?.length === 0 || nfts.error) {
+                //   return (
+                //     <FallbackNode>
+                //       <Typography>{t("emptyMessage") as string}</Typography>
+                //     </FallbackNode>
+                //   );
+                // }
                 return (
                   <Grid
                     container
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {recallBooks!.map((book) => {
+                    {bookList!.map((book) => {
                       return (
                         <Grid
                           item
@@ -98,7 +165,7 @@ const RecallBooks = () => {
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <SellButton
+                                <RecallButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
@@ -113,7 +180,7 @@ const RecallBooks = () => {
                     })}
                   </Grid>
                 );
-              })()} */}
+              })()}
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>

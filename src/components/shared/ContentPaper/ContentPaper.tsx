@@ -5,19 +5,24 @@ interface ContentPaperProps {
   children: React.ReactNode;
   height?: number | string;
   isPaginate?: boolean;
+  button?: JSX.Element;
 }
 
 const ContentPaper = ({
   title,
   children,
   height,
-  isPaginate = false
+  isPaginate = false,
+  button
 }: ContentPaperProps) => {
   return (
     <Paper sx={{ p: 3, height: `${height}` }}>
-      <Typography variant="h5" gutterBottom>
-        {title}
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" mb={3}>
+        <Typography variant="h5" gutterBottom>
+          {title}
+        </Typography>
+        {button}
+      </Stack>
       {children}
       {isPaginate && (
         <Stack sx={{ mt: 3 }}>
