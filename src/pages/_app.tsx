@@ -2,6 +2,7 @@ import { useRef } from "react";
 
 import { Box, CssBaseline } from "@mui/material";
 
+import Portal from "@mui/base/Portal";
 import "@styles/GlobalStyles/GlobalStyles.scss";
 import { AnimatePresence, motion } from "framer-motion";
 import { SessionProvider } from "next-auth/react";
@@ -85,17 +86,19 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
                     }
                   }}
                 >
-                  <Loading />
+                  <Portal>
+                    <Loading />
 
-                  {Component.PageLayout ? (
-                    <Component.PageLayout>
-                      <Component {...pageProps} />
-                    </Component.PageLayout>
-                  ) : (
-                    <DefaultLayout>
-                      <Component {...pageProps} />
-                    </DefaultLayout>
-                  )}
+                    {Component.PageLayout ? (
+                      <Component.PageLayout>
+                        <Component {...pageProps} />
+                      </Component.PageLayout>
+                    ) : (
+                      <DefaultLayout>
+                        <Component {...pageProps} />
+                      </DefaultLayout>
+                    )}
+                  </Portal>
                 </motion.div>
               </AnimatePresence>
             </MyThemeContextProvider>
