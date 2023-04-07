@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import {
   Avatar,
@@ -25,6 +26,7 @@ import { ListItemProps } from "@_types/list";
 import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
+import axios from "axios";
 import { motion } from "framer-motion";
 import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
@@ -105,6 +107,7 @@ const NavBar = () => {
 
   const handleLogin = async () => {
     try {
+      console.log("Hello");
       const callbackUrl =
         (router.query?.callbackUrl as string) ?? router.pathname ?? "/";
 
@@ -134,6 +137,15 @@ const NavBar = () => {
       } else {
         router.push(callbackUrl);
       }
+      //create new account
+      await axios
+        .post("/api/users/create", {
+          wallet_address: wagmiAddress?.toLowerCase(),
+          fullname: "Anonymous"
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     } catch (error) {
       // window.alert(error);
       console.error(error);
