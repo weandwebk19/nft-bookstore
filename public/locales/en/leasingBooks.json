@@ -5,5 +5,9 @@
   "loadingMessage": "Putting books on the shelves...",
   "button_ownedBooks": "My owned books",
   "breadcrumbs_bookshelf": "Bookshelf",
-  "breadcrumbs_leasingBooks": "Leasing books"
+  "breadcrumbs_leasingBooks": "Leasing books",
+  "dialogTitle": "Recall all",
+  "message": "Are you sure to recall all the books?",
+  "button_cancel": "Cancel",
+  "button_recall": "Recall"
 }
