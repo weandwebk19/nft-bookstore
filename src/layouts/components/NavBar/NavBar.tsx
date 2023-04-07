@@ -260,7 +260,7 @@ const NavBar = () => {
   };
 
   const handlePublishABookClick = () => {
-    router.push("/author/create");
+    router.push("/books/create");
   };
 
   const handleCreateListingClick = () => {
@@ -460,7 +460,7 @@ const NavBar = () => {
       onClick: () => handlePublishABookClick(),
       disabled: false,
       subList: [],
-      href: "/author/create"
+      href: "/books/create"
     },
     {
       type: "button",

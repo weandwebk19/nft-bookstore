@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
@@ -163,6 +164,7 @@ const LeaseButton = ({
             </Grid>
           </Grid>
         </FormProvider>
+        <ToastContainer />
       </Dialog>
     </>
   );

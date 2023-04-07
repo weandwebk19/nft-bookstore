@@ -9,7 +9,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useOwnedNfts } from "@/components/hooks/web3";
+import { useOwnedBorrowedBooks } from "@/components/hooks/web3";
 import {
   LeaseButton,
   ReadButton,
@@ -35,7 +35,7 @@ const RentedBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedNfts();
+  const { nfts } = useOwnedBorrowedBooks();
   const router = useRouter();
   const rentedBooks = nfts.data;
 

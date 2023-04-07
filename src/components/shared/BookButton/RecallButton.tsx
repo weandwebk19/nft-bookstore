@@ -2,17 +2,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import {
-  Avatar,
-  Box,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Stack,
-  Typography
-} from "@mui/material";
+import { AlertColor, Box, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
@@ -22,13 +12,14 @@ import * as yup from "yup";
 
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
-import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 
 import { Image } from "../Image";
+import { Snackbar } from "../Snackbar";
 
 interface RecallButtonProps {
+  rentee: string;
+  isEnded: boolean;
   title: string;
   bookCover: string;
   author: string;
@@ -54,6 +45,8 @@ const defaultValues = {
 };
 
 const RecallButton = ({
+  rentee,
+  isEnded,
   bookCover,
   title,
   author,
@@ -62,15 +55,28 @@ const RecallButton = ({
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
 
-  const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
-  const openBookCard = Boolean(anchorBookCard);
+  const [anchorRecallDiaglog, setAnchorRecallDiaglog] =
+    useState<Element | null>(null);
+  const openRecallDiaglog = Boolean(anchorRecallDiaglog);
 
-  const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorBookCard(e.currentTarget);
+  const [severity, setSeverity] = useState<AlertColor>("success");
+  const [alertMessage, setAlertMessage] = useState<string>("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const handleSnackbarClose = () => {
+    setOpenSnackbar(false);
   };
 
-  const handleBookCardClose = () => {
-    setAnchorBookCard(null);
+  const handleRecallDiaglogClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorRecallDiaglog(e.currentTarget);
+    if (isEnded) {
+      setAlertMessage("Successfully recalled!");
+      setOpenSnackbar(true);
+    }
+  };
+
+  const handleRecallDiaglogClose = () => {
+    setAnchorRecallDiaglog(null);
   };
 
   const methods = useForm({
@@ -108,9 +114,15 @@ const RecallButton = ({
         error: "Recall error"
       });
 
-      console.log("receipt", receipt);
+      console.log("recall info", receipt);
+      setSeverity("success" as AlertColor);
+      setAlertMessage("Successfully recalled!");
+      setOpenSnackbar(true);
     } catch (e: any) {
       console.error(e);
+      setSeverity("error" as AlertColor);
+      setAlertMessage("Oops! Something went wrong!");
+      setOpenSnackbar(true);
     }
   };
 
@@ -132,99 +144,70 @@ const RecallButton = ({
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Recall</StyledButton>
+      <StyledButton
+        onClick={handleRecallDiaglogClick}
+        customVariant={isEnded ? "primary" : "secondary"}
+      >
+        Recall
+      </StyledButton>
 
-      <Dialog title="Recall" open={openBookCard} onClose={handleBookCardClose}>
-        <FormProvider {...methods}>
-          <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
-            <Grid item md={4}>
-              <Stack>
-                <Image
-                  src={bookCover}
-                  alt={title}
-                  sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-                  className={styles["book-item__book-cover"]}
-                />
-                <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
-              </Stack>
-            </Grid>
-            <Grid item md={8}>
-              <Stack
-                spacing={3}
-                sx={{
-                  mb: 5
-                }}
-              >
-                <Typography>
-                  These people are in a rental term duration. Are you sure you
-                  want to recall this?
-                </Typography>
-                <List>
-                  <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar
-                        alt="Remy Sharp"
-                        src="/static/images/avatar/1.jpg"
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary="Tho Le"
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: "inline" }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            2 weeks left.
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItem>
-                  <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar
-                        alt="Remy Sharp"
-                        src="/static/images/avatar/1.jpg"
-                      />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary="Remy Sharp"
-                      secondary={
-                        <>
-                          <Typography
-                            sx={{ display: "inline" }}
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                          >
-                            1 day left.
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </ListItem>
-                </List>
-              </Stack>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <StyledButton
-                  customVariant="secondary"
-                  sx={{ mr: 2 }}
-                  onClick={handleBookCardClose}
+      {!isEnded && (
+        <Dialog
+          title="Recall"
+          open={openRecallDiaglog}
+          onClose={handleRecallDiaglogClose}
+        >
+          <FormProvider {...methods}>
+            <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
+              <Grid item md={4}>
+                <Stack>
+                  <Image
+                    src={bookCover}
+                    alt={title}
+                    sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
+                    className={styles["book-item__book-cover"]}
+                  />
+                  <Typography variant="h5">{title}</Typography>
+                  <Typography>{authorName}</Typography>
+                </Stack>
+              </Grid>
+              <Grid item md={8}>
+                <Stack
+                  spacing={3}
+                  sx={{
+                    mb: 5
+                  }}
                 >
-                  Cancel
-                </StyledButton>
-                <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Recall all
-                </StyledButton>
-              </Box>
+                  {!isEnded && (
+                    <Typography>
+                      {rentee} is in a rental term duration. Are you sure you
+                      want to recall this?
+                    </Typography>
+                  )}
+                </Stack>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                  <StyledButton
+                    customVariant="secondary"
+                    sx={{ mr: 2 }}
+                    onClick={handleRecallDiaglogClose}
+                  >
+                    Cancel
+                  </StyledButton>
+                  <StyledButton onClick={handleSubmit(onSubmit)}>
+                    Recall
+                  </StyledButton>
+                </Box>
+              </Grid>
             </Grid>
-          </Grid>
-        </FormProvider>
-      </Dialog>
+          </FormProvider>
+        </Dialog>
+      )}
+      <Snackbar
+        severity={severity}
+        open={openSnackbar}
+        handleClose={handleSnackbarClose}
+        message={alertMessage}
+      />
     </>
   );
 };
