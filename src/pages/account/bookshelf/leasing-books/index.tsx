@@ -14,7 +14,6 @@ import withAuth from "@/components/HOC/withAuth";
 import { useAccount, useOwnedListedBooks } from "@/components/hooks/web3";
 import { RecallButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
-import { BookList } from "@/components/shared/BookList";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { Dialog } from "@/components/shared/Dialog";
@@ -178,6 +177,8 @@ const LeasingBooks = () => {
                             buttons={
                               <>
                                 <RecallButton
+                                  rentee={book?.rentee}
+                                  isEnded={book?.endRentalDay === 0}
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
@@ -185,6 +186,7 @@ const LeasingBooks = () => {
                                 />
                               </>
                             }
+                            rentee={book?.rentee}
                             status={
                               book?.endRentalDay !== undefined
                                 ? book?.endRentalDay > 0

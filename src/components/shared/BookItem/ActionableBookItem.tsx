@@ -18,6 +18,7 @@ interface ActionableBookItemProps {
   author: string;
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
+  rentee?: string;
   status?: string;
 }
 
@@ -29,6 +30,7 @@ const ActionableBookItem = ({
   author,
   onClick,
   buttons,
+  rentee,
   status
 }: ActionableBookItemProps) => {
   const theme = useTheme();
@@ -79,12 +81,9 @@ const ActionableBookItem = ({
           }}
         >
           <Stack>
-            <Stack direction="row" justifyContent="space-between">
-              <Stack direction="row">
-                <InsertDriveFileIcon fontSize="small" color="disabled" />
-                <Typography variant="caption">{fileType}</Typography>
-              </Stack>
-              {status !== undefined ? <Chip label={status} /> : <></>}
+            <Stack direction="row">
+              <InsertDriveFileIcon fontSize="small" color="disabled" />
+              <Typography variant="caption">{fileType}</Typography>
             </Stack>
             <Typography
               variant="h6"
@@ -97,6 +96,10 @@ const ActionableBookItem = ({
           </Stack>
 
           <Divider sx={{ my: 3 }} />
+          <Stack direction="row" justifyContent="space-between">
+            <Typography>{rentee}</Typography>
+            {status !== undefined ? <Chip label={status} /> : <></>}
+          </Stack>
           <Stack direction="row" spacing={2}>
             {buttons}
           </Stack>
