@@ -10,7 +10,7 @@ import "./SharedBookStorage.sol";
 contract BookTemporary is ExtendTime, SharedBookStorage {
   using Counters for Counters.Counter;
 
-  struct RentedBook {
+  struct LeaseBook {
     uint256 tokenId;
     address renter;
     uint price; // ETH/book/1week
@@ -27,7 +27,7 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
     uint endTime;
   }
 
-  event RentedBookCreated (
+  event LeaseBookCreated (
     uint tokenId,
     address renter,
     uint price,
@@ -46,11 +46,11 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
 
   TimeLock private _timelock;
 
-  // Variable for Rented Books
-  mapping (uint => mapping (address => uint)) _allRentedBook; // (tokenID -> (renter -> ID))
-  mapping(address => uint) private _totalOwnedRentedBook;
-  mapping(uint => RentedBook) private _idToRentedBook; // (ID -> RentedBook))
-  Counters.Counter private _rentedBooks;
+  // Variable for Lease Books
+  mapping (uint => mapping (address => uint)) _allLeaseBook; // (tokenID -> (renter -> ID))
+  mapping(address => uint) private _totalOwnedLeaseBook;
+  mapping(uint => LeaseBook) private _idToLeaseBook; // (ID -> LeaseBook))
+  Counters.Counter private _leaseBooks;
 
   // These variables will manage which books are borrowed
   // hashId -> id BorrowedBook
@@ -66,9 +66,10 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
     _timelock = timelock;
   }
 
-  function isRented(uint tokenId, address renter) public view returns (bool) {
-    uint idRentedBook = getIdRentedBook(tokenId, renter);
-    if(idRentedBook > 0) {
+  // ===================================LEASING============================================
+  function isLeased(uint tokenId, address renter) public view returns (bool) {
+    uint idLeaseBook = getIdLeaseBook(tokenId, renter);
+    if(idLeaseBook > 0) {
       return true;
     }
     else {
@@ -76,27 +77,110 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
     }
   }
 
-  function getRentedBook(uint tokenId, address renter) public view returns (RentedBook memory) {
-    uint idRentedBook = getIdRentedBook(tokenId, renter);
-    return _idToRentedBook[idRentedBook];
+  function getLeaseBook(uint tokenId, address renter) public view returns (LeaseBook memory) {
+    uint idLeaseBook = getIdLeaseBook(tokenId, renter);
+    return _idToLeaseBook[idLeaseBook];
   }
 
-  function getRentedBookFromId(uint id) public view returns (RentedBook memory) {
-    return _idToRentedBook[id];
+  function getLeaseBookFromId(uint id) public view returns (LeaseBook memory) {
+    return _idToLeaseBook[id];
   }
 
-  function getTotalOwnedRentedBook(address renter) public view returns(uint) {
-    return _totalOwnedRentedBook[renter];
+  function getTotalOwnedLeaseBook(address renter) public view returns(uint) {
+    return _totalOwnedLeaseBook[renter];
   }
 
-  function _createRentedBook(uint tokenId, address renter, uint256 price, uint amount) private {
-    _rentedBooks.increment();
-    _allRentedBook[tokenId][renter] = _rentedBooks.current();
-    _idToRentedBook[_rentedBooks.current()] = RentedBook(tokenId, renter, price, amount);
-    _totalOwnedRentedBook[renter]++;
-    emit RentedBookCreated(tokenId, renter, price, amount);
+  function _createLeaseBook(uint tokenId, address renter, uint256 price, uint amount) private {
+    _leaseBooks.increment();
+    _allLeaseBook[tokenId][renter] = _leaseBooks.current();
+    _idToLeaseBook[_leaseBooks.current()] = LeaseBook(tokenId, renter, price, amount);
+    _totalOwnedLeaseBook[renter]++;
+    emit LeaseBookCreated(tokenId, renter, price, amount);
   }
 
+  function getIdLeaseBook(uint tokenId, address renter) public view returns(uint) {
+    if (tokenId == 0 || renter == address(0)) {
+      revert InvalidParamsError();
+    }
+    return _allLeaseBook[tokenId][renter];
+  }
+
+  function getAmountOfLeaseBooks(uint256 tokenId, address owner) public view returns(uint) {
+    uint idLeaseBook = getIdLeaseBook(tokenId, owner);
+
+    uint totalBook = 0;
+    if (idLeaseBook != 0) {
+      totalBook +=_idToLeaseBook[idLeaseBook].amount;
+    }
+    
+    return totalBook;
+  }
+
+  function _removeItemFromAllLeaseBooks(uint tokenId, address renter) private {
+    uint idLeaseBook = getIdLeaseBook(tokenId, renter);
+    uint lastIdLeaseBook = _leaseBooks.current();
+    LeaseBook memory lastLeaseBook = _idToLeaseBook[lastIdLeaseBook];
+    uint lastTokenId = lastLeaseBook.tokenId;
+    address lastRenter = lastLeaseBook.renter;
+    if (idLeaseBook != 0) {
+      if (lastIdLeaseBook != idLeaseBook) {
+        _allLeaseBook[lastTokenId][lastRenter] = idLeaseBook;
+        _idToLeaseBook[idLeaseBook] = lastLeaseBook;
+      }
+
+      _leaseBooks.decrement();
+      _totalOwnedLeaseBook[renter]--;
+      delete _allLeaseBook[tokenId][renter];
+      delete _idToLeaseBook[lastIdLeaseBook];
+    }
+  }
+
+  function updateLeaseBookFromRenting(uint256 tokenId,
+                                      uint newPrice,
+                                      uint256 newAmount,
+                                      address renter) public {
+    uint idLeaseBook = getIdLeaseBook(tokenId, renter);
+    if (idLeaseBook == 0) {
+      revert InvalidIdError(idLeaseBook);
+    }
+
+    _idToLeaseBook[idLeaseBook].price = newPrice;
+
+    if (newAmount != 0) {
+      _idToLeaseBook[idLeaseBook].amount = newAmount;
+    } else {
+      _removeItemFromAllLeaseBooks(tokenId, renter);
+    }
+  }
+
+  function getAllLeaseBooks() public view returns (LeaseBook[] memory) {
+    LeaseBook[] memory books = new LeaseBook[](_leaseBooks.current());
+
+    for (uint i = 1; i <= _leaseBooks.current(); i++) {
+      LeaseBook memory book = _idToLeaseBook[i];
+      books[i - 1] = book;
+    }
+
+    return books;
+  }
+
+  function leaseBooks(uint256 tokenId, 
+                      address renter,
+                      uint price,
+                      uint256 amount
+                      ) public payable {
+
+    uint idLeaseBook = getIdLeaseBook(tokenId, renter);
+    if (idLeaseBook == 0) {
+      if (amount > 0) {
+        _createLeaseBook(tokenId, renter, price, amount);
+      }
+    } else {
+      updateLeaseBookFromRenting(tokenId, price, amount, renter);
+    }
+  }
+
+  // ===================================Borrowing============================================
   function getHashIdForBorrowedBook(uint tokenId, 
                                     address renter, 
                                     address borrower, 
@@ -158,92 +242,6 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
                              startTime, 
                              endTime);
   }
-
-  // ===================================RENTING============================================
-
-  function getIdRentedBook(uint tokenId, address renter) public view returns(uint) {
-    if (tokenId == 0 || renter == address(0)) {
-      revert InvalidParamsError();
-    }
-    return _allRentedBook[tokenId][renter];
-  }
-
-  function getAmountOfRentedBooks(uint256 tokenId, address owner) public view returns(uint) {
-    uint idRentedBook = getIdRentedBook(tokenId, owner);
-
-    uint totalBook = 0;
-    if (idRentedBook != 0) {
-      totalBook +=_idToRentedBook[idRentedBook].amount;
-    }
-    
-    return totalBook;
-  }
-
-  function _removeItemFromAllRentedBooks(uint tokenId, address renter) private {
-    uint idRentedBook = getIdRentedBook(tokenId, renter);
-    uint lastIdRentedBook = _rentedBooks.current();
-    RentedBook memory lastRentedBook = _idToRentedBook[lastIdRentedBook];
-    uint lastTokenId = lastRentedBook.tokenId;
-    address lastRenter = lastRentedBook.renter;
-    if (idRentedBook != 0) {
-      if (lastIdRentedBook != idRentedBook) {
-        _allRentedBook[lastTokenId][lastRenter] = idRentedBook;
-        _idToRentedBook[idRentedBook] = lastRentedBook;
-      }
-
-      _rentedBooks.decrement();
-      _totalOwnedRentedBook[renter]--;
-      delete _allRentedBook[tokenId][renter];
-      delete _idToRentedBook[lastIdRentedBook];
-    }
-  }
-
-  function updateRentedBookFromRenting(uint256 tokenId,
-                                      uint newPrice,
-                                      uint256 newAmount,
-                                      address renter) public {
-    uint idRentedBook = getIdRentedBook(tokenId, renter);
-    if (idRentedBook == 0) {
-      revert InvalidIdError(idRentedBook);
-    }
-
-    _idToRentedBook[idRentedBook].price = newPrice;
-
-    if (newAmount != 0) {
-      _idToRentedBook[idRentedBook].amount = newAmount;
-    } else {
-      _removeItemFromAllRentedBooks(tokenId, renter);
-    }
-  }
-
-  function getAllRentedBooks() public view returns (RentedBook[] memory) {
-    RentedBook[] memory books = new RentedBook[](_rentedBooks.current());
-
-    for (uint i = 1; i <= _rentedBooks.current(); i++) {
-      RentedBook memory book = _idToRentedBook[i];
-      books[i - 1] = book;
-    }
-
-    return books;
-  }
-
-  function leaseRentedBooks(uint256 tokenId, 
-                           address renter,
-                           uint price,
-                           uint256 amount
-                          ) public payable {
-
-    uint idRentedBook = getIdRentedBook(tokenId, renter);
-    if (idRentedBook == 0) {
-      if (amount > 0) {
-        _createRentedBook(tokenId, renter, price, amount);
-      }
-    } else {
-      updateRentedBookFromRenting(tokenId, price, amount, renter);
-    }
-  }
-
-  // ===================================Borrowing============================================
 
   function getIdBorrowedBook(uint tokenId,
                              address renter, 
@@ -395,7 +393,7 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
                      endTime);
   }
 
-  function borrowRentedBooks(uint256 tokenId,
+  function borrowBooks(uint256 tokenId,
                             address renter,
                             uint256 amount,
                             uint256 price,
@@ -404,17 +402,17 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
                             address borrower,
                             uint256 value) public payable returns(uint256) {
                              
-    uint idRentedBook = getIdRentedBook(tokenId, renter);
-    if(idRentedBook != 0) {
+    uint idLeaseBook = getIdLeaseBook(tokenId, renter);
+    if(idLeaseBook != 0) {
         uint totalPrice = amount * price * (endTime - startTime) / 604800;
 
         if (value != totalPrice) {
           revert InvalidValueError(value);
         }
 
-        RentedBook memory rentedBook = getRentedBook(tokenId, renter);
+        LeaseBook memory leaseBook = getLeaseBook(tokenId, renter);
 
-        if (amount > rentedBook.amount || amount <= 0) {
+        if (amount > leaseBook.amount || amount <= 0) {
           revert InvalidAmountError(amount);
         }
 
@@ -426,10 +424,10 @@ contract BookTemporary is ExtendTime, SharedBookStorage {
                             startTime, 
                             endTime, 
                             borrower);
-        updateRentedBookFromRenting(tokenId,
-                                    rentedBook.price,
-                                    rentedBook.amount - amount,
-                                    renter);
+        updateLeaseBookFromRenting(tokenId,
+                                   leaseBook.price,
+                                   leaseBook.amount - amount,
+                                   renter);
 
         return totalPrice;
     }

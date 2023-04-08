@@ -344,11 +344,11 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have one rented items for renter", async () => {
-      const ownedRentedBooks1 = await _contract.getOwnedRentedBooks({
+      const ownedRentedBooks1 = await _contract.getOwnedLeaseBooks({
         from: accounts[1]
       });
 
-      const ownedRentedBooks0 = await _contract.getOwnedRentedBooks({
+      const ownedRentedBooks0 = await _contract.getOwnedLeaseBooks({
         from: accounts[0]
       });
       assert.equal(
@@ -387,7 +387,7 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have correct amount and newprice amount", async () => {
-      const ownedRentedBooks = await _contract.getOwnedRentedBooks({
+      const ownedRentedBooks = await _contract.getOwnedLeaseBooks({
         from: accounts[1]
       });
       const rentedBooks = await _contract.getAllBooksOnRenting();
@@ -417,7 +417,7 @@ contract("BookStore", (accounts) => {
       await _contract.updateBookFromRenting(1, _newNftPrice, 0, accounts[1], {
         from: accounts[1]
       });
-      const ownedRentedBooks = await _contract.getOwnedRentedBooks({
+      const ownedRentedBooks = await _contract.getOwnedLeaseBooks({
         from: accounts[1]
       });
       const rentedBooks = await _contract.getAllBooksOnRenting();
