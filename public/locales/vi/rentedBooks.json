@@ -1,8 +1,8 @@
 {
   "titlePage": "Sách đang thuê - NFT Bookstore",
-  "rentedBooksTitle": "Sách đang thuê",
+  "borrowedBooksTitle": "Sách đang thuê",
   "emptyMessage": "Bạn chưa thuê quyển sách nào!",
   "loadingMessage": "Đang đặt sách lên kệ...",
   "breadcrumbs_bookshelf": "Kệ sách",
-  "breadcrumbs_rentedBooks": "Sách đang thuê"
+  "breadcrumbs_borrowedBooks": "Sách đang thuê"
 }

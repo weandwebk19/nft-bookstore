@@ -12,18 +12,26 @@ export default async function handler(
     try {
       const client = await clientPromise;
       const db = client.db("NftBookStore");
-      const { userId, bookId } = req.query;
+      const { walletAddress, tokenId } = req.query;
 
       const watchlist = await db.collection("watchlists").deleteOne({
-        book_id: new ObjectId(bookId as string),
-        user_id: new ObjectId(userId as string)
+        wallet_address: (walletAddress as string).toLowerCase(),
+        token_id: parseInt(tokenId as string)
       });
 
-      return res.json({
-        success: true,
-        message: "Watchlist deleted successfully.",
-        data: watchlist
-      });
+      if (watchlist) {
+        return res.json({
+          success: true,
+          message: "Watchlist deleted successfully.",
+          data: watchlist
+        });
+      } else {
+        return res.json({
+          success: false,
+          message: "Watchlist deleted failed.",
+          data: null
+        });
+      }
     } catch (e: any) {
       return res.status(400).json({
         message: "Something went wrong.",
