@@ -18,8 +18,18 @@ const Ticket = ({ header, body, image, footer, href }: TicketProps) => {
   const theme = useTheme();
   const router = useRouter();
 
+  const handleNavigate = (e: any) => {
+    e.preventDefault();
+    router.push(`${href}`);
+  };
+
   return (
-    <Box className={style["ticket"]} onClick={() => router.push(`${href}`)}>
+    <Box
+      className={style["ticket"]}
+      onClick={(e) => {
+        handleNavigate(e);
+      }}
+    >
       <Box
         className={style["ticket__top"]}
         sx={{
