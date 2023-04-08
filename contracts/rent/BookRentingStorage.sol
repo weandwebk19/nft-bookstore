@@ -180,6 +180,9 @@ contract BookRentingStorage is ExtendTime {
   }
 
   // ===================================Borrowing============================================
+  function getTotalBorrowedBooksOnBorrowing() public view returns(uint){
+    return _borrowedBooks.current();
+  }
   function getHashIdForBorrowedBook(uint tokenId, 
                                     address renter, 
                                     address borrower, 
@@ -603,45 +606,16 @@ contract BookRentingStorage is ExtendTime {
     return false;
   }
 
-  function excRecallBorrowedBooks(uint tokenId, 
-                                  address renter, 
-                                  address borrower,
-                                  uint startTime,
-                                  uint endTime) public returns(bool) {
-    uint idBorrowedBook = getIdBorrowedBook(tokenId, 
-                                              renter, 
-                                              borrower, 
-                                              startTime, 
-                                              endTime);
+  function excRecallBorrowedBooks(uint idBorrowedBook) public returns(bool) {
+    BorrowedBook memory book = getBorrowedBookFromId(idBorrowedBook);
     bytes memory data = abi.encodePacked(idBorrowedBook);
     string memory func = "_recallBorrowedBooks(uint)";
-    if (_timelock.isExecute(renter, 0, func, data, endTime)) {
+    if (_timelock.isExecute(book.renter, 0, func, data, book.endTime)) {
 
       return _recallBorrowedBooks(idBorrowedBook);
     }
 
     return false;
-  }
-
-  function excRecallAllBorrowedBooks(address renter) public returns(uint) {
-    uint total = 0;
-    if (_borrowedBooks.current() > 0) {
-
-      for (uint i = 1; i <= _borrowedBooks.current(); i++) {
-        BorrowedBook memory book = _idToBorrowedBook[i];
-        if (book.renter == renter && 
-            excRecallBorrowedBooks(book.tokenId,
-                                   book.renter, 
-                                   book.borrower,
-                                   book.startTime, 
-                                   book.endTime)) {
-
-          total++;     
-
-        }
-      }
-    }
-    return total;
   }
 
 }

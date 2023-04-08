@@ -569,28 +569,17 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   // Return true if success, owthersise return false
-  function recallBorrowedBooks(uint tokenId, 
-                               address renter, 
-                               address borrower,
-                               uint startTime,
-                               uint endTime) public returns(bool) {
-    if (renter != msg.sender) {
-      revert Error.InvalidAddressError(msg.sender);
-    }  
-    BookRentingStorage.BorrowedBook memory borrowedBook = 
-          _bookRentingStorage.getBorrowedBook(tokenId, renter, borrower, startTime, endTime);
-    bool res = false;
-    if(borrowedBook.tokenId != 0) {
-      res = _bookRentingStorage.excRecallBorrowedBooks(tokenId, 
-                                            renter, 
-                                            borrower,
-                                            borrowedBook.startTime,
-                                            borrowedBook.endTime);
+  function recallBorrowedBooks(uint idBorrowedBook) public returns(bool) {
+    BookRentingStorage.BorrowedBook memory book = 
+          _bookRentingStorage.getBorrowedBookFromId(idBorrowedBook);
+    if (book.renter == msg.sender) {
+      bool res = _bookRentingStorage.excRecallBorrowedBooks(idBorrowedBook);
       if(res) {
-        _safeTransferFrom(borrower, msg.sender, tokenId, borrowedBook.amount, "");
+        _safeTransferFrom(book.borrower, msg.sender, book.tokenId, book.amount, "");
       }
+      return res;
     }
-    return res;
+    return false;
   }
 
   // Return total of borrowed books which is recalled, if total equal 0,
@@ -598,8 +587,24 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function recallAllBorrowedBooks() public returns (uint) {
     if (address(0) == msg.sender) {
       revert Error.InvalidAddressError(address(0));
-    }  
-    return _bookRentingStorage.excRecallAllBorrowedBooks(msg.sender);
+    }
+
+    uint total = 0;
+    uint length = _bookRentingStorage.getTotalBorrowedBooksOnBorrowing();
+    if (length > 0) {
+
+      for (uint i = 1; i <= length; i++) {
+        BookRentingStorage.BorrowedBook memory book =
+            _bookRentingStorage.getBorrowedBookFromId(i);
+        if (book.renter == msg.sender && 
+            recallBorrowedBooks(i)) {
+
+          total++;     
+
+        }
+      }
+    }
+    return total;  
   }
 
   function shareBooks(
@@ -730,6 +735,74 @@ contract BookStore is ERC1155URIStorage, Ownable {
     } else {
       revert Error.ExecutionError();
     }
+  }
+
+  // Return true if success, owthersise return false
+  function recallSharedBooks(uint idSharedBook) public returns(bool) {
+    BookSharingStorage.BookSharing memory book =
+            _bookSharingStorage.getSharedBooks(idSharedBook);
+    if (book.fromRenter == msg.sender) {
+      bool res = _bookSharingStorage.excRecallSharedBooks(idSharedBook);
+      if (res) {
+        _safeTransferFrom(book.sharedPer, msg.sender, book.tokenId, book.amount, "");
+      }
+      return res;
+    }
+    return false;
+  }
+
+  function recallAllSharedBooks() public returns (uint) {
+    if (address(0) == msg.sender) {
+      revert Error.InvalidAddressError(address(0));
+    }
+
+    uint total = 0;
+    uint length = _bookSharingStorage.getTotalSharedBooks();
+    if (length > 0) {
+      for (uint i = 1; i <= length; i++) {
+          BookSharingStorage.BookSharing memory book =
+            _bookSharingStorage.getSharedBooks(i);
+        if (book.fromRenter == msg.sender && 
+            recallSharedBooks(i)) {
+          total++;     
+        }
+      }
+    }
+    return total;  
+  }
+
+  function recallBooksOnSharing(uint idBooksOnSharing) public returns(bool) {
+    BookSharingStorage.BookSharing memory book =
+            _bookSharingStorage.getBooksOnSharing(idBooksOnSharing);
+    if (book.fromRenter == msg.sender) {
+      bool res = _bookSharingStorage.excRecallBooksOnSharing(idBooksOnSharing);
+      if(res) {
+        _safeTransferFrom(book.sharer, msg.sender, book.tokenId, book.amount, "");
+      }
+      return res;
+    }
+    return false;
+  }
+
+  function recallAllBooksOnSharing() public returns (uint) {
+    if (address(0) == msg.sender) {
+      revert Error.InvalidAddressError(address(0));
+    }
+
+    uint total = 0;
+    uint length = _bookSharingStorage.getTotalBooksOnSharing();
+    if (length > 0) {
+
+      for (uint i = 1; i <= length; i++) {
+        BookSharingStorage.BookSharing memory book =
+            _bookSharingStorage.getBooksOnSharing(i);
+        if (book.fromRenter == msg.sender && 
+            recallBooksOnSharing(i)) {
+          total++;     
+        }
+      }
+    }
+    return total;  
   }
   
   function convertBookOnSharingToBorrowedBook(uint idBooksOnSharing, 

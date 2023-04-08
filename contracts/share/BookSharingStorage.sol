@@ -188,6 +188,10 @@ contract BookSharingStorage {
         return 0;
     }
 
+    function getTotalSharedBooks() public view returns(uint) {
+        return _sharedBooks.current();
+    }
+
     function getBooksOnSharing(uint idBooksOnSharing) public view returns(BookSharing memory) {
         if (idBooksOnSharing == 0) {
             revert Error.InvalidIdError(idBooksOnSharing);
@@ -338,6 +342,10 @@ contract BookSharingStorage {
 
         }
 
+    }
+
+    function getTotalBooksOnSharing() public view returns(uint) {
+        return _booksOnSharing.current();
     }
 
     function _updateBooksOnSharingInternal(uint idBookOnSharing,
@@ -590,6 +598,81 @@ contract BookSharingStorage {
                                     address owner) public view returns(uint) {
             
         return _amountOwnedSharedBooks[owner][tokenId];
+    }
+
+    function excRecallSharedBooks(uint idSharedBook) public returns(bool) {
+
+        bytes memory data = abi.encodePacked(idSharedBook);
+        BookSharing memory book = _idToSharedBook[idSharedBook];
+        string memory func = "removeSharedBooks(uint,address,address,uint,uint)";
+        if (_timelock.isExecute(book.fromRenter, 
+                                0, 
+                                func, 
+                                data, 
+                                book.endTime)) {
+            removeSharedBooks(idSharedBook, 
+                             book.sharedPer, 
+                             book.sharer, 
+                             book.startTime, 
+                             book.endTime);
+            return true;
+        }
+
+        return false;
+    }
+
+    function excRecallAllSharedBooks(address renter) public returns(uint) {
+        uint total = 0;
+        if (_sharedBooks.current() > 0) {
+
+        for (uint i = 1; i <= _sharedBooks.current(); i++) {
+            BookSharing memory book = _idToSharedBook[i];
+            if (book.fromRenter == renter && 
+                excRecallSharedBooks(i)) {
+                total++;     
+
+            }
+        }
+        }
+        return total;
+    }
+
+    function excRecallBooksOnSharing(uint idBooksOnSharing) public returns(bool) {
+
+        bytes memory data = abi.encodePacked(idBooksOnSharing);
+        BookSharing memory book = _idToBookOnSharing[idBooksOnSharing];
+        string memory func = "removeBooksOnSharing(uint,address,address,uint,uint)";
+        if (_timelock.isExecute(book.fromRenter, 
+                                0, 
+                                func, 
+                                data, 
+                                book.endTime)) {
+            removeBooksOnSharing(idBooksOnSharing, 
+                                 book.fromRenter, 
+                                 book.sharer, 
+                                 book.startTime, 
+                                 book.endTime);
+            return true;
+        }
+
+        return false;
+    }
+
+    function excRecallAllBooksOnSharing(address renter) public returns(uint) {
+        uint total = 0;
+        if (_booksOnSharing.current() > 0) {
+
+        for (uint i = 1; i <= _booksOnSharing.current(); i++) {
+            BookSharing memory book = _idToBookOnSharing[i];
+            if (book.fromRenter == renter && 
+                book.sharedPer == address(0) && 
+                excRecallBooksOnSharing(i)) {
+                total++;     
+
+            }
+        }
+        }
+        return total;
     }
 
 }

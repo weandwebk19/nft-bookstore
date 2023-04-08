@@ -585,15 +585,7 @@ contract("BookStore", (accounts) => {
 
   describe("Recall Borrowed Books", () => {
     it("accounts[0] can not recall borrowed book from accounts[1]", async () => {
-      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
-        from: accounts[1]
-      });
-      const res = await _contract.recallBorrowedBooks.call(
-        2,
-        accounts[0],
-        accounts[1],
-        ownedBorrowedBooks[0].startTime,
-        ownedBorrowedBooks[0].endTime,
+      const res = await _contract.recallBorrowedBooks.call(1,
         {
           from: accounts[0]
         }
@@ -1400,6 +1392,52 @@ contract("BookStore", (accounts) => {
       assert.equal(ownedBorrowedBooks[1].amount, 5, "Amount of borrowed book 2 is invalid");
       assert.equal(ownedBorrowedBooks[2].amount, 10, "Amount of borrowed book 3 is invalid");
 
+    });
+  });
+
+  describe("Recall Books On Sharing", () => {
+    it("accounts[0] can not recall books on sharing from accounts[1]", async () => {
+
+      const res = await _contract.recallBooksOnSharing.call(1, {from: accounts[0]});
+      assert.equal(
+        res.toString().localeCompare("false"),
+        0,
+        "Recall Books On Sharing execution is wrong"
+      );
+    });
+
+    it("accounts[0] can not recall all yoursellf books on sharing from everyone", async () => {
+      const total = await _contract.recallAllBooksOnSharing.call({
+        from: accounts[0]
+      });
+      assert.equal(
+        total.toString(),
+        0,
+        "Recall All books on sharing is wrong"
+      );
+    });
+  });
+
+  describe("Recall Shared Books", () => {
+    it("accounts[0] can not recall shared books from accounts[2]", async () => {
+
+      const res = await _contract.recallSharedBooks.call(1, {from: accounts[0]});
+      assert.equal(
+        res.toString().localeCompare("false"),
+        0,
+        "Recall shared books execution is wrong"
+      );
+    });
+
+    it("accounts[0] can not recall all yoursellf shared books from everyone", async () => {
+      const total = await _contract.recallAllSharedBooks.call({
+        from: accounts[0]
+      });
+      assert.equal(
+        total.toString(),
+        0,
+        "Recall All shared books is wrong"
+      );
     });
   });
 
