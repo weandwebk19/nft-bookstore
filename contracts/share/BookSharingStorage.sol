@@ -189,7 +189,6 @@ contract BookSharingStorage {
                             address sharer,
                             uint startTime,
                             uint endTime) public view returns(uint) {
-        require(tokenId != 0 && sharedPer != address(0), "Token id and your's address is invalid");
         bytes32 hashId = getHashIdForSharedBook(tokenId, 
                                                 sharer, 
                                                 sharedPer, 
@@ -205,9 +204,6 @@ contract BookSharingStorage {
     }
 
     function getSharedBooks(uint idSharedBook) public view returns(BookSharing memory) {
-        require(idSharedBook != 0, "Id of shared book is invalid");
-        require(_idToSharedBook[idSharedBook].sharedPer != address(0),
-                 "Shared Book is invalid");
         return _idToSharedBook[idSharedBook];
     }
 
@@ -221,7 +217,9 @@ contract BookSharingStorage {
                         uint256 endTime) public payable {
 
         uint idBookOnSharing = getIdBookOnSharing(tokenId, fromRenter, sharer, startTime, endTime);
-        require(idBookOnSharing == 0, "Books is existed on sharing");
+        if (idBookOnSharing != 0) {
+            revert Error.InvalidIdError(idBookOnSharing);
+        }
         _createBookForSharing(tokenId, fromRenter, sharer, priceOfBB, price, amount, startTime, endTime);
 
     }
@@ -300,8 +298,12 @@ contract BookSharingStorage {
                                         uint newPrice,
                                         uint256 newAmount
                                         ) private {
-        require(_idToSharedBook[idSharedBook].tokenId == tokenId, "Token Id is invalid");
-        require(_idToSharedBook[idSharedBook].sharedPer == sharedPer, "Address of sharered person is invalid");
+        if (_idToSharedBook[idSharedBook].tokenId != tokenId) {
+            revert Error.InvalidIdError(tokenId);
+        }
+        if (_idToSharedBook[idSharedBook].sharedPer != sharedPer) {
+            revert Error.InvalidAddressError(sharedPer);
+        }
         if(_idToSharedBook[idSharedBook].price != newPrice) {
 
             _idToSharedBook[idSharedBook].price = newPrice;
@@ -330,8 +332,12 @@ contract BookSharingStorage {
                                            uint newPrice,
                                            uint256 newAmount
                                         ) private {
-        require(_idToBookOnSharing[idBookOnSharing].tokenId == tokenId, "Token Id is invalid");
-        require(_idToBookOnSharing[idBookOnSharing].sharer == sharer, "Address of sharer is invalid");
+        if (_idToBookOnSharing[idBookOnSharing].tokenId != tokenId) {
+            revert Error.InvalidIdError(tokenId);
+        }
+        if (_idToBookOnSharing[idBookOnSharing].sharer != sharer) {
+            revert Error.InvalidAddressError(sharer);
+        }
         if(_idToBookOnSharing[idBookOnSharing].price != newPrice ) {
 
             _idToBookOnSharing[idBookOnSharing].price = newPrice;
@@ -358,16 +364,23 @@ contract BookSharingStorage {
                                   uint tokenId,
                                   uint newPrice, 
                                   uint newAmount) public {
-
-        require(idBookOnSharing != 0, "Book is not existed on sharing");
-        require(newPrice > 0, "New price is invalid");
-        require(newAmount > 0, "New price is invalid");
+        if (idBookOnSharing == 0) {
+            revert Error.InvalidIdError(idBookOnSharing);
+        }
+        if (newPrice == 0) {
+            revert Error.InvalidPriceError(newPrice);
+        }
+        if (newAmount == 0) {
+            revert Error.InvalidAmountError(newAmount);
+        }
         _updateBooksOnSharingInternal(idBookOnSharing, sharer, tokenId, newPrice, newAmount);
     }
 
     function _removeBooksOnSharingInternal(bytes32 hashId) private {
         uint idBook = _allBooksOnSharing[hashId];
-        require(idBook != 0, "Book on sharing is not exist");
+        if (idBook == 0) {
+            revert Error.InvalidIdError(idBook);
+        }
         BookSharing memory bookOnSharing = _idToBookOnSharing[idBook];
 
         uint lastIdBook = _booksOnSharing.current();
@@ -399,8 +412,6 @@ contract BookSharingStorage {
                                   address sharer,
                                   uint startTime,
                                   uint endTime) public {
-        require(tokenId > 0, "Token id is invalid");
-        require(sharer != address(0), "Address of sharer is invalid");
 
         bytes32 hashId = getHashIdForBookOnSharing(tokenId, 
                                                    fromRenter,
@@ -413,7 +424,9 @@ contract BookSharingStorage {
 
     function _removeSharedBooksInternal(bytes32 hashId) private {
         uint idBook = _allSharedBooks[hashId];
-        require(idBook != 0, "Shared book is not exist");
+        if (idBook == 0) {
+            revert Error.InvalidIdError(idBook);
+        }
         BookSharing memory sharedBook = _idToSharedBook[idBook];
 
         uint lastIdBook = _sharedBooks.current();
@@ -446,9 +459,6 @@ contract BookSharingStorage {
                               uint startTime,
                               uint endTime
                               ) public {
-        require(tokenId > 0, "Token Id is invalid");
-        require(owner != address(0), "Address of owner is invalid");
-
         bytes32 hashId = getHashIdForSharedBook(tokenId, 
                                                 sharer, 
                                                 owner, 
@@ -461,12 +471,18 @@ contract BookSharingStorage {
                                 address sender,
                                 uint amount) public payable returns(uint) {
         BookSharing memory booksOnSharing = getBooksOnSharing(idBooksOnSharing);
-        require(booksOnSharing.tokenId > 0, "Token id is invalid");
-        require(booksOnSharing.sharer != address(0) && sender != address(0), 
-                "Address of sharer or sender is invalid");
-        require(booksOnSharing.sharer != sender, "You may not take books shared by yourself");
-        require(amount <= booksOnSharing.amount && amount > 0,
-                     "Amount of books which you want take is invalid");
+        if (booksOnSharing.tokenId == 0) {
+            revert Error.InvalidIdError(booksOnSharing.tokenId);
+        }
+        if (booksOnSharing.sharer == address(0) || sender == address(0)) {
+            revert Error.InvalidAddressError(address(0));
+        }
+        if (booksOnSharing.sharer == sender) {
+            revert Error.InvalidAddressError(sender);
+        }
+        if (amount > booksOnSharing.amount && amount == 0) {
+            revert Error.InvalidAmountError(amount);
+        }
         uint tokenId = booksOnSharing.tokenId;
         address sharer = booksOnSharing.sharer;
 
@@ -501,8 +517,9 @@ contract BookSharingStorage {
                                                        sharer, 
                                                        booksOnSharing.startTime, 
                                                        booksOnSharing.endTime); 
-            require(_allBooksOnSharing[hashId] == idBooksOnSharing,
-                     "Hash id of books on sharing is invalid");
+            if (_allBooksOnSharing[hashId] != idBooksOnSharing) {
+                revert Error.InvalidIdError(idBooksOnSharing);
+            }
             _removeBooksOnSharingInternal(hashId);
         } else {
             _updateBooksOnSharingInternal(idBooksOnSharing,

@@ -7,6 +7,12 @@ contract Error {
     error InvalidAmountError(uint);
     error InvalidAddressError(address);
     error InvalidValueError(uint);
+    error InvalidPriceError(uint);
+    error InvalidOwnerError(uint,address);
+    error InvalidTokenUriError(string);
+    error InvalidTimeError(uint);
+    error ExecutionError();
+
 
     error AlreadyExistsRequestError(bool);
     error AlreadyExistsResponseError(bool);

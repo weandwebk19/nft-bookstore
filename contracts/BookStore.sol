@@ -53,17 +53,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function setListingPrice(uint newPrice) external onlyOwner {
-    require(newPrice > 0, "Price must be at least 1 wei");
+    if (newPrice == 0) {
+      revert Error.InvalidPriceError(newPrice);
+    }
     listingPrice = newPrice;
   }
 
   function setLeasingPrice(uint newPrice) external onlyOwner {
-    require(newPrice > 0, "Price must be at least 1 wei");
+    if (newPrice == 0) {
+      revert Error.InvalidPriceError(newPrice);
+    }
     leasingPrice = newPrice;
   }
 
   function setSharingPrice(uint newPrice) external onlyOwner {
-    require(newPrice > 0, "Price must be at least 1 wei");
+    if (newPrice == 0) {
+      revert Error.InvalidPriceError(newPrice);
+    }    
     sharingPrice = newPrice;
   }
 
@@ -71,10 +77,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint256 tokenId,
     string memory tokenURI
   ) external onlyOwner {
-    require(
-      _idToNFTBook[tokenId].author == msg.sender,
-      "Only author of this token can call this method."
-    );
+    if (_idToNFTBook[tokenId].author != msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
+    }
     // Delete old URI
     string memory oldURI = ERC1155URIStorage.uri(tokenId);
     delete _usedTokenURIs[oldURI];
@@ -119,10 +124,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getBalanceOfOwnerBook(uint tokenId) public view returns (uint) {
-    require(
-      isOwnerOfToken(tokenId, msg.sender),
-      "You are not the owner of this token"
-    );
+    if (!isOwnerOfToken(tokenId, msg.sender)) {
+      revert Error.InvalidOwnerError(tokenId, msg.sender);
+    }
 
     return ERC1155.balanceOf(msg.sender, tokenId);
   }
@@ -170,12 +174,15 @@ contract BookStore is ERC1155URIStorage, Ownable {
     string memory tokenURI,
     uint256 quantity
   ) public payable returns (uint) {
-    require(!isTokenURIExist(tokenURI), "Token URI already exists");
-    require(
-      quantity > 0 && quantity <= MAX_BALANCE,
-      "The number of books you want to publish is not appropriate"
-    );
-    require(msg.value == listingPrice, "Price must be equal to listing price");
+    if (isTokenURIExist(tokenURI)) {
+      revert Error.InvalidTokenUriError(tokenURI);
+    }
+    if (quantity == 0 || quantity > MAX_BALANCE) {
+      revert Error.InvalidAmountError(quantity);
+    }
+    if (msg.value != listingPrice) {
+      revert Error.InvalidPriceError(msg.value);
+    }
 
     _tokenIds.increment();
     uint newTokenId = _tokenIds.current();
@@ -306,13 +313,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
   {
     BookRentingStorage.BorrowedBook[] memory borrowedBooks = _bookRentingStorage
       .getOwnedBorrowedBooks(msg.sender);
-
-    require(
-      borrowedBooks.length ==
-        _bookRentingStorage.getTotalOwnedBorrowedBook(msg.sender),
-      "Length of owned borrowed books is invalid"
-    );
-
     return borrowedBooks;
   }
 
@@ -323,7 +323,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getAmountOfAllTypeBooksUntradeable(uint256 tokenId) public view returns(uint) {
-    require(tokenId != 0 && msg.sender != address(0), "Token id and owner is invalid");
     return _listedBookStorage.getAmountOfListedBooks(tokenId, msg.sender) +
           _bookRentingStorage.getAmountOfLeaseBooks(tokenId, msg.sender) + 
           _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, msg.sender) + 
@@ -334,12 +333,17 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function sellBooks(uint256 tokenId,
                     uint price,
                     uint256 amount) public payable {
-    require(isOwnerOfToken(tokenId, msg.sender),
-          "You are not the owner of this token");
-    require(getAmountOfAllTypeBooksUntradeable(tokenId) + amount <= ERC1155.balanceOf(msg.sender, tokenId),
-          "You don't have enough books to sell");
-    require(msg.value == listingPrice,
-           "Price must be equal to listing price");
+    if (!isOwnerOfToken(tokenId, msg.sender)) {
+      revert Error.InvalidOwnerError(tokenId, msg.sender);
+    }
+    if (getAmountOfAllTypeBooksUntradeable(tokenId) + amount > 
+        ERC1155.balanceOf(msg.sender, tokenId) || amount == 0) {
+      revert Error.InvalidAmountError(amount);
+    }
+    if (msg.value != listingPrice) {
+      revert Error.InvalidPriceError(msg.value);
+    }
+
     _listedBookStorage.sellListedBooks(tokenId, price, amount, msg.sender);
   }
 
@@ -348,17 +352,17 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint price,
     uint256 amount
   ) public payable {
-    require(
-      isOwnerOfToken(tokenId, msg.sender),
-      "You are not the owner of this token"
-    );
-    require(
-      getAmountOfAllTypeBooksUntradeable(tokenId) + amount <=
-        ERC1155.balanceOf(msg.sender, tokenId) &&
-        amount > 0,
-      "You don't have enough books to sell"
-    );
-    require(msg.value == leasingPrice, "Price must be equal to renting price");
+    
+    if (!isOwnerOfToken(tokenId, msg.sender)) {
+      revert Error.InvalidOwnerError(tokenId, msg.sender);
+    }
+    if (getAmountOfAllTypeBooksUntradeable(tokenId) + amount > 
+        ERC1155.balanceOf(msg.sender, tokenId) || amount == 0) {
+      revert Error.InvalidAmountError(amount);
+    }
+    if (msg.value != leasingPrice) {
+      revert Error.InvalidPriceError(msg.value);
+    }
     _bookRentingStorage.leaseBooks(tokenId, msg.sender, price, amount);
   }
 
@@ -368,11 +372,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint256 newAmount,
     address seller
   ) public {
-    require(
-      isOwnerOfToken(tokenId, seller),
-      "You are not the owner of this token"
-    );
-    require(seller == msg.sender, "You are not the seller of this token");
+    if (!isOwnerOfToken(tokenId, msg.sender)) {
+      revert Error.InvalidOwnerError(tokenId, msg.sender);
+    }
+    if (seller != msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
+    }
     _listedBookStorage.updateListedBookFromSale(
       tokenId,
       newPrice,
@@ -387,11 +392,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint256 newAmount,
     address renter
   ) public {
-    require(
-      isOwnerOfToken(tokenId, renter),
-      "You are not the owner of this token"
-    );
-    require(renter == msg.sender, "You are not the renter of this token");
+    if (!isOwnerOfToken(tokenId, renter)) {
+      revert Error.InvalidOwnerError(tokenId, renter);
+    }
+    if (renter != msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
+    }
 
     _bookRentingStorage.updateLeaseBookFromRenting(tokenId,
                                                    newPrice,
@@ -440,7 +446,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint256 amount,
     uint rentalDuration
   ) public payable {
-    require(rentalDuration >= MIN_TIME, "Rental period is at least one week");
+    if (rentalDuration < MIN_TIME) {
+      revert Error.InvalidTimeError(rentalDuration);
+    }
 
     uint startTime = block.timestamp;
     uint endTime = startTime + rentalDuration;
@@ -456,7 +464,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
       _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
       payable(renter).transfer(totalPrice);
     } else {
-      require(false, "Book execution failed");
+      revert Error.ExecutionError();
     }
   }
 
@@ -475,10 +483,15 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                             uint endTime,
                                             uint extendedAmount,
                                             uint extendedTime) public {
-                                              
-    require(renter != address(0) && msg.sender != address(0), "Address is invalid");
-    require(renter != msg.sender , "You can not renew with yourself");
-    require(extendedTime >= MIN_TIME, "Extended time is invalid");
+    if (renter == address(0) || msg.sender == address(0)) {
+      revert Error.InvalidAddressError(address(0));
+    }
+    if (renter == msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
+    }   
+    if (extendedTime < MIN_TIME) {
+      revert Error.InvalidTimeError(extendedTime);
+    }                                           
     _bookRentingStorage.requestExtendTimeOfBorrowedBooks(tokenId, 
                                                     renter, 
                                                     msg.sender,
@@ -496,9 +509,15 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                         uint newExtendedAmount,
                                         uint newExtendedTime) public {
                                               
-    require(renter != address(0) && msg.sender != address(0), "Address is invalid");
-    require(renter != msg.sender , "You can not renew with yourself");
-    require(newExtendedTime >= MIN_TIME, "Extended time is invalid");
+    if (renter == address(0) || msg.sender == address(0)) {
+      revert Error.InvalidAddressError(address(0));
+    }
+    if (renter == msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
+    }   
+    if (newExtendedTime < MIN_TIME) {
+      revert Error.InvalidTimeError(newExtendedTime);
+    }      
 
     _bookRentingStorage.updateRequestOfBorrowedBooks(tokenId,
                                                 renter,  
@@ -522,7 +541,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function transferForSendedRequest(uint id, 
                                     address renter, 
                                     bool isExtend) public payable {
-    require(renter != msg.sender, "You cannot make this transaction with yourself");
+    if (renter == msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
+    }   
     uint totalPrice = _bookRentingStorage.transferForSendedRequest(id, 
                                                               renter, 
                                                               msg.sender, 
@@ -530,27 +551,21 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                                               isExtend);
 
     if (totalPrice > 0) {
-      require(msg.value == totalPrice, "Total price is invalid");
+      if (msg.value != totalPrice) {
+        revert Error.InvalidPriceError(msg.value);
+      }
       payable(renter).transfer(totalPrice);
     }
   }
 
   function getAllOwnedRequestsOnExtending()
-    public
-    view
-    returns (BookRentingStorage.Request[] memory)
-  {
-    require(msg.sender != address(0), "Address is invalid");
+    public view returns (BookRentingStorage.Request[] memory){
     return _bookRentingStorage.getAllOwnedRequest(msg.sender);
   }
 
-  function getAllOwnedResponsesOnExtending()
-    public
-    view
-    returns (BookRentingStorage.Response[] memory)
-  {
-    require(msg.sender != address(0), "Address is invalid");
-    return _bookRentingStorage.getAllOwnedResponse(msg.sender);
+  function getAllOwnedResponsesOnExtending() public view
+    returns (BookRentingStorage.Response[] memory){ 
+      return _bookRentingStorage.getAllOwnedResponse(msg.sender);
   }
 
   // Return true if success, owthersise return false
@@ -559,7 +574,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                address borrower,
                                uint startTime,
                                uint endTime) public returns(bool) {
-    require(renter == msg.sender, "You cannot take this book back, because you are not the renter");
+    if (renter != msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
+    }  
     BookRentingStorage.BorrowedBook memory borrowedBook = 
           _bookRentingStorage.getBorrowedBook(tokenId, renter, borrower, startTime, endTime);
     bool res = false;
@@ -579,7 +596,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
   // Return total of borrowed books which is recalled, if total equal 0,
   // you do not have any recallable books. Needed automate this function with Chainlink
   function recallAllBorrowedBooks() public returns (uint) {
-    require(address(0) != msg.sender, "Your's address is invalid");
+    if (address(0) == msg.sender) {
+      revert Error.InvalidAddressError(address(0));
+    }  
     return _bookRentingStorage.excRecallAllBorrowedBooks(msg.sender);
   }
 
@@ -590,19 +609,21 @@ contract BookStore is ERC1155URIStorage, Ownable {
   ) public payable {
     BookRentingStorage.BorrowedBook memory borrowedBook = _bookRentingStorage
       .getBorrowedBookFromId(idBorrowedBook);
-
-    require(
-      msg.sender == borrowedBook.borrower,
-      "You do not own this borrowed book"
-    );
-    require(
-      msg.value == sharingPrice,
-      "The cost of making this transaction is not valid"
-    );
-    require(price > 0, "Price for shared books is invalid");
-    require(amount > 0 && amount <= borrowedBook.amount, "Amount for shared books is invalid");
-    require(block.timestamp < borrowedBook.endTime, "This book has expired rental");
-
+    if (msg.sender != borrowedBook.borrower) {
+      revert Error.InvalidAddressError(msg.sender);
+    }  
+    if (msg.value != sharingPrice) {
+      revert Error.InvalidPriceError(sharingPrice);
+    }
+    if (price == 0) {
+      revert Error.InvalidPriceError(price);
+    }
+    if (amount == 0 || amount > borrowedBook.amount) {
+      revert Error.InvalidAmountError(amount);
+    }
+    if (block.timestamp >= borrowedBook.endTime) {
+      revert Error.InvalidTimeError(block.timestamp);
+    }
     _bookSharingStorage.shareBooks(borrowedBook.tokenId, 
                                    borrowedBook.renter,
                                    msg.sender, 
@@ -622,28 +643,17 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getAllOwnedBooksOnSharing()
-    public
-    view
-    returns (BookSharingStorage.BookSharing[] memory)
-  {
-    require(msg.sender != address(0), "Address is invalid");
+    public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllOwnedBooksOnSharing(msg.sender);
   }
 
   function getAllSharedBook()
-    public
-    view
-    returns (BookSharingStorage.BookSharing[] memory)
-  {
+    public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllSharedBook();
   }
 
   function getAllOwnedSharedBook()
-    public
-    view
-    returns (BookSharingStorage.BookSharing[] memory)
-  {
-    require(msg.sender != address(0), "Address is invalid");
+    public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllOwnedSharedBook(msg.sender);
   }
 
@@ -657,21 +667,29 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                                                 booksOnSharing.sharer, 
                                                                 booksOnSharing.startTime, 
                                                                 booksOnSharing.endTime);
-    require (idBorrowedBook != 0, "Borrowed Books for Books on sharing is not exist");
+    if (idBorrowedBook == 0) {
+      revert Error.InvalidIdError(idBorrowedBook);
+    }
     BookRentingStorage.BorrowedBook memory borrowedBook = 
                     _bookRentingStorage.getBorrowedBookFromId(idBorrowedBook);
-    require(msg.sender == borrowedBook.borrower, "You do not own this borrowed book");
-
-    require(borrowedBook.tokenId != 0, "Token id is invalid");
-    require(newPrice > 0, "Price for shared books is invalid");
-    require(newAmount > 0 && newAmount <= borrowedBook.amount + booksOnSharing.amount,
-             "Amount for shared books is invalid");
+    if (msg.sender != borrowedBook.borrower) {
+      revert Error.InvalidAddressError(msg.sender);
+    }
+    if (borrowedBook.tokenId == 0) {
+      revert Error.InvalidIdError(0);
+    }
+    if (newPrice == 0) {
+      revert Error.InvalidPriceError(newPrice);
+    }
+    if (newAmount == 0 || 
+        newAmount > borrowedBook.amount + booksOnSharing.amount) {
+      revert Error.InvalidAmountError(newAmount);
+    }
 
     bool isDecrease;
     uint balance;
     
     if (newAmount <= booksOnSharing.amount) {
-      require(false, "Check log");
       isDecrease = false;
       balance = booksOnSharing.amount - newAmount;
     } else {
@@ -692,12 +710,14 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   function takeBooksOnSharing(uint idBooksOnSharing,  
                               uint amount) public payable {
-    require(msg.sender != address(0), "Addresses is invalid");
-    require(idBooksOnSharing > 0, "Id Books on sharing is invalid");
+    if (msg.sender == address(0)) {
+      revert Error.InvalidAddressError(msg.sender);
+    }
+    if (idBooksOnSharing == 0) {
+      revert Error.InvalidIdError(0);
+    }
     BookSharingStorage.BookSharing memory booksOnSharing = 
                       _bookSharingStorage.getBooksOnSharing(idBooksOnSharing);
-    require(booksOnSharing.sharer != address(0), "Address of sharer is invalid");
-
     uint price = _bookSharingStorage.takeBooksOnSharing(idBooksOnSharing,
                                                         msg.sender, 
                                                         amount);
@@ -708,14 +728,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
       uint totalPrice = price * amount;
       payable(booksOnSharing.sharer).transfer(totalPrice);
     } else {
-      require(false, "Take Books On Sharing execution failed");
+      revert Error.ExecutionError();
     }
   }
   
   function convertBookOnSharingToBorrowedBook(uint idBooksOnSharing, 
                                               uint amount) public payable {
-    require(address(0) != msg.sender, "Your's address is invalid");
-    require(amount !=0 , "Amount that want convert is invalid");
     _bookTemporary.convertBookOnSharingToBorrowedBook(idBooksOnSharing, msg.sender, amount);
   }
 
