@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "../utils/Timelock.sol";
 import "../utils/Error.sol";
 
 contract BookSharingStorage {
@@ -33,6 +34,7 @@ contract BookSharingStorage {
         uint endTime
     );
 
+    TimeLock private _timelock;
     // Variable for Shared Books
 
     // (hash ID ->  ID Book on sharing)
@@ -43,8 +45,6 @@ contract BookSharingStorage {
     mapping(uint => BookSharing) private _idToBookOnSharing; // (ID -> Book on Sharing)
     mapping(address => mapping(uint => uint)) private _amountOwnedBooksOnSharing;
 
-
-
     // hash ID => ID shared book
     mapping (bytes32 => uint) _allSharedBooks;
     // For shared person
@@ -54,10 +54,14 @@ contract BookSharingStorage {
     // Shared person => (tokenId => amount)
     mapping(address => mapping(uint => uint)) private _amountOwnedSharedBooks;
 
+    
+    constructor(TimeLock timelock) {
+        _timelock = timelock;
+    }
+
     function getTotalBookOnSharing() public view returns(uint) {
         return _booksOnSharing.current();
     }
-
     function getHashIdForSharedBook(uint tokenId, 
                                     address sharer, 
                                     address sharedPer, 
@@ -103,6 +107,11 @@ contract BookSharingStorage {
                                                                    endTime);
         _totalOwnedBookOnSharing[sharer]++;
         _amountOwnedBooksOnSharing[sharer][tokenId] += amount;
+        _timelock.queue(fromRenter,
+                        0, 
+                        "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                        abi.encodePacked(_booksOnSharing.current()), 
+                        endTime);   
         emit BookSharingCreated(tokenId,
                                 fromRenter,
                                 sharer,
@@ -144,6 +153,11 @@ contract BookSharingStorage {
                                                              endTime);
         _totalOwnedSharedBook[sharedPer]++;
         _amountOwnedSharedBooks[sharedPer][tokenId] += amount;
+        _timelock.queue(fromRenter,
+                        0, 
+                        "removeSharedBooks(uint,address,address,uint,uint)", 
+                        abi.encodePacked(_sharedBooks.current()), 
+                        endTime);  
         emit BookSharingCreated(tokenId,
                                fromRenter,
                                sharer,
@@ -384,9 +398,26 @@ contract BookSharingStorage {
         BookSharing memory bookOnSharing = _idToBookOnSharing[idBook];
 
         uint lastIdBook = _booksOnSharing.current();
+        bytes32 txId = _timelock.getTxId(bookOnSharing.fromRenter,
+                                         0, 
+                                         "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                                         abi.encodePacked(idBook), 
+                                         bookOnSharing.endTime);
+        _timelock.cancel(txId);
         if (lastIdBook != idBook) {
-
             BookSharing memory lastBook = _idToBookOnSharing[lastIdBook];
+            txId = _timelock.getTxId(lastBook.fromRenter,
+                                     0, 
+                                     "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                                     abi.encodePacked(lastIdBook), 
+                                     lastBook.endTime);
+            
+            _timelock.update(txId,
+                             lastBook.fromRenter,
+                             0, 
+                             "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                             abi.encodePacked(idBook), 
+                             lastBook.endTime);
             bytes32 lastHashId = getHashIdForBookOnSharing(lastBook.tokenId, 
                                                            lastBook.fromRenter,
                                                            lastBook.sharer, 
@@ -430,9 +461,26 @@ contract BookSharingStorage {
         BookSharing memory sharedBook = _idToSharedBook[idBook];
 
         uint lastIdBook = _sharedBooks.current();
+        bytes32 txId = _timelock.getTxId(sharedBook.fromRenter,
+                                         0, 
+                                         "removeSharedBooks(uint,address,address,uint,uint)", 
+                                         abi.encodePacked(idBook), 
+                                         sharedBook.endTime);
+        _timelock.cancel(txId);
         if (lastIdBook != idBook) {
-
             BookSharing memory lastBook = _idToSharedBook[lastIdBook];
+            txId = _timelock.getTxId(lastBook.fromRenter,
+                                     0, 
+                                     "removeSharedBooks(uint,address,address,uint,uint)", 
+                                     abi.encodePacked(lastIdBook), 
+                                     lastBook.endTime);
+            
+            _timelock.update(txId,
+                             lastBook.fromRenter,
+                             0, 
+                             "removeSharedBooks(uint,address,address,uint,uint)", 
+                             abi.encodePacked(idBook), 
+                             lastBook.endTime);
             bytes32 lastHashId = getHashIdForSharedBook(lastBook.tokenId, 
                                                         lastBook.sharer, 
                                                         lastBook.sharedPer, 

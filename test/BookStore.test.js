@@ -22,7 +22,7 @@ contract("BookStore", (accounts) => {
     await Error.deployed();
     await Timelock.deployed();
     await ExtendTime.deployed();
-    await BookSharingStorage.deployed();
+    await BookSharingStorage.deployed(Timelock.address);
     await BookRentingStorage.deployed(Timelock.address);
     await BookTemporary.deployed(BookRentingStorage.address, 
                                  BookSharingStorage.address);

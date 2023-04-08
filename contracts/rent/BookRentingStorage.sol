@@ -233,6 +233,11 @@ contract BookRentingStorage is ExtendTime {
                                                                endTime);
     _totalOwnedBorrowedBook[borrower]++;
     _amountOwnedBorrowedBooks[borrower][tokenId] += amount;
+    _timelock.queue(renter,
+                    0, 
+                    "_recallBorrowedBooks(uint)", 
+                    abi.encodePacked(_borrowedBooks.current()), 
+                    endTime);
     emit BorrowedBookCreated(tokenId,
                              renter,
                              borrower, 
@@ -279,9 +284,26 @@ contract BookRentingStorage is ExtendTime {
                                                   lastBorrowedBook.borrower,
                                                   lastBorrowedBook.startTime,
                                                   lastBorrowedBook.endTime);
-
+    bytes32 txId = _timelock.getTxId(borrowedBook.renter,
+                                     0, 
+                                     "_recallBorrowedBooks(uint)", 
+                                     abi.encodePacked(idBorrowedBook), 
+                                     borrowedBook.endTime);
+    _timelock.cancel(txId);
     if (idBorrowedBook != 0) {
       if (lastIdBorrowedBook != idBorrowedBook) {
+        txId = _timelock.getTxId(lastBorrowedBook.renter,
+                                 0, 
+                                 "_recallBorrowedBooks(uint)", 
+                                 abi.encodePacked(lastIdBorrowedBook), 
+                                 lastBorrowedBook.endTime);
+        
+        _timelock.update(txId,
+                         lastBorrowedBook.renter,
+                         0, 
+                         "_recallBorrowedBooks(uint)", 
+                         abi.encodePacked(idBorrowedBook), 
+                         lastBorrowedBook.endTime);
         _allBorrowedBook[hashLastId] = idBorrowedBook;
         _idToBorrowedBook[idBorrowedBook] = lastBorrowedBook;
       }
@@ -359,47 +381,14 @@ contract BookRentingStorage is ExtendTime {
     return borrowedBooks;
   }
 
-  function _updateTimelock(uint tokenId,
-                           uint value, 
-                           address renter, 
-                           address borrower, 
-                           uint oldEndTime,
-                           uint newEndTime) private returns(bool) {
-    bytes32 txId = _timelock.getTxId(renter,
-                                     value, 
-                                     "_recallBorrowedBooks(uint)", 
-                                     abi.encodePacked(tokenId,renter,borrower), 
-                                     oldEndTime);
-     
-    return _timelock.update(txId,
-                             renter,
-                             value, 
-                             "_recallBorrowedBooks(uint)", 
-                             abi.encodePacked(tokenId, renter, borrower), 
-                             newEndTime);
-  
-  }
-
-  function _queueTimelock(uint tokenId,
-                          uint value, 
-                          address renter, 
-                          address borrower, 
-                          uint endTime) private {
-    _timelock.queue(renter,
-                     value, 
-                     "_recallBorrowedBooks(uint)", 
-                     abi.encodePacked(tokenId, renter, borrower), 
-                     endTime);
-  }
-
   function borrowBooks(uint256 tokenId,
-                            address renter,
-                            uint256 amount,
-                            uint256 price,
-                            uint startTime,
-                            uint endTime,
-                            address borrower,
-                            uint256 value) public payable returns(uint256) {
+                       address renter,
+                       uint256 amount,
+                       uint256 price,
+                       uint startTime,
+                       uint endTime,
+                       address borrower,
+                       uint256 value) public payable returns(uint256) {
                              
     uint idLeaseBook = getIdLeaseBook(tokenId, renter);
     if(idLeaseBook != 0) {
@@ -415,14 +404,13 @@ contract BookRentingStorage is ExtendTime {
           revert Error.InvalidAmountError(amount);
         }
 
-        _queueTimelock(tokenId, 0, renter, borrower, endTime);
         createBorrowedBook(tokenId,
-                            renter,
-                            price, 
-                            amount, 
-                            startTime, 
-                            endTime, 
-                            borrower);
+                           renter,
+                           price, 
+                           amount, 
+                           startTime, 
+                           endTime, 
+                           borrower);
         updateLeaseBookFromRenting(tokenId,
                                    leaseBook.price,
                                    leaseBook.amount - amount,
@@ -526,15 +514,20 @@ contract BookRentingStorage is ExtendTime {
         } else {
           endTime = currentTime + response.time;
         }
-
-        // Update timelock for borrowed Book
-        _updateTimelock(borrowedBook.tokenId,
-                        0, 
-                        borrowedBook.renter, 
-                        borrowedBook.borrower, 
-                        borrowedBook.endTime,
-                        endTime);
         if (response.amount == borrowedBook.amount) {
+                  // Update timelock for borrowed Book
+          bytes32 txId = _timelock.getTxId(renter,
+                                           0, 
+                                           "_recallBorrowedBooks(uint)", 
+                                           abi.encodePacked(id), 
+                                           borrowedBook.endTime);
+        
+          _timelock.update(txId,
+                           renter,
+                           0, 
+                           "_recallBorrowedBooks(uint)", 
+                           abi.encodePacked(id), 
+                           endTime);
           bytes32 newHashId = getHashIdForBorrowedBook(borrowedBook.tokenId,
                                                        renter, 
                                                        borrower, 
@@ -615,15 +608,15 @@ contract BookRentingStorage is ExtendTime {
                                   address borrower,
                                   uint startTime,
                                   uint endTime) public returns(bool) {
-    bytes memory data = abi.encodePacked(tokenId, renter, borrower);
-    string memory func = "_recallBorrowedBooks(uint)";
-    uint value = 0;
-    if (_timelock.isExecute(renter, value, func, data, endTime)) {
-      uint idBorrowedBook = getIdBorrowedBook(tokenId, 
+    uint idBorrowedBook = getIdBorrowedBook(tokenId, 
                                               renter, 
                                               borrower, 
                                               startTime, 
                                               endTime);
+    bytes memory data = abi.encodePacked(idBorrowedBook);
+    string memory func = "_recallBorrowedBooks(uint)";
+    if (_timelock.isExecute(renter, 0, func, data, endTime)) {
+
       return _recallBorrowedBooks(idBorrowedBook);
     }
 

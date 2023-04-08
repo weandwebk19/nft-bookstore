@@ -20,14 +20,10 @@ module.exports = function (deployer) {
 
   }).then(function() {
 
-    return deployer.deploy(BookSharingStorage);
-
-  }).then(function() {
-
     return deployer.deploy(Timelock);
 
-  }).then(function(timelock) {
-
+  }).then(async function(timelock) {
+    await deployer.deploy(BookSharingStorage, timelock.address);
     return deployer.deploy(BookRentingStorage, timelock.address);
 
   }).then(function() {

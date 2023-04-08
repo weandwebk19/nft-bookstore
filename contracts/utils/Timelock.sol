@@ -86,9 +86,7 @@ contract TimeLock {
             emit Queue(txId, _newOwner, _newvalue, _newFunc, _newData, _newTimestamp);
             return true;
         }
-
-        revert Error.NotQueuedError(txId);
-
+        return false;
     }
 
     function isExecute(
@@ -116,6 +114,7 @@ contract TimeLock {
 
     function cancel(bytes32 _txId) public {
         if (!queued[_txId]) {
+            require(false, "Check log1");
             revert Error.NotQueuedError(_txId);
         }
 
