@@ -6,7 +6,9 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./ListedBookStorage.sol";
+import "./list/ListedBookStorage.sol";
+import "./rent/BookRentingStorage.sol";
+import "./share/BookSharingStorage.sol";
 import "./BookTemporary.sol";
 
 contract BookStore is ERC1155URIStorage, Ownable {
@@ -22,11 +24,13 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   ListedBookStorage private _listedBookStorage;
   BookTemporary private _bookTemporary;
+  BookRentingStorage private _bookRentingStorage;
+  BookSharingStorage private _bookSharingStorage;
 
   uint MAX_BALANCE = 500;
   uint MIN_TIME = 604800; // Rental period is at least one week
   uint public listingPrice = 0.025 ether;
-  uint public rentingPrice = 0.001 ether;
+  uint public leasingPrice = 0.001 ether;
   uint private sharingPrice = 0.0005 ether;
   uint private convertPrice = 0.000005 ether;
 
@@ -44,6 +48,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
   ) ERC1155("https://example.com/api/{id}.json") {
     _listedBookStorage = listedBookStorage;
     _bookTemporary = bookTemporary;
+    _bookRentingStorage = _bookTemporary.getBookRentingStorage();
+    _bookSharingStorage = bookTemporary.getBookSharingStorage();
   }
 
   function setListingPrice(uint newPrice) external onlyOwner {
@@ -51,9 +57,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
     listingPrice = newPrice;
   }
 
-  function setRentingPrice(uint newPrice) external onlyOwner {
+  function setLeasingPrice(uint newPrice) external onlyOwner {
     require(newPrice > 0, "Price must be at least 1 wei");
-    rentingPrice = newPrice;
+    leasingPrice = newPrice;
   }
 
   function setSharingPrice(uint newPrice) external onlyOwner {
@@ -83,7 +89,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function isLeased(uint tokenId, address renter) public view returns (bool) {
-    return _bookTemporary.isLeased(tokenId, renter);
+    return _bookRentingStorage.isLeased(tokenId, renter);
   }
 
   function _beforeTokenTransfer(
@@ -267,23 +273,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getOwnedLeaseBooks()
     public
     view
-    returns (BookTemporary.LeaseBook[] memory)
+    returns (BookRentingStorage.LeaseBook[] memory)
   {
-    uint ownedLeaseBookCount = _bookTemporary.getTotalOwnedLeaseBook(
+    uint ownedLeaseBookCount = _bookRentingStorage.getTotalOwnedLeaseBook(
       msg.sender
     );
     uint ownedItemsCount = getTotalOwnedToken();
-    BookTemporary.LeaseBook[] memory books = new BookTemporary.LeaseBook[](
+    BookRentingStorage.LeaseBook[] memory books = new BookRentingStorage.LeaseBook[](
       ownedLeaseBookCount
     );
 
     uint currentIndex = 0;
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
-      BookTemporary.LeaseBook memory book = _bookTemporary.getLeaseBook(
-                                                            tokenId,
-                                                            msg.sender
-                                                          );
+      BookRentingStorage.LeaseBook memory book = _bookRentingStorage.getLeaseBook(
+                                                                    tokenId,
+                                                                    msg.sender
+                                                                  );
       if (book.tokenId != 0 && book.renter != address(0)) {
         books[currentIndex] = book;
         currentIndex++;
@@ -296,14 +302,14 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getOwnedBorrowedBooks()
     public
     view
-    returns (BookTemporary.BorrowedBook[] memory)
+    returns (BookRentingStorage.BorrowedBook[] memory)
   {
-    BookTemporary.BorrowedBook[] memory borrowedBooks = _bookTemporary
+    BookRentingStorage.BorrowedBook[] memory borrowedBooks = _bookRentingStorage
       .getOwnedBorrowedBooks(msg.sender);
 
     require(
       borrowedBooks.length ==
-        _bookTemporary.getTotalOwnedBorrowedBook(msg.sender),
+        _bookRentingStorage.getTotalOwnedBorrowedBook(msg.sender),
       "Length of owned borrowed books is invalid"
     );
 
@@ -319,10 +325,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getAmountOfAllTypeBooksUntradeable(uint256 tokenId) public view returns(uint) {
     require(tokenId != 0 && msg.sender != address(0), "Token id and owner is invalid");
     return _listedBookStorage.getAmountOfListedBooks(tokenId, msg.sender) +
-          _bookTemporary.getAmountOfLeaseBooks(tokenId, msg.sender) + 
-          _bookTemporary.getAmountOfAllSharedBooks(tokenId, msg.sender) + 
-          _bookTemporary.getAmountOfAllBooksOnSharing(tokenId, msg.sender) + 
-          _bookTemporary.getAmountOfBorrowedBooks(tokenId, msg.sender);
+          _bookRentingStorage.getAmountOfLeaseBooks(tokenId, msg.sender) + 
+          _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, msg.sender) + 
+          _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, msg.sender) + 
+          _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, msg.sender);
   }
   
   function sellBooks(uint256 tokenId,
@@ -352,8 +358,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
         amount > 0,
       "You don't have enough books to sell"
     );
-    require(msg.value == rentingPrice, "Price must be equal to renting price");
-    _bookTemporary.leaseBooks(tokenId, msg.sender, price, amount);
+    require(msg.value == leasingPrice, "Price must be equal to renting price");
+    _bookRentingStorage.leaseBooks(tokenId, msg.sender, price, amount);
   }
 
   function updateBookFromSale(
@@ -387,12 +393,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
     );
     require(renter == msg.sender, "You are not the renter of this token");
 
-    _bookTemporary.updateLeaseBookFromRenting(
-      tokenId,
-      newPrice,
-      newAmount,
-      renter
-    );
+    _bookRentingStorage.updateLeaseBookFromRenting(tokenId,
+                                                   newPrice,
+                                                   newAmount,
+                                                   renter);
   }
 
   function getAllBooksOnSale()
@@ -403,12 +407,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _listedBookStorage.getAllListedBooks();
   }
 
-  function getAllBooksOnRenting()
+  function getAllBooksOnLeasing()
     public
     view
-    returns (BookTemporary.LeaseBook[] memory)
+    returns (BookRentingStorage.LeaseBook[] memory)
   {
-    return _bookTemporary.getAllLeaseBooks();
+    return _bookRentingStorage.getAllLeaseBooks();
   }
 
   function buyBooks(
@@ -440,16 +444,14 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
     uint startTime = block.timestamp;
     uint endTime = startTime + rentalDuration;
-    uint256 totalPrice = _bookTemporary.borrowBooks(
-      tokenId,
-      renter,
-      amount,
-      price,
-      startTime,
-      endTime,
-      msg.sender,
-      msg.value
-    );
+    uint256 totalPrice = _bookRentingStorage.borrowBooks(tokenId,
+                                                         renter,
+                                                         amount,
+                                                         price,
+                                                         startTime,
+                                                         endTime,
+                                                         msg.sender,
+                                                         msg.value);
     if (totalPrice != 0) {
       _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
       payable(renter).transfer(totalPrice);
@@ -461,9 +463,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getAllBorrowedBooks()
     public
     view
-    returns (BookTemporary.BorrowedBook[] memory)
+    returns (BookRentingStorage.BorrowedBook[] memory)
   {
-    return _bookTemporary.getAllBorrowedBooks();
+    return _bookRentingStorage.getAllBorrowedBooks();
   }
 
   //Make a request to extend the rental period and wait for their owner to approve your request
@@ -477,7 +479,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     require(renter != address(0) && msg.sender != address(0), "Address is invalid");
     require(renter != msg.sender , "You can not renew with yourself");
     require(extendedTime >= MIN_TIME, "Extended time is invalid");
-    _bookTemporary.requestExtendTimeOfBorrowedBooks(tokenId, 
+    _bookRentingStorage.requestExtendTimeOfBorrowedBooks(tokenId, 
                                                     renter, 
                                                     msg.sender,
                                                     startTime,
@@ -498,7 +500,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     require(renter != msg.sender , "You can not renew with yourself");
     require(newExtendedTime >= MIN_TIME, "Extended time is invalid");
 
-    _bookTemporary.updateRequestOfBorrowedBooks(tokenId,
+    _bookRentingStorage.updateRequestOfBorrowedBooks(tokenId,
                                                 renter,  
                                                 msg.sender,
                                                 startTime,
@@ -511,7 +513,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
                            address borrower,
                            bool isAccept) public returns(bool){
 
-    return _bookTemporary.doAcceptRequestAndCreateResponse(idBorrowedBook, 
+    return _bookRentingStorage.doAcceptRequestAndCreateResponse(idBorrowedBook, 
                                                            borrower, 
                                                            msg.sender, 
                                                            isAccept);
@@ -521,7 +523,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                     address renter, 
                                     bool isExtend) public payable {
     require(renter != msg.sender, "You cannot make this transaction with yourself");
-    uint totalPrice = _bookTemporary.transferForSendedRequest(id, 
+    uint totalPrice = _bookRentingStorage.transferForSendedRequest(id, 
                                                               renter, 
                                                               msg.sender, 
                                                               block.timestamp, 
@@ -536,19 +538,19 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getAllOwnedRequestsOnExtending()
     public
     view
-    returns (BookTemporary.Request[] memory)
+    returns (BookRentingStorage.Request[] memory)
   {
     require(msg.sender != address(0), "Address is invalid");
-    return _bookTemporary.getAllOwnedRequest(msg.sender);
+    return _bookRentingStorage.getAllOwnedRequest(msg.sender);
   }
 
   function getAllOwnedResponsesOnExtending()
     public
     view
-    returns (BookTemporary.Response[] memory)
+    returns (BookRentingStorage.Response[] memory)
   {
     require(msg.sender != address(0), "Address is invalid");
-    return _bookTemporary.getAllOwnedResponse(msg.sender);
+    return _bookRentingStorage.getAllOwnedResponse(msg.sender);
   }
 
   // Return true if success, owthersise return false
@@ -558,11 +560,11 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                uint startTime,
                                uint endTime) public returns(bool) {
     require(renter == msg.sender, "You cannot take this book back, because you are not the renter");
-    BookTemporary.BorrowedBook memory borrowedBook = 
-          _bookTemporary.getBorrowedBook(tokenId, renter, borrower, startTime, endTime);
+    BookRentingStorage.BorrowedBook memory borrowedBook = 
+          _bookRentingStorage.getBorrowedBook(tokenId, renter, borrower, startTime, endTime);
     bool res = false;
     if(borrowedBook.tokenId != 0) {
-      res = _bookTemporary.excRecallBorrowedBooks(tokenId, 
+      res = _bookRentingStorage.excRecallBorrowedBooks(tokenId, 
                                             renter, 
                                             borrower,
                                             borrowedBook.startTime,
@@ -578,7 +580,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   // you do not have any recallable books. Needed automate this function with Chainlink
   function recallAllBorrowedBooks() public returns (uint) {
     require(address(0) != msg.sender, "Your's address is invalid");
-    return _bookTemporary.excRecallAllBorrowedBooks(msg.sender);
+    return _bookRentingStorage.excRecallAllBorrowedBooks(msg.sender);
   }
 
   function shareBooks(
@@ -586,7 +588,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint price,
     uint256 amount
   ) public payable {
-    BookTemporary.BorrowedBook memory borrowedBook = _bookTemporary
+    BookRentingStorage.BorrowedBook memory borrowedBook = _bookRentingStorage
       .getBorrowedBookFromId(idBorrowedBook);
 
     require(
@@ -601,65 +603,63 @@ contract BookStore is ERC1155URIStorage, Ownable {
     require(amount > 0 && amount <= borrowedBook.amount, "Amount for shared books is invalid");
     require(block.timestamp < borrowedBook.endTime, "This book has expired rental");
 
-    _bookTemporary.shareBooks(borrowedBook.tokenId, 
-                              borrowedBook.renter,
-                              msg.sender, 
-                              borrowedBook.price,
-                              price, 
-                              amount,
-                              borrowedBook.startTime,
-                              borrowedBook.endTime);
+    _bookSharingStorage.shareBooks(borrowedBook.tokenId, 
+                                   borrowedBook.renter,
+                                   msg.sender, 
+                                   borrowedBook.price,
+                                   price, 
+                                   amount,
+                                   borrowedBook.startTime,
+                                   borrowedBook.endTime);
 
-    _bookTemporary.updateAmountBorrowedBookFromBorrowing(idBorrowedBook, amount, true);
+    _bookRentingStorage.updateAmountBorrowedBookFromBorrowing(idBorrowedBook, amount, true);
   }
 
-  function getAllBooksOnSharing()
-    public
-    view
-    returns (BookTemporary.SharedBook[] memory)
+  function getAllBooksOnSharing() 
+    public view returns (BookSharingStorage.BookSharing[] memory)
   {
-    return _bookTemporary.getAllBooksOnSharing();
+    return _bookSharingStorage.getAllBooksOnSharing();
   }
 
   function getAllOwnedBooksOnSharing()
     public
     view
-    returns (BookTemporary.SharedBook[] memory)
+    returns (BookSharingStorage.BookSharing[] memory)
   {
     require(msg.sender != address(0), "Address is invalid");
-    return _bookTemporary.getAllOwnedBooksOnSharing(msg.sender);
+    return _bookSharingStorage.getAllOwnedBooksOnSharing(msg.sender);
   }
 
   function getAllSharedBook()
     public
     view
-    returns (BookTemporary.SharedBook[] memory)
+    returns (BookSharingStorage.BookSharing[] memory)
   {
-    return _bookTemporary.getAllSharedBook();
+    return _bookSharingStorage.getAllSharedBook();
   }
 
   function getAllOwnedSharedBook()
     public
     view
-    returns (BookTemporary.SharedBook[] memory)
+    returns (BookSharingStorage.BookSharing[] memory)
   {
     require(msg.sender != address(0), "Address is invalid");
-    return _bookTemporary.getAllOwnedSharedBook(msg.sender);
+    return _bookSharingStorage.getAllOwnedSharedBook(msg.sender);
   }
 
   function updateBooksOnSharing(uint idBooksOnSharing, 
                                 uint newPrice, 
                                 uint newAmount) public {
-    BookTemporary.SharedBook memory booksOnSharing = 
-                      _bookTemporary.getBooksOnSharing(idBooksOnSharing);
-    uint idBorrowedBook = _bookTemporary.getIdBorrowedBook(booksOnSharing.tokenId,
-                                                           booksOnSharing.fromRenter, 
-                                                           booksOnSharing.sharer, 
-                                                           booksOnSharing.startTime, 
-                                                           booksOnSharing.endTime);
+    BookSharingStorage.BookSharing memory booksOnSharing = 
+                      _bookSharingStorage.getBooksOnSharing(idBooksOnSharing);
+    uint idBorrowedBook = _bookRentingStorage.getIdBorrowedBook(booksOnSharing.tokenId,
+                                                                booksOnSharing.fromRenter, 
+                                                                booksOnSharing.sharer, 
+                                                                booksOnSharing.startTime, 
+                                                                booksOnSharing.endTime);
     require (idBorrowedBook != 0, "Borrowed Books for Books on sharing is not exist");
-    BookTemporary.BorrowedBook memory borrowedBook = 
-                    _bookTemporary.getBorrowedBookFromId(idBorrowedBook);
+    BookRentingStorage.BorrowedBook memory borrowedBook = 
+                    _bookRentingStorage.getBorrowedBookFromId(idBorrowedBook);
     require(msg.sender == borrowedBook.borrower, "You do not own this borrowed book");
 
     require(borrowedBook.tokenId != 0, "Token id is invalid");
@@ -679,28 +679,28 @@ contract BookStore is ERC1155URIStorage, Ownable {
       balance = newAmount - booksOnSharing.amount;
     }
 
-    _bookTemporary.updateBooksOnSharing(idBooksOnSharing, 
-                                        msg.sender, 
-                                        borrowedBook.tokenId, 
-                                        newPrice, 
-                                        newAmount);
+    _bookSharingStorage.updateBooksOnSharing(idBooksOnSharing, 
+                                             msg.sender, 
+                                             borrowedBook.tokenId, 
+                                             newPrice, 
+                                             newAmount);
 
-    _bookTemporary.updateAmountBorrowedBookFromBorrowing(idBorrowedBook,
-                                                         balance,
-                                                         isDecrease);
+    _bookRentingStorage.updateAmountBorrowedBookFromBorrowing(idBorrowedBook,
+                                                              balance,
+                                                              isDecrease);
   }
 
   function takeBooksOnSharing(uint idBooksOnSharing,  
                               uint amount) public payable {
     require(msg.sender != address(0), "Addresses is invalid");
     require(idBooksOnSharing > 0, "Id Books on sharing is invalid");
-    BookTemporary.SharedBook memory booksOnSharing = 
-                      _bookTemporary.getBooksOnSharing(idBooksOnSharing);
+    BookSharingStorage.BookSharing memory booksOnSharing = 
+                      _bookSharingStorage.getBooksOnSharing(idBooksOnSharing);
     require(booksOnSharing.sharer != address(0), "Address of sharer is invalid");
 
-    uint price = _bookTemporary.takeBooksOnSharing(idBooksOnSharing,
-                                                   msg.sender, 
-                                                   amount);
+    uint price = _bookSharingStorage.takeBooksOnSharing(idBooksOnSharing,
+                                                        msg.sender, 
+                                                        amount);
     if (price != 0 && booksOnSharing.tokenId != 0) {
       _safeTransferFrom(booksOnSharing.sharer, msg.sender, booksOnSharing.tokenId, amount, "");
       // The amount you pay for this transaction will not depend on the period of borrowing the book,

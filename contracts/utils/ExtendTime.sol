@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
+import "./Error.sol";
 
 // PROTOCOL:
 //
@@ -19,11 +20,6 @@ pragma solidity ^0.8.17;
 // The class assists in creating a request to extend the loan period and
 // waits for the owner to approve or not
 contract ExtendTime {
-
-    error AlreadyExistsRequestError(bool);
-    error AlreadyExistsResponseError(bool);
-    error InvalidLengthError(uint);
-    error AlreadyChangedStatusError(bool);
 
     struct Request {
         uint id; // id of Borrowed Books
@@ -126,7 +122,7 @@ contract ExtendTime {
                            address sender, 
                            address receiver) internal {
         if (isRequestExist(id, sender, receiver)) {
-            revert AlreadyExistsRequestError(true);
+            revert Error.AlreadyExistsRequestError(true);
         }
         uint index = _totalOwnedRequest[receiver];
         _requests[receiver][index] = Request(id, time, amount, sender, false);
@@ -140,7 +136,7 @@ contract ExtendTime {
                              address sender, 
                              address receiver) internal {
         if (isResponseExist(id, sender, receiver)) {
-            revert AlreadyExistsResponseError(true);
+            revert Error.AlreadyExistsResponseError(true);
         }
         uint index = _totalOwnedResponse[receiver];
         _responses[receiver][index] = Response(id, time, amount, sender);
@@ -156,7 +152,7 @@ contract ExtendTime {
                             address receiver) internal {
         uint length = _totalOwnedRequest[receiver];
         if (length == 0) {
-            revert InvalidLengthError(length);
+            revert Error.InvalidLengthError(length);
         }
         Request memory request;
         for (uint i; i < length; i++) {
@@ -228,7 +224,7 @@ contract ExtendTime {
                                     address receiver) internal {
         uint length = _totalOwnedRequest[receiver];
         if (length == 0) {
-            revert InvalidLengthError(length);
+            revert Error.InvalidLengthError(length);
         }
         Request memory req;
         for (uint i = 0; i < length; i++) {
@@ -236,7 +232,7 @@ contract ExtendTime {
 
             if(req.sender == sender && req.id == id) {
                 if (_requests[receiver][i].isAccept) {
-                    revert AlreadyChangedStatusError(true);
+                    revert Error.AlreadyChangedStatusError(true);
                 }
                 _requests[receiver][i].isAccept = true;
             }
@@ -281,7 +277,7 @@ contract ExtendTime {
                         address sender, 
                         address receiver) public view returns(Request memory) {
         if (!isRequestExist(id, sender, receiver)) {
-            revert AlreadyExistsRequestError(false);
+            revert Error.AlreadyExistsRequestError(false);
         }
         uint length = _totalOwnedRequest[receiver];
         Request memory req;
@@ -299,7 +295,7 @@ contract ExtendTime {
                         address sender, 
                         address receiver) public view returns(Response memory) {
         if (!isResponseExist(id, sender, receiver)) {
-            revert AlreadyExistsResponseError(false);
+            revert Error.AlreadyExistsResponseError(false);
         }
         uint length = _totalOwnedResponse[receiver];
         Response memory res;

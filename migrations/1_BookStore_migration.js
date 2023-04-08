@@ -4,7 +4,9 @@ const ListedBookStorage = artifacts.require("ListedBookStorage");
 const BookTemporary = artifacts.require("BookTemporary");
 const Timelock = artifacts.require("Timelock");
 const ExtendTime = artifacts.require("ExtendTime");
-const SharedBookStorage = artifacts.require("SharedBookStorage");
+const Error = artifacts.require("Error");
+const BookSharingStorage = artifacts.require("BookSharingStorage");
+const BookRentingStorage = artifacts.require("BookRentingStorage");
 
 module.exports = function (deployer) {
   deployer.deploy(ListedBookStorage)
@@ -14,7 +16,11 @@ module.exports = function (deployer) {
 
   }).then(function() {
 
-    return deployer.deploy(SharedBookStorage);
+    return deployer.deploy(Error);
+
+  }).then(function() {
+
+    return deployer.deploy(BookSharingStorage);
 
   }).then(function() {
 
@@ -22,7 +28,20 @@ module.exports = function (deployer) {
 
   }).then(function(timelock) {
 
-    return deployer.deploy(BookTemporary, timelock.address);
+    return deployer.deploy(BookRentingStorage, timelock.address);
+
+  }).then(function() {
+
+    return Promise.all([
+      BookRentingStorage.deployed(),
+      BookSharingStorage.deployed()
+    ]);
+
+  }).then(function([bookRentingStorage, bookSharingStorage]) {
+
+    return deployer.deploy(BookTemporary, 
+                           bookRentingStorage.address, 
+                           bookSharingStorage.address);
 
   }).then(function() {
 
