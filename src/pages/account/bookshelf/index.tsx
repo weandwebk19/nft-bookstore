@@ -61,14 +61,7 @@ const BookShelf = () => {
 
   const bottomCategories = [
     {
-      id: `${preUrl}/recall-books`,
-      component: (
-        <Ticket
-          href={`${preUrl}/recall-books`}
-          header={t("recallBooks") as string}
-          image={images.product1}
-        />
-      )
+      component: <></>
     },
     {
       id: `${preUrl}/sharing-books`,
