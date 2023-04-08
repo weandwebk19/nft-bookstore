@@ -12,23 +12,23 @@ export default async function handler(
   try {
     const client = await clientPromise;
     const db = client.db("NftBookStore");
-    const { bookId, userId } = req.query;
+    const { tokenId, walletAddress } = req.query;
 
     const watchlist = await db.collection("watchlists").findOne({
-      user_id: new ObjectId(userId as string),
-      book_id: new ObjectId(bookId as string)
+      wallet_address: (walletAddress as string).toLowerCase(),
+      token_id: parseInt(tokenId as string)
     });
 
     if (watchlist) {
       return res.json({
         success: true,
         message: "Get watchlist successfully.",
-        data: toCamel(watchlist)
+        data: toCamel({ ...watchlist, _id: watchlist._id.toString() })
       });
     } else {
       return res.json({
         success: false,
-        message: "bookId or userId is wrong.",
+        message: "tokenId or walletAddress is wrong.",
         data: null
       });
     }

@@ -13,7 +13,6 @@ const EditButton = ({ tokenId }: EditButtonProps) => {
   const handleEditBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}/edit`);
