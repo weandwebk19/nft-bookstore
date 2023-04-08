@@ -23,21 +23,34 @@ const Loading = forwardRef<HTMLDivElement>(
       };
 
       const handleComplete = (url: string) => {
-        const baseUrlWithoutLocale = `/${router.locale}`;
+        if (router.locale === "en") {
+          if (!url && !router.asPath) {
+            setLoading(false);
+          } else if (url.split("?")[0] === router.asPath.split("?")[0]) {
+            setLoading(false);
+          }
+        } else {
+          const baseUrlWithoutLocale = `/${router.locale}`;
+          if (url.toString().startsWith(baseUrlWithoutLocale)) {
+            console.log("url", url.split("?")[0]);
+            console.log("router.asPath", router.asPath.split("?")[0]);
+            const pathWithoutLocale = url
+              .split("?")[0] // get without the query string
+              .substring(baseUrlWithoutLocale.length);
+            console.log("pathWithoutLocale", pathWithoutLocale);
+
+            if (!url && !router.asPath) {
+              setLoading(false);
+            } else if (pathWithoutLocale === router.asPath.split("?")[0]) {
+              // setTimeout(() => setLoading(false), 0);
+
+              setLoading(false);
+            }
+          }
+        }
 
         if (router.asPath === "/") {
           setLoading(false);
-        }
-
-        if (url.toString().startsWith(baseUrlWithoutLocale)) {
-          const pathWithoutLocale = url.substring(baseUrlWithoutLocale.length);
-          if (!url && !router.asPath) {
-            setLoading(false);
-          } else if (pathWithoutLocale === router.asPath) {
-            // setTimeout(() => setLoading(false), 0);
-
-            setLoading(false);
-          }
         }
       };
 

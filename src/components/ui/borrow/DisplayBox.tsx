@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { FunctionComponent } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
@@ -7,33 +9,24 @@ import { useAllLeasingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
 import {
   AddToWatchlistButton,
   BookmarkButton
 } from "@/components/shared/BookButton";
 import RentButton from "@/components/shared/BookButton/RentButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
-import { BookList } from "@/components/shared/BookList";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList, bookList2 } from "@/mocks";
-import {
-  BookGenres,
-  ListedBook,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails,
-  NftListedBook
-} from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
+  const { t } = useTranslation("borrowBooks");
+
   const router = useRouter();
 
-  const { rentedBooks } = useAllLeasingBooks();
+  const { nfts } = useAllLeasingBooks();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -51,16 +44,13 @@ const DisplayBox: FunctionComponent = () => {
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
-            <ContentPaper isPaginate={true} title="Rental books">
+            <ContentPaper isPaginate={true} title={t("borrowBooksTitle")}>
               {(() => {
-                if (rentedBooks.isLoading) {
+                if (nfts.isLoading) {
                   return (
-                    <Typography>Putting books on the shelves...</Typography>
+                    <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (
-                  rentedBooks?.data?.length === 0 ||
-                  rentedBooks.error
-                ) {
+                } else if (nfts?.data?.length === 0 || nfts.error) {
                   return <FallbackNode />;
                 }
                 return (
@@ -73,7 +63,7 @@ const DisplayBox: FunctionComponent = () => {
                   `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
                   title, bookCover, author,... */}
 
-                    {rentedBooks?.data?.map((book) => {
+                    {nfts?.data?.map((book) => {
                       return (
                         <Grid
                           item
@@ -100,10 +90,13 @@ const DisplayBox: FunctionComponent = () => {
                                   renter={book?.renter}
                                   price={book?.price}
                                   supplyAmount={book?.amount}
-                                  borrowBooks={rentedBooks?.borrowBooks}
+                                  borrowBooks={nfts?.borrowBooks}
                                 />
                                 <BookmarkButton />
-                                <AddToWatchlistButton isLastInButtonGroup />
+                                <AddToWatchlistButton
+                                  isLastInButtonGroup
+                                  tokenId={book?.tokenId}
+                                />
                               </>
                             }
                           />
@@ -124,6 +117,7 @@ const DisplayBox: FunctionComponent = () => {
           </Stack>
         </Grid>
       </Grid>
+      <ToastContainer />
     </Box>
   );
 };

@@ -19,7 +19,7 @@ export default async function handler(
     if (bookDetail) {
       return res.json({
         success: true,
-        message: "Get bookDetail successfully.",
+        message: "Get bookId successfully.",
         data: bookDetail?._id
       });
     } else {

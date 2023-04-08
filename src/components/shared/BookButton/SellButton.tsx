@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
@@ -70,6 +71,14 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
   const onSubmit = async (data: any) => {
     try {
       const listingPrice = await contract!.listingPrice();
+      // const tx = await contract?.sellBooks(
+      //   tokenId,
+      //   ethers.utils.parseEther(data.price.toString()),
+      //   data.amount,
+      //   {
+      //     value: listingPrice
+      //   }
+      // );
       const tx = await contract?.sellBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
@@ -87,7 +96,7 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
 
       console.log("receipt", receipt);
     } catch (e: any) {
-      console.error(e.message);
+      console.error(e);
     }
   };
 
@@ -155,6 +164,7 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
             </Grid>
           </Grid>
         </FormProvider>
+        <ToastContainer />
       </Dialog>
     </>
   );

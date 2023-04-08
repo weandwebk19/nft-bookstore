@@ -7,9 +7,9 @@ import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
 import {
   AddToWatchlistButton,
   BookmarkButton
@@ -20,6 +20,8 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
 const DisplayBox: FunctionComponent = () => {
+  const { t } = useTranslation("tradeInBooks");
+
   const router = useRouter();
 
   const { listedBooks } = useListedBooks();
@@ -40,11 +42,11 @@ const DisplayBox: FunctionComponent = () => {
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
-            <ContentPaper isPaginate={true} title="Trade-in books">
+            <ContentPaper isPaginate={true} title={t("tradeInBooksTitle")}>
               {(() => {
                 if (listedBooks.isLoading) {
                   return (
-                    <Typography>Putting books on the shelves...</Typography>
+                    <Typography>{t("loadingMessage") as string}</Typography>
                   );
                 } else if (
                   listedBooks?.data?.length === 0 ||
@@ -91,7 +93,10 @@ const DisplayBox: FunctionComponent = () => {
                                   supplyAmount={book?.amount}
                                 />
                                 <BookmarkButton />
-                                <AddToWatchlistButton isLastInButtonGroup />
+                                <AddToWatchlistButton
+                                  isLastInButtonGroup
+                                  tokenId={book?.tokenId}
+                                />
                               </>
                             }
                           />

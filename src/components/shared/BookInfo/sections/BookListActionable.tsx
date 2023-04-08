@@ -1,5 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material";
 
+import { useTranslation } from "next-i18next";
+
 import BookCardActionable from "./BookCardActionable";
 
 interface BookListActionableProps {
@@ -13,16 +15,18 @@ const BookListActionable = ({
   isOpenForBorrow,
   bookListActionable
 }: BookListActionableProps) => {
+  const { t } = useTranslation("bookDetail");
+
   return (
     <Box>
       {isOpenForTradeIn && (
         <Typography variant="h5" gutterBottom>
-          Listings
+          {t("listings")}
         </Typography>
       )}
       {isOpenForBorrow && (
         <Typography variant="h5" gutterBottom>
-          Rentings
+          {t("leasings")}
         </Typography>
       )}
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>

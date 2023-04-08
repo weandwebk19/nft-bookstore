@@ -26,21 +26,17 @@ const pageReload = () => {
 const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
   try {
     //create new account
-    let response = await axios
-      .post("/api/users/create", {
-        wallet_address: ethereum.selectedAddress,
-        fullname: "Anonymous"
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    let response = await axios.post("/api/users/create", {
+      wallet_address: ethereum.selectedAddress,
+      fullname: "Anonymous"
+    });
 
     const isLocked = !(await ethereum._metamask.isUnlocked());
     if (isLocked) {
       pageReload();
     }
   } catch (error) {
-    console.log("An error occurred while deleting ", error);
+    console.log(error);
   }
 };
 

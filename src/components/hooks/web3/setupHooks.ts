@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Web3Dependencies } from "@_types/hooks";
 
-import { useBookDetail } from ".";
 import { UseAccountHook, hookFactory as createAccountHook } from "./useAccount";
 import {
   UseAllLeasingBooksHook,
@@ -21,6 +20,10 @@ import {
 } from "./useListedBooks";
 import { UseNetworkHook, hookFactory as createNetworkHook } from "./useNetwork";
 import {
+  UseOwnedBorrowedBooksHook,
+  hookFactory as createOwnedBorrowedBooksHook
+} from "./useOwnedBorrowedBooks";
+import {
   UseOwnedListedBooksHook,
   hookFactory as createOwnedListedBooksHook
 } from "./useOwnedListedBooks";
@@ -28,6 +31,14 @@ import {
   UseOwnedNftsHook,
   hookFactory as createOwnedBooksHook
 } from "./useOwnedNfts";
+import {
+  UseOwnedRentedBooksHook,
+  hookFactory as createOwnedRentedBooksHook
+} from "./useOwnedRentedBooks";
+import {
+  UseOwnedSharedBooksHook,
+  hookFactory as createOwnedSharedBooksHook
+} from "./useOwnedSharedBooks";
 
 export type Web3Hooks = {
   useAccount: UseAccountHook;
@@ -37,6 +48,9 @@ export type Web3Hooks = {
   useOwnedNfts: UseOwnedNftsHook;
   useCreatedBooks: UseCreatedBooksHook;
   useOwnedListedBooks: UseOwnedListedBooksHook;
+  useOwnedBorrowedBooks: UseOwnedBorrowedBooksHook;
+  useOwnedRentedBooks: UseOwnedRentedBooksHook;
+  useOwnedSharedBooks: UseOwnedSharedBooksHook;
   useBookDetail: UseBookDetailHook;
 };
 
@@ -53,6 +67,9 @@ export const setupHooks: SetupHooks = (deps) => {
     useOwnedNfts: createOwnedBooksHook(deps),
     useCreatedBooks: createCreatedBooksHook(deps),
     useOwnedListedBooks: createOwnedListedBooksHook(deps),
+    useOwnedRentedBooks: createOwnedRentedBooksHook(deps),
+    useOwnedBorrowedBooks: createOwnedBorrowedBooksHook(deps),
+    useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
     useBookDetail: createBookDetailHook(deps)
   };
 };

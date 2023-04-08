@@ -59,7 +59,10 @@ export default async function handler(
       });
     }
   } catch (e: any) {
-    console.error(e);
-    throw new Error(e).message;
+    return res.json({
+      success: false,
+      message: e.message,
+      data: e
+    });
   }
 }

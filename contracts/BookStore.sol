@@ -693,7 +693,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
     bool isDecrease;
     uint balance;
-    
+
     if (newAmount <= booksOnSharing.amount) {
       isDecrease = false;
       balance = booksOnSharing.amount - newAmount;
@@ -727,7 +727,13 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                                         msg.sender, 
                                                         amount);
     if (price != 0 && booksOnSharing.tokenId != 0) {
-      _safeTransferFrom(booksOnSharing.sharer, msg.sender, booksOnSharing.tokenId, amount, "");
+      _safeTransferFrom(
+        booksOnSharing.sharer,
+        msg.sender,
+        booksOnSharing.tokenId,
+        amount,
+        ""
+      );
       // The amount you pay for this transaction will not depend on the period of borrowing the book,
       // the price will be set by the sharer
       uint totalPrice = price * amount;
@@ -809,5 +815,4 @@ contract BookStore is ERC1155URIStorage, Ownable {
                                               uint amount) public payable {
     _bookTemporary.convertBookOnSharingToBorrowedBook(idBooksOnSharing, msg.sender, amount);
   }
-
 }

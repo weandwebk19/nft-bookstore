@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Grid, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+
+import { Image } from "../Image";
 
 interface ActionableBookItemProps {
   bookCover: string;
@@ -16,6 +18,8 @@ interface ActionableBookItemProps {
   author: string;
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
+  rentee?: string;
+  status?: string;
 }
 
 const ActionableBookItem = ({
@@ -25,7 +29,9 @@ const ActionableBookItem = ({
   tokenId,
   author,
   onClick,
-  buttons
+  buttons,
+  rentee,
+  status
 }: ActionableBookItemProps) => {
   const theme = useTheme();
   const [authorName, setAuthorName] = useState();
@@ -48,53 +54,57 @@ const ActionableBookItem = ({
 
   return (
     <Box
-      // className={styles["book-item"]}
       sx={{
         backgroundColor: `${theme.palette.background.default}`,
-        borderRadius: "5px"
+        borderRadius: "5px",
+        height: "100%"
       }}
     >
-      <Grid container columns={{ xs: 4, sm: 8, md: 12 }}>
-        <Grid
-          item
-          md={4}
-          onClick={() => onClick(tokenId)}
-          sx={{ cursor: "pointer" }}
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        sx={{
+          height: "100%"
+        }}
+      >
+        <Image
+          src={bookCover}
+          alt={title}
+          sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
+          className={styles["book-item__book-cover"]}
+        />
+        <Stack
+          justifyContent="space-between"
+          sx={{
+            p: 3,
+            width: "100%",
+            height: "100%"
+          }}
         >
-          <Box
-            component="img"
-            className={styles["book-item__book-cover"]}
-            src={bookCover}
-            alt={title}
-            sx={{ width: "100%", height: "100%" }}
-          />
-        </Grid>
-        <Grid item md={8}>
-          <Stack
-            justifyContent="space-between"
-            sx={{
-              p: 3,
-              width: "100%",
-              height: "100%"
-            }}
-          >
-            <Stack>
-              <Stack direction="row">
-                <InsertDriveFileIcon fontSize="small" color="disabled" />
-                <Typography variant="caption">{fileType}</Typography>
-              </Stack>
-              <Typography variant="h5">{title}</Typography>
-              <Typography variant="body2">{authorName}</Typography>
+          <Stack>
+            <Stack direction="row">
+              <InsertDriveFileIcon fontSize="small" color="disabled" />
+              <Typography variant="caption">{fileType}</Typography>
             </Stack>
-
-            <Divider sx={{ my: 3 }} />
-
-            <Stack direction="row" spacing={2}>
-              {buttons}
-            </Stack>
+            <Typography
+              variant="h6"
+              className="text-limit text-limit--2"
+              sx={{ minHeight: "64px" }}
+            >
+              {title}
+            </Typography>
+            <Typography variant="body2">{authorName}</Typography>
           </Stack>
-        </Grid>
-      </Grid>
+
+          <Divider sx={{ my: 3 }} />
+          <Stack direction="row" justifyContent="space-between">
+            <Typography>{rentee}</Typography>
+            {status !== undefined ? <Chip label={status} /> : <></>}
+          </Stack>
+          <Stack direction="row" spacing={2}>
+            {buttons}
+          </Stack>
+        </Stack>
+      </Stack>
     </Box>
   );
 };

@@ -1,6 +1,8 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
+import { useTranslation } from "next-i18next";
+
 import { Logo } from "../Logo";
 
 interface FallbackNodeProps {
@@ -8,6 +10,7 @@ interface FallbackNodeProps {
 }
 
 const FallbackNode = ({ children }: FallbackNodeProps) => {
+  const { t } = useTranslation("fallback");
   const theme = useTheme();
   return (
     <Stack justifyContent="center" alignItems="center">
@@ -32,7 +35,7 @@ const FallbackNode = ({ children }: FallbackNodeProps) => {
       </Divider>
       <Typography variant="h6">*</Typography>
       {children}
-      {!children && <Typography>There&apos;s nothing here.</Typography>}
+      {!children && <Typography>{t("emptyMessage")}</Typography>}
       <Divider sx={{ my: 3, width: "50%" }} />
     </Stack>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Box,
@@ -202,7 +203,7 @@ const RentButton = ({
                         router.push("/account/bookshelf/owned-books");
                       }}
                     >
-                      My rented books
+                      My borrowed books
                     </StyledButton>
                   </>
                 ) : (
@@ -247,6 +248,7 @@ const RentButton = ({
             </Stack>
           </Stack>
         </FormProvider>
+        <ToastContainer />
       </Dialog>
     </>
   );
