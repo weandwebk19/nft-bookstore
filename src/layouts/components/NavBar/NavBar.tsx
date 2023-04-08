@@ -107,7 +107,6 @@ const NavBar = () => {
 
   const handleLogin = async () => {
     try {
-      console.log("Hello");
       const callbackUrl =
         (router.query?.callbackUrl as string) ?? router.pathname ?? "/";
 
@@ -197,25 +196,28 @@ const NavBar = () => {
   const [anchorNavMenu, setAnchorNavMenu] = useState<Element | null>(null);
   const openNavMenu = Boolean(anchorNavMenu);
 
-  const handleHomeClick = () => {
+  const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/");
   };
 
-  const handleAboutClick = () => {
+  const handleAboutClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/about");
   };
 
-  const handleContactClick = () => {
+  const handleContactClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/contact");
   };
 
   const handleNavMenuItemClick = (key: string) => {
     switch (key) {
       case "About Us":
-        handleAboutClick();
+        (e: React.MouseEvent<HTMLButtonElement>) => handleAboutClick(e);
         break;
       case "Contact":
-        handleContactClick();
+        (e: React.MouseEvent<HTMLButtonElement>) => handleContactClick(e);
         break;
       default:
         setAnchorNavMenu(null);

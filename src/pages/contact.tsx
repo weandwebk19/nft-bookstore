@@ -64,30 +64,32 @@ export default function Contact() {
           <ContentContainer titles={[t("titleContent1"), t("titleContent2")]}>
             <Box sx={{ flexGrow: 1 }}>
               <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <FormGroup label={t("name")} required>
-                        <InputController name="name" />
-                      </FormGroup>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormGroup label={t("email")} required>
-                        <InputController name="email" />
-                      </FormGroup>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormGroup label={t("message")} required>
-                        <TextAreaController name="message" />
-                      </FormGroup>
-                    </Grid>
-                    <Grid item xs={12} container justifyContent="flex-end">
-                      <StyledButton variant="contained" type="submit">
-                        {t("send")}
-                      </StyledButton>
-                    </Grid>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <FormGroup label={t("name")} required>
+                      <InputController name="name" />
+                    </FormGroup>
                   </Grid>
-                </form>
+                  <Grid item xs={12} sm={6}>
+                    <FormGroup label={t("email")} required>
+                      <InputController name="email" />
+                    </FormGroup>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormGroup label={t("message")} required>
+                      <TextAreaController name="message" />
+                    </FormGroup>
+                  </Grid>
+                  <Grid item xs={12} container justifyContent="flex-end">
+                    <StyledButton
+                      variant="contained"
+                      type="submit"
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      {t("send")}
+                    </StyledButton>
+                  </Grid>
+                </Grid>
               </FormProvider>
             </Box>
           </ContentContainer>
