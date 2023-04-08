@@ -4,8 +4,9 @@ import { Button, Tooltip } from "@mui/material";
 
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 
-import { useUserInfo } from "@hooks/api/useUserInfo";
 import axios from "axios";
+
+import { useAccount } from "@/components/hooks/web3";
 
 interface AddToWatchlistButtonProps {
   isFirstInButtonGroup?: boolean;
@@ -18,24 +19,19 @@ const AddToWatchlistButton = ({
   isLastInButtonGroup = false,
   tokenId
 }: AddToWatchlistButtonProps) => {
-  const userInfo = useUserInfo();
+  const { account } = useAccount();
   const [isWatched, setIsWatched] = useState<boolean>();
   const handleAddToWatchlist = async () => {
     try {
-      if (userInfo.data) {
-        const userId = userInfo.data.id;
-        const bookId = (await axios.get(`/api/books/token/${tokenId}/bookId`))
-          .data.data;
-        if (bookId) {
-          const res = await axios.post("/api/watchlists/create", {
-            userId,
-            bookId
-          });
-          if (res.data.success) {
-            setIsWatched(true);
-          }
-          console.log(res);
+      if (account.data) {
+        const res = await axios.post("/api/watchlists/create", {
+          tokenId,
+          walletAddress: account.data
+        });
+        if (res.data.success) {
+          setIsWatched(true);
         }
+        console.log(res);
       }
     } catch (err) {
       console.log(err);
@@ -44,12 +40,9 @@ const AddToWatchlistButton = ({
 
   const handleRemoveFromWatchlist = async () => {
     try {
-      if (userInfo.data) {
-        const userId = userInfo.data.id;
-        const bookId = (await axios.get(`/api/books/token/${tokenId}/bookId`))
-          .data.data;
+      if (account.data) {
         const res = await axios.delete(
-          `/api/watchlists/${userId}/${bookId}/delete`
+          `/api/watchlists/${account.data}/${tokenId}/delete`
         );
         if (res.data.success) {
           setIsWatched(false);
@@ -64,11 +57,9 @@ const AddToWatchlistButton = ({
   useEffect(() => {
     (async () => {
       try {
-        const bookId = (await axios.get(`/api/books/token/${tokenId}/bookId`))
-          .data.data;
-        if (bookId && userInfo.data) {
+        if (tokenId && account.data) {
           const res = await axios.get(
-            `/api/watchlists/${userInfo.data.id}/${bookId}`
+            `/api/watchlists/${account.data}/${tokenId}`
           );
           if (res.data.success === true) {
             setIsWatched(true);
@@ -78,7 +69,7 @@ const AddToWatchlistButton = ({
         console.log(err);
       }
     })();
-  }, [tokenId, userInfo.data]);
+  }, [tokenId, account.data]);
 
   return (
     <Tooltip title="Add to watchlist">

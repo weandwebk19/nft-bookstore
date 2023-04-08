@@ -3,7 +3,7 @@
   "containerTitle": "My Bookshelf",
   "createdBooks": "Created Books",
   "ownedBooks": "Owned Books",
-  "rentedBooks": "Rented Books",
+  "borrowedBooks": "Borrowed Books",
   "sharedBooks": "Shared Books",
   "recallBooks": "Recall Books",
   "sharingBooks": "Sharing Books",

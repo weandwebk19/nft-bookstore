@@ -22,7 +22,7 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
 const RentedBooks = () => {
-  const { t } = useTranslation("rentedBooks");
+  const { t } = useTranslation("borrowedBooks");
 
   const breadCrumbs = [
     {
@@ -30,8 +30,8 @@ const RentedBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_rentedBooks") as string,
-      href: "/account/bookshelf/rented-books"
+      content: t("breadcrumbs_borrowedBooks") as string,
+      href: "/account/bookshelf/borrowed-books"
     }
   ];
 
@@ -65,7 +65,7 @@ const RentedBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("rentedBooksTitle")}>
+            <ContentPaper title={t("borrowedBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
@@ -148,7 +148,7 @@ export async function getStaticProps({ locale }: any) {
         "navbar",
         "footer",
         "filter",
-        "rentedBooks"
+        "borrowedBooks"
       ]))
     }
   };

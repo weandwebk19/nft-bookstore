@@ -1,4 +1,6 @@
 import clientPromise from "@lib/mongodb";
+import { toCamel } from "@utils/nomalizer";
+import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
@@ -10,27 +12,33 @@ export default async function handler(
   try {
     const client = await clientPromise;
     const db = client.db("NftBookStore");
-    const tokenId: string = req.query.tokenId as string;
+    const { walletAddress } = req.query;
 
-    const bookDetail = await db
-      .collection("books")
-      .findOne({ token_id: parseInt(tokenId) });
+    const watchlists = await db
+      .collection("watchlists")
+      .find({
+        wallet_address: (walletAddress as string).toLowerCase()
+      })
+      .toArray();
 
-    if (bookDetail) {
+    if (watchlists) {
       return res.json({
         success: true,
-        message: "Get bookId successfully.",
-        data: bookDetail?._id
+        message: "Get watchlist successfully.",
+        data: watchlists
       });
     } else {
       return res.json({
         success: false,
-        message: "TokenId is wrong.",
+        message: "walletAddress is wrong.",
         data: null
       });
     }
   } catch (e: any) {
-    console.error(e);
-    throw new Error(e).message;
+    return res.json({
+      success: false,
+      message: e.message,
+      data: e
+    });
   }
 }
