@@ -65,9 +65,11 @@ const ActionableBookItem = ({
         sx={{
           height: "100%"
         }}
-        onClick={() => onClick(tokenId)}
       >
-        <Box sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}>
+        <Box
+          sx={{ flexShrink: 0, aspectRatio: "2 / 3", cursor: "pointer" }}
+          onClick={() => onClick(tokenId)}
+        >
           <Image
             src={bookCover}
             alt={title}
