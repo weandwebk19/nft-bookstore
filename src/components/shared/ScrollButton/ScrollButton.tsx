@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 
 import { Box, IconButton, Tooltip } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 const ScrollButton = () => {
+  const theme = useTheme();
   const [visible, setVisible] = useState(false);
 
   const toggleVisible = () => {
@@ -33,7 +35,8 @@ const ScrollButton = () => {
           onClick={scrollToTop}
           className="scroll-button"
           sx={{
-            display: visible ? "flex" : "none"
+            display: visible ? "flex" : "none",
+            color: `${theme.palette.common.black}`
           }}
         >
           <ArrowUpwardIcon />
