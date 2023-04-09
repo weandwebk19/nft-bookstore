@@ -11,7 +11,11 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useAccount, useOwnedRentedBooks } from "@/components/hooks/web3";
+import {
+  useAccount,
+  useOwnedLeasedOutBooks,
+  useOwnedLeasingBooks
+} from "@/components/hooks/web3";
 import { RecallButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
@@ -21,6 +25,7 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { bookList } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
+import { BorrowedBook, LeaseBook } from "@/types/nftBook";
 import pluralize from "@/utils/pluralize";
 
 const LeasingBooks = () => {
@@ -37,9 +42,9 @@ const LeasingBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedRentedBooks();
-  console.log("nfts", nfts);
-  const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
+  const leasingBooks = useOwnedLeasingBooks().nfts.data as LeaseBook[];
+  const leasedOutBooks = useOwnedLeasedOutBooks().nfts.data as BorrowedBook[];
+  // const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
   const router = useRouter();
 
   // const { account } = useAccount();
@@ -158,7 +163,7 @@ const LeasingBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {bookList!.map((book) => {
+                    {leasingBooks!.map((book: LeaseBook) => {
                       return (
                         <Grid
                           item

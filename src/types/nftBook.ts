@@ -114,7 +114,7 @@ export type ListedBook = {
   meta: NftBookMeta;
 } & ListedBookCore;
 
-export type RentedBook = {
+export type LeaseBook = {
   meta: NftBookMeta;
 } & LeaseBookCore;
 

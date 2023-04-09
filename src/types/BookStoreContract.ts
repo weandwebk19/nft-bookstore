@@ -100,7 +100,7 @@ export type BookStoreContractMethodNames =
   | "getOwnedListedBooks"
   | "getCreatedNFTBooks"
   | "getTotalOwnedToken"
-  | "getOwnedLeaseBooks"
+  | "getOwnedLeasingBooks"
   | "getOwnedBorrowedBooks"
   | "getAmountUnUsedBook"
   | "getAmountOfAllTypeBooksUntradeable"
@@ -602,7 +602,7 @@ export interface BookStoreContract {
    * StateMutability: view
    * Type: function
    */
-  getOwnedLeaseBooks(
+  getOwnedLeasingBooks(
     overrides?: ContractCallOverrides
   ): Promise<LeasebookResponse[]>;
   /**
