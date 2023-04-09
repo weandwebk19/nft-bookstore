@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
@@ -27,16 +27,18 @@ const ScrollButton = () => {
 
   return (
     <Box className="scroll-wrapper">
-      <IconButton
-        color="primary"
-        onClick={scrollToTop}
-        className="scroll-button"
-        sx={{
-          display: visible ? "flex" : "none"
-        }}
-      >
-        <ArrowUpwardIcon />
-      </IconButton>
+      <Tooltip title="Scroll to top" placement="top">
+        <IconButton
+          color="primary"
+          onClick={scrollToTop}
+          className="scroll-button"
+          sx={{
+            display: visible ? "flex" : "none"
+          }}
+        >
+          <ArrowUpwardIcon />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };
