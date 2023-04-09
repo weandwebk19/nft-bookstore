@@ -7,47 +7,19 @@ import { Section } from "@react-email/section";
 import { Text } from "@react-email/text";
 import { CldImage } from "next-cloudinary";
 
-import AuthorRegistrationLayout from "./AuthorRegistrationLayout";
-
-const heading = {
-  fontSize: "18px",
-  lineHeight: "32px",
-  color: "#3c4043",
-  margin: "0px",
-  fontWeight: "600",
-  marginLeft: "12px"
-};
-
-const paragraphContent = {
-  padding: "0 40px"
-};
-
-const paragraph = {
-  fontSize: "14px",
-  lineHeight: "22px",
-  color: "#3c4043"
-};
-
-const hr = {
-  borderColor: "#e8eaed",
-  margin: "20px 0"
-};
-
-const button = {
-  backgroundColor: "#656ee8",
-  borderRadius: "5px",
-  color: "#fff",
-  fontSize: "16px",
-  fontWeight: "bold",
-  textDecoration: "none",
-  textAlign: "center" as const,
-  cursor: "pointer"
-};
+import AuthorRegistrationLayout, {
+  button,
+  heading,
+  hr,
+  paragraph,
+  paragraphContent
+} from "./AuthorRegistrationLayout";
 
 export default function AuthorRequestEmail(
   authorInfo: AuthorInfo,
   hash: string
 ) {
+  console.log("authorInfo: ", authorInfo);
   return (
     <AuthorRegistrationLayout preview="Require Become Author">
       <Section style={paragraphContent}>
