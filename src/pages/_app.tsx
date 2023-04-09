@@ -22,6 +22,7 @@ import { publicProvider } from "wagmi/providers/public";
 
 import { Web3Provider } from "@/components/providers";
 import { Loading } from "@/components/shared/Loading";
+import { ScrollButton } from "@/components/shared/ScrollButton";
 import { MyThemeContextProvider } from "@/contexts/ThemeContext";
 import { DefaultLayout } from "@/layouts";
 
@@ -98,6 +99,8 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
                         <Component {...pageProps} />
                       </DefaultLayout>
                     )}
+
+                    <ScrollButton />
                   </Portal>
                 </motion.div>
               </AnimatePresence>
