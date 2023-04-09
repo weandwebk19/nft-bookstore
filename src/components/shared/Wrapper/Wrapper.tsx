@@ -20,7 +20,7 @@ const Wrapper = ({
   children,
   xs = 4,
   sm = 4,
-  md = 3,
+  md = 4,
   lg = 3
 }: WrapperProps) => {
   return (
@@ -42,7 +42,7 @@ const Wrapper = ({
               );
             } else if (itemsInARow === 4) {
               return (
-                <Grid key={i} item xs={xs} sm={sm} md={3}>
+                <Grid key={i} item xs={xs} sm={sm} md={md} lg={3}>
                   {item.component}
                 </Grid>
               );

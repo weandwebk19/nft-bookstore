@@ -20,6 +20,7 @@ import { polygon } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
 import { Web3Provider } from "@/components/providers";
+import { Cursor } from "@/components/shared/Cursor";
 import { Loading } from "@/components/shared/Loading";
 import { MyThemeContextProvider } from "@/contexts/ThemeContext";
 import { DefaultLayout } from "@/layouts";
@@ -63,6 +64,7 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
           <SessionProvider session={pageProps.session} refetchInterval={0}>
             <MyThemeContextProvider>
               <CssBaseline />
+              <Cursor />
               <AnimatePresence mode="wait">
                 <motion.div
                   key={router.route}
