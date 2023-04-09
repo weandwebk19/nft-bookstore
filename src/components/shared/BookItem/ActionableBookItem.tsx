@@ -18,7 +18,7 @@ interface ActionableBookItemProps {
   author: string;
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
-  rentee?: string;
+  renter?: string;
   status?: string;
 }
 
@@ -30,7 +30,7 @@ const ActionableBookItem = ({
   author,
   onClick,
   buttons,
-  rentee,
+  renter,
   status
 }: ActionableBookItemProps) => {
   const theme = useTheme();
@@ -102,7 +102,7 @@ const ActionableBookItem = ({
 
           <Divider sx={{ my: 3 }} />
           <Stack direction="row" justifyContent="space-between">
-            <Typography>{rentee}</Typography>
+            <Typography>{renter}</Typography>
             {status !== undefined ? <Chip label={status} /> : <></>}
           </Stack>
           <Stack direction="row" spacing={2}>

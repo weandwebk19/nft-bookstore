@@ -92,7 +92,7 @@ const LeaseButton = ({
 
       console.log("receipt", receipt);
     } catch (e: any) {
-      console.error(e.message);
+      console.log(e.data.message);
     }
   };
 

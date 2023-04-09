@@ -1,27 +1,22 @@
-/* eslint-disable prettier/prettier */
-import { useCallback } from "react";
-import { toast } from "react-toastify";
-
 import { CryptoHookFactory } from "@_types/hooks";
 import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { BorrowedBook } from "@/types/nftBook";
+import { BookSharing } from "@/types/nftBook";
 
-type OwnedBorrowedBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
+type OwnedSharingBooksHookFactory = CryptoHookFactory<BookSharing[]>;
 
-export type UseOwnedBorrowedBooksHook =
-  ReturnType<OwnedBorrowedBooksHookFactory>;
+export type UseOwnedSharingBooksHook = ReturnType<OwnedSharingBooksHookFactory>;
 
-export const hookFactory: OwnedBorrowedBooksHookFactory =
+export const hookFactory: OwnedSharingBooksHookFactory =
   ({ contract }) =>
   () => {
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedBorrowedBooks" : null,
+      contract ? "web3/useOwnedSharingBooks" : null,
       async () => {
-        const nfts = [] as BorrowedBook[];
-        const coreNfts = await contract!.getOwnedBorrowedBooks();
+        const nfts = [] as BookSharing[];
+        const coreNfts = await contract!.getAllOwnedBooksOnSharing();
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
@@ -36,13 +31,15 @@ export const hookFactory: OwnedBorrowedBooksHookFactory =
           try {
             nfts.push({
               tokenId: item?.tokenId?.toNumber(),
-              renter: item?.renter,
+              fromRenter: item?.fromRenter,
               amount: item?.amount?.toNumber(),
               price: parseInt(ethers.utils.formatEther(item?.price)),
-              meta,
-              borrower: item?.borrower,
+              sharer: item?.sharer,
+              sharedPer: item?.sharedPer,
+              priceOfBB: item?.priceOfBB?.toNumber(),
               startTime: item?.startTime?.toNumber(),
-              endTime: item?.endTime?.toNumber()
+              endTime: item?.endTime?.toNumber(),
+              meta
             });
           } catch (err) {
             console.log(err);
