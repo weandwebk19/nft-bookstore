@@ -15,6 +15,7 @@ import {
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
+import ShareButton from "@/components/shared/BookButton/ShareButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
@@ -103,13 +104,7 @@ const BorrowedBooks = () => {
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <SellButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                                <LeaseButton
+                                <ShareButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
