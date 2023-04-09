@@ -64,9 +64,9 @@ export const useOwnedBorrowedBooks = () => {
   };
 };
 
-export const useOwnedRentedBooks = () => {
+export const useOwnedLeasingBooks = () => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedRentedBooks();
+  const swrRes = hooks.useOwnedLeasingBooks();
 
   return {
     nfts: swrRes

@@ -24,6 +24,10 @@ import {
   hookFactory as createOwnedBorrowedBooksHook
 } from "./useOwnedBorrowedBooks";
 import {
+  UseOwnedLeasingBooksHook,
+  hookFactory as createOwnedLeasingBooksHook
+} from "./useOwnedLeasingBooks";
+import {
   UseOwnedListedBooksHook,
   hookFactory as createOwnedListedBooksHook
 } from "./useOwnedListedBooks";
@@ -31,10 +35,6 @@ import {
   UseOwnedNftsHook,
   hookFactory as createOwnedBooksHook
 } from "./useOwnedNfts";
-import {
-  UseOwnedRentedBooksHook,
-  hookFactory as createOwnedRentedBooksHook
-} from "./useOwnedRentedBooks";
 import {
   UseOwnedSharedBooksHook,
   hookFactory as createOwnedSharedBooksHook
@@ -49,7 +49,7 @@ export type Web3Hooks = {
   useCreatedBooks: UseCreatedBooksHook;
   useOwnedListedBooks: UseOwnedListedBooksHook;
   useOwnedBorrowedBooks: UseOwnedBorrowedBooksHook;
-  useOwnedRentedBooks: UseOwnedRentedBooksHook;
+  useOwnedLeasingBooks: UseOwnedLeasingBooksHook;
   useOwnedSharedBooks: UseOwnedSharedBooksHook;
   useBookDetail: UseBookDetailHook;
 };
@@ -67,7 +67,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useOwnedNfts: createOwnedBooksHook(deps),
     useCreatedBooks: createCreatedBooksHook(deps),
     useOwnedListedBooks: createOwnedListedBooksHook(deps),
-    useOwnedRentedBooks: createOwnedRentedBooksHook(deps),
+    useOwnedLeasingBooks: createOwnedLeasingBooksHook(deps),
     useOwnedBorrowedBooks: createOwnedBorrowedBooksHook(deps),
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
     useBookDetail: createBookDetailHook(deps)

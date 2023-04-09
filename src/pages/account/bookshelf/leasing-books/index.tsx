@@ -11,7 +11,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useAccount, useOwnedRentedBooks } from "@/components/hooks/web3";
+import { useAccount, useOwnedLeasingBooks } from "@/components/hooks/web3";
 import { RecallButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
@@ -37,7 +37,7 @@ const LeasingBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedRentedBooks();
+  const { nfts } = useOwnedLeasingBooks();
   console.log("nfts", nfts);
   const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
   const router = useRouter();
