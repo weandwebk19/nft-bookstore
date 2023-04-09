@@ -15,13 +15,14 @@ import {
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
+import ShareButton from "@/components/shared/BookButton/ShareButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
-const RentedBooks = () => {
+const BorrowedBooks = () => {
   const { t } = useTranslation("borrowedBooks");
 
   const breadCrumbs = [
@@ -103,13 +104,7 @@ const RentedBooks = () => {
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <SellButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                                <LeaseButton
+                                <ShareButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
@@ -138,7 +133,7 @@ const RentedBooks = () => {
   );
 };
 
-export default withAuth(RentedBooks);
+export default withAuth(BorrowedBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {

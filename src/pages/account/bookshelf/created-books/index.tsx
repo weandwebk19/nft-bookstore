@@ -62,7 +62,7 @@ const CreatedBooks = () => {
         </Box>
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
-          <Grid item xs={4} sm={8} md={9}>
+          <Grid item xs={4} sm={8} md={9} lg={9}>
             <ContentPaper title="Created books">
               {(() => {
                 if (nfts.isLoading) {
@@ -80,17 +80,17 @@ const CreatedBooks = () => {
                   <Grid
                     container
                     spacing={3}
-                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 12 }}
                   >
                     {createdBooks!.map((book) => {
                       return (
                         <Grid
                           item
                           key={book.tokenId}
-                          xs={4}
+                          xs={2}
                           sm={8}
-                          md={6}
-                          lg={12}
+                          md={12}
+                          lg={6}
                         >
                           <ActionableBookItem
                             tokenId={book?.tokenId}
@@ -100,7 +100,11 @@ const CreatedBooks = () => {
                             author={book?.author}
                             onClick={handleBookClick}
                             buttons={
-                              <>
+                              <Stack
+                                direction={{ xs: "column", sm: "row" }}
+                                spacing={{ xs: 2, sm: 2, md: 3 }}
+                                sx={{ width: "100%" }}
+                              >
                                 <SellButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
@@ -108,7 +112,7 @@ const CreatedBooks = () => {
                                   author={book?.author}
                                 />
                                 <EditButton tokenId={book?.tokenId} />
-                              </>
+                              </Stack>
                             }
                           />
                         </Grid>
@@ -119,7 +123,7 @@ const CreatedBooks = () => {
               })()}
             </ContentPaper>
           </Grid>
-          <Grid item xs={4} sm={8} md={3}>
+          <Grid item xs={4} sm={8} md={3} lg={3}>
             <ContentPaper title="Filter">
               <FilterBar />
             </ContentPaper>

@@ -66,12 +66,17 @@ const ActionableBookItem = ({
           height: "100%"
         }}
       >
-        <Image
-          src={bookCover}
-          alt={title}
-          sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
-          className={styles["book-item__book-cover"]}
-        />
+        <Box
+          sx={{ flexShrink: 0, aspectRatio: "2 / 3", cursor: "pointer" }}
+          onClick={() => onClick(tokenId)}
+        >
+          <Image
+            src={bookCover}
+            alt={title}
+            sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
+            className={styles["book-item__book-cover"]}
+          />
+        </Box>
         <Stack
           justifyContent="space-between"
           sx={{
@@ -81,8 +86,8 @@ const ActionableBookItem = ({
           }}
         >
           <Stack>
-            <Stack direction="row">
-              <InsertDriveFileIcon fontSize="small" color="disabled" />
+            <Stack direction="row" spacing={0.5}>
+              <InsertDriveFileIcon fontSize="small" color="action" />
               <Typography variant="caption">{fileType}</Typography>
             </Stack>
             <Typography

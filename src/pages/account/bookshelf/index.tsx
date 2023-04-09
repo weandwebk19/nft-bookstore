@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -23,7 +23,8 @@ const BookShelf = () => {
         <Ticket
           href={`${preUrl}/created-books`}
           header={t("createdBooks") as string}
-          image={images.product1}
+          body={t("createdBooksDesc") as string}
+          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv13_tggmtv.jpg"
         />
       )
     },
@@ -33,17 +34,19 @@ const BookShelf = () => {
         <Ticket
           href={`${preUrl}/owned-books`}
           header={t("ownedBooks") as string}
-          image={images.product2}
+          body={t("ownedBooksDesc") as string}
+          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv50_fhjnov.jpg"
         />
       )
     },
     {
-      id: `${preUrl}/rented-books`,
+      id: `${preUrl}/borrowed-books`,
       component: (
         <Ticket
-          href={`${preUrl}/rented-books`}
+          href={`${preUrl}/borrowed-books`}
           header={t("borrowedBooks") as string}
-          image={images.product3}
+          body={t("borrowedBooksDesc") as string}
+          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958967/nft_bookstore/img/gradient/vv20_g4evt5.jpg"
         />
       )
     },
@@ -53,7 +56,8 @@ const BookShelf = () => {
         <Ticket
           href={`${preUrl}/shared-books`}
           header={t("sharedBooks") as string}
-          image={images.product3}
+          body={t("sharedBooksDesc") as string}
+          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv41_dupr2k.jpg"
         />
       )
     }
@@ -69,7 +73,8 @@ const BookShelf = () => {
         <Ticket
           href={`${preUrl}/sharing-books`}
           header={t("sharingBooks") as string}
-          image={images.product1}
+          body={t("sharingBooksDesc") as string}
+          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958967/nft_bookstore/img/gradient/vv39_fhjups.jpg"
         />
       )
     },
@@ -79,7 +84,8 @@ const BookShelf = () => {
         <Ticket
           href={`${preUrl}/listing-books`}
           header={t("listingBooks") as string}
-          image={images.product1}
+          body={t("listingBooksDesc") as string}
+          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv12_nho4ox.jpg"
         />
       )
     },
@@ -89,7 +95,8 @@ const BookShelf = () => {
         <Ticket
           href={`${preUrl}/leasing-books`}
           header={t("leasingBooks") as string}
-          image={images.product1}
+          body={t("leasingBooksDesc") as string}
+          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958962/nft_bookstore/img/gradient/vv02_vxdv70.jpg"
         />
       )
     }
@@ -106,6 +113,7 @@ const BookShelf = () => {
       <Stack spacing={6}>
         <ContentContainer titles={[`${t("containerTitle")}`]}>
           <Wrapper items={topCategories} itemsInARow={4} />
+
           <Wrapper items={bottomCategories} itemsInARow={4} />
         </ContentContainer>
       </Stack>
