@@ -64,9 +64,27 @@ export const useOwnedBorrowedBooks = () => {
   };
 };
 
-export const useOwnedRentedBooks = () => {
+export const useOwnedLeasingBooks = () => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedRentedBooks();
+  const swrRes = hooks.useOwnedLeasingBooks();
+
+  return {
+    nfts: swrRes
+  };
+};
+
+export const useOwnedLeasedOutBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedLeasedOutBooks();
+
+  return {
+    nfts: swrRes
+  };
+};
+
+export const useOwnedSharedBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedSharedBooks();
 
   return {
     nfts: swrRes
@@ -86,6 +104,6 @@ export const useAllLeasingBooks = () => {
   const swrRes = hooks.useAllLeasingBooks();
 
   return {
-    rentedBooks: swrRes
+    nfts: swrRes
   };
 };

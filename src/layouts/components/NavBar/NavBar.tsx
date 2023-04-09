@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import {
   Avatar,
@@ -25,6 +26,7 @@ import { ListItemProps } from "@_types/list";
 import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
+import axios from "axios";
 import { motion } from "framer-motion";
 import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
@@ -134,6 +136,15 @@ const NavBar = () => {
       } else {
         router.push(callbackUrl);
       }
+      //create new account
+      await axios
+        .post("/api/users/create", {
+          wallet_address: wagmiAddress?.toLowerCase(),
+          fullname: "Anonymous"
+        })
+        .catch((e) => {
+          console.log(e);
+        });
     } catch (error) {
       // window.alert(error);
       console.error(error);
@@ -185,25 +196,28 @@ const NavBar = () => {
   const [anchorNavMenu, setAnchorNavMenu] = useState<Element | null>(null);
   const openNavMenu = Boolean(anchorNavMenu);
 
-  const handleHomeClick = () => {
+  const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/");
   };
 
-  const handleAboutClick = () => {
+  const handleAboutClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/about");
   };
 
-  const handleContactClick = () => {
+  const handleContactClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/contact");
   };
 
   const handleNavMenuItemClick = (key: string) => {
     switch (key) {
       case "About Us":
-        handleAboutClick();
+        (e: React.MouseEvent<HTMLButtonElement>) => handleAboutClick(e);
         break;
       case "Contact":
-        handleContactClick();
+        (e: React.MouseEvent<HTMLButtonElement>) => handleContactClick(e);
         break;
       default:
         setAnchorNavMenu(null);

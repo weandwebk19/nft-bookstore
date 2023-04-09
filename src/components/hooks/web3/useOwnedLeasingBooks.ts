@@ -1,26 +1,22 @@
-/* eslint-disable prettier/prettier */
-import { useCallback } from "react";
-import { toast } from "react-toastify";
-
 import { CryptoHookFactory } from "@_types/hooks";
 import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { RentedBook } from "@/types/nftBook";
+import { LeaseBook } from "@/types/nftBook";
 
-type OwnedRentedBooksHookFactory = CryptoHookFactory<RentedBook[]>;
+type OwnedLeasingBooksHookFactory = CryptoHookFactory<LeaseBook[]>;
 
-export type UseOwnedRentedBooksHook = ReturnType<OwnedRentedBooksHookFactory>;
+export type UseOwnedLeasingBooksHook = ReturnType<OwnedLeasingBooksHookFactory>;
 
-export const hookFactory: OwnedRentedBooksHookFactory =
+export const hookFactory: OwnedLeasingBooksHookFactory =
   ({ contract }) =>
   () => {
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedRentedBooks" : null,
+      contract ? "web3/useOwnedLeasingBooks" : null,
       async () => {
-        const nfts = [] as RentedBook[];
-        const coreNfts = await contract!.getOwnedRentedBooks();
+        const nfts = [] as LeaseBook[];
+        const coreNfts = await contract!.getOwnedLeasingBooks();
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];

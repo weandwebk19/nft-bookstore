@@ -15,10 +15,11 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
-import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-interface LeaseButtonProps {
+import { Image } from "../Image";
+
+interface ShareButtonProps {
   title: string;
   bookCover: string;
   author: string;
@@ -27,10 +28,11 @@ interface LeaseButtonProps {
 
 const schema = yup
   .object({
-    price: yup
-      .number()
-      .min(0, `The price must be higher than 0.`)
-      .typeError("Price must be a number"),
+    sharedAddress: yup
+      .string()
+      .required(
+        "Please paste the address of the person you want to share with!"
+      ),
     amount: yup
       .number()
       .min(1, `The price must be higher than 0.`)
@@ -39,16 +41,16 @@ const schema = yup
   .required();
 
 const defaultValues = {
-  price: 0,
+  sharedAddress: "",
   amount: 1
 };
 
-const LeaseButton = ({
+const ShareButton = ({
   bookCover,
   title,
   author,
   tokenId
-}: LeaseButtonProps) => {
+}: ShareButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
 
@@ -73,26 +75,34 @@ const LeaseButton = ({
   const { handleSubmit } = methods;
 
   const onSubmit = async (data: any) => {
-    // console.log(data);
     try {
-      const tx = await contract?.leaseBooks(
+      const listingPrice = await contract!.listingPrice();
+      // const tx = await contract?.sellBooks(
+      //   tokenId,
+      //   ethers.utils.parseEther(data.price.toString()),
+      //   data.amount,
+      //   {
+      //     value: listingPrice
+      //   }
+      // );
+      const tx = await contract?.sellBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
         data.amount,
         {
-          value: ethers.utils.parseEther((0.001).toString())
+          value: listingPrice
         }
       );
 
       const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Lease NftBook Token",
-        success: "NftBook has ben sold",
-        error: "Lease error"
+        pending: "Sharing NftBook Token",
+        success: "Sharing successfully",
+        error: "There's an error in sharing process!"
       });
 
       console.log("receipt", receipt);
     } catch (e: any) {
-      console.log(e.data.message);
+      console.error(e);
     }
   };
 
@@ -114,13 +124,9 @@ const LeaseButton = ({
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Lease</StyledButton>
+      <StyledButton onClick={handleBookCardClick}>Share</StyledButton>
 
-      <Dialog
-        title="Open for lease"
-        open={openBookCard}
-        onClose={handleBookCardClose}
-      >
+      <Dialog title="Share" open={openBookCard} onClose={handleBookCardClose}>
         <FormProvider {...methods}>
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
@@ -142,8 +148,8 @@ const LeaseButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Leasing price/day" required>
-                  <InputController name="price" type="number" />
+                <FormGroup label="Share with (address)" required>
+                  <InputController name="sharedAddress" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
                   <InputController name="amount" type="number" />
@@ -158,7 +164,7 @@ const LeaseButton = ({
                   Cancel
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Lease out
+                  Start sharing
                 </StyledButton>
               </Box>
             </Grid>
@@ -170,4 +176,4 @@ const LeaseButton = ({
   );
 };
 
-export default LeaseButton;
+export default ShareButton;

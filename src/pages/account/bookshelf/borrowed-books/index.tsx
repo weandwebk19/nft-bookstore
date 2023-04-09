@@ -15,14 +15,15 @@ import {
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
+import ShareButton from "@/components/shared/BookButton/ShareButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
-const RentedBooks = () => {
-  const { t } = useTranslation("rentedBooks");
+const BorrowedBooks = () => {
+  const { t } = useTranslation("borrowedBooks");
 
   const breadCrumbs = [
     {
@@ -30,8 +31,8 @@ const RentedBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_rentedBooks") as string,
-      href: "/account/bookshelf/rented-books"
+      content: t("breadcrumbs_borrowedBooks") as string,
+      href: "/account/bookshelf/borrowed-books"
     }
   ];
 
@@ -65,7 +66,7 @@ const RentedBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("rentedBooksTitle")}>
+            <ContentPaper title={t("borrowedBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
@@ -103,13 +104,7 @@ const RentedBooks = () => {
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <SellButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                                <LeaseButton
+                                <ShareButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
@@ -138,7 +133,7 @@ const RentedBooks = () => {
   );
 };
 
-export default withAuth(RentedBooks);
+export default withAuth(BorrowedBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -148,7 +143,7 @@ export async function getStaticProps({ locale }: any) {
         "navbar",
         "footer",
         "filter",
-        "rentedBooks"
+        "borrowedBooks"
       ]))
     }
   };

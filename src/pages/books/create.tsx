@@ -236,6 +236,53 @@ const CreateBook = () => {
     return { signedData, account };
   };
 
+  const deleteFileOnCloud = async () => {
+    try {
+      // Remove all data from pinata
+      if (bookCoverLink !== "") {
+        await deleteFile(
+          bookCoverLink.replace(
+            `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/`,
+            ""
+          )
+        );
+      }
+      if (bookFileLink !== "") {
+        await deleteFile(
+          bookFileLink.replace(
+            `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/`,
+            ""
+          )
+        );
+      }
+      if (bookSampleLink !== "") {
+        await deleteFile(
+          bookSampleLink.replace(
+            `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/`,
+            ""
+          )
+        );
+      }
+      if (nftURI !== "") {
+        await deleteFile(
+          nftURI.replace(`${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/`, "")
+        );
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleError = async (err: any) => {
+    await deleteFileOnCloud();
+    toast.error(err.message, {
+      position: toast.POSITION.TOP_CENTER
+    });
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+  };
+
   const uploadBookSample = async (file: File) => {
     if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
@@ -263,10 +310,7 @@ const CreateBook = () => {
         setBookSampleLink(link);
         return link;
       } catch (e: any) {
-        console.error(e.message);
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+        await handleError(e);
       }
     }
     return "";
@@ -300,10 +344,7 @@ const CreateBook = () => {
         setBookFileLink(link);
         return link;
       } catch (e: any) {
-        console.error(e.message);
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+        await handleError(e);
       }
     }
     return "";
@@ -336,10 +377,7 @@ const CreateBook = () => {
         setBookCoverLink(link);
         return link;
       } catch (e: any) {
-        console.error(e.message);
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+        await handleError(e);
       }
     }
     return "";
@@ -365,10 +403,7 @@ const CreateBook = () => {
       setNftURI(link);
       return link;
     } catch (e: any) {
-      console.error(e.message);
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      await handleError(e);
     }
     return "";
   };
@@ -393,10 +428,7 @@ const CreateBook = () => {
         return tokenId;
       }
     } catch (e: any) {
-      console.error(e.message);
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      await handleError(e);
     }
   };
 
@@ -411,17 +443,12 @@ const CreateBook = () => {
       });
       return res;
     } catch (e: any) {
-      console.error(e.message);
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      await handleError(e);
     }
   };
 
   const { handleSubmit, trigger, getValues } = methods;
   const onSubmit = (data: any) => {
-    console.log(data);
-
     try {
       if (activeStep === 1) {
         (async () => {
@@ -491,28 +518,8 @@ const CreateBook = () => {
       } else {
         handleNext();
       }
-    } catch (error) {
-      console.log("error", error);
-
-      (async () => {
-        // Remove all data from pinata
-        if (bookCoverLink !== "") {
-          const res = await deleteFile(bookCoverLink);
-          console.log("res", res);
-        }
-        if (bookFileLink !== "") {
-          deleteFile(bookFileLink);
-        }
-        if (bookSampleLink !== "") {
-          deleteFile(bookSampleLink);
-        }
-        if (nftURI !== "") {
-          deleteFile(nftURI);
-        }
-      })();
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+    } catch (err: any) {
+      handleError(err);
     }
   };
 

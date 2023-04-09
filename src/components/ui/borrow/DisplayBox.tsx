@@ -26,7 +26,7 @@ const DisplayBox: FunctionComponent = () => {
 
   const router = useRouter();
 
-  const { rentedBooks } = useAllLeasingBooks();
+  const { nfts } = useAllLeasingBooks();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -46,14 +46,11 @@ const DisplayBox: FunctionComponent = () => {
           <Stack spacing={3}>
             <ContentPaper isPaginate={true} title={t("borrowBooksTitle")}>
               {(() => {
-                if (rentedBooks.isLoading) {
+                if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (
-                  rentedBooks?.data?.length === 0 ||
-                  rentedBooks.error
-                ) {
+                } else if (nfts?.data?.length === 0 || nfts.error) {
                   return <FallbackNode />;
                 }
                 return (
@@ -66,7 +63,7 @@ const DisplayBox: FunctionComponent = () => {
                   `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
                   title, bookCover, author,... */}
 
-                    {rentedBooks?.data?.map((book) => {
+                    {nfts?.data?.map((book) => {
                       return (
                         <Grid
                           item
@@ -93,7 +90,7 @@ const DisplayBox: FunctionComponent = () => {
                                   renter={book?.renter}
                                   price={book?.price}
                                   supplyAmount={book?.amount}
-                                  borrowBooks={rentedBooks?.borrowBooks}
+                                  borrowBooks={nfts?.borrowBooks}
                                 />
                                 <BookmarkButton />
                                 <AddToWatchlistButton

@@ -3,6 +3,10 @@
 
 @import "./variables";
 
+// * {
+//   cursor: none;
+// }
+
 a,
 abbr,
 address,
@@ -315,3 +319,29 @@ section {
 #canvas3d {
   border-radius: 10em;
 }
+
+// .cursor {
+//   // position: fixed;
+//   // left: 0;
+//   // top: 0;
+//   // width: 32px;
+//   // height: 32px;
+//   // border-radius: 16px;
+//   // // background-color: black;
+//   // border: 1px solid black;
+
+//   &-outer {
+//     position: fixed;
+//     left: 0;
+//     top: 0;
+//     height: 50px;
+//     width: 50px;
+//     border-radius: 50%;
+//     border: 1px solid #0f1928;
+//     background-color: transparent;
+//     transition: height 0.3s cubic-bezier(0.46, 0.03, 0.52, 0.96),
+//       width 0.3s cubic-bezier(0.46, 0.03, 0.52, 0.96);
+//     pointer-events: none;
+//     opacity: 0.4;
+//   }
+// }

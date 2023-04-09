@@ -7,21 +7,20 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { BorrowedBook } from "@/types/nftBook";
+import { SharedBook } from "@/types/nftBook";
 
-type OwnedBorrowedBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
+type OwnedSharedBooksHookFactory = CryptoHookFactory<SharedBook[]>;
 
-export type UseOwnedBorrowedBooksHook =
-  ReturnType<OwnedBorrowedBooksHookFactory>;
+export type UseOwnedSharedBooksHook = ReturnType<OwnedSharedBooksHookFactory>;
 
-export const hookFactory: OwnedBorrowedBooksHookFactory =
+export const hookFactory: OwnedSharedBooksHookFactory =
   ({ contract }) =>
   () => {
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedBorrowedBooks" : null,
+      contract ? "web3/useOwnedSharedBooks" : null,
       async () => {
-        const nfts = [] as BorrowedBook[];
-        const coreNfts = await contract!.getOwnedBorrowedBooks();
+        const nfts = [] as SharedBook[];
+        const coreNfts = await contract!.getAllOwnedSharedBook();
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
@@ -36,13 +35,15 @@ export const hookFactory: OwnedBorrowedBooksHookFactory =
           try {
             nfts.push({
               tokenId: item?.tokenId?.toNumber(),
-              renter: item?.renter,
+              fromRenter: item?.fromRenter,
+              sharer: item?.sharer,
+              sharedPer: item?.sharedPer,
               amount: item?.amount?.toNumber(),
-              price: parseInt(ethers.utils.formatEther(item?.price)),
-              meta,
-              borrower: item?.borrower,
               startTime: item?.startTime?.toNumber(),
-              endTime: item?.endTime?.toNumber()
+              endTime: item?.endTime?.toNumber(),
+              priceOfBB: parseInt(ethers.utils.formatEther(item?.priceOfBB)),
+              price: parseInt(ethers.utils.formatEther(item?.price)),
+              meta
             });
           } catch (err) {
             console.log(err);

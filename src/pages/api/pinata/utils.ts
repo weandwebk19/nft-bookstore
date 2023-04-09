@@ -33,11 +33,13 @@ const abi = contract.abi;
 const targetNetwork = process.env.NEXT_PUBLIC_NETWORK_ID as keyof NETWORK;
 
 export const contractAddress = contract["networks"][targetNetwork]["address"];
-export const pinataApiKey = process.env.PINATA_API_KEY as string;
-export const pinataSecretApiKey = process.env.PINATA_SECRET_API_KEY as string;
-export const pinataUnpinApiKey = process.env.PINATA_UNPIN_API_KEY as string;
+export const pinataApiKey = process.env.NEXT_PUBLIC_PINATA_API_KEY as string;
+export const pinataSecretApiKey = process.env
+  .NEXT_PUBLIC_PINATA_SECRET_API_KEY as string;
+export const pinataUnpinApiKey = process.env
+  .NEXT_PUBLIC_PINATA_UNPIN_API_KEY as string;
 export const pinataUnpinSecretApiKey = process.env
-  .PINATA_UNPIN_SECRET_API_KEY as string;
+  .NEXT_PUBLIC_PINATA_UNPIN_SECRET_API_KEY as string;
 
 const sessionOptions = {
   cookieName: "userSession",
@@ -119,10 +121,10 @@ export const getMetadata = async (nftUri: string) => {
   return data;
 };
 
-export const deleteFile = async (nftUri: string) => {
+export const deleteFile = async (hash: string) => {
   try {
     const pinata = new pinataSDK(pinataUnpinApiKey, pinataUnpinSecretApiKey);
-    const jsonRes = await pinata.unpin(nftUri);
+    const jsonRes = await pinata.unpin(hash);
 
     return jsonRes;
   } catch (e) {

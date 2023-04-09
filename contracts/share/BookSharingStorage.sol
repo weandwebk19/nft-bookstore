@@ -1,21 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "../utils/Timelock.sol";
+import "../utils/Error.sol";
 
-contract SharedBookStorage {
+contract BookSharingStorage {
     using Counters for Counters.Counter;
-
-    error InvalidAddressError(address);
-    error InvalidAmountError(uint);
-    error InvalidIdError(uint);
-    error InvalidValueError(uint);
-    error InvalidParamsError();
-
     
     // priceOfBB: Save the price of previously borrowed books.
     // For the purpose of creating a new borrowed book when convert.
     // Read func convertBookOnSharingToBorrowedBook to more understand
-    struct SharedBook {
+    struct BookSharing {
         uint256 tokenId;
         address fromRenter;
         address sharer;
@@ -27,7 +22,7 @@ contract SharedBookStorage {
         uint endTime;
     }
 
-    event SharedBookCreated (
+    event BookSharingCreated (
         uint256 tokenId,
         address fromRenter,
         address sharer,
@@ -39,6 +34,7 @@ contract SharedBookStorage {
         uint endTime
     );
 
+    TimeLock private _timelock;
     // Variable for Shared Books
 
     // (hash ID ->  ID Book on sharing)
@@ -46,24 +42,26 @@ contract SharedBookStorage {
     // For sharer
     mapping(address => uint) private _totalOwnedBookOnSharing; 
     Counters.Counter private _booksOnSharing;
-    mapping(uint => SharedBook) private _idToBookOnSharing; // (ID -> Book on Sharing)
+    mapping(uint => BookSharing) private _idToBookOnSharing; // (ID -> Book on Sharing)
     mapping(address => mapping(uint => uint)) private _amountOwnedBooksOnSharing;
-
-
 
     // hash ID => ID shared book
     mapping (bytes32 => uint) _allSharedBooks;
     // For shared person
     mapping(address => uint) private _totalOwnedSharedBook; 
     Counters.Counter private _sharedBooks;
-    mapping(uint => SharedBook) private _idToSharedBook; // (ID -> Shared book)
+    mapping(uint => BookSharing) private _idToSharedBook; // (ID -> Shared book)
     // Shared person => (tokenId => amount)
     mapping(address => mapping(uint => uint)) private _amountOwnedSharedBooks;
+
+    
+    constructor(TimeLock timelock) {
+        _timelock = timelock;
+    }
 
     function getTotalBookOnSharing() public view returns(uint) {
         return _booksOnSharing.current();
     }
-
     function getHashIdForSharedBook(uint tokenId, 
                                     address sharer, 
                                     address sharedPer, 
@@ -93,12 +91,12 @@ contract SharedBookStorage {
                                                    startTime, 
                                                    endTime);
         if (_allSharedBooks[hashId] != 0) {
-            revert InvalidIdError(_allSharedBooks[hashId]);
+            revert Error.InvalidIdError(_allSharedBooks[hashId]);
         }
         _booksOnSharing.increment();
         
         _allBooksOnSharing[hashId] = _booksOnSharing.current();
-        _idToBookOnSharing[_booksOnSharing.current()] = SharedBook(tokenId,
+        _idToBookOnSharing[_booksOnSharing.current()] = BookSharing(tokenId,
                                                                    fromRenter,
                                                                    sharer,
                                                                    address(0), 
@@ -109,15 +107,20 @@ contract SharedBookStorage {
                                                                    endTime);
         _totalOwnedBookOnSharing[sharer]++;
         _amountOwnedBooksOnSharing[sharer][tokenId] += amount;
-        emit SharedBookCreated(tokenId,
-                               fromRenter,
-                               sharer,
-                               address(0), 
-                               priceOfBB,
-                               price, 
-                               amount,
-                               startTime,
-                               endTime);
+        _timelock.queue(fromRenter,
+                        0, 
+                        "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                        abi.encodePacked(_booksOnSharing.current()), 
+                        endTime);   
+        emit BookSharingCreated(tokenId,
+                                fromRenter,
+                                sharer,
+                                address(0), 
+                                priceOfBB,
+                                price, 
+                                amount,
+                                startTime,
+                                endTime);
     }
 
     function _createSharedBook(uint tokenId, 
@@ -135,11 +138,11 @@ contract SharedBookStorage {
                                                 startTime, 
                                                 endTime);
         if (_allSharedBooks[hashId] != 0) {
-            revert InvalidIdError(_allSharedBooks[hashId]);
+            revert Error.InvalidIdError(_allSharedBooks[hashId]);
         }
         _sharedBooks.increment();
         _allSharedBooks[hashId] = _sharedBooks.current();
-        _idToSharedBook[_sharedBooks.current()] = SharedBook(tokenId,
+        _idToSharedBook[_sharedBooks.current()] = BookSharing(tokenId,
                                                              fromRenter,
                                                              sharer,
                                                              sharedPer, 
@@ -150,7 +153,12 @@ contract SharedBookStorage {
                                                              endTime);
         _totalOwnedSharedBook[sharedPer]++;
         _amountOwnedSharedBooks[sharedPer][tokenId] += amount;
-        emit SharedBookCreated(tokenId,
+        _timelock.queue(fromRenter,
+                        0, 
+                        "removeSharedBooks(uint,address,address,uint,uint)", 
+                        abi.encodePacked(_sharedBooks.current()), 
+                        endTime);  
+        emit BookSharingCreated(tokenId,
                                fromRenter,
                                sharer,
                                sharedPer, 
@@ -180,12 +188,16 @@ contract SharedBookStorage {
         return 0;
     }
 
-    function getBooksOnSharing(uint idBooksOnSharing) public view returns(SharedBook memory) {
+    function getTotalSharedBooks() public view returns(uint) {
+        return _sharedBooks.current();
+    }
+
+    function getBooksOnSharing(uint idBooksOnSharing) public view returns(BookSharing memory) {
         if (idBooksOnSharing == 0) {
-            revert InvalidIdError(idBooksOnSharing);
+            revert Error.InvalidIdError(idBooksOnSharing);
         } 
         if (_idToBookOnSharing[idBooksOnSharing].sharedPer != address(0)) {
-            revert InvalidAddressError(_idToBookOnSharing[idBooksOnSharing].sharedPer);
+            revert Error.InvalidAddressError(_idToBookOnSharing[idBooksOnSharing].sharedPer);
         }
         return _idToBookOnSharing[idBooksOnSharing];
     }
@@ -195,7 +207,6 @@ contract SharedBookStorage {
                             address sharer,
                             uint startTime,
                             uint endTime) public view returns(uint) {
-        require(tokenId != 0 && sharedPer != address(0), "Token id and your's address is invalid");
         bytes32 hashId = getHashIdForSharedBook(tokenId, 
                                                 sharer, 
                                                 sharedPer, 
@@ -210,10 +221,7 @@ contract SharedBookStorage {
         return 0;
     }
 
-    function getSharedBooks(uint idSharedBook) public view returns(SharedBook memory) {
-        require(idSharedBook != 0, "Id of shared book is invalid");
-        require(_idToSharedBook[idSharedBook].sharedPer != address(0),
-                 "Shared Book is invalid");
+    function getSharedBooks(uint idSharedBook) public view returns(BookSharing memory) {
         return _idToSharedBook[idSharedBook];
     }
 
@@ -227,19 +235,21 @@ contract SharedBookStorage {
                         uint256 endTime) public payable {
 
         uint idBookOnSharing = getIdBookOnSharing(tokenId, fromRenter, sharer, startTime, endTime);
-        require(idBookOnSharing == 0, "Books is existed on sharing");
+        if (idBookOnSharing != 0) {
+            revert Error.InvalidIdError(idBookOnSharing);
+        }
         _createBookForSharing(tokenId, fromRenter, sharer, priceOfBB, price, amount, startTime, endTime);
 
     }
 
-    function getAllBooksOnSharing() public view returns (SharedBook[] memory) {
+    function getAllBooksOnSharing() public view returns (BookSharing[] memory) {
         uint length = _booksOnSharing.current();
-        SharedBook[] memory books;
+        BookSharing[] memory books;
         if (length > 0) {
-            books = new SharedBook[](length);
+            books = new BookSharing[](length);
 
             for (uint i = 1; i <= length; i++) {
-                SharedBook memory book = _idToBookOnSharing[i];
+                BookSharing memory book = _idToBookOnSharing[i];
                 books[i - 1] = book;
             }
         }
@@ -247,16 +257,16 @@ contract SharedBookStorage {
         return books;
     }
 
-    function getAllOwnedBooksOnSharing(address owner) public view returns (SharedBook[] memory) {
+    function getAllOwnedBooksOnSharing(address owner) public view returns (BookSharing[] memory) {
         uint total = _totalOwnedBookOnSharing[owner];
-        SharedBook[] memory books;
+        BookSharing[] memory books;
 
         if (total > 0) {
             uint currentIndex = 0;
-            books = new SharedBook[](total);
+            books = new BookSharing[](total);
 
             for (uint i = 1; i <= _booksOnSharing.current(); i++) {
-                SharedBook memory book = _idToBookOnSharing[i];
+                BookSharing memory book = _idToBookOnSharing[i];
                 if (book.sharer == owner && book.sharedPer == address(0)) {
                     books[currentIndex] = book;
                     currentIndex += 1;
@@ -266,14 +276,14 @@ contract SharedBookStorage {
         return books;
     }
 
-    function getAllSharedBook() public view returns (SharedBook[] memory) {
+    function getAllSharedBook() public view returns (BookSharing[] memory) {
         uint length = _sharedBooks.current();
-        SharedBook[] memory books;
+        BookSharing[] memory books;
         if (length > 0) {
-            books = new SharedBook[](length);
+            books = new BookSharing[](length);
 
             for (uint i = 1; i <= length; i++) {
-                SharedBook memory book = _idToSharedBook[i];
+                BookSharing memory book = _idToSharedBook[i];
                 books[i - 1] = book;
             }
         }
@@ -281,16 +291,16 @@ contract SharedBookStorage {
         return books;
     }
 
-    function getAllOwnedSharedBook(address owner) public view returns (SharedBook[] memory) {
+    function getAllOwnedSharedBook(address owner) public view returns (BookSharing[] memory) {
         uint total = _totalOwnedSharedBook[owner];
-        SharedBook[] memory books;
+        BookSharing[] memory books;
 
         if (total > 0) {
             uint currentIndex = 0;
-            books = new SharedBook[](total);
+            books = new BookSharing[](total);
 
             for (uint i = 1; i <= _sharedBooks.current(); i++) {
-                SharedBook memory book = _idToSharedBook[i];
+                BookSharing memory book = _idToSharedBook[i];
                 if (book.sharedPer == owner) {
                     books[currentIndex] = book;
                     currentIndex += 1;
@@ -306,8 +316,12 @@ contract SharedBookStorage {
                                         uint newPrice,
                                         uint256 newAmount
                                         ) private {
-        require(_idToSharedBook[idSharedBook].tokenId == tokenId, "Token Id is invalid");
-        require(_idToSharedBook[idSharedBook].sharedPer == sharedPer, "Address of sharered person is invalid");
+        if (_idToSharedBook[idSharedBook].tokenId != tokenId) {
+            revert Error.InvalidIdError(tokenId);
+        }
+        if (_idToSharedBook[idSharedBook].sharedPer != sharedPer) {
+            revert Error.InvalidAddressError(sharedPer);
+        }
         if(_idToSharedBook[idSharedBook].price != newPrice) {
 
             _idToSharedBook[idSharedBook].price = newPrice;
@@ -330,14 +344,22 @@ contract SharedBookStorage {
 
     }
 
+    function getTotalBooksOnSharing() public view returns(uint) {
+        return _booksOnSharing.current();
+    }
+
     function _updateBooksOnSharingInternal(uint idBookOnSharing,
                                            address sharer,
                                            uint tokenId,
                                            uint newPrice,
                                            uint256 newAmount
                                         ) private {
-        require(_idToBookOnSharing[idBookOnSharing].tokenId == tokenId, "Token Id is invalid");
-        require(_idToBookOnSharing[idBookOnSharing].sharer == sharer, "Address of sharer is invalid");
+        if (_idToBookOnSharing[idBookOnSharing].tokenId != tokenId) {
+            revert Error.InvalidIdError(tokenId);
+        }
+        if (_idToBookOnSharing[idBookOnSharing].sharer != sharer) {
+            revert Error.InvalidAddressError(sharer);
+        }
         if(_idToBookOnSharing[idBookOnSharing].price != newPrice ) {
 
             _idToBookOnSharing[idBookOnSharing].price = newPrice;
@@ -364,22 +386,46 @@ contract SharedBookStorage {
                                   uint tokenId,
                                   uint newPrice, 
                                   uint newAmount) public {
-
-        require(idBookOnSharing != 0, "Book is not existed on sharing");
-        require(newPrice > 0, "New price is invalid");
-        require(newAmount > 0, "New price is invalid");
+        if (idBookOnSharing == 0) {
+            revert Error.InvalidIdError(idBookOnSharing);
+        }
+        if (newPrice == 0) {
+            revert Error.InvalidPriceError(newPrice);
+        }
+        if (newAmount == 0) {
+            revert Error.InvalidAmountError(newAmount);
+        }
         _updateBooksOnSharingInternal(idBookOnSharing, sharer, tokenId, newPrice, newAmount);
     }
 
     function _removeBooksOnSharingInternal(bytes32 hashId) private {
         uint idBook = _allBooksOnSharing[hashId];
-        require(idBook != 0, "Book on sharing is not exist");
-        SharedBook memory bookOnSharing = _idToBookOnSharing[idBook];
+        if (idBook == 0) {
+            revert Error.InvalidIdError(idBook);
+        }
+        BookSharing memory bookOnSharing = _idToBookOnSharing[idBook];
 
         uint lastIdBook = _booksOnSharing.current();
+        bytes32 txId = _timelock.getTxId(bookOnSharing.fromRenter,
+                                         0, 
+                                         "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                                         abi.encodePacked(idBook), 
+                                         bookOnSharing.endTime);
+        _timelock.cancel(txId);
         if (lastIdBook != idBook) {
-
-            SharedBook memory lastBook = _idToBookOnSharing[lastIdBook];
+            BookSharing memory lastBook = _idToBookOnSharing[lastIdBook];
+            txId = _timelock.getTxId(lastBook.fromRenter,
+                                     0, 
+                                     "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                                     abi.encodePacked(lastIdBook), 
+                                     lastBook.endTime);
+            
+            _timelock.update(txId,
+                             lastBook.fromRenter,
+                             0, 
+                             "removeBooksOnSharing(uint,address,address,uint,uint)", 
+                             abi.encodePacked(idBook), 
+                             lastBook.endTime);
             bytes32 lastHashId = getHashIdForBookOnSharing(lastBook.tokenId, 
                                                            lastBook.fromRenter,
                                                            lastBook.sharer, 
@@ -405,8 +451,6 @@ contract SharedBookStorage {
                                   address sharer,
                                   uint startTime,
                                   uint endTime) public {
-        require(tokenId > 0, "Token id is invalid");
-        require(sharer != address(0), "Address of sharer is invalid");
 
         bytes32 hashId = getHashIdForBookOnSharing(tokenId, 
                                                    fromRenter,
@@ -419,13 +463,32 @@ contract SharedBookStorage {
 
     function _removeSharedBooksInternal(bytes32 hashId) private {
         uint idBook = _allSharedBooks[hashId];
-        require(idBook != 0, "Shared book is not exist");
-        SharedBook memory sharedBook = _idToSharedBook[idBook];
+        if (idBook == 0) {
+            revert Error.InvalidIdError(idBook);
+        }
+        BookSharing memory sharedBook = _idToSharedBook[idBook];
 
         uint lastIdBook = _sharedBooks.current();
+        bytes32 txId = _timelock.getTxId(sharedBook.fromRenter,
+                                         0, 
+                                         "removeSharedBooks(uint,address,address,uint,uint)", 
+                                         abi.encodePacked(idBook), 
+                                         sharedBook.endTime);
+        _timelock.cancel(txId);
         if (lastIdBook != idBook) {
-
-            SharedBook memory lastBook = _idToSharedBook[lastIdBook];
+            BookSharing memory lastBook = _idToSharedBook[lastIdBook];
+            txId = _timelock.getTxId(lastBook.fromRenter,
+                                     0, 
+                                     "removeSharedBooks(uint,address,address,uint,uint)", 
+                                     abi.encodePacked(lastIdBook), 
+                                     lastBook.endTime);
+            
+            _timelock.update(txId,
+                             lastBook.fromRenter,
+                             0, 
+                             "removeSharedBooks(uint,address,address,uint,uint)", 
+                             abi.encodePacked(idBook), 
+                             lastBook.endTime);
             bytes32 lastHashId = getHashIdForSharedBook(lastBook.tokenId, 
                                                         lastBook.sharer, 
                                                         lastBook.sharedPer, 
@@ -452,9 +515,6 @@ contract SharedBookStorage {
                               uint startTime,
                               uint endTime
                               ) public {
-        require(tokenId > 0, "Token Id is invalid");
-        require(owner != address(0), "Address of owner is invalid");
-
         bytes32 hashId = getHashIdForSharedBook(tokenId, 
                                                 sharer, 
                                                 owner, 
@@ -466,13 +526,19 @@ contract SharedBookStorage {
     function takeBooksOnSharing(uint idBooksOnSharing,
                                 address sender,
                                 uint amount) public payable returns(uint) {
-        SharedBook memory booksOnSharing = getBooksOnSharing(idBooksOnSharing);
-        require(booksOnSharing.tokenId > 0, "Token id is invalid");
-        require(booksOnSharing.sharer != address(0) && sender != address(0), 
-                "Address of sharer or sender is invalid");
-        require(booksOnSharing.sharer != sender, "You may not take books shared by yourself");
-        require(amount <= booksOnSharing.amount && amount > 0,
-                     "Amount of books which you want take is invalid");
+        BookSharing memory booksOnSharing = getBooksOnSharing(idBooksOnSharing);
+        if (booksOnSharing.tokenId == 0) {
+            revert Error.InvalidIdError(booksOnSharing.tokenId);
+        }
+        if (booksOnSharing.sharer == address(0) || sender == address(0)) {
+            revert Error.InvalidAddressError(address(0));
+        }
+        if (booksOnSharing.sharer == sender) {
+            revert Error.InvalidAddressError(sender);
+        }
+        if (amount > booksOnSharing.amount && amount == 0) {
+            revert Error.InvalidAmountError(amount);
+        }
         uint tokenId = booksOnSharing.tokenId;
         address sharer = booksOnSharing.sharer;
 
@@ -493,7 +559,7 @@ contract SharedBookStorage {
                               booksOnSharing.endTime);
 
         } else {
-            SharedBook memory sharedBooks = _idToSharedBook[idSharedBook];
+            BookSharing memory sharedBooks = _idToSharedBook[idSharedBook];
             _updateSharedBooksInternal(idSharedBook, 
                                        sender,
                                        tokenId,
@@ -507,8 +573,9 @@ contract SharedBookStorage {
                                                        sharer, 
                                                        booksOnSharing.startTime, 
                                                        booksOnSharing.endTime); 
-            require(_allBooksOnSharing[hashId] == idBooksOnSharing,
-                     "Hash id of books on sharing is invalid");
+            if (_allBooksOnSharing[hashId] != idBooksOnSharing) {
+                revert Error.InvalidIdError(idBooksOnSharing);
+            }
             _removeBooksOnSharingInternal(hashId);
         } else {
             _updateBooksOnSharingInternal(idBooksOnSharing,
@@ -531,6 +598,81 @@ contract SharedBookStorage {
                                     address owner) public view returns(uint) {
             
         return _amountOwnedSharedBooks[owner][tokenId];
+    }
+
+    function excRecallSharedBooks(uint idSharedBook) public returns(bool) {
+
+        bytes memory data = abi.encodePacked(idSharedBook);
+        BookSharing memory book = _idToSharedBook[idSharedBook];
+        string memory func = "removeSharedBooks(uint,address,address,uint,uint)";
+        if (_timelock.isExecute(book.fromRenter, 
+                                0, 
+                                func, 
+                                data, 
+                                book.endTime)) {
+            removeSharedBooks(idSharedBook, 
+                             book.sharedPer, 
+                             book.sharer, 
+                             book.startTime, 
+                             book.endTime);
+            return true;
+        }
+
+        return false;
+    }
+
+    function excRecallAllSharedBooks(address renter) public returns(uint) {
+        uint total = 0;
+        if (_sharedBooks.current() > 0) {
+
+        for (uint i = 1; i <= _sharedBooks.current(); i++) {
+            BookSharing memory book = _idToSharedBook[i];
+            if (book.fromRenter == renter && 
+                excRecallSharedBooks(i)) {
+                total++;     
+
+            }
+        }
+        }
+        return total;
+    }
+
+    function excRecallBooksOnSharing(uint idBooksOnSharing) public returns(bool) {
+
+        bytes memory data = abi.encodePacked(idBooksOnSharing);
+        BookSharing memory book = _idToBookOnSharing[idBooksOnSharing];
+        string memory func = "removeBooksOnSharing(uint,address,address,uint,uint)";
+        if (_timelock.isExecute(book.fromRenter, 
+                                0, 
+                                func, 
+                                data, 
+                                book.endTime)) {
+            removeBooksOnSharing(idBooksOnSharing, 
+                                 book.fromRenter, 
+                                 book.sharer, 
+                                 book.startTime, 
+                                 book.endTime);
+            return true;
+        }
+
+        return false;
+    }
+
+    function excRecallAllBooksOnSharing(address renter) public returns(uint) {
+        uint total = 0;
+        if (_booksOnSharing.current() > 0) {
+
+        for (uint i = 1; i <= _booksOnSharing.current(); i++) {
+            BookSharing memory book = _idToBookOnSharing[i];
+            if (book.fromRenter == renter && 
+                book.sharedPer == address(0) && 
+                excRecallBooksOnSharing(i)) {
+                total++;     
+
+            }
+        }
+        }
+        return total;
     }
 
 }

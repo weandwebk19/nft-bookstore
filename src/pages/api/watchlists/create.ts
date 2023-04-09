@@ -13,25 +13,25 @@ export default async function handler(
     try {
       const client = await clientPromise;
       const db = client.db("NftBookStore");
-      const { userId, bookId } = req.body;
+      const { tokenId, walletAddress } = req.body;
 
       // Check if the user is exists
       const countUsers = await db.collection("users").count({
-        _id: new ObjectId(userId)
+        wallet_address: walletAddress.toLowerCase()
       });
       // Check if the book is exists
       const countBooks = await db.collection("books").count({
-        _id: new ObjectId(bookId)
+        token_id: tokenId
       });
 
       if (countUsers > 0 && countBooks > 0) {
         db.collection("watchlists").createIndex(
-          { book_id: 1, user_id: 2 },
+          { token_id: 1, wallet_address: 2 },
           { unique: true }
         );
         const newWatchlist = await db.collection("watchlists").insertOne({
-          book_id: new ObjectId(bookId),
-          user_id: new ObjectId(userId)
+          token_id: tokenId,
+          wallet_address: walletAddress.toLowerCase()
         });
 
         return res.json({

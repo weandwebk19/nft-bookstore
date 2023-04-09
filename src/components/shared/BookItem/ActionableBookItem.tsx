@@ -18,7 +18,7 @@ interface ActionableBookItemProps {
   author: string;
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
-  rentee?: string;
+  renter?: string;
   status?: string;
 }
 
@@ -30,7 +30,7 @@ const ActionableBookItem = ({
   author,
   onClick,
   buttons,
-  rentee,
+  renter,
   status
 }: ActionableBookItemProps) => {
   const theme = useTheme();
@@ -66,12 +66,17 @@ const ActionableBookItem = ({
           height: "100%"
         }}
       >
-        <Image
-          src={bookCover}
-          alt={title}
-          sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
-          className={styles["book-item__book-cover"]}
-        />
+        <Box
+          sx={{ flexShrink: 0, aspectRatio: "2 / 3", cursor: "pointer" }}
+          onClick={() => onClick(tokenId)}
+        >
+          <Image
+            src={bookCover}
+            alt={title}
+            sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
+            className={styles["book-item__book-cover"]}
+          />
+        </Box>
         <Stack
           justifyContent="space-between"
           sx={{
@@ -81,8 +86,8 @@ const ActionableBookItem = ({
           }}
         >
           <Stack>
-            <Stack direction="row">
-              <InsertDriveFileIcon fontSize="small" color="disabled" />
+            <Stack direction="row" spacing={0.5}>
+              <InsertDriveFileIcon fontSize="small" color="action" />
               <Typography variant="caption">{fileType}</Typography>
             </Stack>
             <Typography
@@ -97,7 +102,7 @@ const ActionableBookItem = ({
 
           <Divider sx={{ my: 3 }} />
           <Stack direction="row" justifyContent="space-between">
-            <Typography>{rentee}</Typography>
+            <Typography>{renter}</Typography>
             {status !== undefined ? <Chip label={status} /> : <></>}
           </Stack>
           <Stack direction="row" spacing={2}>

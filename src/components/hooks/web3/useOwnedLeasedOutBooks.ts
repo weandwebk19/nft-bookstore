@@ -1,7 +1,3 @@
-/* eslint-disable prettier/prettier */
-import { useCallback } from "react";
-import { toast } from "react-toastify";
-
 import { CryptoHookFactory } from "@_types/hooks";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -9,19 +5,25 @@ import useSWR from "swr";
 
 import { BorrowedBook } from "@/types/nftBook";
 
-type OwnedBorrowedBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
+import { useAccount } from ".";
 
-export type UseOwnedBorrowedBooksHook =
-  ReturnType<OwnedBorrowedBooksHookFactory>;
+type OwnedLeasedOutBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
 
-export const hookFactory: OwnedBorrowedBooksHookFactory =
+export type UseOwnedLeasedOutBooksHook =
+  ReturnType<OwnedLeasedOutBooksHookFactory>;
+
+export const hookFactory: OwnedLeasedOutBooksHookFactory =
   ({ contract }) =>
   () => {
+    const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedBorrowedBooks" : null,
+      contract ? "web3/useOwnedLeasedOutBooks" : null,
       async () => {
         const nfts = [] as BorrowedBook[];
-        const coreNfts = await contract!.getOwnedBorrowedBooks();
+        const allBorrowedBooks = await contract!.getAllBorrowedBooks();
+        const coreNfts = allBorrowedBooks.filter((nft) => {
+          return nft.renter == account.data;
+        });
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
@@ -39,10 +41,10 @@ export const hookFactory: OwnedBorrowedBooksHookFactory =
               renter: item?.renter,
               amount: item?.amount?.toNumber(),
               price: parseInt(ethers.utils.formatEther(item?.price)),
-              meta,
               borrower: item?.borrower,
               startTime: item?.startTime?.toNumber(),
-              endTime: item?.endTime?.toNumber()
+              endTime: item?.endTime?.toNumber(),
+              meta
             });
           } catch (err) {
             console.log(err);

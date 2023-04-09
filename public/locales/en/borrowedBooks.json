@@ -1,0 +1,8 @@
+{
+  "titlePage": "Borrowed books - NFT Bookstore",
+  "borrowedBooksTitle": "Borrowed books",
+  "emptyMessage": "You haven't borrow any books!",
+  "loadingMessage": "Putting books on the shelves...",
+  "breadcrumbs_bookshelf": "Bookshelf",
+  "breadcrumbs_borrowedBooks": "Borrowed books"
+}

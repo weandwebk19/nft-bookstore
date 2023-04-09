@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
+import "./Error.sol";
 
 // Timelock is a contract that helps us in delaying a transaction with a specific time
 contract TimeLock {
-    error AlreadyQueuedError(bytes32 txId);
-    error TimestampNotInRangeError(uint blockTimestamp, uint timestamp);
-    error NotQueuedError(bytes32 txId);
 
     event Queue(
         bytes32 indexed txId,
@@ -50,14 +48,14 @@ contract TimeLock {
     ) public returns (bytes32 txId) {
         txId = getTxId(_owner, _value, _func, _data, _timestamp);
         if (queued[txId]) {
-            revert AlreadyQueuedError(txId);
+            revert Error.AlreadyQueuedError(txId);
         }
         // ---|------------|-------
         //  block    block + MIN_DELAY     
         if (
             _timestamp < block.timestamp + MIN_DELAY 
         ) {
-            revert TimestampNotInRangeError(block.timestamp, _timestamp);
+            revert Error.TimestampNotInRangeError(block.timestamp, _timestamp);
         }
 
         queued[txId] = true;
@@ -79,7 +77,7 @@ contract TimeLock {
             if (
                 _newTimestamp < block.timestamp + MIN_DELAY 
             ) {
-                revert TimestampNotInRangeError(block.timestamp, _newTimestamp);
+                revert Error.TimestampNotInRangeError(block.timestamp, _newTimestamp);
             }
             queued[txId] = false;
 
@@ -88,9 +86,7 @@ contract TimeLock {
             emit Queue(txId, _newOwner, _newvalue, _newFunc, _newData, _newTimestamp);
             return true;
         }
-
-        revert NotQueuedError(txId);
-
+        return false;
     }
 
     function isExecute(
@@ -118,7 +114,8 @@ contract TimeLock {
 
     function cancel(bytes32 _txId) public {
         if (!queued[_txId]) {
-            revert NotQueuedError(_txId);
+            require(false, "Check log1");
+            revert Error.NotQueuedError(_txId);
         }
 
         queued[_txId] = false;

@@ -61,31 +61,32 @@ const Book = () => {
   };
 
   const handleSubmit = () => {
-    // try {
     (async () => {
       try {
+        const res = await deleteFile(
+          "QmUZHW5U4a5a5qyGvB6fXLpzK3ADYQh7MpGmV99njPaNT7"
+        );
+        console.log("bookCoverLink res", res);
+
         // const { signedData, account } = await getSignedData();
 
-        const promise = axios.get(
-          "/api/pinata/metadata/QmZVdqdj5Z4u1f5BT6RDqkufz8FRSERuEyYYt3wY4q9baY/delete"
-        );
+        // const promise = axios.get(
+        //   "/api/pinata/metadata/QmUZHW5U4a5a5qyGvB6fXLpzK3ADYQh7MpGmV99njPaNT7/delete"
+        // );
 
-        const res = await toast.promise(promise, {
-          pending: "Uploading metadata",
-          success: "Metadata uploaded",
-          error: "Metadata upload error"
-        });
+        // const res = await toast.promise(promise, {
+        //   pending: "Uploading metadata",
+        //   success: "Metadata uploaded",
+        //   error: "Metadata upload error"
+        // });
 
-        const data = res.data as PinataRes;
-        const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
-        console.log("data", data);
+        // const data = res.data as PinataRes;
+        // const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
+        // console.log("data", data);
       } catch (err) {
         console.error(err);
       }
     })();
-    // } catch (e: any) {
-    //   console.error(e);
-    // }
     return "";
   };
   return (
