@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
 
-import { addressCheckMiddleware, withSession } from "../../utils";
+import { addressCheckMiddleware, withSessionSSR } from "../../utils";
 import { deleteFile } from "../../utils";
 
-export default withSession(
+export default withSessionSSR(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
     console.log("Delete metadata");
     if (req.method === "DELETE") {

@@ -81,7 +81,7 @@ export type ListedBookCore = {
   amount: number;
 };
 
-export type RentedBookCore = {
+export type LeaseBookCore = {
   tokenId: number;
   renter: string;
   price: number;
@@ -98,7 +98,7 @@ export type BorrowedBookCore = {
   endTime: number;
 };
 
-export type SharedBookCore = {
+export type BookSharingCore = {
   tokenId: number;
   fromRenter: string;
   sharer: string;
@@ -116,15 +116,15 @@ export type ListedBook = {
 
 export type RentedBook = {
   meta: NftBookMeta;
-} & RentedBookCore;
+} & LeaseBookCore;
 
 export type BorrowedBook = {
   meta: NftBookMeta;
 } & BorrowedBookCore;
 
-export type SharedBook = {
+export type BookSharing = {
   meta: NftBookMeta;
-} & SharedBookCore;
+} & BookSharingCore;
 
 export type NftListedBook = {
   meta: NftBookMeta;
