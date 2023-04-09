@@ -21,7 +21,7 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 
-const RentedBooks = () => {
+const BorrowedBooks = () => {
   const { t } = useTranslation("borrowedBooks");
 
   const breadCrumbs = [
@@ -138,7 +138,7 @@ const RentedBooks = () => {
   );
 };
 
-export default withAuth(RentedBooks);
+export default withAuth(BorrowedBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {

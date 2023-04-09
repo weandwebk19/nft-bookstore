@@ -224,6 +224,7 @@ const WalletBar = ({
   if (isInstalled) {
     return (
       <>
+        {("isConnected", isConnected)}
         <StyledButton
           customVariant="primary"
           onClick={() => {
