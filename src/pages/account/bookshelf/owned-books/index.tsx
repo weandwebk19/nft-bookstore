@@ -96,12 +96,14 @@ const OwnedBooks = () => {
                           lg={12}
                         >
                           <ActionableBookItem
+                            status="isOwned"
                             tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
                             author={book?.author}
                             onClick={handleBookClick}
+                            quantity={book?.quantity}
                             buttons={
                               <>
                                 <SellButton

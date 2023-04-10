@@ -1,8 +1,8 @@
 {
-  "titlePage": "Created - NFT Bookstore",
+  "titlePage": "Created books - NFT Bookstore",
   "createdBooksTitle": "Created books",
   "emptyMessage": "There's nothing here!",
   "loadingMessage": "Putting books on the shelves...",
   "breadcrumbs_bookshelf": "Bookshelf",
-  "breadcrumbs_createdBooks": "Created"
+  "breadcrumbs_createdBooks": "Created books"
 }

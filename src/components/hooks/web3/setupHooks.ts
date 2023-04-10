@@ -73,7 +73,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useCreatedBooks: createCreatedBooksHook(deps),
     useOwnedListedBooks: createOwnedListedBooksHook(deps),
     useOwnedLeasingBooks: createOwnedLeasingBooksHook(deps),
-    useOwnedLeaseOutBooks: createOwnedLeasedOutBooksHook(deps),
+    useOwnedLeasedOutBooks: createOwnedLeasedOutBooksHook(deps),
     useOwnedBorrowedBooks: createOwnedBorrowedBooksHook(deps),
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
     useBookDetail: createBookDetailHook(deps)

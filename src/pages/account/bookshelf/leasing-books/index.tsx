@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -23,7 +23,6 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { bookList } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
 import { BorrowedBook, LeaseBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
@@ -43,10 +42,14 @@ const LeasingBooks = () => {
     }
   ];
 
-  const leasingBooks = useOwnedLeasingBooks().nfts.data as LeaseBook[];
-  const leasedOutBooks = useOwnedLeasedOutBooks().nfts.data as BorrowedBook[];
-  // const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
   const router = useRouter();
+
+  const { nfts: leaseNfts } = useOwnedLeasingBooks();
+  const leasingBooks = leaseNfts.data as LeaseBook[];
+
+  const leasedOutBooks = useOwnedLeasedOutBooks()?.nfts.data as BorrowedBook[];
+
+  console.log(leasedOutBooks);
 
   // const { account } = useAccount();
 
@@ -147,67 +150,116 @@ const LeasingBooks = () => {
               }
             >
               {(() => {
-                // if (nfts.isLoading) {
-                //   return (
-                //     <Typography>{t("loadingMessage") as string}</Typography>
-                //   );
-                // } else if (recallBooks?.length === 0 || nfts.error) {
-                //   return (
-                //     <FallbackNode>
-                //       <Typography>{t("emptyMessage") as string}</Typography>
-                //     </FallbackNode>
-                //   );
-                // }
+                if (leaseNfts.isLoading) {
+                  return (
+                    <Typography>{t("loadingMessage") as string}</Typography>
+                  );
+                } else if (leasingBooks?.length === 0 || leaseNfts.error) {
+                  return (
+                    <FallbackNode>
+                      <Typography>{t("emptyMessage") as string}</Typography>
+                    </FallbackNode>
+                  );
+                }
                 return (
                   <Grid
                     container
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {leasingBooks!.map((book: LeaseBook) => {
-                      return (
-                        <Grid
-                          item
-                          key={book.tokenId}
-                          xs={4}
-                          sm={8}
-                          md={6}
-                          lg={12}
-                        >
-                          <ActionableBookItem
-                            tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
-                            author={book?.author}
-                            onClick={handleBookClick}
-                            buttons={
-                              <>
-                                <RecallButton
-                                  rentee={book?.rentee}
-                                  isEnded={book?.endRentalDay === 0}
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                              </>
-                            }
-                            rentee={book?.rentee}
-                            status={
-                              book?.endRentalDay !== undefined
-                                ? book?.endRentalDay > 0
-                                  ? `${pluralize(
-                                      book?.endRentalDay,
-                                      "day"
-                                    )} left`
-                                  : "Ended" // End of leasing term
-                                : undefined
-                            }
-                          />
-                        </Grid>
-                      );
-                    })}
+                    <>
+                      {leasingBooks!.map((book: LeaseBook) => {
+                        return (
+                          <Grid
+                            item
+                            key={book.tokenId}
+                            xs={4}
+                            sm={8}
+                            md={6}
+                            lg={12}
+                          >
+                            <ActionableBookItem
+                              tokenId={book?.tokenId}
+                              bookCover={book?.meta.bookCover}
+                              title={book?.meta.title}
+                              fileType={book?.meta.fileType}
+                              renter={book?.renter}
+                              onClick={handleBookClick}
+                              price={book?.price}
+                              buttons={
+                                <>
+                                  <RecallButton
+                                    rentee={book?.borrower}
+                                    isEnded={book?.endRentalDay === 0}
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    author={book?.author}
+                                  />
+                                </>
+                              }
+                              // status={
+                              //   book?.endRentalDay !== undefined
+                              //     ? book?.endRentalDay > 0
+                              //       ? `${pluralize(
+                              //           book?.endRentalDay,
+                              //           "day"
+                              //         )} left`
+                              //       : "Ended" // End of leasing term
+                              //     : undefined
+                              // }
+                            />
+                          </Grid>
+                        );
+                      })}
+
+                      <Divider sx={{ my: 3 }} />
+
+                      {leasedOutBooks!.map((book: LeaseBook) => {
+                        return (
+                          <Grid
+                            item
+                            key={book.tokenId}
+                            xs={4}
+                            sm={8}
+                            md={6}
+                            lg={12}
+                          >
+                            <ActionableBookItem
+                              tokenId={book?.tokenId}
+                              bookCover={book?.meta.bookCover}
+                              title={book?.meta.title}
+                              fileType={book?.meta.fileType}
+                              renter={book?.renter}
+                              onClick={handleBookClick}
+                              price={book?.price}
+                              buttons={
+                                <>
+                                  <RecallButton
+                                    rentee={book?.borrower}
+                                    isEnded={book?.endRentalDay === 0}
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    author={book?.author}
+                                  />
+                                </>
+                              }
+                              // status={
+                              //   book?.endRentalDay !== undefined
+                              //     ? book?.endRentalDay > 0
+                              //       ? `${pluralize(
+                              //           book?.endRentalDay,
+                              //           "day"
+                              //         )} left`
+                              //       : "Ended" // End of leasing term
+                              //     : undefined
+                              // }
+                            />
+                          </Grid>
+                        );
+                      })}
+                    </>
                   </Grid>
                 );
               })()}

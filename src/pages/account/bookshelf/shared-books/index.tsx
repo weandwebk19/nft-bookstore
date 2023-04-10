@@ -8,17 +8,14 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import {
-  EditButton,
-  LeaseButton,
-  SellButton
-} from "@/components/shared/BookButton";
+import { useOwnedSharedBooks } from "@/components/hooks/web3";
+import { ReadButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
+import { SharedBook } from "@/types/nftBook";
 
 const SharedBooks = () => {
   const { t } = useTranslation("sharedBooks");
@@ -34,7 +31,9 @@ const SharedBooks = () => {
     }
   ];
 
+  const { nfts } = useOwnedSharedBooks();
   const router = useRouter();
+  const sharedBooks = nfts.data as SharedBook[];
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -62,7 +61,7 @@ const SharedBooks = () => {
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
             <ContentPaper title={t("sharedBooksTitle")}>
-              {/* {(() => {
+              {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
@@ -91,21 +90,16 @@ const SharedBooks = () => {
                           lg={12}
                         >
                           <ActionableBookItem
+                            status="isShared"
                             tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.author}
+                            sharer={book?.sharer}
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <SellButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                                <EditButton tokenId={book?.tokenId} />
+                                <ReadButton bookFile={book?.meta.bookFile} />
                               </>
                             }
                           />
@@ -114,7 +108,7 @@ const SharedBooks = () => {
                     })}
                   </Grid>
                 );
-              })()} */}
+              })()}
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>

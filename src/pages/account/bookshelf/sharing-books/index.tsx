@@ -10,6 +10,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
+// import { useOwnedSharingBooks } from "@/components/hooks/web3";
 import { RecallButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
@@ -36,7 +37,9 @@ const SharingBooks = () => {
     }
   ];
 
+  // const { nfts } = useOwnedSharingBooks();
   const router = useRouter();
+  // const sharingBooks = nfts.data as SharingBook[];
 
   const handleOpenRecallDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -145,7 +148,7 @@ const SharingBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {bookList!.map((book) => {
+                    {/* {sharingBooks!.map((book) => {
                       return (
                         <Grid
                           item
@@ -156,11 +159,12 @@ const SharingBooks = () => {
                           lg={12}
                         >
                           <ActionableBookItem
+                            status="isSharing"
                             tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.author}
+                            sharedPerson={book?.sharedPer}
                             onClick={handleBookClick}
                             buttons={
                               <>
@@ -188,7 +192,7 @@ const SharingBooks = () => {
                           />
                         </Grid>
                       );
-                    })}
+                    })} */}
                   </Grid>
                 );
               })()}
