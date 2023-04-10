@@ -42,6 +42,12 @@ const FileController = ({
             sx={{ display: "none" }}
             {...field}
             onChange={(e) => {
+              if (
+                !(e.target as any)?.files ||
+                (e.target as any)?.files.length === 0
+              ) {
+                return;
+              }
               field.onChange((e.target as any)?.files[0]);
             }}
           />
