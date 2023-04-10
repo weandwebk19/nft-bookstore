@@ -11,6 +11,7 @@ interface FileControllerProps {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   InputProps?: object;
+  readOnly?: boolean;
 }
 
 const FileController = ({
@@ -20,6 +21,7 @@ const FileController = ({
   defaultValue,
   onChange,
   InputProps,
+  readOnly = false,
   ...rest
 }: FileControllerProps) => {
   const { control } = useFormContext();
@@ -33,13 +35,19 @@ const FileController = ({
             type="file"
             label={label}
             // error={invalid}
-            InputProps={InputProps}
+            InputProps={{ readOnly, ...InputProps }}
             inputProps={{
               accept: "image/jpg, image/jpeg, image/gif, image/png"
             }}
             sx={{ display: "none" }}
             {...field}
             onChange={(e) => {
+              if (
+                !(e.target as any)?.files ||
+                (e.target as any)?.files.length === 0
+              ) {
+                return;
+              }
               field.onChange((e.target as any)?.files[0]);
             }}
           />

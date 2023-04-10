@@ -37,6 +37,7 @@ import {
 import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
 const SUPPORTED_FORMATS = [
@@ -391,7 +392,10 @@ export default Profile;
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer", "profile"]))
+      ...(await serverSideTranslations(locale, [
+        ...namespaceDefaultLanguage(),
+        "profile"
+      ]))
     }
   };
 }

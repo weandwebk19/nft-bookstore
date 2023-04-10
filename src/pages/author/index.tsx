@@ -5,6 +5,7 @@ import Head from "next/head";
 
 import withAuth from "@/components/HOC/withAuth";
 import DisplayBox from "@/components/ui/publishing/DisplayBox";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const Author = () => {
   return (
@@ -31,7 +32,7 @@ export default withAuth(Author);
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, [...namespaceDefaultLanguage()]))
     }
   };
 }

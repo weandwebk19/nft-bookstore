@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/books/create/steps";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
 
@@ -625,7 +626,7 @@ export default BookDetailEdit;
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, [...namespaceDefaultLanguage()]))
     }
   };
 }

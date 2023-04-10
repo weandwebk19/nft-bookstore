@@ -18,6 +18,7 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { StyledButton } from "@/styles/components/Button";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const ListingBooks = () => {
   const { t } = useTranslation("listingBooks");
@@ -117,9 +118,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "common",
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "filter",
         "listingBooks"
       ]))

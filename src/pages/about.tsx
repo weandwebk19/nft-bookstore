@@ -6,11 +6,14 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
 import { ContentContainer } from "@/components/shared/ContentContainer";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const About = () => {
   const { t } = useTranslation("about");
 
   const theme = useTheme();
+
+  console.log("data:", [...namespaceDefaultLanguage(), "about"]);
 
   return (
     <>
@@ -104,7 +107,10 @@ export default About;
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer", "about"]))
+      ...(await serverSideTranslations(locale, [
+        ...namespaceDefaultLanguage(),
+        "about"
+      ]))
     }
   };
 }

@@ -11,6 +11,7 @@ interface InputControllerProps {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   InputProps?: object;
+  readOnly?: boolean;
 }
 
 const InputController = ({
@@ -20,6 +21,7 @@ const InputController = ({
   defaultValue,
   onChange,
   InputProps,
+  readOnly = false,
   ...rest
 }: InputControllerProps) => {
   const { control } = useFormContext();
@@ -33,7 +35,7 @@ const InputController = ({
             type={type}
             label={label}
             error={invalid}
-            InputProps={InputProps}
+            InputProps={{ readOnly, ...InputProps }}
             {...field}
             onChange={(e) => {
               if (onChange) {

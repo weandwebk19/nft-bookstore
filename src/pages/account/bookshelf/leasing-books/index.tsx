@@ -26,6 +26,7 @@ import { FilterBar } from "@/components/shared/FilterBar";
 import { bookList } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
 import { BorrowedBook, LeaseBook } from "@/types/nftBook";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import pluralize from "@/utils/pluralize";
 
 const LeasingBooks = () => {
@@ -229,9 +230,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "common",
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "filter",
         "leasingBooks"
       ]))

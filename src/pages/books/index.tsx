@@ -3,6 +3,8 @@ import { Stack } from "@mui/material";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
+
 const Book = () => {
   return (
     <>
@@ -24,7 +26,7 @@ export default Book;
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, [...namespaceDefaultLanguage()]))
     }
   };
 }

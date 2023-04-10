@@ -20,6 +20,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const OwnedBooks = () => {
   const { t } = useTranslation("ownedBooks");
@@ -144,9 +145,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "common",
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "filter",
         "ownedBooks"
       ]))

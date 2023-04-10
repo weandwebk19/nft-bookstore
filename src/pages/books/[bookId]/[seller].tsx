@@ -1,13 +1,14 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import BookDetail from "@/components/ui/books/BookDetail";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 export default BookDetail;
 
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, [...namespaceDefaultLanguage()]))
     }
   };
 }
