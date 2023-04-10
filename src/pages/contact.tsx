@@ -15,6 +15,7 @@ import {
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const defaultValues = {
   name: "",
@@ -102,7 +103,10 @@ export default function Contact() {
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer", "contact"]))
+      ...(await serverSideTranslations(locale, [
+        ...namespaceDefaultLanguage(),
+        "contact"
+      ]))
     }
   };
 }

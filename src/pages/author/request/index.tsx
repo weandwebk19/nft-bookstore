@@ -46,6 +46,7 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { uploadImage } from "@/lib/cloudinary";
 import { StyledButton } from "@/styles/components/Button";
 import formatBytes from "@/utils/formatBytes";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
 const SUPPORTED_FORMATS = [
@@ -577,8 +578,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "authorRequest"
       ]))
     }

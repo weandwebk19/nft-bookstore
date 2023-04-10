@@ -10,6 +10,7 @@ import { Book3D } from "@/components/shared/Book3D";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { Ticket } from "@/components/shared/Ticket";
 import { Wrapper } from "@/components/shared/Wrapper";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const preUrl = "/account/bookshelf";
 
@@ -127,8 +128,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "bookshelf"
       ]))
     }

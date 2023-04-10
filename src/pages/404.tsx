@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 import styles from "@/styles/NotFound.module.scss";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const NotFoundPage = () => {
   const { t } = useTranslation("notFound");
@@ -101,8 +102,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "notFound"
       ]))
     }

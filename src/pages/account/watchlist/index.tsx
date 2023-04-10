@@ -9,6 +9,7 @@ import withAuth from "@/components/HOC/withAuth";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import WatchlistTable from "@/components/ui/account/watchlist/WatchlistTable";
 import { WatchlistStatus } from "@/types/watchlist";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const Watchlist = () => {
   const { t } = useTranslation("watchlist");
@@ -56,8 +57,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "watchlist"
       ]))
     }

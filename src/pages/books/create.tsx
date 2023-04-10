@@ -38,6 +38,7 @@ import {
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAX_BOOKFILE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKFILE_SIZE;
 const MAX_BOOKCOVER_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKCOVER_SIZE;
@@ -732,8 +733,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "createBook"
       ]))
     }

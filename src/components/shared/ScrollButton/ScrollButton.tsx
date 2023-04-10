@@ -5,7 +5,10 @@ import { useTheme } from "@mui/material/styles";
 
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
+import { useTranslation } from "next-i18next";
+
 const ScrollButton = () => {
+  const { t } = useTranslation("common");
   const theme = useTheme();
   const [visible, setVisible] = useState(false);
 
@@ -29,7 +32,7 @@ const ScrollButton = () => {
 
   return (
     <Box className="scroll-wrapper">
-      <Tooltip title="Scroll to top" placement="top">
+      <Tooltip title={t("scrollToTop") as string} placement="top">
         <IconButton
           color="primary"
           onClick={scrollToTop}

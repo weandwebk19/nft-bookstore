@@ -26,6 +26,7 @@ import { Loading } from "@/components/shared/Loading";
 import { ScrollButton } from "@/components/shared/ScrollButton";
 import { MyThemeContextProvider } from "@/contexts/ThemeContext";
 import { DefaultLayout } from "@/layouts";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 type PageLayoutProps = {
   children: React.ReactNode;
@@ -40,7 +41,7 @@ type ComponentWithPageLayout = AppProps & {
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, [...namespaceDefaultLanguage()]))
     }
   };
 }

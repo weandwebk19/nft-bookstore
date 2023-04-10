@@ -6,6 +6,7 @@ import Head from "next/head";
 
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import DisplayBox from "@/components/ui/borrow/DisplayBox";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const Borrow = () => {
   const { t } = useTranslation("borrowBooks");
@@ -47,9 +48,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "common",
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "filter",
         "fallback",
         "borrowBooks"

@@ -11,6 +11,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { StyledButton } from "@/styles/components/Button";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 export default function Home() {
   const router = useRouter();
@@ -110,7 +111,10 @@ export default function Home() {
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer", "home"]))
+      ...(await serverSideTranslations(locale, [
+        ...namespaceDefaultLanguage(),
+        "home"
+      ]))
       // Will be passed to the page component as props
     }
   };

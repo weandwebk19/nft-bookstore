@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/books/create/steps";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 import { deleteFile } from "../api/pinata/utils";
 
@@ -121,7 +122,7 @@ export default Book;
 export async function getStaticProps({ locale }: any) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["navbar", "footer"]))
+      ...(await serverSideTranslations(locale, [...namespaceDefaultLanguage()]))
     }
   };
 }
