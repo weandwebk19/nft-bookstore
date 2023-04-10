@@ -16,6 +16,7 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { SharedBook } from "@/types/nftBook";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const SharedBooks = () => {
   const { t } = useTranslation("sharedBooks");
