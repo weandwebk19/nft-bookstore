@@ -110,12 +110,14 @@ const OwnedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
+                                  quantity={book?.quantity}
                                 />
                                 <LeaseButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
+                                  quantity={book?.quantity}
                                 />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>

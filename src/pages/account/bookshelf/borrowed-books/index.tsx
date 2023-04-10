@@ -123,6 +123,7 @@ const BorrowedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.renter}
+                                  borrowedAmount={book?.amount}
                                 />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>

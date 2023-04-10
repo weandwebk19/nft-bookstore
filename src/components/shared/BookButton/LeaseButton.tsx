@@ -23,6 +23,7 @@ interface LeaseButtonProps {
   bookCover: string;
   author: string;
   tokenId: number;
+  quantity: number;
 }
 
 const schema = yup
@@ -47,7 +48,8 @@ const LeaseButton = ({
   bookCover,
   title,
   author,
-  tokenId
+  tokenId,
+  quantity
 }: LeaseButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
@@ -132,7 +134,8 @@ const LeaseButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
+                <Typography>{authorName}</Typography>{" "}
+                <Typography>{quantity} left</Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>

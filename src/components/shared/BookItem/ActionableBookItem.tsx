@@ -245,7 +245,9 @@ const ActionableBookItem = ({
                 status === "isSharing") && (
                 <Stack>
                   <Typography variant="subtitle2">Return in:</Typography>
-                  <Typography variant="label">{countDown}</Typography>
+                  <Typography variant="label">
+                    {countDown !== "0D:0:0:0" ? countDown : "Ended"}
+                  </Typography>
                 </Stack>
               )}
               {(status === "isCreated" || status === "isOwned") && (

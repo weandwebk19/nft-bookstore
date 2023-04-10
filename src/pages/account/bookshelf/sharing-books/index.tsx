@@ -163,30 +163,17 @@ const SharingBooks = () => {
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            sharedPerson={book?.sharedPer}
                             onClick={handleBookClick}
                             buttons={
                               <>
                                 <RecallButton
-                                  rentee={book?.rentee}
-                                  isEnded={book?.endRentalDay === 0}
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    renter={book?.renter}
+                                    amount={book?.amount}
+                                  />
                               </>
-                            }
-                            rentee={book?.rentee}
-                            status={
-                              book?.endRentalDay !== undefined
-                                ? book?.endRentalDay > 0
-                                  ? `${pluralize(
-                                      book?.endRentalDay,
-                                      "day"
-                                    )} left`
-                                  : "Ended" // End of leasing term
-                                : undefined
                             }
                           />
                         </Grid>

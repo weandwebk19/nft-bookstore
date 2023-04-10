@@ -18,11 +18,13 @@ import { Image } from "../Image";
 import { Snackbar } from "../Snackbar";
 
 interface RecallButtonProps {
-  rentee: string;
-  isEnded: boolean;
+  borrower?: string;
+  amount: number;
+  isEnded?: boolean;
+  countDown?: string;
   title: string;
   bookCover: string;
-  author: string;
+  renter: string;
   tokenId: number;
 }
 
@@ -45,14 +47,16 @@ const defaultValues = {
 };
 
 const RecallButton = ({
-  rentee,
+  borrower,
+  amount,
   isEnded,
+  countDown,
   bookCover,
   title,
-  author,
+  renter,
   tokenId
 }: RecallButtonProps) => {
-  const [authorName, setAuthorName] = useState();
+  const [renterName, setRenterName] = useState();
   const { ethereum, contract } = useWeb3();
 
   const [anchorRecallDiaglog, setAnchorRecallDiaglog] =
@@ -129,18 +133,18 @@ const RecallButton = ({
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (renter) {
+          const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setRenterName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [renter]);
 
   return (
     <>
@@ -168,7 +172,8 @@ const RecallButton = ({
                     className={styles["book-item__book-cover"]}
                   />
                   <Typography variant="h5">{title}</Typography>
-                  <Typography>{authorName}</Typography>
+                  <Typography>{renterName}</Typography>
+                  <Typography>Borrowed amount: {amount}</Typography>
                 </Stack>
               </Grid>
               <Grid item md={8}>
@@ -179,10 +184,13 @@ const RecallButton = ({
                   }}
                 >
                   {!isEnded && (
-                    <Typography>
-                      {rentee} is in a rental term duration. Are you sure you
-                      want to recall this?
-                    </Typography>
+                    <>
+                      <Typography>
+                        {borrower} is in a rental term duration. Are you sure
+                        you want to recall this?
+                      </Typography>
+                      <Typography>{countDown} left</Typography>
+                    </>
                   )}
                 </Stack>
                 <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

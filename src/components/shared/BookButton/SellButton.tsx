@@ -24,6 +24,7 @@ interface SellButtonProps {
   bookCover: string;
   author: string;
   tokenId: number;
+  quantity: number;
 }
 
 const schema = yup
@@ -44,7 +45,13 @@ const defaultValues = {
   amount: 1
 };
 
-const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
+const SellButton = ({
+  bookCover,
+  title,
+  author,
+  tokenId,
+  quantity
+}: SellButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
 
@@ -133,6 +140,7 @@ const SellButton = ({ bookCover, title, author, tokenId }: SellButtonProps) => {
                 />
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{authorName}</Typography>
+                <Typography>{quantity} left</Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>

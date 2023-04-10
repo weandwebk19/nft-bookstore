@@ -24,15 +24,15 @@ interface ShareButtonProps {
   bookCover: string;
   author: string;
   tokenId: number;
+  borrowedAmount: number;
 }
 
 const schema = yup
   .object({
-    sharedAddress: yup
-      .string()
-      .required(
-        "Please paste the address of the person you want to share with!"
-      ),
+    price: yup
+      .number()
+      .min(0, `The price must be higher than 0.`)
+      .typeError("Price must be a number"),
     amount: yup
       .number()
       .min(1, `The price must be higher than 0.`)
@@ -41,7 +41,7 @@ const schema = yup
   .required();
 
 const defaultValues = {
-  sharedAddress: "",
+  price: 0,
   amount: 1
 };
 
@@ -49,7 +49,8 @@ const ShareButton = ({
   bookCover,
   title,
   author,
-  tokenId
+  tokenId,
+  borrowedAmount
 }: ShareButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
@@ -139,6 +140,7 @@ const ShareButton = ({
                 />
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{authorName}</Typography>
+                <Typography>{borrowedAmount} left</Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
