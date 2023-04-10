@@ -19,7 +19,6 @@ export default function AuthorRequestEmail(
   authorInfo: AuthorInfo,
   hash: string
 ) {
-  console.log("authorInfo: ", authorInfo);
   return (
     <AuthorRegistrationLayout preview="Require Become Author">
       <Section style={paragraphContent}>

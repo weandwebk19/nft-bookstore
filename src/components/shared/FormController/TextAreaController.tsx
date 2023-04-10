@@ -7,7 +7,18 @@ import { StyledTextArea } from "@/styles/components/TextField";
 
 const MAXIMUM_NUMBER_OF_CHARACTERS = 2000;
 
-const TextAreaController = ({ ...rest }) => {
+interface TextAreaControllerProps {
+  name: string;
+  defaultValue?: string;
+  readOnly?: boolean;
+}
+
+const TextAreaController = ({
+  name,
+  defaultValue,
+  readOnly = false,
+  ...rest
+}: TextAreaControllerProps) => {
   const { control } = useFormContext();
   const [numberOfCharacters, setNumberOfCharacters] = useState<Number>(0);
 
@@ -25,6 +36,7 @@ const TextAreaController = ({ ...rest }) => {
             InputLabelProps={{
               shrink: true
             }}
+            InputProps={{ readOnly }}
             error={invalid}
             {...field}
             onChange={(e) => {
@@ -42,9 +54,9 @@ const TextAreaController = ({ ...rest }) => {
           )}
         </>
       )}
-      name={rest.name}
+      name={name}
       control={control}
-      defaultValue={rest.defaultValue}
+      defaultValue={defaultValue}
     />
   );
 };

@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 
 import {
+  Alert,
+  AlertColor,
   Box,
   FormHelperText,
   IconButton,
   InputAdornment,
   Link,
+  Snackbar,
   Stack,
   Typography
 } from "@mui/material";
@@ -73,6 +75,11 @@ const defaultValues = {
 const AuthorRequest = () => {
   const { t } = useTranslation("authorRequest");
   const { account } = useAccount();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
 
   const schema = yup.object().shape({
     pseudonym: yup.string().required(t("textError1") as string),
@@ -164,10 +171,23 @@ const AuthorRequest = () => {
     }));
   };
 
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+    setMessage("");
+  };
+
   const onSubmit = (data: any) => {
-    console.log("data:", data);
     (async () => {
       try {
+        setIsLoading(true);
+
         const { frontDocument, backDocument, picture, ...authorInfo } = data;
 
         const pictureLink = await uploadImage(picture);
@@ -189,9 +209,22 @@ const AuthorRequest = () => {
             public_id: pictureLink.public_id
           }
         });
-        console.log("res:", res);
+
+        if (res.data.success) {
+          setMessage(t("messageSuccessCreated") as string);
+          setSeverity("success");
+          handleCancel();
+        } else {
+          setMessage(t("messageErrorCreated") as string);
+          setSeverity("error");
+        }
+        setIsLoading(false);
+        setOpen(true);
       } catch (error) {
-        console.log("error:", error);
+        setMessage(t("messageErrorCreated") as string);
+        setSeverity("error");
+        setIsLoading(false);
+        setOpen(true);
       }
     })();
   };
@@ -227,7 +260,6 @@ const AuthorRequest = () => {
                 <Stack spacing={6}>
                   <ContentGroup
                     title={t("titleUpload") as string}
-                    // desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
                     classTitle="required"
                   >
                     <Stack
@@ -265,14 +297,19 @@ const AuthorRequest = () => {
                       )}
 
                       <Stack spacing={3} sx={{ justifyContent: "center" }}>
-                        <StyledButton customVariant="primary" component="label">
+                        <StyledButton
+                          customVariant="primary"
+                          component={isLoading ? "button" : "label"}
+                          disabled={isLoading}
+                        >
                           {t("uploadPhotoBtn") as string}
-                          <FileController name="picture" />
+                          <FileController name="picture" readOnly={isLoading} />
                         </StyledButton>
 
                         <StyledButton
                           customVariant="secondary"
                           onClick={handleRemoveImage}
+                          disabled={isLoading}
                         >
                           {t("removeBtn") as string}
                         </StyledButton>
@@ -290,10 +327,13 @@ const AuthorRequest = () => {
                   <ContentGroup title={t("titleInfo") as string}>
                     <Stack direction="column" spacing={3}>
                       <FormGroup label={t("pseudonym") as string} required>
-                        <InputController name="pseudonym" />
+                        <InputController
+                          name="pseudonym"
+                          readOnly={isLoading}
+                        />
                       </FormGroup>
                       <FormGroup label="More about you">
-                        <TextAreaController name="about" />
+                        <TextAreaController name="about" readOnly={isLoading} />
                       </FormGroup>
                       <Stack
                         direction={{ xs: "column", md: "row" }}
@@ -304,7 +344,7 @@ const AuthorRequest = () => {
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="email" />
+                          <InputController name="email" readOnly={isLoading} />
                         </FormGroup>
                         <FormGroup
                           label={t("phoneNumber") as string}
@@ -316,6 +356,7 @@ const AuthorRequest = () => {
                             onChange={(e) => {
                               e.target.value = e.target.value.trim();
                             }}
+                            readOnly={isLoading}
                           />
                         </FormGroup>
                       </Stack>
@@ -330,12 +371,14 @@ const AuthorRequest = () => {
                             desc={`${
                               t("descAttachment1") as string
                             } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
+                            readOnly={isLoading}
                           />
                           <AttachmentController
                             name="backDocument"
                             desc={`${
                               t("descAttachment1") as string
                             } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
+                            readOnly={isLoading}
                           />
                         </Stack>
                       </FormGroup>
@@ -344,7 +387,7 @@ const AuthorRequest = () => {
                   <ContentGroup title={t("titleSocial") as string}>
                     <Stack direction="column" spacing={3}>
                       <FormGroup label={t("website") as string}>
-                        <InputController name="website" />
+                        <InputController name="website" readOnly={isLoading} />
                       </FormGroup>
                       <FormGroup label={t("walletAddress") as string}>
                         <InputController
@@ -389,7 +432,10 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="facebook" />
+                          <InputController
+                            name="facebook"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -407,7 +453,10 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="twitter" />
+                          <InputController
+                            name="twitter"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                       </Stack>
                       <Stack
@@ -430,7 +479,10 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="linkedIn" />
+                          <InputController
+                            name="linkedIn"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -448,7 +500,10 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="instagram" />
+                          <InputController
+                            name="instagram"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                       </Stack>
                     </Stack>
@@ -467,6 +522,7 @@ const AuthorRequest = () => {
                     <StyledButton
                       customVariant="secondary"
                       onClick={handleCancel}
+                      disabled={isLoading}
                     >
                       {t("cancel") as string}
                     </StyledButton>
@@ -474,6 +530,7 @@ const AuthorRequest = () => {
                       customVariant="primary"
                       type="submit"
                       onClick={handleSubmit(onSubmit)}
+                      disabled={isLoading}
                     >
                       {t("submit") as string}
                     </StyledButton>
@@ -500,6 +557,15 @@ const AuthorRequest = () => {
             </FormProvider>
           </Box>
         </ContentContainer>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert
+            onClose={handleClose}
+            severity={severity as AlertColor}
+            sx={{ width: "100%" }}
+          >
+            {message}
+          </Alert>
+        </Snackbar>
       </main>
     </>
   );

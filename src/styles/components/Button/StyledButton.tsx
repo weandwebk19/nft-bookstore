@@ -17,6 +17,10 @@ const StyledButton = styled(Button, {
     "&:hover": {
       backgroundColor: `${theme.palette.primary.light}`
     },
+    "&:disabled": {
+      color: `${theme.palette.primary.contrastText}`,
+      opacity: 0.7
+    },
     backgroundColor: `${theme.palette.primary.main}`,
     color: `${theme.palette.primary.contrastText}`,
     outline: ` 1px solid ${theme.palette.primary.main}`,
@@ -26,6 +30,10 @@ const StyledButton = styled(Button, {
     "&:hover": {
       border: `1px solid ${theme.palette.primary.light}`,
       color: `${theme.palette.primary.light}`
+    },
+    "&:disabled": {
+      color: `${theme.palette.primary.main}`,
+      opacity: 0.7
     },
     backgroundColor: "none",
     color: `${theme.palette.primary.main}`,

@@ -25,6 +25,7 @@ interface UploadFieldProps {
   error?: boolean;
   helperText?: string;
   desc?: string;
+  disabled?: boolean;
 }
 
 const UploadField = ({
@@ -34,7 +35,8 @@ const UploadField = ({
   error,
   uploaded,
   helperText,
-  desc
+  desc,
+  disabled = false
 }: UploadFieldProps) => {
   const theme = useTheme();
 
@@ -48,6 +50,7 @@ const UploadField = ({
           onChange(acceptedFiles[0]);
         }
       }}
+      disabled={disabled}
     >
       {({ getRootProps, getInputProps, isDragActive }) => (
         <Box
@@ -66,7 +69,7 @@ const UploadField = ({
             height: "100%",
             overflow: "hidden",
             p: 2,
-            cursor: "pointer"
+            cursor: disabled ? "default" : "pointer"
           }}
         >
           <Stack
