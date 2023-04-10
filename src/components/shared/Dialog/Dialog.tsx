@@ -36,7 +36,6 @@ const Dialog = ({
       fullWidth
       disableScrollLock={true}
     >
-      <Loading className="loader-dialog" />
       <StyledDialogTitle>
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography variant="h4">{title}</Typography>

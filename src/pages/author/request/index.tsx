@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -29,7 +29,6 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import * as yup from "yup";
 
-import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
@@ -236,10 +235,10 @@ const AuthorRequest = () => {
                       spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
                       className={styles["profile__avatar"]}
                     >
-                      {!true ? (
+                      {!errors.picture && watchPicture ? (
                         <Box
                           component="img"
-                          src={images.product1}
+                          src={URL.createObjectURL(watchPicture as any)}
                           sx={{
                             width: "100%",
                             maxWidth: "400px",
@@ -279,13 +278,6 @@ const AuthorRequest = () => {
                         </StyledButton>
                       </Stack>
                     </Stack>
-                    {!errors.picture && watchPicture && (
-                      <FormHelperText
-                        sx={{ marginTop: "24px", fontSize: "16px" }}
-                      >
-                        {(watchPicture as any)?.name}
-                      </FormHelperText>
-                    )}
                     {errors && errors.picture && (
                       <FormHelperText
                         error

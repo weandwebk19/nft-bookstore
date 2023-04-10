@@ -224,11 +224,11 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
                 isFirstInButtonGroup
                 tokenId={bookDetail?.nftCore.tokenId!}
               />
-              <Tooltip title="Add to favorites">
+              {/* <Tooltip title="Add to favorites">
                 <IconButton>
                   <BookmarkAddOutlinedIcon color="primary" />
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
             </Stack>
             {/* Trade-in/Borrow navigate */}
             <Stack>

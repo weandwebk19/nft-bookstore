@@ -2,6 +2,7 @@ import { useRef } from "react";
 
 import { Box, CssBaseline } from "@mui/material";
 
+import Portal from "@mui/base/Portal";
 import "@styles/GlobalStyles/GlobalStyles.scss";
 import { AnimatePresence, motion } from "framer-motion";
 import { SessionProvider } from "next-auth/react";
@@ -22,6 +23,7 @@ import { publicProvider } from "wagmi/providers/public";
 import { Web3Provider } from "@/components/providers";
 import { Cursor } from "@/components/shared/Cursor";
 import { Loading } from "@/components/shared/Loading";
+import { ScrollButton } from "@/components/shared/ScrollButton";
 import { MyThemeContextProvider } from "@/contexts/ThemeContext";
 import { DefaultLayout } from "@/layouts";
 
@@ -87,17 +89,21 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
                     }
                   }}
                 >
-                  <Loading />
+                  <Portal>
+                    <Loading />
 
-                  {Component.PageLayout ? (
-                    <Component.PageLayout>
-                      <Component {...pageProps} />
-                    </Component.PageLayout>
-                  ) : (
-                    <DefaultLayout>
-                      <Component {...pageProps} />
-                    </DefaultLayout>
-                  )}
+                    {Component.PageLayout ? (
+                      <Component.PageLayout>
+                        <Component {...pageProps} />
+                      </Component.PageLayout>
+                    ) : (
+                      <DefaultLayout>
+                        <Component {...pageProps} />
+                      </DefaultLayout>
+                    )}
+
+                    <ScrollButton />
+                  </Portal>
                 </motion.div>
               </AnimatePresence>
             </MyThemeContextProvider>
