@@ -27,6 +27,7 @@ import { StyledButton } from "@/styles/components/Button";
 import { BorrowedBook, LeaseBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import pluralize from "@/utils/pluralize";
+import { secondsToDhms } from "@/utils/secondsToDhms";
 
 const LeasingBooks = () => {
   const { t } = useTranslation("leasingBooks");
@@ -49,9 +50,12 @@ const LeasingBooks = () => {
 
   const leasedOutBooks = useOwnedLeasedOutBooks()?.nfts.data as BorrowedBook[];
 
-  console.log(leasedOutBooks);
+  const [nowTime, setNowTime] = useState<number>(0);
 
-  // const { account } = useAccount();
+  useEffect(() => {
+    const seconds = new Date().getTime() / 1000;
+    setNowTime(seconds);
+  }, []);
 
   const handleOpenRecallDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -179,6 +183,7 @@ const LeasingBooks = () => {
                             lg={12}
                           >
                             <ActionableBookItem
+                              status="isLeasing"
                               tokenId={book?.tokenId}
                               bookCover={book?.meta.bookCover}
                               title={book?.meta.title}
@@ -186,15 +191,15 @@ const LeasingBooks = () => {
                               renter={book?.renter}
                               onClick={handleBookClick}
                               price={book?.price}
+                              amount={book?.amount}
                               buttons={
                                 <>
                                   <RecallButton
-                                    rentee={book?.borrower}
-                                    isEnded={book?.endRentalDay === 0}
                                     tokenId={book?.tokenId}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
-                                    author={book?.author}
+                                    renter={book?.renter}
+                                    amount={book?.amount}
                                   />
                                 </>
                               }
@@ -215,7 +220,7 @@ const LeasingBooks = () => {
 
                       <Divider sx={{ my: 3 }} />
 
-                      {leasedOutBooks!.map((book: LeaseBook) => {
+                      {leasedOutBooks!.map((book) => {
                         return (
                           <Grid
                             item
@@ -226,6 +231,7 @@ const LeasingBooks = () => {
                             lg={12}
                           >
                             <ActionableBookItem
+                              status="isLeasing"
                               tokenId={book?.tokenId}
                               bookCover={book?.meta.bookCover}
                               title={book?.meta.title}
@@ -233,15 +239,22 @@ const LeasingBooks = () => {
                               renter={book?.renter}
                               onClick={handleBookClick}
                               price={book?.price}
+                              amount={book?.amount}
+                              borrower={book?.borrower}
+                              countDown={secondsToDhms(book?.endTime - nowTime)}
                               buttons={
                                 <>
                                   <RecallButton
-                                    rentee={book?.borrower}
-                                    isEnded={book?.endRentalDay === 0}
+                                    borrower={book?.borrower}
+                                    isEnded={book?.endTime - nowTime === 0}
+                                    countDown={secondsToDhms(
+                                      book?.endTime - nowTime
+                                    )}
                                     tokenId={book?.tokenId}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
-                                    author={book?.author}
+                                    renter={book?.renter}
+                                    amount={book?.amount}
                                   />
                                 </>
                               }

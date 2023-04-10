@@ -113,6 +113,7 @@ const CreatedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
+                                  quantity={book?.quantity}
                                 />
                                 <EditButton tokenId={book?.tokenId} />
                               </Stack>
