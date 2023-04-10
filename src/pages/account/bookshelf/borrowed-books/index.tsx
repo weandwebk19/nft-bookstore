@@ -1,4 +1,6 @@
 /* eslint-disable prettier/prettier */
+import { useEffect, useState } from "react";
+
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -21,6 +23,8 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { BorrowedBook } from "@/types/nftBook";
+import { secondsToDhms } from "@/utils/secondsToDhms";
 
 const BorrowedBooks = () => {
   const { t } = useTranslation("borrowedBooks");
@@ -38,7 +42,13 @@ const BorrowedBooks = () => {
 
   const { nfts } = useOwnedBorrowedBooks();
   const router = useRouter();
-  const rentedBooks = nfts.data;
+  const rentedBooks = nfts.data as BorrowedBook[];
+  const [nowTime, setNowTime] = useState<number>(0);
+
+  useEffect(() => {
+    const seconds = new Date().getTime() / 1000;
+    setNowTime(seconds);
+  }, []);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -96,19 +106,23 @@ const BorrowedBooks = () => {
                           lg={12}
                         >
                           <ActionableBookItem
+                            status="isBorrowed"
                             tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.author}
+                            renter={book?.renter}
                             onClick={handleBookClick}
+                            price={book?.price}
+                            amount={book?.amount}
+                            countDown={secondsToDhms(book?.endTime - nowTime)}
                             buttons={
                               <>
                                 <ShareButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  author={book?.author}
+                                  author={book?.renter}
                                 />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>
