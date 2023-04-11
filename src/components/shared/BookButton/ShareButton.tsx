@@ -58,7 +58,7 @@ const ShareButton = ({
   tokenId,
   borrowedAmount
 }: ShareButtonProps) => {
-  const [renterName, setAuthorName] = useState();
+  const [renterName, setRenterName] = useState();
   const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
@@ -117,7 +117,7 @@ const ShareButton = ({
           const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setRenterName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
