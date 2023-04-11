@@ -40,10 +40,15 @@ export const hookFactory: CreatedBooksHookFactory =
             meta = metaRes.data;
           }
 
+          const amountTradeable = await contract!.getAmountUnUsedBook(
+            item.tokenId
+          );
+
           nfts.push({
             tokenId: item?.tokenId?.toNumber(),
             author: item?.author,
             quantity: item?.quantity?.toNumber(),
+            amountTradeable: amountTradeable.toNumber(),
             meta
           });
         }

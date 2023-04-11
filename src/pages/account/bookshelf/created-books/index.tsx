@@ -102,6 +102,7 @@ const CreatedBooks = () => {
                             author={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
+                            amountTradeable={book?.amountTradeable}
                             buttons={
                               <Stack
                                 direction={{ xs: "column", sm: "row" }}
@@ -113,7 +114,7 @@ const CreatedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
-                                  quantity={book?.quantity}
+                                  amountTradeable={book?.amountTradeable!}
                                 />
                                 <EditButton tokenId={book?.tokenId} />
                               </Stack>

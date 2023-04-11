@@ -34,6 +34,8 @@ interface ActionableBookItemProps {
   countDown?: string;
   price?: string | number;
   quantity?: number;
+  amountOwned?: number;
+  amountTradeable?: number;
   amount?: number;
   sharer?: string;
   sharedPerson?: string;
@@ -53,12 +55,13 @@ const ActionableBookItem = ({
   countDown,
   price,
   quantity,
+  amountOwned,
+  amountTradeable,
   amount,
   sharer,
   sharedPerson
 }: ActionableBookItemProps) => {
   const account = useAccount();
-  console.log(account);
 
   const theme = useTheme();
   const [authorName, setAuthorName] = useState("");
@@ -250,10 +253,28 @@ const ActionableBookItem = ({
                   </Typography>
                 </Stack>
               )}
-              {(status === "isCreated" || status === "isOwned") && (
+              {status === "isOwned" && (
+                <Stack>
+                  <Typography variant="subtitle2">Amount Owned:</Typography>
+                  <Typography variant="label">{amountOwned}</Typography>
+                </Stack>
+              )}
+              {status === "isOwned" && (
+                <Stack>
+                  <Typography variant="subtitle2">Amount Tradeable:</Typography>
+                  <Typography variant="label">{amountTradeable}</Typography>
+                </Stack>
+              )}
+              {status === "isCreated" && (
                 <Stack>
                   <Typography variant="subtitle2">Quantity:</Typography>
                   <Typography variant="label">{quantity}</Typography>
+                </Stack>
+              )}
+              {status === "isCreated" && (
+                <Stack>
+                  <Typography variant="subtitle2">Amount Tradeable:</Typography>
+                  <Typography variant="label">{amountTradeable}</Typography>
                 </Stack>
               )}
             </Stack>
