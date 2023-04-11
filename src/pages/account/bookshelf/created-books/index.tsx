@@ -94,12 +94,14 @@ const CreatedBooks = () => {
                           lg={6}
                         >
                           <ActionableBookItem
+                            status="isCreated"
                             tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
                             author={book?.author}
                             onClick={handleBookClick}
+                            quantity={book?.quantity}
                             buttons={
                               <Stack
                                 direction={{ xs: "column", sm: "row" }}
@@ -111,6 +113,7 @@ const CreatedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
+                                  quantity={book?.quantity}
                                 />
                                 <EditButton tokenId={book?.tokenId} />
                               </Stack>

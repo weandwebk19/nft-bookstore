@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -23,11 +23,11 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { bookList } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
 import { BorrowedBook, LeaseBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import pluralize from "@/utils/pluralize";
+import { secondsToDhms } from "@/utils/secondsToDhms";
 
 const LeasingBooks = () => {
   const { t } = useTranslation("leasingBooks");
@@ -43,12 +43,19 @@ const LeasingBooks = () => {
     }
   ];
 
-  const leasingBooks = useOwnedLeasingBooks().nfts.data as LeaseBook[];
-  const leasedOutBooks = useOwnedLeasedOutBooks().nfts.data as BorrowedBook[];
-  // const [leasingBooks, setLeasingBooks] = useState<any[]>([]);
   const router = useRouter();
 
-  // const { account } = useAccount();
+  const { nfts: leaseNfts } = useOwnedLeasingBooks();
+  const leasingBooks = leaseNfts.data as LeaseBook[];
+
+  const leasedOutBooks = useOwnedLeasedOutBooks()?.nfts.data as BorrowedBook[];
+
+  const [nowTime, setNowTime] = useState<number>(0);
+
+  useEffect(() => {
+    const seconds = new Date().getTime() / 1000;
+    setNowTime(seconds);
+  }, []);
 
   const handleOpenRecallDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -147,67 +154,125 @@ const LeasingBooks = () => {
               }
             >
               {(() => {
-                // if (nfts.isLoading) {
-                //   return (
-                //     <Typography>{t("loadingMessage") as string}</Typography>
-                //   );
-                // } else if (recallBooks?.length === 0 || nfts.error) {
-                //   return (
-                //     <FallbackNode>
-                //       <Typography>{t("emptyMessage") as string}</Typography>
-                //     </FallbackNode>
-                //   );
-                // }
+                if (leaseNfts.isLoading) {
+                  return (
+                    <Typography>{t("loadingMessage") as string}</Typography>
+                  );
+                } else if (leasingBooks?.length === 0 || leaseNfts.error) {
+                  return (
+                    <FallbackNode>
+                      <Typography>{t("emptyMessage") as string}</Typography>
+                    </FallbackNode>
+                  );
+                }
                 return (
                   <Grid
                     container
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {leasingBooks!.map((book: LeaseBook) => {
-                      return (
-                        <Grid
-                          item
-                          key={book.tokenId}
-                          xs={4}
-                          sm={8}
-                          md={6}
-                          lg={12}
-                        >
-                          <ActionableBookItem
-                            tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
-                            author={book?.author}
-                            onClick={handleBookClick}
-                            buttons={
-                              <>
-                                <RecallButton
-                                  rentee={book?.rentee}
-                                  isEnded={book?.endRentalDay === 0}
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                              </>
-                            }
-                            rentee={book?.rentee}
-                            status={
-                              book?.endRentalDay !== undefined
-                                ? book?.endRentalDay > 0
-                                  ? `${pluralize(
-                                      book?.endRentalDay,
-                                      "day"
-                                    )} left`
-                                  : "Ended" // End of leasing term
-                                : undefined
-                            }
-                          />
-                        </Grid>
-                      );
-                    })}
+                    <>
+                      {leasingBooks!.map((book: LeaseBook) => {
+                        return (
+                          <Grid
+                            item
+                            key={book.tokenId}
+                            xs={4}
+                            sm={8}
+                            md={6}
+                            lg={12}
+                          >
+                            <ActionableBookItem
+                              status="isLeasing"
+                              tokenId={book?.tokenId}
+                              bookCover={book?.meta.bookCover}
+                              title={book?.meta.title}
+                              fileType={book?.meta.fileType}
+                              renter={book?.renter}
+                              onClick={handleBookClick}
+                              price={book?.price}
+                              amount={book?.amount}
+                              buttons={
+                                <>
+                                  <RecallButton
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    renter={book?.renter}
+                                    amount={book?.amount}
+                                  />
+                                </>
+                              }
+                              // status={
+                              //   book?.endRentalDay !== undefined
+                              //     ? book?.endRentalDay > 0
+                              //       ? `${pluralize(
+                              //           book?.endRentalDay,
+                              //           "day"
+                              //         )} left`
+                              //       : "Ended" // End of leasing term
+                              //     : undefined
+                              // }
+                            />
+                          </Grid>
+                        );
+                      })}
+
+                      <Divider sx={{ my: 3 }} />
+
+                      {leasedOutBooks!.map((book) => {
+                        return (
+                          <Grid
+                            item
+                            key={book.tokenId}
+                            xs={4}
+                            sm={8}
+                            md={6}
+                            lg={12}
+                          >
+                            <ActionableBookItem
+                              status="isLeasing"
+                              tokenId={book?.tokenId}
+                              bookCover={book?.meta.bookCover}
+                              title={book?.meta.title}
+                              fileType={book?.meta.fileType}
+                              renter={book?.renter}
+                              onClick={handleBookClick}
+                              price={book?.price}
+                              amount={book?.amount}
+                              borrower={book?.borrower}
+                              countDown={secondsToDhms(book?.endTime - nowTime)}
+                              buttons={
+                                <>
+                                  <RecallButton
+                                    borrower={book?.borrower}
+                                    isEnded={book?.endTime - nowTime === 0}
+                                    countDown={secondsToDhms(
+                                      book?.endTime - nowTime
+                                    )}
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    renter={book?.renter}
+                                    amount={book?.amount}
+                                  />
+                                </>
+                              }
+                              // status={
+                              //   book?.endRentalDay !== undefined
+                              //     ? book?.endRentalDay > 0
+                              //       ? `${pluralize(
+                              //           book?.endRentalDay,
+                              //           "day"
+                              //         )} left`
+                              //       : "Ended" // End of leasing term
+                              //     : undefined
+                              // }
+                            />
+                          </Grid>
+                        );
+                      })}
+                    </>
                   </Grid>
                 );
               })()}

@@ -7,19 +7,36 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { useAccount } from "wagmi";
 
 import { Image } from "../Image";
+
+type ActionableBookItemStatus =
+  | "isCreated"
+  | "isOwned"
+  | "isShared"
+  | "isBorrowed"
+  | "isSharing"
+  | "isListing"
+  | "isLeasing";
 
 interface ActionableBookItemProps {
   bookCover: string;
   title: string;
   fileType: string;
   tokenId: number;
-  author: string;
+  author?: string; // !!! 'author' should ALWAYS be display !!!
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
   renter?: string;
-  status?: string;
+  borrower?: string;
+  status?: ActionableBookItemStatus;
+  countDown?: string;
+  price?: string | number;
+  quantity?: number;
+  amount?: number;
+  sharer?: string;
+  sharedPerson?: string;
 }
 
 const ActionableBookItem = ({
@@ -31,10 +48,24 @@ const ActionableBookItem = ({
   onClick,
   buttons,
   renter,
-  status
+  borrower,
+  status,
+  countDown,
+  price,
+  quantity,
+  amount,
+  sharer,
+  sharedPerson
 }: ActionableBookItemProps) => {
+  const account = useAccount();
+  console.log(account);
+
   const theme = useTheme();
-  const [authorName, setAuthorName] = useState();
+  const [authorName, setAuthorName] = useState("");
+  const [sharerName, setSharerName] = useState("");
+  const [renterName, setRenterName] = useState("");
+  const [sharedPersonName, setSharedPersonName] = useState("");
+  const [borrowerName, setBorrowerName] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -51,6 +82,70 @@ const ActionableBookItem = ({
       }
     })();
   }, [author]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (renter) {
+          const userRes = await axios.get(`/api/users/wallet/${renter}`);
+
+          if (userRes.data.success === true) {
+            setRenterName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [renter]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (borrower) {
+          const userRes = await axios.get(`/api/users/wallet/${borrower}`);
+
+          if (userRes.data.success === true) {
+            setBorrowerName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [borrower]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (sharer) {
+          const userRes = await axios.get(`/api/users/wallet/${sharer}`);
+
+          if (userRes.data.success === true) {
+            setSharerName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [sharer]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (sharedPerson) {
+          const userRes = await axios.get(`/api/users/wallet/${sharedPerson}`);
+
+          if (userRes.data.success === true) {
+            setSharedPersonName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [sharedPerson]);
 
   return (
     <Box
@@ -97,16 +192,78 @@ const ActionableBookItem = ({
             >
               {title}
             </Typography>
-            <Typography variant="body2">{authorName}</Typography>
+            {status !== "isCreated" && (
+              <Typography variant="body2">{authorName}</Typography>
+            )}
+            {status === "isBorrowed" && (
+              <Stack>
+                <Typography variant="subtitle2">Borrowed from:</Typography>
+                <Typography variant="label">{renterName}</Typography>
+              </Stack>
+            )}
+            {status === "isShared" && (
+              <Stack>
+                <Typography variant="subtitle2">Shared by:</Typography>
+                <Typography variant="label">{sharerName}</Typography>
+              </Stack>
+            )}
+            {status === "isLeasing" && (
+              <Stack>
+                <Typography variant="subtitle2">Borrowed by:</Typography>
+                <Typography variant="label">{borrowerName}</Typography>
+              </Stack>
+            )}
+            {status === "isSharing" && (
+              <Stack>
+                <Typography variant="subtitle2">Shared to:</Typography>
+                <Typography variant="label">{sharedPersonName}</Typography>
+              </Stack>
+            )}
           </Stack>
 
           <Divider sx={{ my: 3 }} />
-          <Stack direction="row" justifyContent="space-between">
-            <Typography>{renter}</Typography>
-            {status !== undefined ? <Chip label={status} /> : <></>}
-          </Stack>
-          <Stack direction="row" spacing={2}>
-            {buttons}
+          <Stack spacing={3}>
+            <Stack
+              direction={{ xs: "row", sm: "row", md: "row" }}
+              spacing={{ xs: 1, sm: 2, md: 4 }}
+              justifyContent="space-between"
+            >
+              {status !== "isCreated" && status !== "isOwned" && (
+                <Stack>
+                  <Typography variant="subtitle2">Price:</Typography>
+                  <Typography variant="label">{price} ETH</Typography>
+                </Stack>
+              )}
+              {status !== "isCreated" && status !== "isOwned" && (
+                <Stack>
+                  <Typography variant="subtitle2">Amount:</Typography>
+                  <Typography variant="label">{amount}</Typography>
+                </Stack>
+              )}
+              {(status === "isBorrowed" ||
+                status === "isShared" ||
+                status === "isSharing") && (
+                <Stack>
+                  <Typography variant="subtitle2">Return in:</Typography>
+                  <Typography variant="label">
+                    {countDown !== "0D:0:0:0" ? countDown : "Ended"}
+                  </Typography>
+                </Stack>
+              )}
+              {(status === "isCreated" || status === "isOwned") && (
+                <Stack>
+                  <Typography variant="subtitle2">Quantity:</Typography>
+                  <Typography variant="label">{quantity}</Typography>
+                </Stack>
+              )}
+            </Stack>
+            {/* <Stack direction="row" justifyContent="space-between">
+              <Typography>{renter}</Typography>
+              {status !== undefined ? <Chip label={status} /> : <></>}
+            </Stack> */}
+            <Stack direction="row" spacing={2}>
+              {buttons}
+            </Stack>
           </Stack>
         </Stack>
       </Stack>

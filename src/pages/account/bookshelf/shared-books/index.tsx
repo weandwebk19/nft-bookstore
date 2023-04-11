@@ -9,11 +9,7 @@ import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedSharedBooks } from "@/components/hooks/web3";
-import {
-  EditButton,
-  LeaseButton,
-  SellButton
-} from "@/components/shared/BookButton";
+import { ReadButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
@@ -36,9 +32,9 @@ const SharedBooks = () => {
     }
   ];
 
-  const router = useRouter();
   const { nfts } = useOwnedSharedBooks();
-  const sharedBooks = nfts.data;
+  const router = useRouter();
+  const sharedBooks = nfts.data as BookSharing[];
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -95,21 +91,16 @@ const SharedBooks = () => {
                           lg={12}
                         >
                           <ActionableBookItem
+                            status="isShared"
                             tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.author}
+                            sharer={book?.sharer}
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <SellButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.author}
-                                />
-                                <EditButton tokenId={book?.tokenId} />
+                                <ReadButton bookFile={book?.meta.bookFile} />
                               </>
                             }
                           />
