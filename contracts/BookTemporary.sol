@@ -5,29 +5,32 @@ import "./rent/BookRentingStorage.sol";
 import "./share/BookSharingStorage.sol";
 
 contract BookTemporary {
-
   BookRentingStorage private _bookRentingStorage;
   BookSharingStorage private _bookSharingStorage;
 
-  constructor(BookRentingStorage bookRentingStorage, 
-              BookSharingStorage bookSharingStorage) {
+  constructor(
+    BookRentingStorage bookRentingStorage,
+    BookSharingStorage bookSharingStorage
+  ) {
     _bookRentingStorage = bookRentingStorage;
     _bookSharingStorage = bookSharingStorage;
   }
 
-  function getBookRentingStorage() public view returns(BookRentingStorage) {
+  function getBookRentingStorage() public view returns (BookRentingStorage) {
     return _bookRentingStorage;
   }
 
-  function getBookSharingStorage() public view returns(BookSharingStorage) {
+  function getBookSharingStorage() public view returns (BookSharingStorage) {
     return _bookSharingStorage;
   }
 
-  function convertBookOnSharingToBorrowedBook(uint idBookOnSharing, 
-                                              address owner, 
-                                              uint amount) public payable {
-    BookSharingStorage.BookSharing memory booksOnSharing 
-                    = _bookSharingStorage.getBooksOnSharing(idBookOnSharing);
+  function convertBookOnSharingToBorrowedBook(
+    uint idBookOnSharing,
+    address owner,
+    uint amount
+  ) public payable {
+    BookSharingStorage.BookSharing memory booksOnSharing = _bookSharingStorage
+      .getBooksOnSharing(idBookOnSharing);
 
     if (booksOnSharing.sharer != owner) {
       revert Error.InvalidAddressError(owner);
@@ -37,37 +40,46 @@ contract BookTemporary {
     }
 
     if (amount == booksOnSharing.amount) {
-      _bookSharingStorage.removeBooksOnSharing(booksOnSharing.tokenId,
-                                               booksOnSharing.fromRenter,
-                                               booksOnSharing.sharer,
-                                               booksOnSharing.startTime, 
-                                               booksOnSharing.endTime);
+      _bookSharingStorage.removeBooksOnSharing(
+        booksOnSharing.tokenId,
+        booksOnSharing.fromRenter,
+        booksOnSharing.sharer,
+        booksOnSharing.startTime,
+        booksOnSharing.endTime
+      );
     } else {
-      _bookSharingStorage.updateBooksOnSharing(idBookOnSharing,
-                                               owner,
-                                               booksOnSharing.tokenId,
-                                               booksOnSharing.price,
-                                               booksOnSharing.amount - amount);
+      _bookSharingStorage.updateBooksOnSharing(
+        idBookOnSharing,
+        owner,
+        booksOnSharing.tokenId,
+        booksOnSharing.price,
+        booksOnSharing.amount - amount
+      );
     }
-    
-    uint idBorrowedBook = _bookRentingStorage
-                          .getIdBorrowedBook(booksOnSharing.tokenId, 
-                                             booksOnSharing.fromRenter, 
-                                             owner, 
-                                             booksOnSharing.startTime, 
-                                             booksOnSharing.endTime);
+
+    uint idBorrowedBook = _bookRentingStorage.getIdBorrowedBook(
+      booksOnSharing.tokenId,
+      booksOnSharing.fromRenter,
+      owner,
+      booksOnSharing.startTime,
+      booksOnSharing.endTime
+    );
     if (idBorrowedBook == 0) {
-      _bookRentingStorage.createBorrowedBook(booksOnSharing.tokenId,
-                                             booksOnSharing.fromRenter,
-                                             booksOnSharing.priceOfBB, 
-                                             amount, 
-                                             booksOnSharing.startTime, 
-                                             booksOnSharing.endTime, 
-                                             owner);
+      _bookRentingStorage.createBorrowedBook(
+        booksOnSharing.tokenId,
+        booksOnSharing.fromRenter,
+        booksOnSharing.priceOfBB,
+        amount,
+        booksOnSharing.startTime,
+        booksOnSharing.endTime,
+        owner
+      );
     } else {
-      _bookRentingStorage
-          .updateAmountBorrowedBookFromBorrowing(idBorrowedBook, amount, false);
+      _bookRentingStorage.updateAmountBorrowedBookFromBorrowing(
+        idBorrowedBook,
+        amount,
+        false
+      );
     }
   }
-
 }

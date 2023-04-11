@@ -8,6 +8,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
+import { useOwnedSharedBooks } from "@/components/hooks/web3";
 import {
   EditButton,
   LeaseButton,
@@ -18,6 +19,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { BookSharing } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const SharedBooks = () => {
@@ -35,6 +37,8 @@ const SharedBooks = () => {
   ];
 
   const router = useRouter();
+  const { nfts } = useOwnedSharedBooks();
+  const sharedBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -62,7 +66,7 @@ const SharedBooks = () => {
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
             <ContentPaper title={t("sharedBooksTitle")}>
-              {/* {(() => {
+              {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
@@ -80,7 +84,7 @@ const SharedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {sharedBooks!.map((book) => {
+                    {sharedBooks!.map((book: BookSharing) => {
                       return (
                         <Grid
                           item
@@ -114,7 +118,7 @@ const SharedBooks = () => {
                     })}
                   </Grid>
                 );
-              })()} */}
+              })()}
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>

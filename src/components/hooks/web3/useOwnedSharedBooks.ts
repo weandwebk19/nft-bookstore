@@ -7,9 +7,9 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { SharedBook } from "@/types/nftBook";
+import { BookSharing } from "@/types/nftBook";
 
-type OwnedSharedBooksHookFactory = CryptoHookFactory<SharedBook[]>;
+type OwnedSharedBooksHookFactory = CryptoHookFactory<BookSharing[]>;
 
 export type UseOwnedSharedBooksHook = ReturnType<OwnedSharedBooksHookFactory>;
 
@@ -19,7 +19,7 @@ export const hookFactory: OwnedSharedBooksHookFactory =
     const { data, ...swr } = useSWR(
       contract ? "web3/useOwnedSharedBooks" : null,
       async () => {
-        const nfts = [] as SharedBook[];
+        const nfts = [] as BookSharing[];
         const coreNfts = await contract!.getAllOwnedSharedBook();
 
         for (let i = 0; i < coreNfts.length; i++) {

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
-import { NftBook, RentedBook } from "@_types/nftBook";
+import { LeaseBook } from "@_types/nftBook";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
@@ -16,7 +16,7 @@ type UseAllLeasingBooksResponse = {
   ) => Promise<void>;
 };
 type AllLeasingBooksHookFactory = CryptoHookFactory<
-  RentedBook[],
+  LeaseBook[],
   UseAllLeasingBooksResponse
 >;
 
@@ -28,20 +28,20 @@ export const hookFactory: AllLeasingBooksHookFactory =
     const { data, ...swr } = useSWR(
       contract ? "web3/useAllLeasingBooks" : null,
       async () => {
-        const allLeasingBooks = [] as RentedBook[];
-        const coreRentedBooks = await contract!.getAllBooksOnRenting();
+        const allLeasingBooks = [] as LeaseBook[];
+        const coreLeaseBooks = await contract!.getAllBooksOnLeasing();
 
-        for (let i = 0; i < coreRentedBooks.length; i++) {
-          const rentedBook = coreRentedBooks[i];
-          const tokenURI = await contract!.uri(rentedBook.tokenId);
+        for (let i = 0; i < coreLeaseBooks.length; i++) {
+          const leaseBook = coreLeaseBooks[i];
+          const tokenURI = await contract!.uri(leaseBook.tokenId);
           const metaRes = await fetch(tokenURI);
           const meta = await metaRes.json();
 
           allLeasingBooks.push({
-            tokenId: rentedBook.tokenId.toNumber(),
-            renter: rentedBook.renter,
-            price: parseFloat(ethers.utils.formatEther(rentedBook.price)),
-            amount: rentedBook.amount.toNumber(),
+            tokenId: leaseBook.tokenId.toNumber(),
+            renter: leaseBook.renter,
+            price: parseFloat(ethers.utils.formatEther(leaseBook.price)),
+            amount: leaseBook.amount.toNumber(),
             meta
           });
         }

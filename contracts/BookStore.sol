@@ -52,6 +52,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _bookSharingStorage = bookTemporary.getBookSharingStorage();
   }
 
+  function getUri(uint tokenId) public view returns (string memory) {
+    return ERC1155URIStorage.uri(tokenId);
+  }
+
   function setListingPrice(uint newPrice) external onlyOwner {
     if (newPrice == 0) {
       revert Error.InvalidPriceError(newPrice);
@@ -711,6 +715,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
     returns (BookSharingStorage.BookSharing[] memory)
   {
     return _bookSharingStorage.getAllOwnedSharedBook(msg.sender);
+  }
+
+  function getIdBorrowedBook(
+    uint tokenId,
+    address renter,
+    address borrower,
+    uint startTime,
+    uint endTime
+  ) public view returns (uint) {
+    return
+      _bookRentingStorage.getIdBorrowedBook(
+        tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
   }
 
   function updateBooksOnSharing(
