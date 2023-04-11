@@ -38,7 +38,7 @@ export const hookFactory: OwnedBorrowedBooksHookFactory =
               tokenId: item?.tokenId?.toNumber(),
               renter: item?.renter,
               amount: item?.amount?.toNumber(),
-              price: parseInt(ethers.utils.formatEther(item?.price)),
+              price: parseFloat(ethers.utils.formatEther(item?.price)),
               meta,
               borrower: item?.borrower,
               startTime: item?.startTime?.toNumber(),

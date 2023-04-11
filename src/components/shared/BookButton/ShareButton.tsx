@@ -22,8 +22,11 @@ import { Image } from "../Image";
 interface ShareButtonProps {
   title: string;
   bookCover: string;
-  author: string;
+  renter: string;
+  borrower: string;
   tokenId: number;
+  startTime: number;
+  endTime: number;
   borrowedAmount: number;
 }
 
@@ -48,11 +51,14 @@ const defaultValues = {
 const ShareButton = ({
   bookCover,
   title,
-  author,
+  renter,
+  borrower,
+  startTime,
+  endTime,
   tokenId,
   borrowedAmount
 }: ShareButtonProps) => {
-  const [authorName, setAuthorName] = useState();
+  const [renterName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
@@ -77,30 +83,27 @@ const ShareButton = ({
 
   const onSubmit = async (data: any) => {
     try {
-      const listingPrice = await contract!.listingPrice();
-      // const tx = await contract?.sellBooks(
-      //   tokenId,
-      //   ethers.utils.parseEther(data.price.toString()),
-      //   data.amount,
-      //   {
-      //     value: listingPrice
-      //   }
-      // );
-      const tx = await contract?.sellBooks(
+      const sharingPrice = await contract!.sharingPrice();
+      const idBorrowedBook = await contract!.getIdBorrowedBook(
         tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+      const tx = await contract?.shareBooks(
+        idBorrowedBook.toNumber(),
         ethers.utils.parseEther(data.price.toString()),
         data.amount,
         {
-          value: listingPrice
+          value: sharingPrice
         }
       );
-
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Sharing NftBook Token",
-        success: "Sharing successfully",
+        success: "Share book successfully",
         error: "There's an error in sharing process!"
       });
-
       console.log("receipt", receipt);
     } catch (e: any) {
       console.error(e);
@@ -110,8 +113,8 @@ const ShareButton = ({
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (renter) {
+          const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
             setAuthorName(userRes.data.data.fullname);
@@ -121,7 +124,7 @@ const ShareButton = ({
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [renter]);
 
   return (
     <>
@@ -139,7 +142,7 @@ const ShareButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
+                <Typography>{renterName}</Typography>
                 <Typography>{borrowedAmount} left</Typography>
               </Stack>
             </Grid>
@@ -150,8 +153,8 @@ const ShareButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Share with (address)" required>
-                  <InputController name="sharedAddress" />
+                <FormGroup label="Price" required>
+                  <InputController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
                   <InputController name="amount" type="number" />
