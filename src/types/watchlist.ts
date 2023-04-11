@@ -7,10 +7,10 @@ export type WatchlistStatus =
   | "Frozen";
 
 export type WatchlistRowData = {
-  id: number;
+  tokenId: number;
   bookCover: string;
   title: string;
-  price: number;
-  status: WatchlistStatus;
+  author: string;
+  status?: WatchlistStatus;
   action?: JSX.Element; // Delete button or Edit button, you name it
 };

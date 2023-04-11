@@ -84,6 +84,7 @@ export type BookStoreContractMethodNames =
   | "supportsInterface"
   | "transferOwnership"
   | "uri"
+  | "getUri"
   | "setListingPrice"
   | "setLeasingPrice"
   | "setSharingPrice"
@@ -126,6 +127,7 @@ export type BookStoreContractMethodNames =
   | "getAllOwnedBooksOnSharing"
   | "getAllSharedBook"
   | "getAllOwnedSharedBook"
+  | "getIdBorrowedBook"
   | "updateBooksOnSharing"
   | "takeBooksOnSharing"
   | "recallSharedBooks"
@@ -415,6 +417,17 @@ export interface BookStoreContract {
    * @param tokenId Type: uint256, Indexed: false
    */
   uri(
+    tokenId: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   */
+  getUri(
     tokenId: BigNumberish,
     overrides?: ContractCallOverrides
   ): Promise<string>;
@@ -922,6 +935,25 @@ export interface BookStoreContract {
   getAllOwnedSharedBook(
     overrides?: ContractCallOverrides
   ): Promise<BooksharingResponse[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   * @param renter Type: address, Indexed: false
+   * @param borrower Type: address, Indexed: false
+   * @param startTime Type: uint256, Indexed: false
+   * @param endTime Type: uint256, Indexed: false
+   */
+  getIdBorrowedBook(
+    tokenId: BigNumberish,
+    renter: string,
+    borrower: string,
+    startTime: BigNumberish,
+    endTime: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<BigNumber>;
   /**
    * Payable: false
    * Constant: false

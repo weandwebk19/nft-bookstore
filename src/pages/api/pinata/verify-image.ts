@@ -28,37 +28,40 @@ export default withSessionAPI(
     console.log("verfiy-image");
 
     if (req.method === "POST") {
-      const { bytes, fileName, contentType } = req.body as FileReq;
+      try {
+        const { bytes, fileName, contentType } = req.body as FileReq;
 
-      if (!bytes || !fileName || !contentType) {
-        return res.status(422).send({ message: "Image data are missing" });
-      }
-
-      await addressCheckMiddleware(req, res);
-
-      const buffer = Buffer.from(Object.values(bytes));
-      const formData = new FormData();
-
-      formData.append("file", buffer, {
-        contentType,
-        filename: fileName + "-" + uuidv4()
-      });
-
-      const fileRes = await axios.post(
-        "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        formData,
-        {
-          maxBodyLength: Infinity,
-          headers: {
-            "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
-            pinata_api_key: pinataApiKey,
-            pinata_secret_api_key: pinataSecretApiKey
-          }
+        if (!bytes || !fileName || !contentType) {
+          return res.status(422).send({ message: "Image data are missing" });
         }
-      );
 
-      console.log(req.body);
-      return res.status(200).send(fileRes.data);
+        await addressCheckMiddleware(req, res);
+
+        const buffer = Buffer.from(Object.values(bytes));
+        const formData = new FormData();
+
+        formData.append("file", buffer, {
+          contentType,
+          filename: fileName + "-" + uuidv4()
+        });
+
+        const fileRes = await axios.post(
+          "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          formData,
+          {
+            maxBodyLength: Infinity,
+            headers: {
+              "Content-Type": `multipart/form-data; boundary=${formData.getBoundary()}`,
+              pinata_api_key: pinataApiKey,
+              pinata_secret_api_key: pinataSecretApiKey
+            }
+          }
+        );
+
+        return res.status(200).send(fileRes.data);
+      } catch (err: any) {
+        console.log(err.message);
+      }
     } else {
       return res.status(422).send({ message: "Invalid endpoint" });
     }

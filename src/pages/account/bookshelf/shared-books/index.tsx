@@ -15,7 +15,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { SharedBook } from "@/types/nftBook";
+import { BookSharing } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const SharedBooks = () => {
@@ -34,7 +34,7 @@ const SharedBooks = () => {
 
   const { nfts } = useOwnedSharedBooks();
   const router = useRouter();
-  const sharedBooks = nfts.data as SharedBook[];
+  const sharedBooks = nfts.data as BookSharing[];
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -80,7 +80,7 @@ const SharedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {sharedBooks!.map((book) => {
+                    {sharedBooks!.map((book: BookSharing) => {
                       return (
                         <Grid
                           item

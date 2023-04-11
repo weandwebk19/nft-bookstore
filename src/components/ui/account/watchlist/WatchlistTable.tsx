@@ -1,4 +1,6 @@
 import * as React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Box,
@@ -20,9 +22,11 @@ import {
   GridTreeNodeWithRender
 } from "@mui/x-data-grid";
 import styles from "@styles/BookItem.module.scss";
+import axios from "axios";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
+import { useAccount } from "@/components/hooks/web3";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
@@ -38,6 +42,7 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
 
   const router = useRouter();
   const { t } = useTranslation("watchlist");
+  const { account } = useAccount();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -62,7 +67,30 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
     e.preventDefault();
     setAnchorDeleteButton(null);
 
-    console.log(item);
+    console.log(item.tokenId);
+    console.log(account.data);
+    (async () => {
+      try {
+        if (account.data) {
+          const res = await axios.delete(
+            `/api/watchlists/${account.data}/${item.tokenId}/delete`
+          );
+          if (res.data.success) {
+            toast.success("Remove book from watchlists successfully !", {
+              position: toast.POSITION.TOP_RIGHT
+            });
+          } else {
+            toast.error("Remove book from watchlists error !", {
+              position: toast.POSITION.TOP_RIGHT
+            });
+          }
+        }
+      } catch (err: any) {
+        toast.error(err.message, {
+          position: toast.POSITION.TOP_RIGHT
+        });
+      }
+    })();
   };
 
   const handleCancelClick = (
@@ -107,8 +135,8 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
       minWidth: 250
     },
     {
-      field: "price",
-      headerName: t("price") as string,
+      field: "author",
+      headerName: t("author") as string,
       renderCell: (params) => <Typography>{params.value}</Typography>,
       width: 110
     },
@@ -213,7 +241,11 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
           </Button>
         </ButtonGroup>
       </Stack>
-      <DataGrid columns={columns} rows={data} />
+      <DataGrid
+        getRowId={(row: any) => row.tokenId}
+        columns={columns}
+        rows={data}
+      />
       <Dialog
         title={t("dialogTitle") as string}
         open={openDeleteDialog}
@@ -233,7 +265,7 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
             />
             <Box>
               <Typography variant="h5">{targetItem?.title}</Typography>
-              <Typography variant="h4">{targetItem?.price} ETH</Typography>
+              <Typography variant="h4">{targetItem?.author}</Typography>
             </Box>
           </Stack>
           <Stack direction="row" spacing={3} justifyContent="end">
@@ -249,6 +281,7 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
           </Stack>
         </Stack>
       </Dialog>
+      <ToastContainer />
     </Stack>
   );
 }

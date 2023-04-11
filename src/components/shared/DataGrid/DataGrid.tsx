@@ -6,9 +6,10 @@ import { GridColDef, DataGrid as MUIDataGrid } from "@mui/x-data-grid";
 interface DataGridProps {
   columns: GridColDef[];
   rows: any[];
+  getRowId?: (row: any) => any;
 }
 
-const DataGrid = ({ columns, rows }: DataGridProps) => {
+const DataGrid = ({ columns, rows, getRowId }: DataGridProps) => {
   const theme = useTheme();
   return (
     <Box
@@ -35,6 +36,7 @@ const DataGrid = ({ columns, rows }: DataGridProps) => {
       }}
     >
       <MUIDataGrid
+        getRowId={getRowId}
         autoHeight
         rows={rows}
         columns={columns}
