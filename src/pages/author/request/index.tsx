@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Alert,
@@ -556,6 +558,7 @@ const AuthorRequest = () => {
                 </Stack>
               </form>
             </FormProvider>
+            <ToastContainer />
           </Box>
         </ContentContainer>
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>

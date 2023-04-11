@@ -21,11 +21,15 @@ export default async function handler(
       })
       .toArray();
 
-    if (watchlists) {
+    const rawWatchlists = watchlists.map((watchlist) => {
+      return toCamel({ ...watchlist, _id: watchlist._id.toString() });
+    });
+
+    if (rawWatchlists) {
       return res.json({
         success: true,
         message: "Get watchlist successfully.",
-        data: watchlists
+        data: rawWatchlists
       });
     } else {
       return res.json({
