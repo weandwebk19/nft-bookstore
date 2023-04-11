@@ -97,8 +97,8 @@ const SellButton = ({
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Sell NftBook Token",
-        success: "NftBook has ben sold",
-        error: "Sell error"
+        success: "NftBook is successfully put on sale",
+        error: "Oops! There's a problem with listing process!"
       });
 
       console.log("receipt", receipt);

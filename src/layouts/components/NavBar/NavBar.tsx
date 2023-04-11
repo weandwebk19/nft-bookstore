@@ -41,6 +41,7 @@ import {
 } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
 import { useLocalStorage } from "@/components/hooks/common";
 import { useAccount } from "@/components/hooks/web3";
 import { ActiveLink } from "@/components/shared/ActiveLink";
@@ -164,6 +165,7 @@ const NavBar = () => {
 
   const { pathname, asPath, query } = router;
   const { account } = useAccount();
+  const { data: userInfo } = useUserInfo();
 
   // useEffect(() => {
   //   account.data && setAddress(truncate(account.data, 6, -4));
@@ -467,15 +469,20 @@ const NavBar = () => {
   ];
 
   const createList: ListItemProps[] = [
-    {
-      type: "button",
-      icon: null,
-      content: t("navbar:newBook") as string,
-      onClick: () => handlePublishABookClick(),
-      disabled: false,
-      subList: [],
-      href: "/books/create"
-    },
+    userInfo?.["isAuthor"] !== undefined
+      ? {
+          type: "button",
+          icon: null,
+          content: t("navbar:newBook") as string,
+          onClick: () => handlePublishABookClick(),
+          disabled: false,
+          subList: [],
+          href: "/books/create"
+        }
+      : {
+          type: "divider",
+          subList: []
+        },
     {
       type: "button",
       icon: null,

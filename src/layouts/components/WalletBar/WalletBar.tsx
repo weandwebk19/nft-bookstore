@@ -130,7 +130,7 @@ const WalletBar = ({
         >
           <Chip
             avatar={<AdjustIcon />}
-            label={truncate(address ? address : "", 6, -4)}
+            label={truncate(account ? account : "", 6, -4)}
             variant="outlined"
           />
           <Tooltip title={t("navbar:toolTip_accountMenu")}>
@@ -140,7 +140,7 @@ const WalletBar = ({
           </Tooltip>
         </Stack>
         <AccountMenu
-          account={address}
+          account={account}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
           switchAccount={() => {
@@ -224,7 +224,6 @@ const WalletBar = ({
   if (isInstalled) {
     return (
       <>
-        {("isConnected", isConnected)}
         <StyledButton
           customVariant="primary"
           onClick={() => {

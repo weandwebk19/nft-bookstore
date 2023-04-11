@@ -3,60 +3,111 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  Stack,
+  Step,
+  StepLabel,
+  Stepper,
+  Typography
+} from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
+import {
+  InputController,
+  NumericStepperController
+} from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
+import { daysToSeconds } from "@/utils/timeConvert";
 
-import { Image } from "../Image";
+import Step1 from "../../ui/borrow/steps/Step1";
+import Step2 from "../../ui/borrow/steps/Step2";
 
-interface ShareButtonProps {
+interface ExtendRequestButtonProps {
+  tokenId: number;
   title: string;
   bookCover: string;
-  author: string;
-  tokenId: number;
-  borrowedAmount: number;
+  renter: string;
+  price: number;
+  supplyAmount: number;
+  borrowBooks: (
+    tokenId: number,
+    renter: string,
+    price: number,
+    amount: number,
+    rentalDuration: number
+  ) => Promise<void>;
 }
 
 const schema = yup
   .object({
-    price: yup
-      .number()
-      .min(0, `The price must be higher than 0.`)
-      .typeError("Price must be a number"),
     amount: yup
       .number()
       .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
+      .typeError("Amount must be a number"),
+    rentalDays: yup
+      .number()
+      .min(1, `The day must be higher than 0.`)
+      .typeError("Rental days must be a number")
   })
   .required();
 
 const defaultValues = {
-  price: 0,
-  amount: 1
+  amount: 1,
+  rentalDays: 7
 };
 
-const ShareButton = ({
+const ExtendRequestButton = ({
+  tokenId,
   bookCover,
   title,
-  author,
-  tokenId,
-  borrowedAmount
-}: ShareButtonProps) => {
-  const [authorName, setAuthorName] = useState();
+  renter,
+  price,
+  supplyAmount,
+  borrowBooks
+}: ExtendRequestButtonProps) => {
+  const router = useRouter();
+  const [renterName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
+
+  const [activeStep, setActiveStep] = useState(0);
+
+  const steps = ["Balance checking", "Confirm purchase"];
+
+  const getStepContent = () => {
+    switch (activeStep) {
+      case 0:
+        return <Step1 />;
+      case 1:
+        return <Step2 supplyAmount={supplyAmount} />;
+      default:
+        return null;
+    }
+  };
+
+  const handleNext = async () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
 
   const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorBookCard(e.currentTarget);
@@ -73,45 +124,22 @@ const ShareButton = ({
     mode: "all"
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setValue } = methods;
 
   const onSubmit = async (data: any) => {
     try {
-      const listingPrice = await contract!.listingPrice();
-      // const tx = await contract?.sellBooks(
-      //   tokenId,
-      //   ethers.utils.parseEther(data.price.toString()),
-      //   data.amount,
-      //   {
-      //     value: listingPrice
-      //   }
-      // );
-      const tx = await contract?.sellBooks(
-        tokenId,
-        ethers.utils.parseEther(data.price.toString()),
-        data.amount,
-        {
-          value: listingPrice
-        }
-      );
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Sharing NftBook Token",
-        success: "Sharing successfully",
-        error: "There's an error in sharing process!"
-      });
-
-      console.log("receipt", receipt);
+      const rentalDuration = daysToSeconds(data.rentalDays);
+      await borrowBooks(tokenId, renter, price, data.amount, rentalDuration);
     } catch (e: any) {
-      console.error(e);
+      console.error(e.message);
     }
   };
 
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (renter) {
+          const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
             setAuthorName(userRes.data.data.fullname);
@@ -121,13 +149,19 @@ const ShareButton = ({
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [renter]);
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Share</StyledButton>
+      <Button
+        variant="contained"
+        sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
+        onClick={handleBookCardClick}
+      >
+        Rent now
+      </Button>
 
-      <Dialog title="Share" open={openBookCard} onClose={handleBookCardClose}>
+      <Dialog title="Sell" open={openBookCard} onClose={handleBookCardClose}>
         <FormProvider {...methods}>
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
@@ -139,8 +173,8 @@ const ShareButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
-                <Typography>{borrowedAmount} left</Typography>
+                <Typography>{renter}</Typography>
+                <Typography>{supplyAmount} left</Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -150,7 +184,7 @@ const ShareButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Price" required>
+                <FormGroup label="Listing price" required>
                   <InputController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
@@ -166,7 +200,7 @@ const ShareButton = ({
                   Cancel
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start sharing
+                  Start selling
                 </StyledButton>
               </Box>
             </Grid>
@@ -178,4 +212,4 @@ const ShareButton = ({
   );
 };
 
-export default ShareButton;
+export default ExtendRequestButton;

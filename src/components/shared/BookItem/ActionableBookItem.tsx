@@ -58,7 +58,6 @@ const ActionableBookItem = ({
   sharedPerson
 }: ActionableBookItemProps) => {
   const account = useAccount();
-  console.log(account);
 
   const theme = useTheme();
   const [authorName, setAuthorName] = useState("");
@@ -207,7 +206,7 @@ const ActionableBookItem = ({
                 <Typography variant="label">{sharerName}</Typography>
               </Stack>
             )}
-            {status === "isLeasing" && (
+            {status === "isLeasing" && borrower && (
               <Stack>
                 <Typography variant="subtitle2">Borrowed by:</Typography>
                 <Typography variant="label">{borrowerName}</Typography>
