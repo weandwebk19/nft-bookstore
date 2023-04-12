@@ -7,7 +7,7 @@ import LinearProgress, {
 import { styled } from "@mui/system";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 20,
+  height: 5,
   borderRadius: 5,
   [`&.${linearProgressClasses.colorPrimary}`]: {
     backgroundColor: theme.palette.background.paper
@@ -19,7 +19,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 }));
 
 const StyledLinearProgress = (
-  props: LinearProgressProps & { value: number }
+  props: LinearProgressProps & { value: number; icon?: JSX.Element }
 ) => {
   return (
     <Box
@@ -28,6 +28,7 @@ const StyledLinearProgress = (
         alignItems: "center"
       }}
     >
+      <Box sx={{ mr: 1 }}>{props.icon ? props.icon : <></>}</Box>
       <Box
         sx={{
           width: "100%",
