@@ -4,12 +4,15 @@ import { Box, Grid, Link, Stack, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 
 import styles from "@/styles/NotFound.module.scss";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const NotFoundPage = () => {
   const { t } = useTranslation("notFound");
+
+  const router = useRouter();
 
   return (
     <Grid container columns={{ sm: 1, md: 2, lg: 2 }} sx={{ mt: 6 }}>
@@ -89,7 +92,16 @@ const NotFoundPage = () => {
             {t("story15")}
           </Typography>
           <Typography>
-            {t("story16")} <Link href="/">{t("homepage")}</Link>.
+            {t("story16")}{" "}
+            <Link
+              sx={{ cursor: "pointer" }}
+              onClick={() => {
+                router.push("/");
+              }}
+            >
+              {t("homepage")}
+            </Link>
+            .
           </Typography>
         </article>
       </Grid>

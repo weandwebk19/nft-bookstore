@@ -32,6 +32,9 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 
+import images from "@/assets/images";
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
+import { StyledChip } from "@/styles/components/Chip";
 import { truncate } from "@/utils/truncate";
 
 interface AccountMenuProps {
@@ -40,6 +43,7 @@ interface AccountMenuProps {
   onClose(...args: unknown[]): unknown;
   switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
+  isAuthor: boolean;
 }
 
 const AccountMenu = ({
@@ -47,7 +51,8 @@ const AccountMenu = ({
   open,
   onClose,
   switchAccount,
-  disconnect
+  disconnect,
+  isAuthor
 }: AccountMenuProps) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -107,15 +112,24 @@ const AccountMenu = ({
       onClose={onClose}
     >
       <Stack direction="row" sx={{ mb: 3 }} spacing={3}>
-        <Chip label={t("navbar:readerAccount")} />
-        <StyledButton
-          size="small"
-          onClick={() => {
-            router.push("/author/request");
-          }}
-        >
-          {t("navbar:becomeAnAuthor")}
-        </StyledButton>
+        {isAuthor ? (
+          <StyledChip
+            label={t("navbar:authorAccount")}
+            background={images.gradient1}
+          />
+        ) : (
+          <Stack direction="row" spacing={3}>
+            <Chip label={t("navbar:readerAccount")} />
+            <StyledButton
+              size="small"
+              onClick={() => {
+                router.push("/author/request");
+              }}
+            >
+              {t("navbar:becomeAnAuthor")}
+            </StyledButton>
+          </Stack>
+        )}
       </Stack>
       <Grid container spacing={3} columns={{ xs: 4, sm: 4, md: 12 }}>
         <Grid item xs={4} md={6}>

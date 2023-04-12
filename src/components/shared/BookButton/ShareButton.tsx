@@ -150,8 +150,8 @@ const ShareButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Share with (address)" required>
-                  <InputController name="sharedAddress" />
+                <FormGroup label="Price" required>
+                  <InputController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
                   <InputController name="amount" type="number" />

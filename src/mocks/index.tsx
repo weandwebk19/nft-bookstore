@@ -704,3 +704,30 @@ export const book2 = {
 };
 
 export const bookList2 = [book3, book4, book5, book6, book7];
+
+export const bookComments = [
+  {
+    id: 1,
+    avatar: "",
+    username: "eye_deer",
+    date: "6/20/2023",
+    rating: 5,
+    comment: `I found a lot of this book incredibly tedious. I tend to avoid the winners of the Man / Booker – they make me a little depressed. The only Carey I haven’t liked won the Booker (Oscar and Lucinda), I really didn’t like the little bit of Vernon God Little I read and I never finished The Sea despite really liking Banville’s writing. So, being told a book is a winner of the Booker tends to be a mark against it from the start, unfortunately.`
+  },
+  {
+    id: 2,
+    avatar: "",
+    username: "owwwwwl",
+    date: "6/20/2023",
+    rating: 4,
+    comment: `I found a lot of this book incredibly tedious. I tend to avoid the winners of the Man / Booker – they make me a little depressed. The only Carey I haven’t liked won the Booker (Oscar and Lucinda), I really didn’t like the little bit of Vernon God Little I read and I never finished The Sea despite really liking Banville’s writing. So, being told a book is a winner of the Booker tends to be a mark against it from the start, unfortunately.`
+  },
+  {
+    id: 3,
+    avatar: "",
+    username: "froggy",
+    date: "6/20/2023",
+    rating: 4,
+    comment: `I found a lot of this book incredibly tedious. I tend to avoid the winners of the Man / Booker – they make me a little depressed. The only Carey I haven’t liked won the Booker (Oscar and Lucinda), I really didn’t like the little bit of Vernon God Little I read and I never finished The Sea despite really liking Banville’s writing. So, being told a book is a winner of the Booker tends to be a mark against it from the start, unfortunately.`
+  }
+];

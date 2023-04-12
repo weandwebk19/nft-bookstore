@@ -25,7 +25,7 @@ const BookShelf = () => {
           href={`${preUrl}/created-books`}
           header={t("createdBooks") as string}
           body={t("createdBooksDesc") as string}
-          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv13_tggmtv.jpg"
+          image={images.gradient2}
         />
       )
     },
@@ -36,7 +36,7 @@ const BookShelf = () => {
           href={`${preUrl}/owned-books`}
           header={t("ownedBooks") as string}
           body={t("ownedBooksDesc") as string}
-          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv50_fhjnov.jpg"
+          image={images.gradient3}
         />
       )
     },
@@ -47,7 +47,7 @@ const BookShelf = () => {
           href={`${preUrl}/borrowed-books`}
           header={t("borrowedBooks") as string}
           body={t("borrowedBooksDesc") as string}
-          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958967/nft_bookstore/img/gradient/vv20_g4evt5.jpg"
+          image={images.gradient4}
         />
       )
     },
@@ -58,7 +58,7 @@ const BookShelf = () => {
           href={`${preUrl}/shared-books`}
           header={t("sharedBooks") as string}
           body={t("sharedBooksDesc") as string}
-          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv41_dupr2k.jpg"
+          image={images.gradient5}
         />
       )
     }
@@ -75,7 +75,7 @@ const BookShelf = () => {
           href={`${preUrl}/sharing-books`}
           header={t("sharingBooks") as string}
           body={t("sharingBooksDesc") as string}
-          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958967/nft_bookstore/img/gradient/vv39_fhjups.jpg"
+          image={images.gradient6}
         />
       )
     },
@@ -86,7 +86,7 @@ const BookShelf = () => {
           href={`${preUrl}/listing-books`}
           header={t("listingBooks") as string}
           body={t("listingBooksDesc") as string}
-          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958966/nft_bookstore/img/gradient/vv12_nho4ox.jpg"
+          image={images.gradient7}
         />
       )
     },
@@ -97,7 +97,7 @@ const BookShelf = () => {
           href={`${preUrl}/leasing-books`}
           header={t("leasingBooks") as string}
           body={t("leasingBooksDesc") as string}
-          image="https://res.cloudinary.com/cldcloud/image/upload/v1680958962/nft_bookstore/img/gradient/vv02_vxdv70.jpg"
+          image={images.gradient8}
         />
       )
     }

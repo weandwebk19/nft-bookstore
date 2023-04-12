@@ -88,8 +88,8 @@ const LeaseButton = ({
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Lease NftBook Token",
-        success: "NftBook has ben sold",
-        error: "Lease error"
+        success: "NftBook is successfully leased out!",
+        error: "Oops! There's a problem with leasing process!"
       });
 
       console.log("receipt", receipt);

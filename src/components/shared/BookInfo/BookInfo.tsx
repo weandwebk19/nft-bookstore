@@ -8,7 +8,8 @@ import { useTranslation } from "next-i18next";
 
 import {
   BookBriefing,
-  BookDetail
+  BookDetail,
+  BookRating
 } from "@/components/shared/BookInfo/sections";
 import BookPricingHistory from "@/components/shared/BookInfo/sections/BookPricingHistory";
 import { BookList } from "@/components/shared/BookList";
@@ -28,7 +29,7 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
 
   const theme = useTheme();
 
-  const isOpenForTradeIn = false;
+  const isOpenForPurchase = false;
   const isOpenForBorrow = false;
   const [isPublishedState, setIsPublishedState] = useState(false);
 
@@ -125,68 +126,42 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
             </Stack>
           </Box>
           <Box>
-            <Grid
-              container
-              columns={{ xs: 4, sm: 7, md: 7 }}
+            <Box
               sx={{
-                borderBottom: `1px solid ${theme.palette.primary.main}`,
-                borderRight: { sm: `1px solid ${theme.palette.primary.main}` },
+                borderRight: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                borderBottom: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
                 borderLeft: {
-                  xs: `1px solid ${theme.palette.primary.main}`,
-                  sm: 0
+                  md: 0,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
                 }
               }}
+              p={3}
             >
-              <Grid
-                item
-                xs={4}
-                sm={7}
-                md={4}
-                sx={{
-                  borderRight: {
-                    md: `1px solid ${theme.palette.primary.main}`,
-                    sm: 0,
-                    xs: `1px solid ${theme.palette.primary.main}`
-                  },
-                  borderBottom: {
-                    xs: `1px solid ${theme.palette.primary.main}`,
-                    sm: 0
-                  }
-                }}
-                p={3}
-              >
-                <BookDetail
-                  bookId={bookDetail?.bookId!}
-                  fileType={bookDetail?.meta.fileType!}
-                  totalPages={bookDetail?.info.totalPages}
-                  languages={bookDetail?.info.languages!}
-                  genres={bookDetail?.info.genres!}
-                  version={bookDetail?.meta.version!}
-                  maxSupply={bookDetail?.meta.quantity!}
-                  publishingTime={new Date(bookDetail?.meta.createdAt!)}
-                  owners={
-                    bookDetail?.listedCore !== null
-                      ? bookDetail?.listedCore?.seller!
-                      : bookDetail?.meta.author!
-                  }
-                />
-              </Grid>
-              <Grid
-                item
-                xs={4}
-                sm={8}
-                md={3}
-                p={3}
-                sx={{
-                  borderRight: {
-                    xs: `1px solid ${theme.palette.primary.main}`,
-                    sm: 0
-                  }
-                }}
-              >
-                <BookPricingHistory />
-              </Grid>
-            </Grid>
+              <BookDetail
+                bookId={bookDetail?.bookId!}
+                fileType={bookDetail?.meta.fileType!}
+                totalPages={bookDetail?.info.totalPages}
+                languages={bookDetail?.info.languages!}
+                genres={bookDetail?.info.genres!}
+                version={bookDetail?.meta.version!}
+                maxSupply={bookDetail?.meta.quantity!}
+                publishingTime={new Date(bookDetail?.meta.createdAt!)}
+                owners={
+                  bookDetail?.listedCore !== null
+                    ? bookDetail?.listedCore?.seller!
+                    : bookDetail?.meta.author!
+                }
+              />
+            </Box>
           </Box>
           {/* {(isOpenForTradeIn || isOpenForBorrow) && ( */}
           {(true || isOpenForBorrow) && (
@@ -202,13 +177,26 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
               }}
             >
               <BookListActionable
-                isOpenForTradeIn={true}
+                isOpenForPurchase={true}
                 // isOpenForTradeIn={isOpenForTradeIn}
                 isOpenForBorrow={isOpenForBorrow}
                 bookListActionable={bookListActionable}
               />
             </Box>
           )}
+          <Box
+            sx={{
+              p: 3,
+              borderBottom: `1px solid ${theme.palette.primary.main}`,
+              borderRight: `1px solid ${theme.palette.primary.main}`,
+              borderLeft: {
+                xs: `1px solid ${theme.palette.primary.main}`,
+                sm: 0
+              }
+            }}
+          >
+            <BookRating bookId={bookDetail?.bookId!} />
+          </Box>
           <Box
             sx={{
               p: 3,
