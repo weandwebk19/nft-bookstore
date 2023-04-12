@@ -11,6 +11,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
@@ -60,6 +61,7 @@ const ShareButton = ({
 }: ShareButtonProps) => {
   const [renterName, setRenterName] = useState();
   const { ethereum, contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -83,6 +85,17 @@ const ShareButton = ({
 
   const onSubmit = async (data: any) => {
     try {
+      // handle errors
+      if (data.amount > borrowedAmount) {
+        return toast.error(`Amount must be less than ${borrowedAmount}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      } else if (Math.floor(new Date().getTime() / 1000) >= endTime) {
+        return toast.error("Borrowing time has expired", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
       const sharingPrice = await contract!.sharingPrice();
       const idBorrowedBook = await contract!.getIdBorrowedBook(
         tokenId,
@@ -104,9 +117,11 @@ const ShareButton = ({
         success: "Share book successfully",
         error: "There's an error in sharing process!"
       });
-      console.log("receipt", receipt);
     } catch (e: any) {
       console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 

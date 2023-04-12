@@ -675,9 +675,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     if (msg.value != sharingPrice) {
       revert Error.InvalidPriceError(sharingPrice);
     }
-    if (price == 0) {
-      revert Error.InvalidPriceError(price);
-    }
     if (amount == 0 || amount > borrowedBook.amount) {
       revert Error.InvalidAmountError(amount);
     }

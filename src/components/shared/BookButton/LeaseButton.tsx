@@ -75,8 +75,14 @@ const LeaseButton = ({
   const { handleSubmit } = methods;
 
   const onSubmit = async (data: any) => {
-    // console.log(data);
     try {
+      // handle errors
+      if (data.amount > amountTradeable) {
+        return toast.error(`Amount must be less than ${amountTradeable}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
       const tx = await contract?.leaseBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
@@ -87,14 +93,15 @@ const LeaseButton = ({
       );
 
       const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Lease NftBook Token",
-        success: "NftBook has ben sold",
-        error: "Lease error"
+        pending: "Leasing NftBook Token",
+        success: "Lease NftBook successfully.",
+        error: "Lease NftBook error."
       });
-
-      console.log("receipt", receipt);
     } catch (e: any) {
-      console.log(e.data.message);
+      console.log(e.message);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 
