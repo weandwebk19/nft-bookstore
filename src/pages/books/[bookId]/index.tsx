@@ -19,10 +19,7 @@ export async function getStaticProps({ locale }: any) {
 
 export const getStaticPaths = () => {
   return {
-    paths: [
-      { params: { bookId: "1" }, locale: "en" },
-      { params: { bookId: "2" }, locale: "vi" }
-    ],
+    paths: [],
     fallback: true
   };
 };

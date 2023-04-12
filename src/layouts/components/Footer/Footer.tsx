@@ -34,7 +34,7 @@ const Footer = () => {
           url: "/"
         },
         {
-          content: t("trade-in") as string,
+          content: t("share") as string,
           url: "/"
         },
         {
@@ -57,10 +57,6 @@ const Footer = () => {
         {
           content: t("watchlist") as string,
           url: "/watchlist"
-        },
-        {
-          content: t("favorites") as string,
-          url: "/favorites"
         },
         {
           content: t("my_bookshelf") as string,

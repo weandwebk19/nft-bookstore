@@ -5,15 +5,15 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
-import DisplayBox from "@/components/ui/trade-in/DisplayBox";
+import DisplayBox from "@/components/ui/share/DisplayBox";
 
-const TradeIn = () => {
-  const { t } = useTranslation("tradeInBooks");
+const Share = () => {
+  const { t } = useTranslation("shareBooks");
 
   const breadCrumbs = [
     {
-      content: `${t("breadcrumbs_tradeIn")}`,
-      href: "/trade-in"
+      content: `${t("breadcrumbs_share")}`,
+      href: "/share"
     }
   ];
 
@@ -41,7 +41,7 @@ const TradeIn = () => {
   );
 };
 
-export default TradeIn;
+export default Share;
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -52,7 +52,7 @@ export async function getStaticProps({ locale }: any) {
         "footer",
         "filter",
         "fallback",
-        "tradeInBooks"
+        "shareBooks"
       ]))
     }
   };

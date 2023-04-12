@@ -72,15 +72,15 @@ const MainProduct = () => {
         <StyledCard customVariant="invertedDome" sx={{ m: 2 }}>
           <CardActionArea
             onClick={() => {
-              router.push("/trade-in");
+              router.push("/share");
             }}
           >
             <CardContent sx={{ minHeight: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
-                {t("tradeIn") as string}
+                {t("share") as string}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {t("infoTradeIn") as string}
+                {t("infoShare") as string}
               </Typography>
             </CardContent>
             <CardMedia
@@ -97,7 +97,7 @@ const MainProduct = () => {
               >
                 <CldImage
                   src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628696/nft_bookstore/img/product2_yfv14w.jpg`}
-                  alt="trade-in"
+                  alt="share"
                   fill
                   style={{
                     objectFit: "cover"

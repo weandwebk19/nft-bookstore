@@ -55,7 +55,7 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
     bookDetail?.listedCore?.amount && bookDetail?.listedCore?.amount > 0
       ? true
       : false;
-  const isOpenForTradeIn = false;
+  const isOpenForPurchase = false;
   const isOpenForBorrow = false;
 
   useEffect(() => {
@@ -149,7 +149,7 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
         </Grid>
         <Grid item xs={4} sm={5} md={2} sx={{ p: 3 }}>
           <Stack justifyContent="space-between" sx={{ height: "100%" }}>
-            <Stack>
+            {/* <Stack>
               <Stack sx={{ flexWrap: "wrap" }}>
                 <Typography variant="label" mb={1}>
                   Contract address:
@@ -158,7 +158,7 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
                   <Link href="#">{bookDetail?.info.contractAddress}</Link>
                 </Box>
               </Stack>
-            </Stack>
+            </Stack> */}
             {bookDetail?.meta.bookSample !== "" && (
               <StyledButton
                 customVariant="secondary"
@@ -220,17 +220,11 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
               {/* <StyledButton customVariant="secondary">
                 + Add to watchlist
               </StyledButton> */}
-              <AddToWatchlistButton
-                isFirstInButtonGroup
-                tokenId={bookDetail?.nftCore.tokenId!}
-              />
-              <Tooltip title="Add to favorites">
-                <IconButton>
-                  <BookmarkAddOutlinedIcon color="primary" />
-                </IconButton>
+              <Tooltip title="Add to watchlist">
+                <AddToWatchlistButton tokenId={bookDetail?.nftCore.tokenId!} />
               </Tooltip>
             </Stack>
-            {/* Trade-in/Borrow navigate */}
+            {/* Publishing/Borrow navigate */}
             <Stack>
               {isOpenForBorrow && (
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -238,10 +232,10 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
                   <Link href="books">Go to borrow</Link>
                 </Stack>
               )}
-              {isOpenForTradeIn && (
+              {isOpenForPurchase && (
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Typography>This book is open for trade</Typography>
-                  <Link href="#">Go to trade-in</Link>
+                  <Typography>This book is open for purchase</Typography>
+                  <Link href="#">Go to publishing</Link>
                 </Stack>
               )}
             </Stack>

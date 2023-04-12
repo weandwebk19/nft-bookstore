@@ -291,8 +291,8 @@ const NavBar = () => {
     router.push("/publishing");
   };
 
-  const handleTradeInClick = () => {
-    router.push("/trade-in");
+  const handleShareClick = () => {
+    router.push("/share");
   };
 
   const handleBorrowClick = () => {
@@ -393,19 +393,19 @@ const NavBar = () => {
     },
     {
       type: "link",
-      href: "/trade-in",
+      href: "/borrow",
       icon: null,
-      content: t("navbar:trade-in") as string,
-      onClick: () => handleTradeInClick(),
+      content: t("navbar:borrow") as string,
+      onClick: () => handleBorrowClick(),
       disabled: false,
       subList: []
     },
     {
       type: "link",
-      href: "/borrow",
+      href: "/share",
       icon: null,
-      content: t("navbar:borrow") as string,
-      onClick: () => handleBorrowClick(),
+      content: t("navbar:share") as string,
+      onClick: () => handleShareClick(),
       disabled: false,
       subList: []
     }
