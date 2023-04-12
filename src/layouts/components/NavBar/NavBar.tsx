@@ -167,6 +167,19 @@ const NavBar = () => {
   const { account } = useAccount();
   const { data: userInfo } = useUserInfo();
 
+  const [isAuthor, setIsAuthor] = useState<boolean>(
+    Boolean(userInfo?.isAuthor)
+  );
+
+  useEffect(() => {
+    if (userInfo?.isAuthor !== undefined) {
+      setIsAuthor(userInfo?.isAuthor);
+      console.log(userInfo?.isAuthor);
+    } else {
+      setIsAuthor(false);
+    }
+  }, [userInfo?.isAuthor]);
+
   // useEffect(() => {
   //   account.data && setAddress(truncate(account.data, 6, -4));
   // }, [account]);
@@ -469,7 +482,7 @@ const NavBar = () => {
   ];
 
   const createList: ListItemProps[] = [
-    userInfo?.["isAuthor"] !== undefined
+    userInfo?.isAuthor !== undefined
       ? {
           type: "button",
           icon: null,
@@ -620,6 +633,7 @@ const NavBar = () => {
                   disconnect={disconnect}
                   handleLogin={handleLogin}
                   isConnected={isConnected}
+                  isAuthor={isAuthor}
                 />
                 <AccountMenu
                   account={wagmiAddress}
@@ -627,6 +641,7 @@ const NavBar = () => {
                   onClose={handleAccountMenuClose}
                   switchAccount={account.switchAccount}
                   disconnect={disconnect}
+                  isAuthor={isAuthor}
                 />
                 {/* <Tooltip title="Toggle theme">
                 <IconButton

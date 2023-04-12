@@ -1,13 +1,13 @@
 import { NextComponentType } from "next";
-import { useSession } from "next-auth/react";
 
+import { useUserInfo } from "../hooks/api/useUserInfo";
 import { UnauthenticatedMessage } from "../shared/UnauthenticatedMessage";
 
-function withAuth<T>(Component: NextComponentType<T>) {
+function withAuthor<T>(Component: NextComponentType<T>) {
   const Auth = (props: any) => {
-    const { status } = useSession();
+    const { data } = useUserInfo();
 
-    if (status === "unauthenticated") {
+    if (data?.isAuthor === undefined) {
       return <UnauthenticatedMessage />;
     }
 
@@ -21,4 +21,4 @@ function withAuth<T>(Component: NextComponentType<T>) {
   return Auth;
 }
 
-export default withAuth;
+export default withAuthor;

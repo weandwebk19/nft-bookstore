@@ -29,5 +29,6 @@
   "disconnect": "Disconnect",
   "connectWallet": "Connect wallet",
   "readerAccount": "Reader account",
+  "authorAccount": "Author account",
   "becomeAnAuthor": "Become an author"
 }
