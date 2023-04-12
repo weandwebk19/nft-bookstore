@@ -3,9 +3,9 @@
   "contact": "Liên hệ",
   "bookstore": "Tiệm sách",
   "toolTip_bookstore": "Marketplace",
-  "publishing": "Xuất bản",
-  "trade-in": "Trao đổi",
-  "borrow": "Mượn",
+  "publishing": "Sách xuất bản",
+  "share": "Sách chia sẻ",
+  "borrow": "Sách cho thuê",
   "create": "Tạo mới",
   "toolTip_create": "Niêm yết sách",
   "newBook": "Tạo sách mới",
@@ -29,5 +29,6 @@
   "disconnect": "Ngắt kết nối",
   "connectWallet": "Kết nối ví",
   "readerAccount": "Tài khoản độc giả",
+  "authorAccount": "Tài khoản tác giả",
   "becomeAnAuthor": "Trở thành tác giả"
 }

@@ -22,6 +22,8 @@ import { signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
 
+import images from "@/assets/images";
+import { StyledChip } from "@/styles/components/Chip";
 import { ListItemProps } from "@/types/list";
 import { truncate } from "@/utils/truncate";
 
@@ -36,6 +38,7 @@ interface WalletBarProps {
   switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
   isConnected: boolean;
+  isAuthor: boolean;
 }
 
 const WalletBar = ({
@@ -46,7 +49,8 @@ const WalletBar = ({
   handleLogin,
   switchAccount,
   disconnect,
-  isConnected
+  isConnected,
+  isAuthor
 }: WalletBarProps) => {
   const { t } = useTranslation();
   const { data, status } = useSession();
@@ -128,11 +132,19 @@ const WalletBar = ({
           alignItems="center"
           sx={{ display: { xs: "none", md: "flex" } }}
         >
-          <Chip
-            avatar={<AdjustIcon />}
-            label={truncate(address ? address : "", 6, -4)}
-            variant="outlined"
-          />
+          {isAuthor ? (
+            <StyledChip
+              avatar={<AdjustIcon color="primary" />}
+              label={truncate(account ? account : "", 6, -4)}
+              background={images.gradient1}
+            />
+          ) : (
+            <Chip
+              avatar={<AdjustIcon />}
+              label={truncate(account ? account : "", 6, -4)}
+              variant="outlined"
+            />
+          )}
           <Tooltip title={t("navbar:toolTip_accountMenu")}>
             <IconButton onClick={handleAccountMenuClick}>
               <Avatar alt="Remy Sharp" src="" />
@@ -140,7 +152,7 @@ const WalletBar = ({
           </Tooltip>
         </Stack>
         <AccountMenu
-          account={address}
+          account={account}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
           switchAccount={() => {
@@ -152,6 +164,7 @@ const WalletBar = ({
               redirect: false
             });
           }}
+          isAuthor={isAuthor}
         />
         <Box
           sx={{
@@ -224,7 +237,6 @@ const WalletBar = ({
   if (isInstalled) {
     return (
       <>
-        {("isConnected", isConnected)}
         <StyledButton
           customVariant="primary"
           onClick={() => {

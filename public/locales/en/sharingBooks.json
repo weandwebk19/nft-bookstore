@@ -1,8 +1,10 @@
 {
   "titlePage": "Sharing books - NFT Bookstore",
   "sharingBooksTitle": "Sharing books",
-  "emptyMessage": "There's nothing here!",
+  "sharedOutBooksTitle": "Shared out books",
+  "emptyMessage": "You haven't share any books!",
+  "emptyMessage__sharedOutBooks": "No books have been borrowed yet",
   "loadingMessage": "Putting books on the shelves...",
   "breadcrumbs_bookshelf": "Bookshelf",
-  "breadcrumbs_sharingBooks": "Sharing"
+  "breadcrumbs_sharingBooks": "Sharing books"
 }

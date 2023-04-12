@@ -173,7 +173,7 @@ const RecallButton = ({
                   />
                   <Typography variant="h5">{title}</Typography>
                   <Typography>{renterName}</Typography>
-                  <Typography>Borrowed amount: {amount}</Typography>
+                  <Typography>Amount: {amount}</Typography>
                 </Stack>
               </Grid>
               <Grid item md={8}>
@@ -183,7 +183,7 @@ const RecallButton = ({
                     mb: 5
                   }}
                 >
-                  {!isEnded && (
+                  {borrower && !isEnded && (
                     <>
                       <Typography>
                         {borrower} is in a rental term duration. Are you sure

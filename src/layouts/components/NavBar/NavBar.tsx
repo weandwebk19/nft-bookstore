@@ -41,6 +41,7 @@ import {
 } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
 import { useLocalStorage } from "@/components/hooks/common";
 import { useAccount } from "@/components/hooks/web3";
 import { ActiveLink } from "@/components/shared/ActiveLink";
@@ -164,6 +165,20 @@ const NavBar = () => {
 
   const { pathname, asPath, query } = router;
   const { account } = useAccount();
+  const { data: userInfo } = useUserInfo();
+
+  const [isAuthor, setIsAuthor] = useState<boolean>(
+    Boolean(userInfo?.isAuthor)
+  );
+
+  useEffect(() => {
+    if (userInfo?.isAuthor !== undefined) {
+      setIsAuthor(userInfo?.isAuthor);
+      console.log(userInfo?.isAuthor);
+    } else {
+      setIsAuthor(false);
+    }
+  }, [userInfo?.isAuthor]);
 
   // useEffect(() => {
   //   account.data && setAddress(truncate(account.data, 6, -4));
@@ -289,8 +304,8 @@ const NavBar = () => {
     router.push("/publishing");
   };
 
-  const handleTradeInClick = () => {
-    router.push("/trade-in");
+  const handleShareClick = () => {
+    router.push("/share");
   };
 
   const handleBorrowClick = () => {
@@ -391,19 +406,19 @@ const NavBar = () => {
     },
     {
       type: "link",
-      href: "/trade-in",
+      href: "/borrow",
       icon: null,
-      content: t("navbar:trade-in") as string,
-      onClick: () => handleTradeInClick(),
+      content: t("navbar:borrow") as string,
+      onClick: () => handleBorrowClick(),
       disabled: false,
       subList: []
     },
     {
       type: "link",
-      href: "/borrow",
+      href: "/share",
       icon: null,
-      content: t("navbar:borrow") as string,
-      onClick: () => handleBorrowClick(),
+      content: t("navbar:share") as string,
+      onClick: () => handleShareClick(),
       disabled: false,
       subList: []
     }
@@ -467,15 +482,20 @@ const NavBar = () => {
   ];
 
   const createList: ListItemProps[] = [
-    {
-      type: "button",
-      icon: null,
-      content: t("navbar:newBook") as string,
-      onClick: () => handlePublishABookClick(),
-      disabled: false,
-      subList: [],
-      href: "/books/create"
-    },
+    userInfo?.isAuthor !== undefined
+      ? {
+          type: "button",
+          icon: null,
+          content: t("navbar:newBook") as string,
+          onClick: () => handlePublishABookClick(),
+          disabled: false,
+          subList: [],
+          href: "/books/create"
+        }
+      : {
+          type: "divider",
+          subList: []
+        },
     {
       type: "button",
       icon: null,
@@ -613,6 +633,7 @@ const NavBar = () => {
                   disconnect={disconnect}
                   handleLogin={handleLogin}
                   isConnected={isConnected}
+                  isAuthor={isAuthor}
                 />
                 <AccountMenu
                   account={wagmiAddress}
@@ -620,6 +641,7 @@ const NavBar = () => {
                   onClose={handleAccountMenuClose}
                   switchAccount={account.switchAccount}
                   disconnect={disconnect}
+                  isAuthor={isAuthor}
                 />
                 {/* <Tooltip title="Toggle theme">
                 <IconButton

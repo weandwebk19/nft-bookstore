@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Button, Tooltip } from "@mui/material";
 
-import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 
 import axios from "axios";
 
@@ -90,7 +90,7 @@ const AddToWatchlistButton = ({
         }}
         variant={isWatched ? "contained" : "outlined"}
       >
-        <PlaylistAddIcon fontSize="small" />
+        <BookmarkBorderOutlinedIcon fontSize="small" />
       </Button>
     </Tooltip>
   );
