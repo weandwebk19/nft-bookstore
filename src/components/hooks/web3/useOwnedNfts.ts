@@ -33,10 +33,20 @@ export const hookFactory: OwnedNftsHookFactory =
             await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
           ).data.data;
 
+          const amountOwned = await contract!.getBalanceOfOwnerBook(
+            item.tokenId
+          );
+
+          const amountTradeable = await contract!.getAmountUnUsedBook(
+            item.tokenId
+          );
+
           nfts.push({
             tokenId: item.tokenId.toNumber(),
             author: item.author,
             quantity: item.quantity.toNumber(),
+            amountOwned: amountOwned.toNumber(),
+            amountTradeable: amountTradeable.toNumber(),
             meta
           });
         }

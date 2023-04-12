@@ -22,6 +22,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
@@ -65,6 +66,7 @@ const BuyButton = ({
   const router = useRouter();
   const [sellerName, setSellerName] = useState();
   const { ethereum, contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -111,6 +113,20 @@ const BuyButton = ({
 
   const onSubmit = async (data: any) => {
     try {
+      // Handle errors
+      if (data.amount > supplyAmount) {
+        return toast.error(`Amount must be less than ${supplyAmount}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      } else if (account.data == seller) {
+        return toast.error(
+          "You are not allowed to buy the book published by yourself.",
+          {
+            position: toast.POSITION.TOP_CENTER
+          }
+        );
+      }
+
       const tx = await contract?.buyBooks(tokenId, seller, data.amount, {
         value: ethers.utils.parseEther((price * data.amount).toString())
       });
@@ -120,10 +136,11 @@ const BuyButton = ({
         success: "Nft Book is yours! Go to Profile page",
         error: "Processing error"
       });
-
-      console.log("receipt", receipt);
     } catch (e: any) {
       console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 

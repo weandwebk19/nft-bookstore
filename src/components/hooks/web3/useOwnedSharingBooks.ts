@@ -33,7 +33,7 @@ export const hookFactory: OwnedSharingBooksHookFactory =
               tokenId: item?.tokenId?.toNumber(),
               fromRenter: item?.fromRenter,
               amount: item?.amount?.toNumber(),
-              price: parseInt(ethers.utils.formatEther(item?.price)),
+              price: parseFloat(ethers.utils.formatEther(item?.price)),
               sharer: item?.sharer,
               sharedPer: item?.sharedPer,
               priceOfBB: item?.priceOfBB?.toNumber(),

@@ -23,7 +23,7 @@ interface LeaseButtonProps {
   bookCover: string;
   author: string;
   tokenId: number;
-  quantity: number;
+  amountTradeable: number;
 }
 
 const schema = yup
@@ -49,7 +49,7 @@ const LeaseButton = ({
   title,
   author,
   tokenId,
-  quantity
+  amountTradeable
 }: LeaseButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
@@ -75,8 +75,14 @@ const LeaseButton = ({
   const { handleSubmit } = methods;
 
   const onSubmit = async (data: any) => {
-    // console.log(data);
     try {
+      // handle errors
+      if (data.amount > amountTradeable) {
+        return toast.error(`Amount must be less than ${amountTradeable}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
       const tx = await contract?.leaseBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
@@ -91,10 +97,11 @@ const LeaseButton = ({
         success: "NftBook is successfully leased out!",
         error: "Oops! There's a problem with leasing process!"
       });
-
-      console.log("receipt", receipt);
     } catch (e: any) {
-      console.log(e.data.message);
+      console.log(e.message);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 
@@ -135,7 +142,7 @@ const LeaseButton = ({
                 />
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{authorName}</Typography>{" "}
-                <Typography>{quantity} left</Typography>
+                <Typography>{amountTradeable} left</Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>

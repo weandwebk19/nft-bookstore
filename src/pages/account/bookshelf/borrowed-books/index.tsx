@@ -124,7 +124,10 @@ const BorrowedBooks = () => {
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  author={book?.renter}
+                                  renter={book?.renter}
+                                  borrower={book?.borrower}
+                                  startTime={book?.startTime}
+                                  endTime={book?.endTime}
                                   borrowedAmount={book?.amount}
                                 />
                                 <ExtendRequestButton

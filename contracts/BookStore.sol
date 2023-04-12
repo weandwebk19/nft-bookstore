@@ -31,8 +31,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
   uint MIN_TIME = 604800; // Rental period is at least one week
   uint public listingPrice = 0.025 ether;
   uint public leasingPrice = 0.001 ether;
-  uint private sharingPrice = 0.0005 ether;
-  uint private convertPrice = 0.000005 ether;
+  uint public sharingPrice = 0.0005 ether;
+  uint public convertPrice = 0.000005 ether;
 
   Counters.Counter private _tokenIds;
 
@@ -645,6 +645,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return total;
   }
 
+  function getIdBorrowedBook(
+    uint tokenId,
+    address renter,
+    address borrower,
+    uint startTime,
+    uint endTime
+  ) public view returns (uint) {
+    return
+      _bookRentingStorage.getIdBorrowedBook(
+        tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+  }
+
   function shareBooks(
     uint256 idBorrowedBook,
     uint price,
@@ -657,9 +674,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     }
     if (msg.value != sharingPrice) {
       revert Error.InvalidPriceError(sharingPrice);
-    }
-    if (price == 0) {
-      revert Error.InvalidPriceError(price);
     }
     if (amount == 0 || amount > borrowedBook.amount) {
       revert Error.InvalidAmountError(amount);
@@ -715,23 +729,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     returns (BookSharingStorage.BookSharing[] memory)
   {
     return _bookSharingStorage.getAllOwnedSharedBook(msg.sender);
-  }
-
-  function getIdBorrowedBook(
-    uint tokenId,
-    address renter,
-    address borrower,
-    uint startTime,
-    uint endTime
-  ) public view returns (uint) {
-    return
-      _bookRentingStorage.getIdBorrowedBook(
-        tokenId,
-        renter,
-        borrower,
-        startTime,
-        endTime
-      );
   }
 
   function updateBooksOnSharing(

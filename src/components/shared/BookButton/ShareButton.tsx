@@ -11,6 +11,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
@@ -22,8 +23,11 @@ import { Image } from "../Image";
 interface ShareButtonProps {
   title: string;
   bookCover: string;
-  author: string;
+  renter: string;
+  borrower: string;
   tokenId: number;
+  startTime: number;
+  endTime: number;
   borrowedAmount: number;
 }
 
@@ -48,12 +52,16 @@ const defaultValues = {
 const ShareButton = ({
   bookCover,
   title,
-  author,
+  renter,
+  borrower,
+  startTime,
+  endTime,
   tokenId,
   borrowedAmount
 }: ShareButtonProps) => {
-  const [authorName, setAuthorName] = useState();
+  const [renterName, setRenterName] = useState();
   const { ethereum, contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -77,51 +85,61 @@ const ShareButton = ({
 
   const onSubmit = async (data: any) => {
     try {
-      const listingPrice = await contract!.listingPrice();
-      // const tx = await contract?.sellBooks(
-      //   tokenId,
-      //   ethers.utils.parseEther(data.price.toString()),
-      //   data.amount,
-      //   {
-      //     value: listingPrice
-      //   }
-      // );
-      const tx = await contract?.sellBooks(
+      // handle errors
+      if (data.amount > borrowedAmount) {
+        return toast.error(`Amount must be less than ${borrowedAmount}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      } else if (Math.floor(new Date().getTime() / 1000) >= endTime) {
+        return toast.error("Borrowing time has expired", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const sharingPrice = await contract!.sharingPrice();
+      const idBorrowedBook = await contract!.getIdBorrowedBook(
         tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+      const tx = await contract?.shareBooks(
+        idBorrowedBook.toNumber(),
         ethers.utils.parseEther(data.price.toString()),
         data.amount,
         {
-          value: listingPrice
+          value: sharingPrice
         }
       );
-
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Sharing NftBook Token",
-        success: "Sharing successfully",
+        success: "Share book successfully",
         error: "There's an error in sharing process!"
       });
-
-      console.log("receipt", receipt);
     } catch (e: any) {
       console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (renter) {
+          const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setRenterName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [renter]);
 
   return (
     <>
@@ -139,7 +157,7 @@ const ShareButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
+                <Typography>{renterName}</Typography>
                 <Typography>{borrowedAmount} left</Typography>
               </Stack>
             </Grid>
