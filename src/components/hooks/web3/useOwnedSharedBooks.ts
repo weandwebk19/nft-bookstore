@@ -41,8 +41,8 @@ export const hookFactory: OwnedSharedBooksHookFactory =
               amount: item?.amount?.toNumber(),
               startTime: item?.startTime?.toNumber(),
               endTime: item?.endTime?.toNumber(),
-              priceOfBB: parseInt(ethers.utils.formatEther(item?.priceOfBB)),
-              price: parseInt(ethers.utils.formatEther(item?.price)),
+              priceOfBB: parseFloat(ethers.utils.formatEther(item?.priceOfBB)),
+              price: parseFloat(ethers.utils.formatEther(item?.price)),
               meta
             });
           } catch (err) {
