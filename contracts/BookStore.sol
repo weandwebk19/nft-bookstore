@@ -10,6 +10,7 @@ import "./list/ListedBookStorage.sol";
 import "./rent/BookRentingStorage.sol";
 import "./share/BookSharingStorage.sol";
 import "./BookTemporary.sol";
+import "./ListRealOwners.sol";
 
 contract BookStore is ERC1155URIStorage, Ownable {
   using Counters for Counters.Counter;
@@ -26,13 +27,14 @@ contract BookStore is ERC1155URIStorage, Ownable {
   BookTemporary private _bookTemporary;
   BookRentingStorage private _bookRentingStorage;
   BookSharingStorage private _bookSharingStorage;
+  ListRealOwners private _listRealOwners;
 
   uint MAX_BALANCE = 500;
   uint MIN_TIME = 604800; // Rental period is at least one week
   uint public listingPrice = 0.025 ether;
   uint public leasingPrice = 0.001 ether;
-  uint private sharingPrice = 0.0005 ether;
-  uint private convertPrice = 0.000005 ether;
+  uint public sharingPrice = 0.0005 ether;
+  uint public convertPrice = 0.000005 ether;
 
   Counters.Counter private _tokenIds;
 
@@ -44,12 +46,15 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   constructor(
     ListedBookStorage listedBookStorage,
-    BookTemporary bookTemporary
+    BookTemporary bookTemporary,
+    ListRealOwners listRealOwners
   ) ERC1155("https://example.com/api/{id}.json") {
     _listedBookStorage = listedBookStorage;
     _bookTemporary = bookTemporary;
     _bookRentingStorage = _bookTemporary.getBookRentingStorage();
     _bookSharingStorage = bookTemporary.getBookSharingStorage();
+    _listRealOwners = listRealOwners;
+
   }
 
   function getUri(uint tokenId) public view returns (string memory) {
@@ -117,13 +122,48 @@ contract BookStore is ERC1155URIStorage, Ownable {
       _addTokenToOwnerEnumeration(to, tokenId);
     }
 
-    // Buy books and Borrow books
+    // Buy books/ Borrow books / Share books
     if (from != address(0) && to != address(0) && to != from) {
       uint tokenId = ids[0];
       _addTokenToOwnerEnumeration(to, tokenId);
       if (ERC1155.balanceOf(from, tokenId) == 0) {
         _removeTokenFromOwnerEnumeration(from, tokenId);
       }
+    }
+  }
+
+  function getAllRealOwnerOfTokenId(uint tokenId) 
+      public view returns (address[] memory) {
+      return _listRealOwners.getAllRealOwnerOfTokenId(tokenId);
+  }
+
+  function _afterTokenTransfer(
+    address operator,
+    address from,
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amounts,
+    bytes memory data
+  ) internal virtual override {
+    super._afterTokenTransfer(operator, from, to, ids, amounts, data);
+    uint realQuantity;
+    // Mint book
+    if (from == address(0) && to != address(0)) {
+      uint tokenId = ids[0];
+      realQuantity = ERC1155.balanceOf(to, tokenId) - 
+                    _bookTemporary.getAmountOfUnsalableBooksInTemporary(tokenId, to);
+      _listRealOwners.updateRealOwnerOfTokenIdIfNeed(realQuantity, tokenId, to);
+    }
+
+    // Buy books/ Borrow books / Share books
+    if (from != address(0) && to != address(0) && to != from) {
+      uint tokenId = ids[0];
+      realQuantity = ERC1155.balanceOf(to, tokenId) - 
+                    _bookTemporary.getAmountOfUnsalableBooksInTemporary(tokenId, to);
+      _listRealOwners.updateRealOwnerOfTokenIdIfNeed(realQuantity, tokenId, to);
+      realQuantity = ERC1155.balanceOf(from, tokenId) - 
+                    _bookTemporary.getAmountOfUnsalableBooksInTemporary(tokenId, from);
+      _listRealOwners.updateRealOwnerOfTokenIdIfNeed(realQuantity, tokenId, from);
     }
   }
 
@@ -226,10 +266,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getOwnedListedBooks()
-    public
-    view
-    returns (ListedBookStorage.ListedBook[] memory)
-  {
+    public view returns (ListedBookStorage.ListedBook[] memory) {
     uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(
       msg.sender
     );
@@ -308,19 +345,16 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getOwnedBorrowedBooks()
-    public
-    view
-    returns (BookRentingStorage.BorrowedBook[] memory)
-  {
+    public view returns (BookRentingStorage.BorrowedBook[] memory) {
     BookRentingStorage.BorrowedBook[] memory borrowedBooks = _bookRentingStorage
       .getOwnedBorrowedBooks(msg.sender);
     return borrowedBooks;
   }
 
-  function getAmountUnUsedBook(uint256 tokenId) public view returns (uint) {
-    return
-      getBalanceOfOwnerBook(tokenId) -
-      getAmountOfAllTypeBooksUntradeable(tokenId);
+  function getAmountUnUsedBook(uint256 tokenId) 
+  public view returns (uint) {
+    return getBalanceOfOwnerBook(tokenId) -
+           getAmountOfAllTypeBooksUntradeable(tokenId);
   }
 
   function getAmountOfAllTypeBooksUntradeable(
@@ -328,10 +362,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   ) public view returns (uint) {
     return
       _listedBookStorage.getAmountOfListedBooks(tokenId, msg.sender) +
-      _bookRentingStorage.getAmountOfLeaseBooks(tokenId, msg.sender) +
-      _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, msg.sender) +
-      _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, msg.sender) +
-      _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, msg.sender);
+      _bookTemporary.getAmountOfAllTypeBooksInTemporary(tokenId, msg.sender);
   }
 
   function sellBooks(
@@ -352,7 +383,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     if (msg.value != listingPrice) {
       revert Error.InvalidPriceError(msg.value);
     }
-
     _listedBookStorage.sellListedBooks(tokenId, price, amount, msg.sender);
   }
 
@@ -419,18 +449,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getAllBooksOnSale()
-    public
-    view
-    returns (ListedBookStorage.ListedBook[] memory)
-  {
+    public view returns (ListedBookStorage.ListedBook[] memory){
     return _listedBookStorage.getAllListedBooks();
   }
 
   function getAllBooksOnLeasing()
-    public
-    view
-    returns (BookRentingStorage.LeaseBook[] memory)
-  {
+    public view returns (BookRentingStorage.LeaseBook[] memory) {
     return _bookRentingStorage.getAllLeaseBooks();
   }
 
@@ -484,10 +508,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getAllBorrowedBooks()
-    public
-    view
-    returns (BookRentingStorage.BorrowedBook[] memory)
-  {
+    public view returns (BookRentingStorage.BorrowedBook[] memory){
     return _bookRentingStorage.getAllBorrowedBooks();
   }
 
@@ -500,9 +521,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint extendedAmount,
     uint extendedTime
   ) public {
-    if (renter == address(0) || msg.sender == address(0)) {
-      revert Error.InvalidAddressError(address(0));
-    }
     if (renter == msg.sender) {
       revert Error.InvalidAddressError(msg.sender);
     }
@@ -589,18 +607,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getAllOwnedRequestsOnExtending()
-    public
-    view
-    returns (BookRentingStorage.Request[] memory)
-  {
+    public view returns (BookRentingStorage.Request[] memory) {
     return _bookRentingStorage.getAllOwnedRequest(msg.sender);
   }
 
   function getAllOwnedResponsesOnExtending()
-    public
-    view
-    returns (BookRentingStorage.Response[] memory)
-  {
+    public view returns (BookRentingStorage.Response[] memory) {
     return _bookRentingStorage.getAllOwnedResponse(msg.sender);
   }
 
@@ -627,18 +639,16 @@ contract BookStore is ERC1155URIStorage, Ownable {
   // Return total of borrowed books which is recalled, if total equal 0,
   // you do not have any recallable books. Needed automate this function with Chainlink
   function recallAllBorrowedBooks() public returns (uint) {
-    if (address(0) == msg.sender) {
-      revert Error.InvalidAddressError(address(0));
-    }
-
     uint total = 0;
-    uint length = _bookRentingStorage.getTotalBorrowedBooksOnBorrowing();
-    if (length > 0) {
-      for (uint i = 1; i <= length; i++) {
-        BookRentingStorage.BorrowedBook memory book = _bookRentingStorage
-          .getBorrowedBookFromId(i);
-        if (book.renter == msg.sender && recallBorrowedBooks(i)) {
-          total++;
+    if (address(0) != msg.sender) {
+      uint length = _bookRentingStorage.getTotalBorrowedBooksOnBorrowing();
+      if (length > 0) {
+        for (uint i = 1; i <= length; i++) {
+          BookRentingStorage.BorrowedBook memory book = _bookRentingStorage
+            .getBorrowedBookFromId(i);
+          if (book.renter == msg.sender && recallBorrowedBooks(i)) {
+            total++;
+          }
         }
       }
     }
@@ -657,9 +667,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     }
     if (msg.value != sharingPrice) {
       revert Error.InvalidPriceError(sharingPrice);
-    }
-    if (price == 0) {
-      revert Error.InvalidPriceError(price);
     }
     if (amount == 0 || amount > borrowedBook.amount) {
       revert Error.InvalidAmountError(amount);
@@ -686,34 +693,22 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getAllBooksOnSharing()
-    public
-    view
-    returns (BookSharingStorage.BookSharing[] memory)
-  {
+    public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllBooksOnSharing();
   }
 
   function getAllOwnedBooksOnSharing()
-    public
-    view
-    returns (BookSharingStorage.BookSharing[] memory)
-  {
+    public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllOwnedBooksOnSharing(msg.sender);
   }
 
   function getAllSharedBook()
-    public
-    view
-    returns (BookSharingStorage.BookSharing[] memory)
-  {
+    public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllSharedBook();
   }
 
   function getAllOwnedSharedBook()
-    public
-    view
-    returns (BookSharingStorage.BookSharing[] memory)
-  {
+    public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllOwnedSharedBook(msg.sender);
   }
 
@@ -756,15 +751,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
     if (msg.sender != borrowedBook.borrower) {
       revert Error.InvalidAddressError(msg.sender);
     }
-    if (borrowedBook.tokenId == 0) {
-      revert Error.InvalidIdError(0);
-    }
-    if (newPrice == 0) {
-      revert Error.InvalidPriceError(newPrice);
-    }
-    if (
-      newAmount == 0 || newAmount > borrowedBook.amount + booksOnSharing.amount
-    ) {
+    if (newAmount == 0 || 
+        newAmount > borrowedBook.amount + booksOnSharing.amount) {
       revert Error.InvalidAmountError(newAmount);
     }
 
@@ -849,18 +837,16 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function recallAllSharedBooks() public returns (uint) {
-    if (address(0) == msg.sender) {
-      revert Error.InvalidAddressError(address(0));
-    }
-
     uint total = 0;
-    uint length = _bookSharingStorage.getTotalSharedBooks();
-    if (length > 0) {
-      for (uint i = 1; i <= length; i++) {
-        BookSharingStorage.BookSharing memory book = _bookSharingStorage
-          .getSharedBooks(i);
-        if (book.fromRenter == msg.sender && recallSharedBooks(i)) {
-          total++;
+    if (address(0) != msg.sender) {
+      uint length = _bookSharingStorage.getTotalSharedBooks();
+      if (length > 0) {
+        for (uint i = 1; i <= length; i++) {
+          BookSharingStorage.BookSharing memory book = _bookSharingStorage
+            .getSharedBooks(i);
+          if (book.fromRenter == msg.sender && recallSharedBooks(i)) {
+            total++;
+          }
         }
       }
     }
@@ -887,18 +873,16 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function recallAllBooksOnSharing() public returns (uint) {
-    if (address(0) == msg.sender) {
-      revert Error.InvalidAddressError(address(0));
-    }
-
     uint total = 0;
-    uint length = _bookSharingStorage.getTotalBooksOnSharing();
-    if (length > 0) {
-      for (uint i = 1; i <= length; i++) {
-        BookSharingStorage.BookSharing memory book = _bookSharingStorage
-          .getBooksOnSharing(i);
-        if (book.fromRenter == msg.sender && recallBooksOnSharing(i)) {
-          total++;
+    if (address(0) != msg.sender) {
+      uint length = _bookSharingStorage.getTotalBooksOnSharing();
+      if (length > 0) {
+        for (uint i = 1; i <= length; i++) {
+          BookSharingStorage.BookSharing memory book = _bookSharingStorage
+            .getBooksOnSharing(i);
+          if (book.fromRenter == msg.sender && recallBooksOnSharing(i)) {
+            total++;
+          }
         }
       }
     }
