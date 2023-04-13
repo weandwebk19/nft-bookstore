@@ -1,14 +1,14 @@
 import { NextComponentType } from "next";
 
 import { useUserInfo } from "../hooks/api/useUserInfo";
-import { UnauthenticatedMessage } from "../shared/UnauthenticatedMessage";
+import { UnauthorizedMessage } from "../shared/UnauthorizedMessage";
 
 function withAuthor<T>(Component: NextComponentType<T>) {
   const Auth = (props: any) => {
     const { data } = useUserInfo();
 
     if (data?.isAuthor === undefined) {
-      return <UnauthenticatedMessage />;
+      return <UnauthorizedMessage />;
     }
 
     return <Component {...props} />;

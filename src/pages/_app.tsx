@@ -67,7 +67,7 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
           <SessionProvider session={pageProps.session} refetchInterval={0}>
             <MyThemeContextProvider>
               <CssBaseline />
-              <Cursor />
+              {/* <Cursor /> */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={router.route}

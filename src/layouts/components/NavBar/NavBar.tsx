@@ -289,7 +289,7 @@ const NavBar = () => {
   };
 
   const handlePublishABookClick = () => {
-    router.push("/books/create");
+    router.push("/author/create");
   };
 
   const handleCreateListingClick = () => {
@@ -490,7 +490,7 @@ const NavBar = () => {
           onClick: () => handlePublishABookClick(),
           disabled: false,
           subList: [],
-          href: "/books/create"
+          href: "/author/create"
         }
       : {
           type: "divider",
