@@ -226,26 +226,29 @@ const ActionableBookItem = ({
 
           <Divider sx={{ my: 3 }} />
           <Stack spacing={3}>
-            <Stack
-              direction={{ xs: "row", sm: "row", md: "row" }}
-              spacing={{ xs: 1, sm: 2, md: 4 }}
-              justifyContent="space-between"
-            >
-              {status !== "isCreated" && status !== "isOwned" && (
-                <Stack>
-                  <Typography variant="subtitle2">Price:</Typography>
-                  <Typography variant="label">{price} ETH</Typography>
-                </Stack>
-              )}
-              {status !== "isCreated" && status !== "isOwned" && (
-                <Stack>
-                  <Typography variant="subtitle2">Amount:</Typography>
-                  <Typography variant="label">{amount}</Typography>
-                </Stack>
-              )}
+            <Stack spacing={{ xs: 1, sm: 2, md: 4 }}>
+              <Stack
+                direction={{ xs: "row", sm: "row", md: "row" }}
+                spacing={{ xs: 1, sm: 2, md: 4 }}
+                justifyContent="space-between"
+              >
+                {status !== "isCreated" && status !== "isOwned" && (
+                  <Stack>
+                    <Typography variant="subtitle2">Price:</Typography>
+                    <Typography variant="label">{price} ETH</Typography>
+                  </Stack>
+                )}
+                {status !== "isCreated" && status !== "isOwned" && (
+                  <Stack>
+                    <Typography variant="subtitle2">Amount:</Typography>
+                    <Typography variant="label">{amount}</Typography>
+                  </Stack>
+                )}
+              </Stack>
               {(status === "isBorrowed" ||
                 status === "isShared" ||
-                status === "isSharing") && (
+                status === "isSharing" ||
+                (status === "isLeasing" && borrower)) && (
                 <Stack>
                   <Typography variant="subtitle2">Return in:</Typography>
                   <Typography variant="label">

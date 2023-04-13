@@ -7,6 +7,7 @@ const ExtendTime = artifacts.require("ExtendTime");
 const Error = artifacts.require("Error");
 const BookSharingStorage = artifacts.require("BookSharingStorage");
 const BookRentingStorage = artifacts.require("BookRentingStorage");
+const ListRealOwners = artifacts.require("ListRealOwners");
 
 module.exports = function (deployer) {
   deployer.deploy(ListedBookStorage)
@@ -46,9 +47,9 @@ module.exports = function (deployer) {
       BookTemporary.deployed()
     ]);
 
-  }).then(function([listedBookStorage, bookTemporary]) {
-
-    return deployer.deploy(BookStore, listedBookStorage.address, bookTemporary.address);
+  }).then(async function([listedBookStorage, bookTemporary]) {
+    await  deployer.deploy(ListRealOwners);
+    return deployer.deploy(BookStore, listedBookStorage.address, bookTemporary.address, ListRealOwners.address);
   });
 };
 

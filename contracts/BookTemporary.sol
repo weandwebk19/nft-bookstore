@@ -24,6 +24,25 @@ contract BookTemporary {
     return _bookSharingStorage;
   }
 
+  function getAmountOfAllTypeBooksInTemporary(
+    uint256 tokenId, 
+    address owner
+  ) public view returns (uint) {
+    return _bookRentingStorage.getAmountOfLeaseBooks(tokenId, owner) +
+           _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, owner) +
+           _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, owner) +
+           _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, owner);
+  }
+
+  function getAmountOfUnsalableBooksInTemporary(
+    uint256 tokenId, 
+    address owner
+  ) public view returns (uint) {
+    return _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, owner) +
+           _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, owner) +
+           _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, owner);
+  }
+
   function convertBookOnSharingToBorrowedBook(
     uint idBookOnSharing,
     address owner,
@@ -82,4 +101,5 @@ contract BookTemporary {
       );
     }
   }
+  
 }
