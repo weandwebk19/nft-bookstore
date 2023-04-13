@@ -7,6 +7,7 @@ const Error = artifacts.require("Error");
 const ExtendTime = artifacts.require("ExtendTime");
 const BookRentingStorage = artifacts.require("BookRentingStorage");
 const BookSharingStorage = artifacts.require("BookSharingStorage");
+const ListRealOwners = artifacts.require("ListRealOwners");
 
 const { ethers } = require("ethers");
 contract("BookStore", (accounts) => {
@@ -24,13 +25,15 @@ contract("BookStore", (accounts) => {
     await ExtendTime.deployed();
     await BookSharingStorage.deployed(Timelock.address);
     await BookRentingStorage.deployed(Timelock.address);
+    await ListRealOwners.deployed();
     await BookTemporary.deployed(
       BookRentingStorage.address,
       BookSharingStorage.address
     );
     _contract = await BookStore.deployed(
       ListedBookStorage.address,
-      BookTemporary.address
+      BookTemporary.address,
+      ListRealOwners.address
     );
   });
 
@@ -89,6 +92,12 @@ contract("BookStore", (accounts) => {
         from: accounts[0]
       });
       assert.equal(amount, balance, "It has not equal the first balance.");
+    });
+
+    it("account[0] is real owner of token id 1", async () => {
+      const realOwners = await _contract.getAllRealOwnerOfTokenId(1);
+      assert.equal(realOwners.length, 1,  "Set real owner is wrong");
+      assert.equal(realOwners[0], accounts[0],  "Set real owner is wrong");
     });
   });
 
@@ -249,6 +258,13 @@ contract("BookStore", (accounts) => {
       const listedBooks = await _contract.getAllBooksOnSale();
       assert.equal(listedBooks.length, 0, "Invalid length of Nfts");
     });
+
+    it("account[1] is real owner of token id 1", async () => {
+      const realOwners = await _contract.getAllRealOwnerOfTokenId(1);
+      assert.equal(realOwners.length, 2,  "Set real owner is wrong");
+      assert.equal(realOwners[0], accounts[0],  "Set real owner is wrong");
+      assert.equal(realOwners[1], accounts[1],  "Set real owner is wrong");
+    });
   });
 
   describe("List books on sale", () => {
@@ -290,6 +306,12 @@ contract("BookStore", (accounts) => {
       const isOwner = await _contract.isOwnerOfToken(1, accounts[0]);
       assert(!isOwner, "Set owner is wrong");
       assert.equal(listedBooks.length, 1, "Invalid length of ListedBooks");
+    });
+
+    it("account[0] is not real owner of token id 1", async () => {
+      const realOwners = await _contract.getAllRealOwnerOfTokenId(1);
+      assert.equal(realOwners.length, 1,  "Set real owner is wrong");
+      assert.equal(realOwners[0], accounts[1],  "Set real owner is wrong");
     });
   });
 
@@ -351,11 +373,11 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have one lease items for renter", async () => {
-      const ownedLeaseBooks1 = await _contract.getOwnedLeaseBooks({
+      const ownedLeaseBooks1 = await _contract.getOwnedLeasingBooks({
         from: accounts[1]
       });
 
-      const ownedLeaseBooks0 = await _contract.getOwnedLeaseBooks({
+      const ownedLeaseBooks0 = await _contract.getOwnedLeasingBooks({
         from: accounts[0]
       });
       assert.equal(
@@ -394,7 +416,7 @@ contract("BookStore", (accounts) => {
     });
 
     it("should have correct amount and newprice amount", async () => {
-      const ownedLeaseBooks = await _contract.getOwnedLeaseBooks({
+      const ownedLeaseBooks = await _contract.getOwnedLeasingBooks({
         from: accounts[1]
       });
       const leaseBooks = await _contract.getAllBooksOnLeasing();
@@ -424,7 +446,7 @@ contract("BookStore", (accounts) => {
       await _contract.updateBookFromRenting(1, _newNftPrice, 0, accounts[1], {
         from: accounts[1]
       });
-      const ownedLeaseBooks = await _contract.getOwnedLeaseBooks({
+      const ownedLeaseBooks = await _contract.getOwnedLeasingBooks({
         from: accounts[1]
       });
       const leaseBooks = await _contract.getAllBooksOnLeasing();
@@ -582,6 +604,12 @@ contract("BookStore", (accounts) => {
       } catch (error) {
         assert(error, "Set amount listed tokens and lease tokens are wrong");
       }
+    });
+
+    it("account[1] is not real owner of token id 2", async () => {
+      const realOwners = await _contract.getAllRealOwnerOfTokenId(2);
+      assert.equal(realOwners.length, 1,  "Set real owner is wrong");
+      assert.equal(realOwners[0], accounts[0],  "Set real owner is wrong");
     });
   });
 
@@ -1134,6 +1162,13 @@ contract("BookStore", (accounts) => {
         15,
         "Set amount of all type books untradeable of accounts[2] is wrong"
       );
+    });
+
+    
+    it("account[2] is not real owner of token id 2", async () => {
+      const realOwners = await _contract.getAllRealOwnerOfTokenId(2);
+      assert.equal(realOwners.length, 1,  "Set real owner is wrong");
+      assert.equal(realOwners[0], accounts[0],  "Set real owner is wrong");
     });
   });
 
