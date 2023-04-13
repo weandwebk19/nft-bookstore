@@ -18,7 +18,8 @@ type ActionableBookItemStatus =
   | "isBorrowed"
   | "isSharing"
   | "isListing"
-  | "isLeasing";
+  | "isLeasing"
+  | "isBought";
 
 interface ActionableBookItemProps {
   bookCover: string;
@@ -232,18 +233,22 @@ const ActionableBookItem = ({
                 spacing={{ xs: 1, sm: 2, md: 4 }}
                 justifyContent="space-between"
               >
-                {status !== "isCreated" && status !== "isOwned" && (
-                  <Stack>
-                    <Typography variant="subtitle2">Price:</Typography>
-                    <Typography variant="label">{price} ETH</Typography>
-                  </Stack>
-                )}
-                {status !== "isCreated" && status !== "isOwned" && (
-                  <Stack>
-                    <Typography variant="subtitle2">Amount:</Typography>
-                    <Typography variant="label">{amount}</Typography>
-                  </Stack>
-                )}
+                {status !== "isCreated" &&
+                  status !== "isOwned" &&
+                  status !== "isBought" && (
+                    <Stack>
+                      <Typography variant="subtitle2">Price:</Typography>
+                      <Typography variant="label">{price} ETH</Typography>
+                    </Stack>
+                  )}
+                {status !== "isCreated" &&
+                  status !== "isOwned" &&
+                  status !== "isBought" && (
+                    <Stack>
+                      <Typography variant="subtitle2">Amount:</Typography>
+                      <Typography variant="label">{amount}</Typography>
+                    </Stack>
+                  )}
               </Stack>
               {(status === "isBorrowed" ||
                 status === "isShared" ||
@@ -258,13 +263,15 @@ const ActionableBookItem = ({
               )}
               {status === "isOwned" && (
                 <Stack>
-                  <Typography variant="subtitle2">Amount Owned:</Typography>
+                  <Typography variant="subtitle2">Owned amount:</Typography>
                   <Typography variant="label">{amountOwned}</Typography>
                 </Stack>
               )}
-              {status === "isOwned" && (
+              {(status === "isOwned" ||
+                status === "isCreated" ||
+                status === "isBought") && (
                 <Stack>
-                  <Typography variant="subtitle2">Amount Tradeable:</Typography>
+                  <Typography variant="subtitle2">Tradeable amount:</Typography>
                   <Typography variant="label">{amountTradeable}</Typography>
                 </Stack>
               )}
@@ -274,12 +281,12 @@ const ActionableBookItem = ({
                   <Typography variant="label">{quantity}</Typography>
                 </Stack>
               )}
-              {status === "isCreated" && (
+              {/* {status === "isCreated" && (
                 <Stack>
-                  <Typography variant="subtitle2">Amount Tradeable:</Typography>
+                  <Typography variant="subtitle2">Tradeable amount:</Typography>
                   <Typography variant="label">{amountTradeable}</Typography>
                 </Stack>
-              )}
+              )} */}
             </Stack>
             {/* <Stack direction="row" justifyContent="space-between">
               <Typography>{renter}</Typography>

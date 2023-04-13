@@ -12,7 +12,6 @@ import withAuth from "@/components/HOC/withAuth";
 import { useOwnedNfts } from "@/components/hooks/web3";
 import {
   LeaseButton,
-  RatingButton,
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
@@ -23,8 +22,8 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
-const OwnedBooks = () => {
-  const { t } = useTranslation("ownedBooks");
+const BoughtBooks = () => {
+  const { t } = useTranslation("boughtBooks");
 
   const breadCrumbs = [
     {
@@ -32,14 +31,15 @@ const OwnedBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_ownedBooks") as string,
+      content: t("breadcrumbs_boughtBooks") as string,
       href: "/account/bookshelf/owned-books"
     }
   ];
 
   const { nfts } = useOwnedNfts();
   const router = useRouter();
-  const ownedBooks = nfts.data;
+  const boughtBooks = nfts.data;
+  console.log(boughtBooks);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -67,13 +67,13 @@ const OwnedBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("ownedBooksTitle")}>
+            <ContentPaper title={t("boughtBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (ownedBooks?.length === 0 || nfts.error) {
+                } else if (boughtBooks?.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
                       <Typography>{t("emptyMessage") as string}</Typography>
@@ -86,7 +86,7 @@ const OwnedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {ownedBooks!.map((book) => {
+                    {boughtBooks!.map((book) => {
                       return (
                         <Grid
                           item
@@ -97,7 +97,7 @@ const OwnedBooks = () => {
                           lg={12}
                         >
                           <ActionableBookItem
-                            status="isOwned"
+                            status="isBought"
                             tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
@@ -109,14 +109,20 @@ const OwnedBooks = () => {
                             amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
-                                <RatingButton
+                                <SellButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
                                   amountTradeable={book?.amountTradeable!}
                                 />
-                                <ReadButton bookFile={book?.meta.bookFile} />
+                                <LeaseButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.author}
+                                  amountTradeable={book?.amountTradeable!}
+                                />
                               </>
                             }
                           />
@@ -139,7 +145,7 @@ const OwnedBooks = () => {
   );
 };
 
-export default withAuth(OwnedBooks);
+export default withAuth(BoughtBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -147,7 +153,7 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "ownedBooks"
+        "boughtBooks"
       ]))
     }
   };

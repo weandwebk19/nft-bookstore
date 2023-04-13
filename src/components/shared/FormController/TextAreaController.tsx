@@ -10,12 +10,14 @@ const MAXIMUM_NUMBER_OF_CHARACTERS = 2000;
 interface TextAreaControllerProps {
   name: string;
   defaultValue?: string;
+  maxCharacters?: number;
   readOnly?: boolean;
 }
 
 const TextAreaController = ({
   name,
   defaultValue,
+  maxCharacters = MAXIMUM_NUMBER_OF_CHARACTERS,
   readOnly = false,
   ...rest
 }: TextAreaControllerProps) => {
@@ -31,7 +33,7 @@ const TextAreaController = ({
             id="description"
             minRows={3}
             multiline={true}
-            label={`${numberOfCharacters}/${MAXIMUM_NUMBER_OF_CHARACTERS}`}
+            label={`${numberOfCharacters}/${maxCharacters}`}
             fullWidth
             InputLabelProps={{
               shrink: true
@@ -41,7 +43,7 @@ const TextAreaController = ({
             {...field}
             onChange={(e) => {
               let lengthOfCharacters = e.target.value.length;
-              if (lengthOfCharacters <= MAXIMUM_NUMBER_OF_CHARACTERS) {
+              if (lengthOfCharacters <= maxCharacters) {
                 setNumberOfCharacters(lengthOfCharacters);
                 field.onChange(e);
               }

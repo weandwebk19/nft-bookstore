@@ -312,7 +312,6 @@ const LeasingBooks = () => {
                                 buttons={
                                   <>
                                     <RecallButton
-                                      buttonName="Recall leasing"
                                       tokenId={book?.tokenId}
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}

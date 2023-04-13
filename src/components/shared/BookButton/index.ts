@@ -5,3 +5,4 @@ export { default as LeaseButton } from "./LeaseButton";
 export { default as BookmarkButton } from "./BookmarkButton";
 export { default as AddToWatchlistButton } from "./AddToWatchlistButton";
 export { default as RecallButton } from "./RecallButton";
+export { default as RatingButton } from "./RatingButton";
