@@ -603,8 +603,8 @@ const NavBar = () => {
                 ))}
                 <Box sx={{ mr: 2 }}>
                   <DropdownMenu
+                    buttonVariant="contained"
                     tooltipTitle={t("navbar:toolTip_bookstore") as string}
-                    buttonVariant="outlined"
                     buttonName={t("navbar:bookstore")}
                     items={bookStoreList}
                   />
@@ -613,8 +613,8 @@ const NavBar = () => {
                 {session && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
+                      buttonVariant="outlined"
                       tooltipTitle={t("navbar:toolTip_create") as string}
-                      buttonVariant="contained"
                       buttonName={t("navbar:create")}
                       items={createList}
                     />
