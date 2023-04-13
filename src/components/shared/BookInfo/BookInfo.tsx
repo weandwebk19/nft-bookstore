@@ -6,6 +6,7 @@ import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import { useTranslation } from "next-i18next";
 
+import { useRealOwnerOfTokens } from "@/components/hooks/web3";
 import {
   BookBriefing,
   BookDetail,
@@ -17,6 +18,7 @@ import { ReadMore } from "@/components/shared/ReadMore";
 import { bookList } from "@/mocks";
 import { NftBookDetails } from "@/types/nftBook";
 
+import { FallbackNode } from "../FallbackNode";
 import BookListActionable from "./sections/BookListActionable";
 
 type BookInfoProps = {
@@ -80,6 +82,8 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
       owner: "Hoa Phan"
     }
   ];
+
+  const { ownerTokens } = useRealOwnerOfTokens(bookDetail?.nftCore.tokenId!);
 
   return (
     <Box>
@@ -176,12 +180,26 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
                 }
               }}
             >
-              <BookListActionable
-                isOpenForPurchase={true}
-                // isOpenForTradeIn={isOpenForTradeIn}
-                isOpenForBorrow={isOpenForBorrow}
-                bookListActionable={bookListActionable}
-              />
+              {(() => {
+                if (ownerTokens.isLoading) {
+                  return (
+                    <Typography>{t("loadingMessage") as string}</Typography>
+                  );
+                } else if (
+                  ownerTokens?.data?.length === 0 ||
+                  ownerTokens.error
+                ) {
+                  return <FallbackNode />;
+                }
+                return (
+                  <BookListActionable
+                    isOpenForPurchase={true}
+                    // isOpenForTradeIn={isOpenForTradeIn}
+                    isOpenForBorrow={isOpenForBorrow}
+                    bookListActionable={ownerTokens.data}
+                  />
+                );
+              })()}
             </Box>
           )}
           <Box

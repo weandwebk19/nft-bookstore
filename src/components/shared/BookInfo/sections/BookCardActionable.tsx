@@ -1,23 +1,55 @@
+import { useEffect, useState } from "react";
+
 import { Box, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import LaunchIcon from "@mui/icons-material/Launch";
 
+import axios from "axios";
+import { useRouter } from "next/router";
+
 interface BookCardActionableProps {
-  user?: string;
+  seller?: string;
   price?: Number;
   isRenting?: Boolean;
 }
 
 const BookCardActionable = ({
-  user,
+  seller,
   price,
   isRenting
 }: BookCardActionableProps) => {
   const theme = useTheme();
+  const [sellerName, setSellerName] = useState();
+  const router = useRouter();
+  const { bookId } = router.query;
+
+  const handleNavigate = (e: any) => {
+    e.preventDefault();
+    router.push(`/books/${bookId}/${seller}`);
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (seller) {
+          const userRes = await axios.get(`/api/users/wallet/${seller}`);
+
+          if (userRes.data.success === true) {
+            setSellerName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [seller]);
 
   return (
     <Stack
+      onClick={(e) => {
+        handleNavigate(e);
+      }}
       sx={{
         width: "100%",
         height: "100%",
@@ -40,7 +72,7 @@ const BookCardActionable = ({
           color: `${theme.palette.common.black}`
         }}
       >
-        {user}
+        {sellerName}
         <LaunchIcon
           sx={{
             color: `${theme.palette.common.black}`
@@ -72,7 +104,7 @@ const BookCardActionable = ({
           }}
         >
           {`${price ? price : 0} ETH${isRenting ? "/day" : ""}`}
-          <Typography variant="body1">($0.00...036)</Typography>
+          {/* <Typography variant="body1">($0.00...036)</Typography> */}
         </Box>
       </Box>
     </Stack>

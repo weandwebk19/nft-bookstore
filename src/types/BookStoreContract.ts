@@ -93,6 +93,7 @@ export type BookStoreContractMethodNames =
   | "setTokenUri"
   | "isListed"
   | "isLeased"
+  | "getAllRealOwnerOfTokenId"
   | "getBalanceOfOwnerBook"
   | "getNftBook"
   | "getListedBook"
@@ -263,10 +264,12 @@ export interface BookStoreContract {
    * Type: constructor
    * @param listedBookStorage Type: address, Indexed: false
    * @param bookTemporary Type: address, Indexed: false
+   * @param listRealOwners Type: address, Indexed: false
    */
   "new"(
     listedBookStorage: string,
     bookTemporary: string,
+    listRealOwners: string,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
@@ -519,6 +522,17 @@ export interface BookStoreContract {
     renter: string,
     overrides?: ContractCallOverrides
   ): Promise<boolean>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   */
+  getAllRealOwnerOfTokenId(
+    tokenId: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<string[]>;
   /**
    * Payable: false
    * Constant: true

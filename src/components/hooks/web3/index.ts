@@ -108,6 +108,14 @@ export const useBookDetail = (bookId: string, seller?: string) => {
   };
 };
 
+export const useRealOwnerOfTokens = (tokenId: number) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useRealOwnerOfTokens(tokenId);
+  return {
+    ownerTokens: swrRes
+  };
+};
+
 export const useAllLeasingBooks = () => {
   const hooks = useHooks();
   const swrRes = hooks.useAllLeasingBooks();

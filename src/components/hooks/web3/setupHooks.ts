@@ -47,6 +47,10 @@ import {
   UseOwnedSharingBooksHook,
   hookFactory as createOwnedSharingBooksHook
 } from "./useOwnedSharingBooks";
+import {
+  UseRealOwnerOfTokensHook,
+  hookFactory as createRealOwnerOfTokensHook
+} from "./useRealOwnerOfTokens";
 
 export type Web3Hooks = {
   useAccount: UseAccountHook;
@@ -62,6 +66,7 @@ export type Web3Hooks = {
   useOwnedSharingBooks: UseOwnedSharingBooksHook;
   useOwnedSharedBooks: UseOwnedSharedBooksHook;
   useBookDetail: UseBookDetailHook;
+  useRealOwnerOfTokens: UseRealOwnerOfTokensHook;
 };
 
 export type SetupHooks = {
@@ -82,6 +87,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useOwnedBorrowedBooks: createOwnedBorrowedBooksHook(deps),
     useOwnedSharingBooks: createOwnedSharingBooksHook(deps),
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
-    useBookDetail: createBookDetailHook(deps)
+    useBookDetail: createBookDetailHook(deps),
+    useRealOwnerOfTokens: createRealOwnerOfTokensHook(deps)
   };
 };
