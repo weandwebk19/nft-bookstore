@@ -6,13 +6,16 @@ import { LeaseBook } from "@_types/nftBook";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
+import { useAccount } from ".";
+
 type UseAllLeasingBooksResponse = {
   borrowBooks: (
     tokenId: number,
     renter: string,
     price: number,
     amount: number,
-    rentalDuration: number
+    rentalDuration: number,
+    supplyAmount: number
   ) => Promise<void>;
 };
 type AllLeasingBooksHookFactory = CryptoHookFactory<
@@ -25,6 +28,7 @@ export type UseAllLeasingBooksHook = ReturnType<AllLeasingBooksHookFactory>;
 export const hookFactory: AllLeasingBooksHookFactory =
   ({ contract }) =>
   () => {
+    const { account } = useAccount();
     const { data, ...swr } = useSWR(
       contract ? "web3/useAllLeasingBooks" : null,
       async () => {
@@ -57,9 +61,28 @@ export const hookFactory: AllLeasingBooksHookFactory =
         renter: string,
         price: number,
         amount: number,
-        rentalDuration: number
+        rentalDuration: number,
+        supplyAmount: number
       ) => {
         try {
+          // Handle errors
+          if (rentalDuration < 604800) {
+            return toast.error("Minimum borrow book period is 7 days", {
+              position: toast.POSITION.TOP_CENTER
+            });
+          } else if (amount > supplyAmount) {
+            return toast.error(`Amount must be less than ${supplyAmount}.`, {
+              position: toast.POSITION.TOP_CENTER
+            });
+          } else if (account.data == renter) {
+            return toast.error(
+              "You are not allowed to borrow the book leased by yourself.",
+              {
+                position: toast.POSITION.TOP_CENTER
+              }
+            );
+          }
+
           const value = (price * amount * rentalDuration) / 604800;
           const result = await _contract!.borrowBooks(
             tokenId,
@@ -79,6 +102,9 @@ export const hookFactory: AllLeasingBooksHookFactory =
           });
         } catch (e: any) {
           console.error(e.message);
+          toast.error(`${e.message}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
       },
       [_contract]

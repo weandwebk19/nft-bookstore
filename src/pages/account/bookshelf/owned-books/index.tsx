@@ -104,6 +104,8 @@ const OwnedBooks = () => {
                             author={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
+                            amountOwned={book?.amountOwned}
+                            amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
                                 <SellButton
@@ -111,14 +113,14 @@ const OwnedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
-                                  quantity={book?.quantity}
+                                  amountTradeable={book?.amountTradeable!}
                                 />
                                 <LeaseButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
-                                  quantity={book?.quantity}
+                                  amountTradeable={book?.amountTradeable!}
                                 />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>

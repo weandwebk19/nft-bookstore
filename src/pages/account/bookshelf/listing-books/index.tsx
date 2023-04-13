@@ -12,9 +12,12 @@ import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useAccount, useOwnedListedBooks } from "@/components/hooks/web3";
+import { RecallButton } from "@/components/shared/BookButton";
+import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BookList } from "@/components/shared/BookList";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
+import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { StyledButton } from "@/styles/components/Button";
@@ -51,6 +54,37 @@ const ListingBooks = () => {
     })();
   };
 
+  const handleOpenRecallDialogClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorRecallButton(e.currentTarget);
+  };
+
+  const [anchorRecallButton, setAnchorRecallButton] = useState<Element | null>(
+    null
+  );
+
+  const openRecallDialog = Boolean(anchorRecallButton);
+
+  const handleRecallClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorRecallButton(null);
+  };
+
+  const handleCancelClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorRecallButton(null);
+  };
+
+  const handleRecallClose = () => {
+    setAnchorRecallButton(null);
+  };
+
   useEffect(() => {
     if (nfts.data?.length !== 0) {
       const res = nfts.data?.filter((nft: any) => nft.author !== account.data);
@@ -73,30 +107,106 @@ const ListingBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("listingBooksTitle")}>
+            <ContentPaper
+              title={t("listingBooksTitle")}
+              button={
+                <>
+                  <StyledButton
+                    customVariant="secondary"
+                    onClick={(e) => handleOpenRecallDialogClick(e)}
+                  >
+                    Recall All
+                  </StyledButton>
+                  <Dialog
+                    title={t("dialogTitle") as string}
+                    open={openRecallDialog}
+                    onClose={handleRecallClose}
+                  >
+                    <Stack spacing={3}>
+                      <Typography>{t("message")}</Typography>
+                      <Stack direction="row" spacing={3} justifyContent="end">
+                        <StyledButton
+                          customVariant="secondary"
+                          onClick={(e) => handleCancelClick(e)}
+                        >
+                          {t("button_cancel")}
+                        </StyledButton>
+                        <StyledButton onClick={(e) => handleRecallClick(e)}>
+                          {t("button_recall")}
+                        </StyledButton>
+                      </Stack>
+                    </Stack>
+                  </Dialog>
+                </>
+              }
+            >
               {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (ownedBooks.length === 0 || nfts.error) {
+                } else if (ownedBooks?.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
-                      <Stack spacing={3}>
-                        <Typography>{t("emptyMessage") as string}</Typography>
-                        <StyledButton
-                          onClick={() => {
-                            router.push("/account/bookshelf/created-books");
-                          }}
-                        >
-                          {t("button_createdBooks")}
-                        </StyledButton>
-                      </Stack>
+                      <Typography>{t("emptyMessage") as string}</Typography>
                     </FallbackNode>
                   );
                 }
                 return (
-                  <BookList bookList={ownedBooks!} onClick={handleBookClick} />
+                  <Grid
+                    container
+                    spacing={3}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                  >
+                    <>
+                      {ownedBooks!.map((book) => {
+                        return (
+                          <Grid
+                            item
+                            key={book.tokenId}
+                            xs={4}
+                            sm={8}
+                            md={6}
+                            lg={12}
+                          >
+                            <ActionableBookItem
+                              status="isListing"
+                              tokenId={book?.tokenId}
+                              bookCover={book?.meta.bookCover}
+                              title={book?.meta.title}
+                              fileType={book?.meta.fileType}
+                              renter={book?.renter}
+                              onClick={handleBookClick}
+                              price={book?.price}
+                              amount={book?.amount}
+                              buttons={
+                                <>
+                                  <RecallButton
+                                    buttonName="Unlisting"
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    renter={book?.renter}
+                                    amount={book?.amount}
+                                  />
+                                </>
+                              }
+                              // status={
+                              //   book?.endRentalDay !== undefined
+                              //     ? book?.endRentalDay > 0
+                              //       ? `${pluralize(
+                              //           book?.endRentalDay,
+                              //           "day"
+                              //         )} left`
+                              //       : "Ended" // End of leasing term
+                              //     : undefined
+                              // }
+                            />
+                          </Grid>
+                        );
+                      })}
+                    </>
+                  </Grid>
                 );
               })()}
             </ContentPaper>

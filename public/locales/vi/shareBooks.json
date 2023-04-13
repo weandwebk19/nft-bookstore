@@ -1,7 +1,7 @@
 {
   "titlePage": "Trao đổi - NFT Bookstore",
-  "tradeInBooksTitle": "Sách mua lại",
+  "shareBooksTitle": "Sách mua lại",
   "emptyMessage": "Không có sách để trưng bày!",
   "loadingMessage": "Đang đặt sách lên kệ...",
-  "breadcrumbs_tradeIn": "Trao đổi"
+  "breadcrumbs_share": "Trao đổi"
 }

@@ -45,7 +45,8 @@ interface RentButtonProps {
     renter: string,
     price: number,
     amount: number,
-    rentalDuration: number
+    rentalDuration: number,
+    supplyAmount: number
   ) => Promise<void>;
 }
 
@@ -126,7 +127,14 @@ const RentButton = ({
   const onSubmit = async (data: any) => {
     try {
       const rentalDuration = daysToSeconds(data.rentalDays);
-      await borrowBooks(tokenId, renter, price, data.amount, rentalDuration);
+      await borrowBooks(
+        tokenId,
+        renter,
+        price,
+        data.amount,
+        rentalDuration,
+        supplyAmount
+      );
     } catch (e: any) {
       console.error(e.message);
     }

@@ -12,10 +12,7 @@ import axios from "axios";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import {
-  AddToWatchlistButton,
-  BookmarkButton
-} from "@/components/shared/BookButton";
+import { AddToWatchlistButton } from "@/components/shared/BookButton";
 import RentButton from "@/components/shared/BookButton/RentButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
@@ -92,7 +89,6 @@ const DisplayBox: FunctionComponent = () => {
                                   supplyAmount={book?.amount}
                                   borrowBooks={nfts?.borrowBooks}
                                 />
-                                <BookmarkButton />
                                 <AddToWatchlistButton
                                   isLastInButtonGroup
                                   tokenId={book?.tokenId}

@@ -26,6 +26,7 @@ interface RecallButtonProps {
   bookCover: string;
   renter: string;
   tokenId: number;
+  buttonName?: string;
 }
 
 const schema = yup
@@ -54,7 +55,8 @@ const RecallButton = ({
   bookCover,
   title,
   renter,
-  tokenId
+  tokenId,
+  buttonName = "Recall"
 }: RecallButtonProps) => {
   const [renterName, setRenterName] = useState();
   const { ethereum, contract } = useWeb3();
@@ -152,12 +154,12 @@ const RecallButton = ({
         onClick={handleRecallDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        Recall
+        {buttonName}
       </StyledButton>
 
       {!isEnded && (
         <Dialog
-          title="Recall"
+          title={buttonName}
           open={openRecallDiaglog}
           onClose={handleRecallDiaglogClose}
         >
@@ -173,7 +175,7 @@ const RecallButton = ({
                   />
                   <Typography variant="h5">{title}</Typography>
                   <Typography>{renterName}</Typography>
-                  <Typography>Borrowed amount: {amount}</Typography>
+                  <Typography>Amount: {amount}</Typography>
                 </Stack>
               </Grid>
               <Grid item md={8}>
@@ -183,7 +185,7 @@ const RecallButton = ({
                     mb: 5
                   }}
                 >
-                  {!isEnded && (
+                  {borrower && !isEnded && (
                     <>
                       <Typography>
                         {borrower} is in a rental term duration. Are you sure

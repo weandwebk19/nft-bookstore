@@ -1,7 +1,9 @@
 {
   "titlePage": "Sách cho thuê - NFT Bookstore",
   "leasingBooksTitle": "Sách cho thuê",
+  "leasedOutBooksTitle": "Sách đã có người thuê",
   "emptyMessage": "Bạn chưa cho thuê quyển sách nào!",
+  "emptyMessage__leasedOutBooks": "Chưa có quyển sách nào được thuê!",
   "loadingMessage": "Đang đặt sách lên kệ...",
   "button_ownedBooks": "Sách đã sở hữu",
   "breadcrumbs_bookshelf": "Kệ sách",

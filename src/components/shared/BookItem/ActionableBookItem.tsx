@@ -34,6 +34,8 @@ interface ActionableBookItemProps {
   countDown?: string;
   price?: string | number;
   quantity?: number;
+  amountOwned?: number;
+  amountTradeable?: number;
   amount?: number;
   sharer?: string;
   sharedPerson?: string;
@@ -53,12 +55,13 @@ const ActionableBookItem = ({
   countDown,
   price,
   quantity,
+  amountOwned,
+  amountTradeable,
   amount,
   sharer,
   sharedPerson
 }: ActionableBookItemProps) => {
   const account = useAccount();
-  console.log(account);
 
   const theme = useTheme();
   const [authorName, setAuthorName] = useState("");
@@ -207,7 +210,7 @@ const ActionableBookItem = ({
                 <Typography variant="label">{sharerName}</Typography>
               </Stack>
             )}
-            {status === "isLeasing" && (
+            {status === "isLeasing" && borrower && (
               <Stack>
                 <Typography variant="subtitle2">Borrowed by:</Typography>
                 <Typography variant="label">{borrowerName}</Typography>
@@ -223,26 +226,29 @@ const ActionableBookItem = ({
 
           <Divider sx={{ my: 3 }} />
           <Stack spacing={3}>
-            <Stack
-              direction={{ xs: "row", sm: "row", md: "row" }}
-              spacing={{ xs: 1, sm: 2, md: 4 }}
-              justifyContent="space-between"
-            >
-              {status !== "isCreated" && status !== "isOwned" && (
-                <Stack>
-                  <Typography variant="subtitle2">Price:</Typography>
-                  <Typography variant="label">{price} ETH</Typography>
-                </Stack>
-              )}
-              {status !== "isCreated" && status !== "isOwned" && (
-                <Stack>
-                  <Typography variant="subtitle2">Amount:</Typography>
-                  <Typography variant="label">{amount}</Typography>
-                </Stack>
-              )}
+            <Stack spacing={{ xs: 1, sm: 2, md: 4 }}>
+              <Stack
+                direction={{ xs: "row", sm: "row", md: "row" }}
+                spacing={{ xs: 1, sm: 2, md: 4 }}
+                justifyContent="space-between"
+              >
+                {status !== "isCreated" && status !== "isOwned" && (
+                  <Stack>
+                    <Typography variant="subtitle2">Price:</Typography>
+                    <Typography variant="label">{price} ETH</Typography>
+                  </Stack>
+                )}
+                {status !== "isCreated" && status !== "isOwned" && (
+                  <Stack>
+                    <Typography variant="subtitle2">Amount:</Typography>
+                    <Typography variant="label">{amount}</Typography>
+                  </Stack>
+                )}
+              </Stack>
               {(status === "isBorrowed" ||
                 status === "isShared" ||
-                status === "isSharing") && (
+                status === "isSharing" ||
+                (status === "isLeasing" && borrower)) && (
                 <Stack>
                   <Typography variant="subtitle2">Return in:</Typography>
                   <Typography variant="label">
@@ -250,10 +256,28 @@ const ActionableBookItem = ({
                   </Typography>
                 </Stack>
               )}
-              {(status === "isCreated" || status === "isOwned") && (
+              {status === "isOwned" && (
+                <Stack>
+                  <Typography variant="subtitle2">Amount Owned:</Typography>
+                  <Typography variant="label">{amountOwned}</Typography>
+                </Stack>
+              )}
+              {status === "isOwned" && (
+                <Stack>
+                  <Typography variant="subtitle2">Amount Tradeable:</Typography>
+                  <Typography variant="label">{amountTradeable}</Typography>
+                </Stack>
+              )}
+              {status === "isCreated" && (
                 <Stack>
                   <Typography variant="subtitle2">Quantity:</Typography>
                   <Typography variant="label">{quantity}</Typography>
+                </Stack>
+              )}
+              {status === "isCreated" && (
+                <Stack>
+                  <Typography variant="subtitle2">Amount Tradeable:</Typography>
+                  <Typography variant="label">{amountTradeable}</Typography>
                 </Stack>
               )}
             </Stack>

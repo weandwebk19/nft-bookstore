@@ -48,7 +48,8 @@ const LeasingBooks = () => {
   const { nfts: leaseNfts } = useOwnedLeasingBooks();
   const leasingBooks = leaseNfts.data as LeaseBook[];
 
-  const leasedOutBooks = useOwnedLeasedOutBooks()?.nfts.data as BorrowedBook[];
+  const { nfts: leasedOutNfts } = useOwnedLeasedOutBooks();
+  const leasedOutBooks = leasedOutNfts.data as BorrowedBook[];
 
   const [nowTime, setNowTime] = useState<number>(0);
 
@@ -120,163 +121,226 @@ const LeasingBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper
-              title={t("leasingBooksTitle")}
-              button={
-                <>
-                  <StyledButton
-                    customVariant="secondary"
-                    onClick={(e) => handleOpenRecallDialogClick(e)}
-                  >
-                    Recall All
-                  </StyledButton>
-                  <Dialog
-                    title={t("dialogTitle") as string}
-                    open={openRecallDialog}
-                    onClose={handleRecallClose}
-                  >
-                    <Stack spacing={3}>
-                      <Typography>{t("message")}</Typography>
-                      <Stack direction="row" spacing={3} justifyContent="end">
-                        <StyledButton
-                          customVariant="secondary"
-                          onClick={(e) => handleCancelClick(e)}
-                        >
-                          {t("button_cancel")}
-                        </StyledButton>
-                        <StyledButton onClick={(e) => handleRecallClick(e)}>
-                          {t("button_recall")}
-                        </StyledButton>
+            <Stack spacing={3}>
+              {/* Lease books that have not been borrowed by anyone */}
+              <ContentPaper
+                title={t("leasingBooksTitle")}
+                button={
+                  <>
+                    <StyledButton
+                      customVariant="secondary"
+                      onClick={(e) => handleOpenRecallDialogClick(e)}
+                    >
+                      Recall All
+                    </StyledButton>
+                    <Dialog
+                      title={t("dialogTitle") as string}
+                      open={openRecallDialog}
+                      onClose={handleRecallClose}
+                    >
+                      <Stack spacing={3}>
+                        <Typography>{t("message")}</Typography>
+                        <Stack direction="row" spacing={3} justifyContent="end">
+                          <StyledButton
+                            customVariant="secondary"
+                            onClick={(e) => handleCancelClick(e)}
+                          >
+                            {t("button_cancel")}
+                          </StyledButton>
+                          <StyledButton onClick={(e) => handleRecallClick(e)}>
+                            {t("button_recall")}
+                          </StyledButton>
+                        </Stack>
                       </Stack>
-                    </Stack>
-                  </Dialog>
-                </>
-              }
-            >
-              {(() => {
-                if (leaseNfts.isLoading) {
-                  return (
-                    <Typography>{t("loadingMessage") as string}</Typography>
-                  );
-                } else if (leasingBooks?.length === 0 || leaseNfts.error) {
-                  return (
-                    <FallbackNode>
-                      <Typography>{t("emptyMessage") as string}</Typography>
-                    </FallbackNode>
-                  );
+                    </Dialog>
+                  </>
                 }
-                return (
-                  <Grid
-                    container
-                    spacing={3}
-                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
-                  >
-                    <>
-                      {leasingBooks!.map((book: LeaseBook) => {
-                        return (
-                          <Grid
-                            item
-                            key={book.tokenId}
-                            xs={4}
-                            sm={8}
-                            md={6}
-                            lg={12}
-                          >
-                            <ActionableBookItem
-                              status="isLeasing"
-                              tokenId={book?.tokenId}
-                              bookCover={book?.meta.bookCover}
-                              title={book?.meta.title}
-                              fileType={book?.meta.fileType}
-                              renter={book?.renter}
-                              onClick={handleBookClick}
-                              price={book?.price}
-                              amount={book?.amount}
-                              buttons={
-                                <>
-                                  <RecallButton
-                                    tokenId={book?.tokenId}
-                                    title={book?.meta.title}
-                                    bookCover={book?.meta.bookCover}
-                                    renter={book?.renter}
-                                    amount={book?.amount}
-                                  />
-                                </>
-                              }
-                              // status={
-                              //   book?.endRentalDay !== undefined
-                              //     ? book?.endRentalDay > 0
-                              //       ? `${pluralize(
-                              //           book?.endRentalDay,
-                              //           "day"
-                              //         )} left`
-                              //       : "Ended" // End of leasing term
-                              //     : undefined
-                              // }
-                            />
-                          </Grid>
-                        );
-                      })}
+              >
+                {(() => {
+                  if (leaseNfts.isLoading) {
+                    return (
+                      <Typography>{t("loadingMessage") as string}</Typography>
+                    );
+                  } else if (leasingBooks?.length === 0 || leaseNfts.error) {
+                    return (
+                      <FallbackNode>
+                        <Typography>{t("emptyMessage") as string}</Typography>
+                      </FallbackNode>
+                    );
+                  }
+                  return (
+                    <Grid
+                      container
+                      spacing={3}
+                      columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                    >
+                      <>
+                        {leasingBooks!.map((book: LeaseBook) => {
+                          return (
+                            <Grid
+                              item
+                              key={book.tokenId}
+                              xs={4}
+                              sm={8}
+                              md={6}
+                              lg={12}
+                            >
+                              <ActionableBookItem
+                                status="isLeasing"
+                                tokenId={book?.tokenId}
+                                bookCover={book?.meta.bookCover}
+                                title={book?.meta.title}
+                                fileType={book?.meta.fileType}
+                                renter={book?.renter}
+                                onClick={handleBookClick}
+                                price={book?.price}
+                                amount={book?.amount}
+                                buttons={
+                                  <>
+                                    <RecallButton
+                                      buttonName="Recall leasing"
+                                      tokenId={book?.tokenId}
+                                      title={book?.meta.title}
+                                      bookCover={book?.meta.bookCover}
+                                      renter={book?.renter}
+                                      amount={book?.amount}
+                                    />
+                                  </>
+                                }
+                                // status={
+                                //   book?.endRentalDay !== undefined
+                                //     ? book?.endRentalDay > 0
+                                //       ? `${pluralize(
+                                //           book?.endRentalDay,
+                                //           "day"
+                                //         )} left`
+                                //       : "Ended" // End of leasing term
+                                //     : undefined
+                                // }
+                              />
+                            </Grid>
+                          );
+                        })}
+                      </>
+                    </Grid>
+                  );
+                })()}
+              </ContentPaper>
 
-                      <Divider sx={{ my: 3 }} />
-
-                      {leasedOutBooks!.map((book) => {
-                        return (
-                          <Grid
-                            item
-                            key={book.tokenId}
-                            xs={4}
-                            sm={8}
-                            md={6}
-                            lg={12}
+              {/* Lease books that have been borrowed by others */}
+              <ContentPaper
+                title={t("leasedOutBooksTitle")}
+                button={
+                  <>
+                    <StyledButton
+                      customVariant="secondary"
+                      onClick={(e) => handleOpenRecallDialogClick(e)}
+                    >
+                      Recall All
+                    </StyledButton>
+                    <Dialog
+                      title={t("dialogTitle") as string}
+                      open={openRecallDialog}
+                      onClose={handleRecallClose}
+                    >
+                      <Stack spacing={3}>
+                        <Typography>{t("message")}</Typography>
+                        <Stack direction="row" spacing={3} justifyContent="end">
+                          <StyledButton
+                            customVariant="secondary"
+                            onClick={(e) => handleCancelClick(e)}
                           >
-                            <ActionableBookItem
-                              status="isLeasing"
-                              tokenId={book?.tokenId}
-                              bookCover={book?.meta.bookCover}
-                              title={book?.meta.title}
-                              fileType={book?.meta.fileType}
-                              renter={book?.renter}
-                              onClick={handleBookClick}
-                              price={book?.price}
-                              amount={book?.amount}
-                              borrower={book?.borrower}
-                              countDown={secondsToDhms(book?.endTime - nowTime)}
-                              buttons={
-                                <>
-                                  <RecallButton
-                                    borrower={book?.borrower}
-                                    isEnded={book?.endTime - nowTime === 0}
-                                    countDown={secondsToDhms(
-                                      book?.endTime - nowTime
-                                    )}
-                                    tokenId={book?.tokenId}
-                                    title={book?.meta.title}
-                                    bookCover={book?.meta.bookCover}
-                                    renter={book?.renter}
-                                    amount={book?.amount}
-                                  />
-                                </>
-                              }
-                              // status={
-                              //   book?.endRentalDay !== undefined
-                              //     ? book?.endRentalDay > 0
-                              //       ? `${pluralize(
-                              //           book?.endRentalDay,
-                              //           "day"
-                              //         )} left`
-                              //       : "Ended" // End of leasing term
-                              //     : undefined
-                              // }
-                            />
-                          </Grid>
-                        );
-                      })}
-                    </>
-                  </Grid>
-                );
-              })()}
-            </ContentPaper>
+                            {t("button_cancel")}
+                          </StyledButton>
+                          <StyledButton onClick={(e) => handleRecallClick(e)}>
+                            {t("button_recall")}
+                          </StyledButton>
+                        </Stack>
+                      </Stack>
+                    </Dialog>
+                  </>
+                }
+              >
+                {(() => {
+                  if (leasedOutNfts.isLoading) {
+                    return (
+                      <Typography>{t("loadingMessage") as string}</Typography>
+                    );
+                  } else if (
+                    leasedOutBooks?.length === 0 ||
+                    leasedOutNfts.error
+                  ) {
+                    return (
+                      <FallbackNode>
+                        <Typography>
+                          {t("emptyMessage__leasedOutBooks") as string}
+                        </Typography>
+                      </FallbackNode>
+                    );
+                  }
+                  return (
+                    <Grid
+                      container
+                      spacing={3}
+                      columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
+                    >
+                      <>
+                        {leasedOutBooks!.map((book) => {
+                          return (
+                            <Grid
+                              item
+                              key={book.tokenId}
+                              xs={4}
+                              sm={8}
+                              md={6}
+                              lg={12}
+                            >
+                              <ActionableBookItem
+                                status="isLeasing"
+                                tokenId={book?.tokenId}
+                                bookCover={book?.meta.bookCover}
+                                title={book?.meta.title}
+                                fileType={book?.meta.fileType}
+                                renter={book?.renter}
+                                onClick={handleBookClick}
+                                price={book?.price}
+                                amount={book?.amount}
+                                borrower={book?.borrower}
+                                countDown={secondsToDhms(
+                                  book?.endTime - nowTime
+                                )}
+                                buttons={
+                                  <>
+                                    <RecallButton
+                                      buttonName="Recall leasing"
+                                      tokenId={book?.tokenId}
+                                      title={book?.meta.title}
+                                      bookCover={book?.meta.bookCover}
+                                      renter={book?.renter}
+                                      amount={book?.amount}
+                                    />
+                                  </>
+                                }
+                                // status={
+                                //   book?.endRentalDay !== undefined
+                                //     ? book?.endRentalDay > 0
+                                //       ? `${pluralize(
+                                //           book?.endRentalDay,
+                                //           "day"
+                                //         )} left`
+                                //       : "Ended" // End of leasing term
+                                //     : undefined
+                                // }
+                              />
+                            </Grid>
+                          );
+                        })}
+                      </>
+                    </Grid>
+                  );
+                })()}
+              </ContentPaper>
+            </Stack>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
             <ContentPaper title="Filter">

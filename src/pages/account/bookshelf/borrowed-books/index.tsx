@@ -17,6 +17,7 @@ import {
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
+import ExtendRequestButton from "@/components/shared/BookButton/ExtendRequestButton";
 import ShareButton from "@/components/shared/BookButton/ShareButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
@@ -123,8 +124,20 @@ const BorrowedBooks = () => {
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  author={book?.renter}
+                                  renter={book?.renter}
+                                  borrower={book?.borrower}
+                                  startTime={book?.startTime}
+                                  endTime={book?.endTime}
                                   borrowedAmount={book?.amount}
+                                />
+                                <ExtendRequestButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  renter={book?.renter}
+                                  price={book?.price}
+                                  supplyAmount={book?.amount}
+                                  borrowBooks={nfts?.borrowBooks}
                                 />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>

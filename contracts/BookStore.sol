@@ -655,6 +655,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return total;
   }
 
+  function getIdBorrowedBook(
+    uint tokenId,
+    address renter,
+    address borrower,
+    uint startTime,
+    uint endTime
+  ) public view returns (uint) {
+    return
+      _bookRentingStorage.getIdBorrowedBook(
+        tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+  }
+
   function shareBooks(
     uint256 idBorrowedBook,
     uint price,
@@ -710,23 +727,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getAllOwnedSharedBook()
     public view returns (BookSharingStorage.BookSharing[] memory) {
     return _bookSharingStorage.getAllOwnedSharedBook(msg.sender);
-  }
-
-  function getIdBorrowedBook(
-    uint tokenId,
-    address renter,
-    address borrower,
-    uint startTime,
-    uint endTime
-  ) public view returns (uint) {
-    return
-      _bookRentingStorage.getIdBorrowedBook(
-        tokenId,
-        renter,
-        borrower,
-        startTime,
-        endTime
-      );
   }
 
   function updateBooksOnSharing(

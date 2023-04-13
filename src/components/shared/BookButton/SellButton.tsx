@@ -24,7 +24,7 @@ interface SellButtonProps {
   bookCover: string;
   author: string;
   tokenId: number;
-  quantity: number;
+  amountTradeable: number;
 }
 
 const schema = yup
@@ -50,7 +50,7 @@ const SellButton = ({
   title,
   author,
   tokenId,
-  quantity
+  amountTradeable
 }: SellButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
@@ -77,15 +77,14 @@ const SellButton = ({
 
   const onSubmit = async (data: any) => {
     try {
+      // handle errors
+      if (data.amount > amountTradeable) {
+        return toast.error(`Amount must be less than ${amountTradeable}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
       const listingPrice = await contract!.listingPrice();
-      // const tx = await contract?.sellBooks(
-      //   tokenId,
-      //   ethers.utils.parseEther(data.price.toString()),
-      //   data.amount,
-      //   {
-      //     value: listingPrice
-      //   }
-      // );
       const tx = await contract?.sellBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
@@ -97,13 +96,14 @@ const SellButton = ({
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Sell NftBook Token",
-        success: "NftBook has ben sold",
-        error: "Sell error"
+        success: "NftBook is successfully put on sale",
+        error: "Oops! There's a problem with listing process!"
       });
-
-      console.log("receipt", receipt);
     } catch (e: any) {
       console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 
@@ -140,7 +140,7 @@ const SellButton = ({
                 />
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{authorName}</Typography>
-                <Typography>{quantity} left</Typography>
+                <Typography>{amountTradeable} left</Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>

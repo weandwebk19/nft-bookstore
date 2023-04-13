@@ -47,7 +47,7 @@ export const hookFactory: BookDetailHookFactory =
                   tokenId,
                   seller,
                   amount,
-                  price: ethers.utils.formatEther(price)
+                  price: parseFloat(ethers.utils.formatEther(price))
                 }),
                 meta: meta,
                 info: bookInfo

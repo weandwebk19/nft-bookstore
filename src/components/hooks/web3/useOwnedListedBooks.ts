@@ -37,7 +37,7 @@ export const hookFactory: OwnedListedBooksHookFactory =
               tokenId: item?.tokenId?.toNumber(),
               seller: item?.seller,
               amount: item?.amount?.toNumber(),
-              price: parseInt(ethers.utils.formatEther(item?.price)),
+              price: parseFloat(ethers.utils.formatEther(item?.price)),
               meta
             });
           } catch (err) {

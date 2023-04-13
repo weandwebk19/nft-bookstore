@@ -5,13 +5,13 @@ import { useTranslation } from "next-i18next";
 import BookCardActionable from "./BookCardActionable";
 
 interface BookListActionableProps {
-  isOpenForTradeIn: boolean;
+  isOpenForPurchase: boolean;
   isOpenForBorrow: boolean;
   bookListActionable: any[];
 }
 
 const BookListActionable = ({
-  isOpenForTradeIn,
+  isOpenForPurchase,
   isOpenForBorrow,
   bookListActionable
 }: BookListActionableProps) => {
@@ -19,7 +19,7 @@ const BookListActionable = ({
 
   return (
     <Box>
-      {isOpenForTradeIn && (
+      {isOpenForPurchase && (
         <Typography variant="h5" gutterBottom>
           {t("listings")}
         </Typography>

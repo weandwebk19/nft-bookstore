@@ -71,6 +71,8 @@ export type NftBookCore = {
 };
 
 export type NftBook = {
+  amountOwned?: number;
+  amountTradeable?: number;
   meta: NftBookMeta;
 } & NftBookCore;
 
