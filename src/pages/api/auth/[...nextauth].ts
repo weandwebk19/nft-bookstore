@@ -1,3 +1,4 @@
+import axios from "axios";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getCsrfToken } from "next-auth/react";
@@ -26,6 +27,7 @@ export default async function auth(req: any, res: any) {
           const siwe = new SiweMessage(
             JSON.parse(credentials?.message || "{}")
           );
+
           const nextAuthUrl = new URL(process.env.NEXTAUTH_URL as string);
 
           const result = await siwe.verify({
@@ -39,6 +41,7 @@ export default async function auth(req: any, res: any) {
               id: siwe.address
             };
           }
+
           return null;
         } catch (e) {
           return null;
@@ -62,6 +65,9 @@ export default async function auth(req: any, res: any) {
     },
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
+      async jwt({ token, user }) {
+        return { ...token, ...user };
+      },
       async session({ session, token }: { session: any; token: any }) {
         session.address = token.sub;
         session.user.name = token.sub;

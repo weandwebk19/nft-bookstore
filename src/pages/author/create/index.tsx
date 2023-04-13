@@ -26,6 +26,7 @@ import * as yup from "yup";
 
 import withAuth from "@/components/HOC/withAuth";
 import withAuthor from "@/components/HOC/withAuthor";
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
 import { useAccount, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -35,7 +36,7 @@ import {
   Step1,
   Step2,
   Step3
-} from "@/components/ui/books/create/steps";
+} from "@/components/ui/author/create/steps";
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
@@ -98,6 +99,9 @@ const CreateBook = () => {
   const [bookFileLink, setBookFileLink] = useState("");
   const [bookCoverLink, setBookCoverLink] = useState("");
   const [bookSampleLink, setBookSampleLink] = useState("");
+
+  // const { data } = useUserInfo();
+  // console.log(data.isAuthor);
 
   const steps = [
     t("titleStep1") as string,
@@ -727,7 +731,7 @@ const CreateBook = () => {
   );
 };
 
-export default withAuth(CreateBook);
+export default withAuth(withAuthor(CreateBook));
 
 export async function getStaticProps({ locale }: any) {
   return {
