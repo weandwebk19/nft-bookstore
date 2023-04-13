@@ -36,7 +36,7 @@ export const hookFactory: OwnedSharingBooksHookFactory =
               price: parseFloat(ethers.utils.formatEther(item?.price)),
               sharer: item?.sharer,
               sharedPer: item?.sharedPer,
-              priceOfBB: item?.priceOfBB?.toNumber(),
+              priceOfBB: parseFloat(ethers.utils.formatEther(item?.priceOfBB)),
               startTime: item?.startTime?.toNumber(),
               endTime: item?.endTime?.toNumber(),
               meta
