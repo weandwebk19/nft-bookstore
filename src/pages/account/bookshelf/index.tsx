@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -30,12 +30,12 @@ const BookShelf = () => {
       )
     },
     {
-      id: `${preUrl}/owned-books`,
+      id: `${preUrl}/bought-books`,
       component: (
         <Ticket
-          href={`${preUrl}/owned-books`}
-          header={t("ownedBooks") as string}
-          body={t("ownedBooksDesc") as string}
+          href={`${preUrl}/bought-books`}
+          header={t("boughtBooks") as string}
+          body={t("boughtBooksDesc") as string}
           image={images.gradient3}
         />
       )
@@ -113,8 +113,15 @@ const BookShelf = () => {
       </Head>
       <Stack spacing={6}>
         <ContentContainer titles={[`${t("containerTitle")}`]}>
+          <Paper sx={{ width: "100%" }}>
+            <Ticket
+              href={`${preUrl}/owned-books`}
+              header={t("ownedBooks") as string}
+              body={t("ownedBooksDesc") as string}
+              image={images.gradient8}
+            />
+          </Paper>
           <Wrapper items={topCategories} itemsInARow={4} />
-
           <Wrapper items={bottomCategories} itemsInARow={4} />
         </ContentContainer>
       </Stack>

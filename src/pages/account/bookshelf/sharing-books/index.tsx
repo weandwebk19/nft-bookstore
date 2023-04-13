@@ -276,7 +276,6 @@ const SharingBooks = () => {
                               buttons={
                                 <>
                                   <RecallButton
-                                    buttonName="Recall sharing"
                                     tokenId={book?.tokenId}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
