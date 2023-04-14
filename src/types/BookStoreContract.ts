@@ -90,20 +90,19 @@ export type BookStoreContractMethodNames =
   | "setListingPrice"
   | "setLeasingPrice"
   | "setSharingPrice"
-  | "setTokenUri"
   | "isListed"
   | "isLeased"
   | "getAllRealOwnerOfTokenId"
   | "getBalanceOfOwnerBook"
   | "getNftBook"
   | "getListedBook"
+  | "getListedBook"
   | "isTokenURIExist"
   | "mintBook"
   | "isOwnerOfToken"
   | "getOwnedNFTBooks"
   | "getOwnedListedBooks"
-  | "getCreatedNFTBooks"
-  | "getTotalOwnedToken"
+  | "getOwnedPurchasedBooks"
   | "getOwnedLeasingBooks"
   | "getOwnedBorrowedBooks"
   | "getAmountUnUsedBook"
@@ -188,6 +187,14 @@ export interface ListedbookResponse {
   amount: BigNumber;
   3: BigNumber;
 }
+export interface PurchasedbookResponse {
+  listedId: BigNumber;
+  0: BigNumber;
+  buyer: string;
+  1: string;
+  amount: BigNumber;
+  2: BigNumber;
+}
 export interface LeasebookResponse {
   tokenId: BigNumber;
   0: BigNumber;
@@ -263,11 +270,13 @@ export interface BookStoreContract {
    * StateMutability: nonpayable
    * Type: constructor
    * @param listedBookStorage Type: address, Indexed: false
+   * @param purchasedBookStorage Type: address, Indexed: false
    * @param bookTemporary Type: address, Indexed: false
    * @param listRealOwners Type: address, Indexed: false
    */
   "new"(
     listedBookStorage: string,
+    purchasedBookStorage: string,
     bookTemporary: string,
     listRealOwners: string,
     overrides?: ContractTransactionOverrides
@@ -485,19 +494,6 @@ export interface BookStoreContract {
   ): Promise<ContractTransaction>;
   /**
    * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param tokenId Type: uint256, Indexed: false
-   * @param tokenURI Type: string, Indexed: false
-   */
-  setTokenUri(
-    tokenId: BigNumberish,
-    tokenURI: string,
-    overrides?: ContractTransactionOverrides
-  ): Promise<ContractTransaction>;
-  /**
-   * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
@@ -555,6 +551,17 @@ export interface BookStoreContract {
     tokenId: BigNumberish,
     overrides?: ContractCallOverrides
   ): Promise<NftbookResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param idListedBook Type: uint256, Indexed: false
+   */
+  getListedBook(
+    idListedBook: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<ListedbookResponse>;
   /**
    * Payable: false
    * Constant: true
@@ -629,16 +636,9 @@ export interface BookStoreContract {
    * StateMutability: view
    * Type: function
    */
-  getCreatedNFTBooks(
+  getOwnedPurchasedBooks(
     overrides?: ContractCallOverrides
-  ): Promise<NftbookResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getTotalOwnedToken(overrides?: ContractCallOverrides): Promise<BigNumber>;
+  ): Promise<PurchasedbookResponse[]>;
   /**
    * Payable: false
    * Constant: true
