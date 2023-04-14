@@ -26,7 +26,7 @@ interface ActionableBookItemProps {
   title: string;
   fileType: string;
   tokenId: number;
-  author?: string; // !!! 'author' should ALWAYS be display !!!
+  owner?: string; // !!! 'author' should ALWAYS be display !!!  => /// In some cases, we can use seller instead
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
   renter?: string;
@@ -47,7 +47,7 @@ const ActionableBookItem = ({
   title,
   fileType,
   tokenId,
-  author,
+  owner,
   onClick,
   buttons,
   renter,
@@ -65,7 +65,7 @@ const ActionableBookItem = ({
   const account = useAccount();
 
   const theme = useTheme();
-  const [authorName, setAuthorName] = useState("");
+  const [ownerName, setOwnerName] = useState("");
   const [sharerName, setSharerName] = useState("");
   const [renterName, setRenterName] = useState("");
   const [sharedPersonName, setSharedPersonName] = useState("");
@@ -74,18 +74,18 @@ const ActionableBookItem = ({
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (owner) {
+          const userRes = await axios.get(`/api/users/wallet/${owner}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setOwnerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [owner]);
 
   useEffect(() => {
     (async () => {
@@ -197,7 +197,7 @@ const ActionableBookItem = ({
               {title}
             </Typography>
             {status !== "isCreated" && (
-              <Typography variant="body2">{authorName}</Typography>
+              <Typography variant="body2">{ownerName}</Typography>
             )}
             {status === "isBorrowed" && (
               <Stack>

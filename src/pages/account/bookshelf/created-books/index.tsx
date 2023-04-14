@@ -99,7 +99,7 @@ const CreatedBooks = () => {
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.author}
+                            owner={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
                             amountTradeable={book?.amountTradeable}
@@ -113,7 +113,7 @@ const CreatedBooks = () => {
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  author={book?.author}
+                                  owner={book?.author}
                                   amountTradeable={book?.amountTradeable!}
                                 />
                                 <EditButton tokenId={book?.tokenId} />

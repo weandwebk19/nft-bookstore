@@ -29,31 +29,33 @@ export const hookFactory: OwnedPurchasedBooksHookFactory =
             const item = coreNfts[i];
             const listedBook = await contract!.getListedBookById(item.listedId);
             const tokenURI = await contract!.getUri(listedBook.tokenId);
-            const metaRes = await (
-              await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
-            ).data;
-            let meta = null;
-            if (metaRes.success === true) {
-              meta = metaRes.data;
+            if (listedBook.tokenId.toNumber() !== 0) {
+              const metaRes = await (
+                await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
+              ).data;
+              let meta = null;
+              if (metaRes.success === true) {
+                meta = metaRes.data;
+              }
+
+              const amountTradeable = await contract!.getAmountUnUsedBook(
+                listedBook.tokenId
+              );
+
+              nfts.push({
+                listedBook: toNumber({
+                  tokenId: listedBook.tokenId,
+                  seller: listedBook.seller,
+                  amount: listedBook.amount,
+                  price: parseFloat(ethers.utils.formatEther(listedBook.price))
+                }),
+                listedId: item?.listedId?.toNumber(),
+                buyer: item?.buyer,
+                amount: item?.amount?.toNumber(),
+                amountTradeable: amountTradeable.toNumber(),
+                meta
+              });
             }
-
-            const amountTradeable = await contract!.getAmountUnUsedBook(
-              listedBook.tokenId
-            );
-
-            nfts.push({
-              listedBook: toNumber({
-                tokenId: listedBook.tokenId,
-                seller: listedBook.seller,
-                amount: listedBook.amount,
-                price: parseFloat(ethers.utils.formatEther(listedBook.price))
-              }),
-              listedId: item?.listedId?.toNumber(),
-              buyer: item?.buyer,
-              amount: item?.amount?.toNumber(),
-              amountTradeable: amountTradeable.toNumber(),
-              meta
-            });
           }
           return nfts;
         } catch (err) {

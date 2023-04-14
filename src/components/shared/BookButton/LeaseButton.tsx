@@ -21,7 +21,7 @@ import { StyledButton } from "@/styles/components/Button";
 interface LeaseButtonProps {
   title: string;
   bookCover: string;
-  author: string;
+  owner: string;
   tokenId: number;
   amountTradeable: number;
 }
@@ -47,11 +47,11 @@ const defaultValues = {
 const LeaseButton = ({
   bookCover,
   title,
-  author,
+  owner,
   tokenId,
   amountTradeable
 }: LeaseButtonProps) => {
-  const [authorName, setAuthorName] = useState();
+  const [ownerName, setOwnerName] = useState();
   const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
@@ -109,18 +109,18 @@ const LeaseButton = ({
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (owner) {
+          const userRes = await axios.get(`/api/users/wallet/${owner}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setOwnerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [owner]);
 
   return (
     <>
@@ -142,7 +142,7 @@ const LeaseButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>{" "}
+                <Typography>{ownerName}</Typography>{" "}
                 <Typography>{amountTradeable} left</Typography>
               </Stack>
             </Grid>
