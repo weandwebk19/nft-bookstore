@@ -55,6 +55,15 @@ export const useOwnedListedBooks = () => {
   };
 };
 
+export const useOwnedPurchasedBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedPurchasedBooks();
+
+  return {
+    nfts: swrRes
+  };
+};
+
 export const useOwnedBorrowedBooks = () => {
   const hooks = useHooks();
   const swrRes = hooks.useOwnedBorrowedBooks();
@@ -105,6 +114,14 @@ export const useBookDetail = (bookId: string, seller?: string) => {
   const swrRes = hooks.useBookDetail(bookId, seller);
   return {
     bookDetail: swrRes
+  };
+};
+
+export const useRealOwnerOfTokens = (tokenId: number) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useRealOwnerOfTokens(tokenId);
+  return {
+    ownerTokens: swrRes
   };
 };
 

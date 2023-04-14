@@ -9,6 +9,8 @@ import useSWR from "swr";
 
 import { NftBook } from "@/types/nftBook";
 
+import { useAccount } from ".";
+
 type UseCreatedBooksResponse = {
   // listNft: (tokenId: number, price: number) => Promise<void>;
 };
@@ -23,14 +25,16 @@ export type UseCreatedBooksHook = ReturnType<CreatedBooksHookFactory>;
 export const hookFactory: CreatedBooksHookFactory =
   ({ contract }) =>
   () => {
+    const { account } = useAccount();
     const { data, ...swr } = useSWR(
       contract ? "web3/useCreatedBooks" : null,
       async () => {
         const nfts = [] as NftBook[];
-        const coreNfts = await contract!.getCreatedNFTBooks();
+        const ownedBooks = await contract!.getOwnedNFTBooks();
+        const createdBooks = ownedBooks.filter((e) => e.author == account.data);
 
-        for (let i = 0; i < coreNfts.length; i++) {
-          const item = coreNfts[i];
+        for (let i = 0; i < createdBooks.length; i++) {
+          const item = createdBooks[i];
           const tokenURI = await contract!.uri(item.tokenId);
           const metaRes = await (
             await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)

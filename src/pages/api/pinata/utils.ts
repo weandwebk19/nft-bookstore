@@ -94,21 +94,6 @@ export const addressCheckMiddleware = async (
   });
 };
 
-export const setURI = async (tokenId: number, tokenURI: string) => {
-  return new Promise(async (resolve, reject) => {
-    const provider = new ethers.providers.JsonRpcProvider(url);
-    const contract = new ethers.Contract(
-      contractAddress,
-      abi,
-      provider
-    ) as unknown as BookStoreContract;
-
-    await contract.setTokenUri(tokenId, tokenURI);
-
-    resolve("Set URI successfully.");
-  });
-};
-
 export const getMetadata = async (nftUri: string) => {
   const nftRes = await axios.get(nftUri, {
     headers: {
