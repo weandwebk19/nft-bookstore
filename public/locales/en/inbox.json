@@ -1,0 +1,16 @@
+{
+  "titlePage": "Inbox - NFT Bookstore",
+  "containerTitle": "My Inbox",
+  "button_cancel": "Cancel",
+  "button_delete": "Remove",
+  "tooltip_delete": "Remove this",
+  "dialogTitle": "Remove this from your Inbox",
+  "message": "Are you sure you want to remove this from your inbox?",
+  "id": "ID",
+  "bookCover": "Book cover",
+  "title": "Title",
+  "price": "Price (ETH)",
+  "author": "Author",
+  "status": "Status",
+  "action": "Action"
+}

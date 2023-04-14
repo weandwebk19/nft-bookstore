@@ -1,4 +1,4 @@
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Stack } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -6,7 +6,6 @@ import Head from "next/head";
 
 import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
-import { Book3D } from "@/components/shared/Book3D";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { Ticket } from "@/components/shared/Ticket";
 import { Wrapper } from "@/components/shared/Wrapper";
@@ -19,23 +18,23 @@ const MailBox = () => {
 
   const topCategories = [
     {
-      id: `${preUrl}/inboxes`,
+      id: `${preUrl}/inbox`,
       component: (
         <Ticket
-          href={`${preUrl}/inboxes`}
-          header={t("inBoxes") as string}
-          body={t("inBoxesDesc") as string}
+          href={`${preUrl}/inbox`}
+          header={t("inbox") as string}
+          body={t("inboxDesc") as string}
           image={images.gradient1}
         />
       )
     },
     {
-      id: `${preUrl}/outboxes`,
+      id: `${preUrl}/outbox`,
       component: (
         <Ticket
-          href={`${preUrl}/outboxes`}
-          header={t("outBoxes") as string}
-          body={t("outBoxesDesc") as string}
+          href={`${preUrl}/outbox`}
+          header={t("outbox") as string}
+          body={t("outboxDesc") as string}
           image={images.gradient2}
         />
       )

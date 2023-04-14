@@ -1,8 +1,8 @@
 {
   "titlePage": "Mailbox - NFT Bookstore",
   "containerTitle": "My Mailbox",
-  "inBoxes": "Inboxes",
-  "inBoxesDesc": "Manage all the messages sent to you.",
-  "outBoxes": "Outboxes",
-  "outBoxesDesc": "Manage all the messages you send."
+  "inbox": "Inbox",
+  "inboxDesc": "Manage all the messages sent to you.",
+  "outbox": "Outbox",
+  "outboxDesc": "Manage all the messages you send."
 }

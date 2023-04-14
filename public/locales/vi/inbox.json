@@ -1,0 +1,16 @@
+{
+  "titlePage": "Hộp thư đến - NFT Bookstore",
+  "containerTitle": "Hộp thư đến của tôi",
+  "button_cancel": "Hủy",
+  "button_delete": "Xóa",
+  "tooltip_delete": "Xóa",
+  "dialogTitle": "Xóa khỏi Hộp thư đến",
+  "message": "Bạn có chắc rằng muốn xóa quyển sách này khỏi Hộp thư đến",
+  "id": "ID",
+  "bookCover": "Bìa sách",
+  "title": "Tựa sách",
+  "price": "Giá (ETH)",
+  "author": "Tác giả",
+  "status": "Trạng thái",
+  "action": "Hành động"
+}

@@ -1,8 +1,8 @@
 {
   "titlePage": "Hộp thư - NFT Bookstore",
   "containerTitle": "Hộp thư của tôi",
-  "inBoxes": "Hộp thư đến",
-  "inBoxesDesc": "Quản lý tất cả mọi tin nhắn được gửi đến bạn.",
-  "outBoxes": "Hộp thư đi",
-  "outBoxesDesc": "Quản lý tất cả mọi tin nhắn mà bạn gửi đi."
+  "inbox": "Hộp thư đến",
+  "inboxDesc": "Quản lý tất cả mọi tin nhắn được gửi đến bạn.",
+  "outbox": "Hộp thư đi",
+  "outboxDesc": "Quản lý tất cả mọi tin nhắn mà bạn gửi đi."
 }
