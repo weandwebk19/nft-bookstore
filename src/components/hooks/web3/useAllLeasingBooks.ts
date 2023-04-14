@@ -37,7 +37,7 @@ export const hookFactory: AllLeasingBooksHookFactory =
 
         for (let i = 0; i < coreLeaseBooks.length; i++) {
           const leaseBook = coreLeaseBooks[i];
-          const tokenURI = await contract!.uri(leaseBook.tokenId);
+          const tokenURI = await contract!.getUri(leaseBook.tokenId);
           const metaRes = await fetch(tokenURI);
           const meta = await metaRes.json();
 

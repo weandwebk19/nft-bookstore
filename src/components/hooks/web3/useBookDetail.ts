@@ -25,7 +25,7 @@ export const hookFactory: BookDetailHookFactory =
             await axios.get(`/api/books/${bookId}`)
           ).data?.data;
           const coreNftBook = await contract!.getNftBook(bookInfo?.tokenId);
-          const tokenURI = await contract!.uri(bookInfo?.tokenId);
+          const tokenURI = await contract!.getUri(bookInfo?.tokenId);
           const meta = await (await fetch(tokenURI)).json();
 
           const sellerDefault = seller ? seller : coreNftBook?.author;

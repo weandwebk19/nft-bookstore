@@ -83,12 +83,13 @@ const LeaseButton = ({
         });
       }
 
+      const leasingPrice = await contract!.leasingPrice();
       const tx = await contract?.leaseBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
         data.amount,
         {
-          value: ethers.utils.parseEther((0.001).toString())
+          value: leasingPrice
         }
       );
 
