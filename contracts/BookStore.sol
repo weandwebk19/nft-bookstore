@@ -205,10 +205,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _listedBookStorage.getListedBook(tokenId, seller);
   }
 
-  function getListedBook(
+  function getListedBookById(
     uint idListedBook
   ) public view returns (ListedBookStorage.ListedBook memory) {
-    return _listedBookStorage.getListedBook(idListedBook);
+    return _listedBookStorage.getListedBookById(idListedBook);
   }
 
   function isTokenURIExist(string memory tokenURI) public view returns (bool) {

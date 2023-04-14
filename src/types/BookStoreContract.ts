@@ -96,7 +96,7 @@ export type BookStoreContractMethodNames =
   | "getBalanceOfOwnerBook"
   | "getNftBook"
   | "getListedBook"
-  | "getListedBook"
+  | "getListedBookById"
   | "isTokenURIExist"
   | "mintBook"
   | "isOwnerOfToken"
@@ -556,10 +556,12 @@ export interface BookStoreContract {
    * Constant: true
    * StateMutability: view
    * Type: function
-   * @param idListedBook Type: uint256, Indexed: false
+   * @param tokenId Type: uint256, Indexed: false
+   * @param seller Type: address, Indexed: false
    */
   getListedBook(
-    idListedBook: BigNumberish,
+    tokenId: BigNumberish,
+    seller: string,
     overrides?: ContractCallOverrides
   ): Promise<ListedbookResponse>;
   /**
@@ -567,12 +569,10 @@ export interface BookStoreContract {
    * Constant: true
    * StateMutability: view
    * Type: function
-   * @param tokenId Type: uint256, Indexed: false
-   * @param seller Type: address, Indexed: false
+   * @param idListedBook Type: uint256, Indexed: false
    */
-  getListedBook(
-    tokenId: BigNumberish,
-    seller: string,
+  getListedBookById(
+    idListedBook: BigNumberish,
     overrides?: ContractCallOverrides
   ): Promise<ListedbookResponse>;
   /**

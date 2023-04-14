@@ -42,7 +42,7 @@ contract ListedBookStorage {
     return _idToListedBook[idListedBook];
   }
 
-  function getListedBook(
+  function getListedBookById(
     uint idListedBook
   ) public view returns (ListedBook memory) {
     return _idToListedBook[idListedBook];

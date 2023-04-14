@@ -136,6 +136,7 @@ export type ListedBook = {
 
 export type PurchasedBook = {
   listedBook: ListedBookCore;
+  amountTradeable: number;
   meta: NftBookMeta;
 } & PurchasedBookCore;
 

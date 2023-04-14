@@ -243,7 +243,7 @@ const ActionableBookItem = ({
                   )}
                 {status !== "isCreated" &&
                   status !== "isOwned" &&
-                  status !== "isBought" && (
+                  status === "isBought" && (
                     <Stack>
                       <Typography variant="subtitle2">Amount:</Typography>
                       <Typography variant="label">{amount}</Typography>

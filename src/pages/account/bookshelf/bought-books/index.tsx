@@ -9,7 +9,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useOwnedNfts } from "@/components/hooks/web3";
+import { useOwnedPurchasedBooks } from "@/components/hooks/web3";
 import {
   LeaseButton,
   ReadButton,
@@ -36,10 +36,10 @@ const BoughtBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedNfts();
+  const { nfts } = useOwnedPurchasedBooks();
   const router = useRouter();
   const boughtBooks = nfts.data;
-  console.log(boughtBooks);
+  // console.log(nfts);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -104,8 +104,7 @@ const BoughtBooks = () => {
                             fileType={book?.meta.fileType}
                             author={book?.author}
                             onClick={handleBookClick}
-                            quantity={book?.quantity}
-                            amountOwned={book?.amountOwned}
+                            amount={book?.amount}
                             amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
