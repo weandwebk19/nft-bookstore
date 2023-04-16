@@ -1,12 +1,17 @@
-import { ChangeEvent } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
+  Alert,
+  AlertColor,
   Box,
+  FormHelperText,
   IconButton,
   InputAdornment,
   Link,
+  Snackbar,
   Stack,
   Typography
 } from "@mui/material";
@@ -23,10 +28,13 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/ContentContainer.module.scss";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import * as yup from "yup";
 
-import images from "@/assets/images";
+import withAuth from "@/components/HOC/withAuth";
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
@@ -35,96 +43,110 @@ import {
   InputController,
   TextAreaController
 } from "@/components/shared/FormController";
+import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { uploadImage } from "@/lib/cloudinary";
 import { StyledButton } from "@/styles/components/Button";
+import formatBytes from "@/utils/formatBytes";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAXIMUM_ATTACHMENTS_SIZE = 100000000;
-
-const schema = yup.object().shape({
-  pseudonym: yup.string().required("Please enter your pseudonym"),
-  about: yup.string(),
-  email: yup
-    .string()
-    .required("Please enter your email address")
-    .email("Please enter valid email address"),
-  phoneNumber: yup
-    .string()
-    .required("Please enter your phone number")
-    .matches(
-      /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
-      "Please enter valid phone number"
-    ),
-  website: yup.string(),
-  walletAddress: yup.string(),
-  facebook: yup.string(),
-  twitter: yup.string(),
-  linkedIn: yup.string(),
-  instagram: yup.string(),
-
-  frontDocument: yup
-    .mixed()
-    .required("File is required")
-    .test("required", "You need to provide a file", (file) => {
-      if (file && (file as any).length !== 0) return true;
-      return false;
-    })
-    .test("multipleFiles", "One file only can be provided.", (file) => {
-      return (file as any).length <= 1;
-    })
-    .test("fileSize", "The file is too large", (file) => {
-      let fileSize;
-      if ((file as any).length > 0) {
-        fileSize = (file as any).reduce((total: number, current: any) => {
-          return total + current.size;
-        }, 0);
-      }
-
-      console.log("file:", file);
-      console.log("fileSize:", fileSize);
-      console.log("MAXIMUM_ATTACHMENTS_SIZE:", MAXIMUM_ATTACHMENTS_SIZE);
-
-      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-    }),
-  backDocument: yup
-    .mixed()
-    .required("File is required")
-    .test("required", "You need to provide a file", (file) => {
-      if (file && (file as any).length !== 0) return true;
-      return false;
-    })
-    .test("multipleFiles", "One file only can be provided.", (file) => {
-      return (file as any).length <= 1;
-    })
-    .test("fileSize", "The file is too large", (file) => {
-      let fileSize;
-      if ((file as any).length > 0) {
-        fileSize = (file as any).reduce((total: number, current: any) => {
-          return total + current.size;
-        }, 0);
-      }
-
-      return file && fileSize <= MAXIMUM_ATTACHMENTS_SIZE;
-    })
-});
-
-type FormData = yup.InferType<typeof schema>;
+const SUPPORTED_FORMATS = [
+  "image/jpg",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/svg"
+];
 
 const defaultValues = {
   pseudonym: "",
   about: "",
   email: "",
+  phoneNumber: "",
   website: "",
-  walletAddress: "0x6d5f4vrRafverHKJ561692842xderyb",
+  walletAddress: "",
   facebook: "",
   twitter: "",
   linkedIn: "",
   instagram: "",
   frontDocument: "",
-  backDocument: ""
+  backDocument: "",
+  picture: ""
 };
 
-const Profile = () => {
-  const { ethereum, contract } = useWeb3();
+const AuthorRequest = () => {
+  const { t } = useTranslation("authorRequest");
+  const { account } = useAccount();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
+
+  const schema = yup.object().shape({
+    pseudonym: yup.string().required(t("textError1") as string),
+    about: yup.string(),
+    email: yup
+      .string()
+      .required(t("textError2") as string)
+      .email(t("textError3") as string),
+    phoneNumber: yup
+      .string()
+      .required(t("textError4") as string)
+      .matches(
+        /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
+        t("textError5") as string
+      ),
+    website: yup.string(),
+    walletAddress: yup.string(),
+    facebook: yup.string(),
+    twitter: yup.string(),
+    linkedIn: yup.string(),
+    instagram: yup.string(),
+    frontDocument: yup
+      .mixed()
+      .required(t("textError6") as string)
+      .test("required", t("textError7") as string, (file: any) => {
+        if (file) return true;
+        return false;
+      })
+      .test("fileSize", t("textError8") as string, (file: any) => {
+        return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+      })
+      .test("fileFormat", t("textError12") as string, (file: any) => {
+        return file && SUPPORTED_FORMATS.includes(file.type);
+      }),
+    backDocument: yup
+      .mixed()
+      .required(t("textError6") as string)
+      .test("required", t("textError7") as string, (file: any) => {
+        if (file) return true;
+        return false;
+      })
+      .test("fileSize", t("textError8") as string, (file: any) => {
+        return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+      })
+      .test("fileFormat", t("textError12") as string, (file: any) => {
+        return file && SUPPORTED_FORMATS.includes(file.type);
+      }),
+    picture: yup
+      .mixed()
+      .required(t("textError9") as string)
+      .test("required", t("textError10") as string, (file: any) => {
+        if (file) return true;
+        return false;
+      })
+      .test("fileSize", t("textError11") as string, (file: any) => {
+        return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+      })
+      .test("fileFormat", t("textError12") as string, (file: any) => {
+        return file && SUPPORTED_FORMATS.includes(file.type);
+      })
+  });
+
+  type FormData = yup.InferType<typeof schema>;
+
   const methods = useForm<FormData>({
     shouldUnregister: false,
     defaultValues,
@@ -134,57 +156,98 @@ const Profile = () => {
   const {
     handleSubmit,
     formState: { errors },
-    getValues
+    getValues,
+    setValue,
+    watch,
+    reset
   } = methods;
+  const watchPicture = watch("picture");
 
-  console.log("errors:", errors);
+  const handleRemoveImage = async () => {
+    setValue("picture", "");
+  };
 
-  const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("e.target.files:", e.target.files);
-    if (!e.target.files || e.target.files.length === 0) {
-      console.error("Select a file");
+  const handleCancel = async () => {
+    reset((formValues) => ({
+      ...defaultValues,
+      walletAddress: formValues.walletAddress
+    }));
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
       return;
     }
 
-    // const file = e.target.files[0];
-    // const buffer = await file.arrayBuffer();
-    // const bytes = new Uint8Array(buffer);
-    // console.log("click");
-  };
-
-  const getSignedData = async () => {
-    const messageToSign = await axios.get("/api/verify");
-    const accounts = (await ethereum?.request({
-      method: "eth_requestAccounts"
-    })) as string[];
-    const account = accounts[0];
-
-    const signedData = await ethereum?.request({
-      method: "personal_sign",
-      params: [
-        JSON.stringify(messageToSign.data),
-        account,
-        messageToSign.data.id
-      ]
-    });
-
-    return { signedData, account };
+    setOpen(false);
+    setMessage("");
   };
 
   const onSubmit = (data: any) => {
-    console.log("data:", data);
+    (async () => {
+      try {
+        setIsLoading(true);
+
+        const { frontDocument, backDocument, picture, ...authorInfo } = data;
+
+        const pictureLink = await uploadImage(picture);
+        const frontDocumentLink = await uploadImage(frontDocument);
+        const backDocumentLink = await uploadImage(backDocument);
+
+        const res = await axios.post("/api/authors/request", {
+          ...authorInfo,
+          frontDocument: {
+            secure_url: frontDocumentLink.secure_url,
+            public_id: frontDocumentLink.public_id
+          },
+          backDocument: {
+            secure_url: backDocumentLink.secure_url,
+            public_id: backDocumentLink.public_id
+          },
+          picture: {
+            secure_url: pictureLink.secure_url,
+            public_id: pictureLink.public_id
+          }
+        });
+
+        if (res.data.success) {
+          setMessage(t("messageSuccessCreated") as string);
+          setSeverity("success");
+          handleCancel();
+        } else {
+          setMessage(t("messageErrorCreated") as string);
+          setSeverity("error");
+        }
+        setIsLoading(false);
+        setOpen(true);
+      } catch (error) {
+        setMessage(t("messageErrorCreated") as string);
+        setSeverity("error");
+        setIsLoading(false);
+        setOpen(true);
+      }
+    })();
   };
+
+  useEffect(() => {
+    setValue("walletAddress", account.data);
+  }, [account.data]);
 
   return (
     <>
       <Head>
-        <title>Author request - NFT Bookstore</title>
+        <title>{t("titlePage") as string}</title>
         <meta name="description" content="The world's first NFT Bookstore" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer titles={["Make an", "Author request"]}>
+        <ContentContainer
+          titles={[t("titleContent1") as string, t("titleContent2") as string]}
+        >
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Box sx={{ my: 2 }}>
               <Typography
@@ -192,25 +255,25 @@ const Profile = () => {
                 className="form-label required"
                 sx={{ fontSize: "14px" }}
               >
-                Required
+                {t("required") as string}
               </Typography>
             </Box>
             <FormProvider {...methods}>
               <form>
                 <Stack spacing={6}>
                   <ContentGroup
-                    title="Upload your photo"
-                    desc="This field is optional, but we recommend that you upload your photo or logo to improve brand recognition and credibility with your readers."
+                    title={t("titleUpload") as string}
+                    classTitle="required"
                   >
                     <Stack
                       direction={{ xs: "column", sm: "column", md: "row" }}
                       spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
                       className={styles["profile__avatar"]}
                     >
-                      {!true ? (
+                      {!errors.picture && watchPicture ? (
                         <Box
                           component="img"
-                          src={images.product1}
+                          src={URL.createObjectURL(watchPicture as any)}
                           sx={{
                             width: "100%",
                             maxWidth: "400px",
@@ -223,7 +286,7 @@ const Profile = () => {
                       ) : (
                         <Avatar
                           alt="Remy Sharp"
-                          src=""
+                          src={""}
                           sx={{
                             display: "flex",
                             maxWidth: "400px",
@@ -235,48 +298,59 @@ const Profile = () => {
                           }}
                         />
                       )}
+
                       <Stack spacing={3} sx={{ justifyContent: "center" }}>
-                        <StyledButton customVariant="primary" component="label">
-                          Upload your photo
-                          <input
-                            type="file"
-                            hidden
-                            onChange={handleImage}
-                            accept="image/*"
-                            // accept="image/png, image/jpeg"
-                          />
+                        <StyledButton
+                          customVariant="primary"
+                          component={isLoading ? "button" : "label"}
+                          disabled={isLoading}
+                        >
+                          {t("uploadPhotoBtn") as string}
+                          <FileController name="picture" readOnly={isLoading} />
                         </StyledButton>
 
                         <StyledButton
                           customVariant="secondary"
-                          onClick={() => {}}
+                          onClick={handleRemoveImage}
+                          disabled={isLoading}
                         >
-                          Remove current
+                          {t("removeBtn") as string}
                         </StyledButton>
                       </Stack>
                     </Stack>
+                    {errors && errors.picture && (
+                      <FormHelperText
+                        error
+                        sx={{ marginTop: "24px", fontSize: "16px" }}
+                      >
+                        {errors?.picture?.message}
+                      </FormHelperText>
+                    )}
                   </ContentGroup>
-                  <ContentGroup title="Author information">
+                  <ContentGroup title={t("titleInfo") as string}>
                     <Stack direction="column" spacing={3}>
-                      <FormGroup label="Pseudonym" required>
-                        <InputController name="pseudonym" />
+                      <FormGroup label={t("pseudonym") as string} required>
+                        <InputController
+                          name="pseudonym"
+                          readOnly={isLoading}
+                        />
                       </FormGroup>
                       <FormGroup label="More about you">
-                        <TextAreaController name="about" />
+                        <TextAreaController name="about" readOnly={isLoading} />
                       </FormGroup>
                       <Stack
                         direction={{ xs: "column", md: "row" }}
                         spacing={{ xs: 2 }}
                       >
                         <FormGroup
-                          label="Email"
+                          label={t("email") as string}
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="email" />
+                          <InputController name="email" readOnly={isLoading} />
                         </FormGroup>
                         <FormGroup
-                          label="Phone number"
+                          label={t("phoneNumber") as string}
                           required
                           className={styles["form__group-half"]}
                         >
@@ -285,10 +359,11 @@ const Profile = () => {
                             onChange={(e) => {
                               e.target.value = e.target.value.trim();
                             }}
+                            readOnly={isLoading}
                           />
                         </FormGroup>
                       </Stack>
-                      <FormGroup label="ID Document" required>
+                      <FormGroup label={t("idDocument") as string} required>
                         <Stack
                           direction={{ xs: "column", md: "row" }}
                           spacing={{ xs: 3 }}
@@ -296,22 +371,28 @@ const Profile = () => {
                         >
                           <AttachmentController
                             name="frontDocument"
-                            desc="File types recommended: JPG, PNG, GIF, SVG. Max size: 100 MB"
+                            desc={`${
+                              t("descAttachment1") as string
+                            } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
+                            readOnly={isLoading}
                           />
                           <AttachmentController
                             name="backDocument"
-                            desc="File types recommended: JPG, PNG, GIF, SVG. Max size: 100 MB"
+                            desc={`${
+                              t("descAttachment1") as string
+                            } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
+                            readOnly={isLoading}
                           />
                         </Stack>
                       </FormGroup>
                     </Stack>
                   </ContentGroup>
-                  <ContentGroup title="Social link">
+                  <ContentGroup title={t("titleSocial") as string}>
                     <Stack direction="column" spacing={3}>
-                      <FormGroup label="Website">
-                        <InputController name="website" />
+                      <FormGroup label={t("website") as string}>
+                        <InputController name="website" readOnly={isLoading} />
                       </FormGroup>
-                      <FormGroup label="Wallet address">
+                      <FormGroup label={t("walletAddress") as string}>
                         <InputController
                           name="walletAddress"
                           InputProps={{
@@ -333,7 +414,7 @@ const Profile = () => {
                           }}
                         />
                       </FormGroup>
-                      <FormGroup label="Social media" />
+                      <FormGroup label={t("socialMedia") as string} />
                       <Stack
                         direction={{ xs: "column", md: "row" }}
                         spacing={{ xs: 2 }}
@@ -354,7 +435,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="facebook" />
+                          <InputController
+                            name="facebook"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -372,7 +456,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="twitter" />
+                          <InputController
+                            name="twitter"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                       </Stack>
                       <Stack
@@ -395,7 +482,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="linkedIn" />
+                          <InputController
+                            name="linkedIn"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -413,7 +503,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="instagram" />
+                          <InputController
+                            name="instagram"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                       </Stack>
                     </Stack>
@@ -431,39 +524,66 @@ const Profile = () => {
                   >
                     <StyledButton
                       customVariant="secondary"
-                      type="submit"
-                      onClick={() => {}}
+                      onClick={handleCancel}
+                      disabled={isLoading}
                     >
-                      Cancel
+                      {t("cancel") as string}
                     </StyledButton>
                     <StyledButton
                       customVariant="primary"
                       type="submit"
                       onClick={handleSubmit(onSubmit)}
+                      disabled={isLoading}
                     >
-                      Submit
+                      {t("submit") as string}
                     </StyledButton>
                   </Stack>
                   <Typography
                     sx={{ fontStyle: "italic", mt: "32px !important" }}
                   >
-                    By clicking{" "}
+                    {t("termsAndConditions1") as string}{" "}
                     <b>
-                      <i>Submit</i>
+                      <i>{t("termsAndConditions2") as string}</i>
                     </b>
-                    , you agree to our{" "}
-                    <Link href="/terms-of-service">Terms of Service</Link> and
-                    that you have read our{" "}
-                    <Link href="/term-of-service">Privacy Policy</Link>.
+                    , {t("termsAndConditions3") as string}{" "}
+                    <Link href="/terms-of-service">
+                      {t("termsAndConditions4") as string}
+                    </Link>{" "}
+                    {t("termsAndConditions5") as string}{" "}
+                    <Link href="/term-of-service">
+                      {t("termsAndConditions6") as string}
+                    </Link>
+                    {t("termsAndConditions7") as string}
                   </Typography>
                 </Stack>
               </form>
             </FormProvider>
+            <ToastContainer />
           </Box>
         </ContentContainer>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert
+            onClose={handleClose}
+            severity={severity as AlertColor}
+            sx={{ width: "100%" }}
+          >
+            {message}
+          </Alert>
+        </Snackbar>
       </main>
     </>
   );
 };
 
-export default Profile;
+export default withAuth(AuthorRequest);
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, [
+        ...namespaceDefaultLanguage(),
+        "authorRequest"
+      ]))
+    }
+  };
+}

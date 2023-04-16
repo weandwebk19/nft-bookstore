@@ -1,37 +1,40 @@
-/* eslint-disable prettier/prettier */
 import { FunctionComponent } from "react";
 
-import { Box, Grid, Stack } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 
 import { useListedBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
-import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
+import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
-import { BookList } from "@/components/shared/BookList";
+import { AddToWatchlistButton } from "@/components/shared/BookButton";
+import BuyButton from "@/components/shared/BookButton/BuyButton";
+import { OwnableBookItem } from "@/components/shared/BookItem";
+import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { Wrapper } from "@/components/shared/Wrapper";
-import { book, bookList } from "@/mocks";
-import {
-  BookGenres,
-  ListedBook,
-  NftBook,
-  NftBookAttribute,
-  NftBookDetails
-} from "@/types/nftBook";
+import { book } from "@/mocks";
 
 const DisplayBox: FunctionComponent = () => {
+  const { t } = useTranslation("publishingBooks");
+
   const router = useRouter();
 
   const { listedBooks } = useListedBooks();
 
-  // console.log("nftBooks: ", listedBooks);
-
   const handleBookClick = (tokenId: number | string) => {
-    router.push(`/publishing/${tokenId}`);
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        router.push(`/books/${bookId}`);
+      }
+    })();
   };
+
+  // should be replaced with the newest book that has been published
+  const firstBook = listedBooks?.data?.[0];
 
   return (
     <Box>
@@ -39,65 +42,82 @@ const DisplayBox: FunctionComponent = () => {
         <Grid item xs={4} sm={5} md={9}>
           <Stack spacing={3}>
             {/* Book Banner */}
-            <BookBanner
-              meta={book.meta}
-              details={book.details}
-              tokenId={book.tokenId}
-              author={book.author}
-              price={book.price}
-              onClick={() => {
-                alert(book.meta.title);
-              }}
-              balance={0}
-              seller={""}
-              amount={0}
-            />
+            {firstBook && (
+              <BookBanner
+                tokenId={firstBook?.tokenId}
+                title={firstBook?.meta.title}
+                author={firstBook?.seller}
+                bookCover={firstBook?.meta.bookCover}
+                fileType={firstBook?.meta.fileType}
+                //  description={firstBook?.info.description}
+                //  price={firstBook?.price}
+                //  genres={}
+                //  languages={}
+                onClick={() => {
+                  alert(book.meta.title);
+                }}
+              />
+            )}
 
-            <ContentPaper isPaginate={true} title={<>Publishing books</>}>
-              <Grid
-                container
-                spacing={3}
-                columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
-              >
-                {listedBooks.data?.map((book: ListedBook) => (
-                  <Grid item key={book.tokenId} xs={4} sm={4} md={3} lg={6}>
-                    <BookItem
-                      tokenId={book.tokenId}
-                      seller={book.seller}
-                      amount={book.amount}
-                      price={book.price}
-                      meta={book.meta}
-                      author=""
-                      balance={0}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
-                  </Grid>
-                ))}
-                {/* {bookList.map((book) => (
+            <ContentPaper isPaginate={true} title={t("publishingBooksTitle")}>
+              {(() => {
+                if (listedBooks.isLoading) {
+                  return (
+                    <Typography>{t("loadingMessage") as string}</Typography>
+                  );
+                } else if (
+                  listedBooks?.data?.length === 0 ||
+                  listedBooks.error
+                ) {
+                  return <FallbackNode />;
+                }
+                return (
                   <Grid
-                    item
-                    key={book.tokenId}
-                    xs={4}
-                    sm={4}
-                    md={3}
-                    lg={6}
+                    container
+                    spacing={3}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    <BookItem
-                      tokenId={book.tokenId}
-                      price={book.price}
-                      isListed={book.isListed}
-                      meta={book.meta}
-                      author={book.author}
-                      onClick={() => {
-                        handleBookClick(book.tokenId);
-                      }}
-                    />
+                    {listedBooks?.data?.map((book) => {
+                      return (
+                        <Grid
+                          item
+                          key={book.tokenId}
+                          xs={4}
+                          sm={8}
+                          md={6}
+                          lg={6}
+                        >
+                          <OwnableBookItem
+                            price={book?.price}
+                            tokenId={book?.tokenId}
+                            bookCover={book?.meta.bookCover}
+                            title={book?.meta.title}
+                            fileType={book?.meta.fileType}
+                            author={book?.seller}
+                            onClick={handleBookClick}
+                            buttons={
+                              <>
+                                <BuyButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  seller={book?.seller}
+                                  price={book?.price}
+                                  supplyAmount={book?.amount}
+                                />
+                                <AddToWatchlistButton
+                                  isLastInButtonGroup
+                                  tokenId={book?.tokenId}
+                                />
+                              </>
+                            }
+                          />
+                        </Grid>
+                      );
+                    })}
                   </Grid>
-                ))} */}
-              </Grid>
-              <BookList bookList={bookList} onClick={handleBookClick} />
+                );
+              })()}
             </ContentPaper>
           </Stack>
         </Grid>

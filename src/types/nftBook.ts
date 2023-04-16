@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export type PricingHistory = {
   highest: number;
   lowest: number;
@@ -31,25 +33,24 @@ export type NftBookAttribute = {
 };
 
 export type BookInfo = {
-  token_id: string;
-  contract_address?: string;
+  tokenId: number;
+  contractAddress?: string;
   description: string;
   languages: string[];
-  genres: (keyof typeof BookGenres)[];
-  version: number | string;
-  max_supply: number;
-  external_link?: string;
-  total_pages?: number;
+  genres: string[];
+  externalLink?: string;
+  totalPages?: number;
   keywords?: string;
-  publishing_time?: Date;
+  publishingTime?: Date;
 };
 
 export type NftBookDetails = {
   bookId: string;
-  registered: number;
-  openDate?: Date;
-  endDate?: Date;
-} & BookInfo;
+  nftCore: NftBookCore; // Data from smartcontract
+  listedCore?: ListedBookCore; // Data from smartcontract
+  meta: NftBookMeta; // Data from metadata
+  info: BookInfo; // Data from database
+};
 
 export type NftBookMeta = {
   title: string;
@@ -57,35 +58,108 @@ export type NftBookMeta = {
   bookCover: string;
   bookSample: string;
   fileType: string;
+  version: string;
+  author: string;
+  quantity: number;
+  createdAt: string;
 };
 
 export type NftBookCore = {
-  tokenId: number | string;
+  tokenId: number;
   author: string;
-  balance: number;
+  quantity: number;
 };
 
+export type NftBook = {
+  amountOwned?: number;
+  amountTradeable?: number;
+  meta: NftBookMeta;
+} & NftBookCore;
+
 export type ListedBookCore = {
-  tokenId: number | string;
+  tokenId: number;
   seller: string;
   price: number;
   amount: number;
 };
 
+export type PurchasedBookCore = {
+  listedId: number;
+  buyer: string;
+  amount: number;
+};
+
+export type LeaseBookCore = {
+  tokenId: number;
+  renter: string;
+  price: number;
+  amount: number;
+};
+
+export type BorrowedBookCore = {
+  tokenId: number;
+  renter: string;
+  borrower: string;
+  price: number;
+  amount: number;
+  startTime: number;
+  endTime: number;
+};
+
+export type BookSharingCore = {
+  tokenId: number;
+  fromRenter: string;
+  sharer: string;
+  sharedPer: string;
+  priceOfBB: number;
+  price: number; // price / books
+  amount: number;
+  startTime: number;
+  endTime: number;
+};
+
+export type SharedBookCore = {
+  tokenId: number;
+  fromRenter: string;
+  sharer: string;
+  sharedPer: string;
+  priceOfBB: number;
+  price: number;
+  amount: number;
+  startTime: number;
+  endTime: number;
+};
+
 export type ListedBook = {
   meta: NftBookMeta;
-  details?: NftBookDetails;
 } & ListedBookCore;
 
-export type NftBook = {
+export type PurchasedBook = {
+  listedBook: ListedBookCore;
+  amountTradeable: number;
   meta: NftBookMeta;
-  details?: NftBookDetails;
-} & NftBookCore;
+} & PurchasedBookCore;
+
+export type LeaseBook = {
+  meta: NftBookMeta;
+} & LeaseBookCore;
+
+export type BorrowedBook = {
+  meta: NftBookMeta;
+} & BorrowedBookCore;
+
+export type SharedBook = {
+  meta: NftBookMeta;
+} & SharedBookCore;
+
+export type BookSharing = {
+  meta: NftBookMeta;
+} & BookSharingCore;
 
 export type NftListedBook = {
   meta: NftBookMeta;
-  details?: NftBookDetails;
-} & ListedBookCore;
+} & ListedBookCore &
+  NftBookCore;
 
 export type PinataRes = {
   IpfsHash: string;

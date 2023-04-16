@@ -11,10 +11,15 @@ const images = {
   product2: require("@/assets/images/product2.jpg").default.src,
   product3: require("@/assets/images/product3.jpg").default.src,
   gradient1: require("@/assets/images/gradient1.jpg").default.src,
+  gradient2: require("@/assets/images/vv13.jpg").default.src,
+  gradient3: require("@/assets/images/vv19.jpg").default.src,
+  gradient4: require("@/assets/images/vv29.jpg").default.src,
+  gradient5: require("@/assets/images/vv39.jpg").default.src,
+  gradient6: require("@/assets/images/vv40.jpg").default.src,
+  gradient7: require("@/assets/images/vv44.jpg").default.src,
+  gradient8: require("@/assets/images/vv50.jpg").default.src,
   loading: require("@/assets/images/loading.gif").default.src,
   genre2: require("@/assets/images/genre2.svg").default.src,
-  artPhotography: require("@/assets/images/book-genres/art-photography.svg")
-    .default.src,
   heroImg: require("@/assets/images/hero-img.jpg").default.src
 };
 

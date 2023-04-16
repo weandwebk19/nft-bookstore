@@ -1,15 +1,25 @@
+import { useEffect } from "react";
+
 import { Box, Stack } from "@mui/material";
 
 import DisplayBox from "@ui/Home/DisplayBox";
 import Hero from "@ui/Home/Hero";
 import MainProduct from "@ui/Home/MainProduct";
+import { CldImage } from "next-cloudinary";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
-import images from "@/assets/images";
+import { StyledButton } from "@/styles/components/Button";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 export default function Home() {
+  const router = useRouter();
+
+  const imageCloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
   return (
-    <Box>
+    <>
       <Head>
         <title>NFT Bookstore</title>
         <meta name="description" content="The world's first NFT Bookstore" />
@@ -49,8 +59,63 @@ export default function Home() {
           {/* <Box component="section">
             <DisplayBox />
           </Box> */}
+
+          {/* Become an author */}
+          <Box component="section" sx={{ height: "30vh" }}>
+            <Box
+              className="thumbnail"
+              sx={{
+                height: "inherit",
+                position: "absolute",
+                left: 0,
+                width: "100vw",
+                overflow: "hidden",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              {/* <Box
+                component="img"
+                src={images.gradient1}
+                alt=""
+                className="portrait"
+              /> */}
+              <CldImage
+                src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628696/nft_bookstore/img/gradient1_osuxrc.jpg`}
+                alt="gradient"
+                fill
+                style={{
+                  width: "100%",
+                  left: "50%",
+                  top: "50%",
+                  objectFit: "cover"
+                }}
+                className="portrait"
+              />
+              <StyledButton
+                onClick={() => {
+                  router.push("/author/request");
+                }}
+              >
+                Become an author
+              </StyledButton>
+            </Box>
+          </Box>
         </Stack>
       </main>
-    </Box>
+    </>
   );
+}
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, [
+        ...namespaceDefaultLanguage(),
+        "home"
+      ]))
+      // Will be passed to the page component as props
+    }
+  };
 }

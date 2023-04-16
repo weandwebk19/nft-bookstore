@@ -1,4 +1,5 @@
 import {
+  Box,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -8,16 +9,22 @@ import {
 import { useTheme } from "@mui/material/styles";
 
 import { StyledCard } from "@styles/components/Card";
+import { CldImage } from "next-cloudinary";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { ContentContainer } from "@/components/shared/ContentContainer";
+import { Image } from "@/components/shared/Image";
 
 const MainProduct = () => {
+  const { t } = useTranslation("home");
+  const imageCloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
   const router = useRouter();
 
   return (
-    <ContentContainer titles={["Our products"]}>
+    <ContentContainer titles={[t("titleProducts") as string]}>
       <Grid
         container
         direction="row"
@@ -31,60 +38,109 @@ const MainProduct = () => {
             }}
           >
             <CardMedia
-              component="img"
-              height="300"
-              image={images.product1}
-              alt="green iguana"
-            />
-            <CardContent sx={{ height: 215 }}>
+              sx={{
+                height: "300px"
+              }}
+            >
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "100%",
+                  position: "relative"
+                }}
+              >
+                <CldImage
+                  src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628695/nft_bookstore/img/product1_ixtr9a.jpg`}
+                  alt="publishing"
+                  fill
+                  style={{
+                    objectFit: "cover"
+                  }}
+                />
+              </Box>
+            </CardMedia>
+            <CardContent sx={{ minHeight: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
-                Publishing
+                {t("publishing") as string}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Millions of readers are eagerly anticipating your books right
-                now. What exactly are you waiting for? Join NFT Bookstore today
-                and start connecting with readers all over the world. Let&apos;s
-                get your books published.
+                {t("infoPublishing") as string}
               </Typography>
             </CardContent>
           </CardActionArea>
         </StyledCard>
         <StyledCard customVariant="invertedDome" sx={{ m: 2 }}>
-          <CardActionArea>
-            <CardContent sx={{ height: 215 }}>
+          <CardActionArea
+            onClick={() => {
+              router.push("/share");
+            }}
+          >
+            <CardContent sx={{ minHeight: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
-                Trade-in
+                {t("share") as string}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Increase your knowledge by reading books and earn money by
-                participating in the NFT Bookstore market. Do you want to learn
-                more? Join NFT Bookstore right now!
+                {t("infoShare") as string}
               </Typography>
             </CardContent>
             <CardMedia
-              component="img"
-              height="300"
-              image={images.product2}
-              alt="green iguana"
-            />
+              sx={{
+                height: "300px"
+              }}
+            >
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "100%",
+                  position: "relative"
+                }}
+              >
+                <CldImage
+                  src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628696/nft_bookstore/img/product2_yfv14w.jpg`}
+                  alt="share"
+                  fill
+                  style={{
+                    objectFit: "cover"
+                  }}
+                />
+              </Box>
+            </CardMedia>
           </CardActionArea>
         </StyledCard>
         <StyledCard customVariant="dome" sx={{ m: 2 }}>
-          <CardActionArea>
+          <CardActionArea
+            onClick={() => {
+              router.push("/borrow");
+            }}
+          >
             <CardMedia
-              component="img"
-              height="300"
-              image={images.product3}
-              alt="green iguana"
-            />
+              sx={{
+                height: "300px"
+              }}
+            >
+              <Box
+                sx={{
+                  height: "100%",
+                  width: "100%",
+                  position: "relative"
+                }}
+              >
+                <CldImage
+                  src={`https://res.cloudinary.com/${imageCloud}/image/upload/v1678628696/nft_bookstore/img/product3_e05rs7.jpg`}
+                  alt="borrow"
+                  fill
+                  style={{
+                    objectFit: "cover"
+                  }}
+                />
+              </Box>
+            </CardMedia>
             <CardContent sx={{ height: 215 }}>
               <Typography gutterBottom variant="h5" component="div">
-                Borrow
+                {t("borrow") as string}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Do you want to read your favorite books for just one cent? Join
-                us and take advantage of this fantastic opportunity available
-                only through NFT Bookstore!
+                {t("infoBorrow") as string}
               </Typography>
             </CardContent>
           </CardActionArea>

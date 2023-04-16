@@ -6,11 +6,13 @@ type AttachmentControllerProps = {
   name: string;
   multiple?: any;
   desc?: string;
+  readOnly?: boolean;
 };
 
 const AttachmentController = ({
   multiple = false,
   desc,
+  readOnly = false,
   ...rest
 }: AttachmentControllerProps) => {
   const { control } = useFormContext();
@@ -31,6 +33,7 @@ const AttachmentController = ({
             uploaded={value}
             multiple={multiple}
             desc={desc}
+            disabled={readOnly}
           />
         </>
       )}

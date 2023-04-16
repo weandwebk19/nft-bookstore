@@ -1,13 +1,14 @@
 import { useEffect } from "react";
 
 import { CryptoHookFactory } from "@_types/hooks";
+import axios from "axios";
 import useSWR from "swr";
 
 type UseAccountResponse = {
   connect: () => void;
   isLoading: boolean;
   isInstalled: boolean;
-  disconnect: () => void;
+  switchAccount: () => void;
 };
 
 type AccountHookFactory = CryptoHookFactory<string, UseAccountResponse>;
@@ -44,6 +45,7 @@ export const hookFactory: AccountHookFactory =
 
     const handleAccountsChanged = (...args: unknown[]) => {
       const accounts = args[0] as string[];
+
       if (accounts.length === 0) {
         console.error("Please, connect to Web3 wallet");
       } else if (accounts[0] !== data) {
@@ -59,7 +61,7 @@ export const hookFactory: AccountHookFactory =
       }
     };
 
-    const disconnect = async () => {
+    const switchAccount = async () => {
       try {
         ethereum?.request({
           method: "wallet_requestPermissions",
@@ -82,6 +84,6 @@ export const hookFactory: AccountHookFactory =
       isInstalled: ethereum?.isMetaMask || false,
       mutate,
       connect,
-      disconnect
+      switchAccount
     };
   };

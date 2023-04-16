@@ -1,0 +1,22 @@
+{
+  "titlePage": "Kệ sách - NFT Bookstore",
+  "containerTitle": "Kệ sách của tôi",
+  "createdBooks": "Sách đã tạo",
+  "createdBooksDesc": "Gồm những quyển sách đã được viết ra và tải lên bởi chính bạn.",
+  "boughtBooks": "Sách đã mua",
+  "boughtBooksDesc": "Quản lý những quyển sách đã tạo hoặc mua của người khác.",
+  "ownedBooks": "Sách đang sở hữu",
+  "ownedBooksDesc": "Đọc tất cả những quyển sách đã tạo, đã mua, đang thuê hay đang được chia sẻ với bạn đều ỏ đây.",
+  "borrowedBooks": "Sách đang thuê",
+  "borrowedBooksDesc": "Theo dõi những quyển sách bạn đã mượn từ người khác và hạn trả lại.",
+  "sharedBooks": "Sách đã chia sẻ",
+  "sharingBooksDesc": "Những quyển sách bạn đã chia sẻ với người có cùng sở thích.",
+  "recallBooks": "Sách trả lại",
+  "sharingBooks": "Sách đang chia sẻ",
+  "leasingBooksDesc": "Theo dõi thời hạn của những cuốn sách mà bạn đã cho người khác thuê.",
+  "leasingBooks": "Sách đang cho thuê",
+  "listingBooksDesc": "Theo dõi sách bán của bạn, trao đổi những tác phẩm kỹ thuật số để nhận lại tiền điện tử.",
+  "listingBooks": "Sách đang bán",
+  "punchline1": "Đọc, đọc nữa đọc mãi",
+  "punchline2": "Theo dõi sách đang bán/cho thuê"
+}

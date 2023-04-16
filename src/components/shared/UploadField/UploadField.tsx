@@ -19,11 +19,13 @@ import formatBytes from "@/utils/formatBytes";
 interface UploadFieldProps {
   onChange: any;
   onBlur: any;
-  uploaded?: File[];
+  // uploaded?: File[] | File;
+  uploaded?: any;
   multiple?: boolean;
   error?: boolean;
   helperText?: string;
   desc?: string;
+  disabled?: boolean;
 }
 
 const UploadField = ({
@@ -33,12 +35,23 @@ const UploadField = ({
   error,
   uploaded,
   helperText,
-  desc
+  desc,
+  disabled = false
 }: UploadFieldProps) => {
   const theme = useTheme();
 
   return (
-    <Dropzone multiple={multiple} onDrop={onChange}>
+    <Dropzone
+      multiple={multiple}
+      onDrop={(acceptedFiles: File[]) => {
+        if (multiple) {
+          onChange(acceptedFiles);
+        } else {
+          onChange(acceptedFiles[0]);
+        }
+      }}
+      disabled={disabled}
+    >
       {({ getRootProps, getInputProps, isDragActive }) => (
         <Box
           {...getRootProps()}
@@ -56,11 +69,15 @@ const UploadField = ({
             height: "100%",
             overflow: "hidden",
             p: 2,
-            cursor: "pointer"
+            cursor: disabled ? "default" : "pointer"
           }}
         >
           <Stack
-            sx={{ flexGrow: 1, justifyContent: "center", alignItems: "center" }}
+            sx={{
+              flexGrow: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
           >
             <CloudUpload />
             <input {...getInputProps()} onBlur={onBlur} />
@@ -74,7 +91,7 @@ const UploadField = ({
             )}
           </Stack>
 
-          {!error && Number(uploaded?.length) > 0 && (
+          {!error && multiple && Number(uploaded?.length) > 0 && (
             <List sx={{ width: "100%" }}>
               {uploaded?.map((f: any, index: number) => (
                 <ListItem key={index}>
@@ -84,9 +101,24 @@ const UploadField = ({
                   <ListItemText
                     primary={f.name}
                     secondary={formatBytes(f.size)}
+                    className="text-limit text-limit--1"
                   />
                 </ListItem>
               ))}
+            </List>
+          )}
+
+          {!error && !multiple && uploaded && (
+            <List sx={{ width: "100%" }}>
+              <ListItem>
+                <ListItemIcon>
+                  <InsertDriveFile />
+                </ListItemIcon>
+                <ListItemText
+                  primary={uploaded?.name}
+                  secondary={formatBytes(uploaded?.size)}
+                />
+              </ListItem>
             </List>
           )}
 

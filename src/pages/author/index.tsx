@@ -1,8 +1,11 @@
 import { Box, Stack } from "@mui/material";
 
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
+import withAuth from "@/components/HOC/withAuth";
 import DisplayBox from "@/components/ui/publishing/DisplayBox";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const Author = () => {
   return (
@@ -15,7 +18,7 @@ const Author = () => {
       </Head>
       <main>
         <Stack spacing={8}>
-          <Box component="section" sx={{ marginTop: "100px" }}>
+          <Box component="section">
             <DisplayBox />
           </Box>
         </Stack>
@@ -24,4 +27,12 @@ const Author = () => {
   );
 };
 
-export default Author;
+export default withAuth(Author);
+
+export async function getStaticProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, [...namespaceDefaultLanguage()]))
+    }
+  };
+}

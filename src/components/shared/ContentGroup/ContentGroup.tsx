@@ -6,13 +6,23 @@ interface ContentGroupProps {
   title: React.ReactNode | string;
   desc?: string;
   children: React.ReactNode;
+  classTitle?: string;
 }
 
-const ContentGroup = ({ title, desc, children }: ContentGroupProps) => {
+const ContentGroup = ({
+  title,
+  desc,
+  children,
+  classTitle
+}: ContentGroupProps) => {
   return (
     <Box>
       <Box className={styles["content__group"]}>
-        <Typography variant="h5" gutterBottom>
+        <Typography
+          variant="h5"
+          gutterBottom
+          className={`${classTitle ? classTitle : ""}`}
+        >
           {title}
         </Typography>
         {desc && (

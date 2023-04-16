@@ -1,0 +1,22 @@
+{
+  "titlePage": "Danh sách theo dõi - NFT Bookstore",
+  "containerTitle": "Danh sách theo dõi của tôi",
+  "button_cancel": "Hủy",
+  "button_delete": "Xóa",
+  "tooltip_delete": "Xóa",
+  "dialogTitle": "Xóa khỏi Danh sách theo dõi",
+  "message": "Bạn có chắc rằng muốn xóa quyển sách này khỏi Danh sách theo dõi",
+  "filter": "Lọc theo",
+  "all": "Tất cả",
+  "justPublished": "Vừa xuất bản",
+  "waitingForOpen": "Chờ mở",
+  "leasings": "Có thể thuê",
+  "listings": "Có thể mua",
+  "frozen": "Đóng băng",
+  "id": "ID",
+  "bookCover": "Bìa sách",
+  "title": "Tựa sách",
+  "price": "Giá (ETH)",
+  "status": "Trạng thái",
+  "action": "Hành động"
+}

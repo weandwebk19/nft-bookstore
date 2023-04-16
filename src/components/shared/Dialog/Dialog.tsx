@@ -1,9 +1,11 @@
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Paper, Typography } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
 
 import { StyledDialog, StyledDialogTitle } from "@styles/components/Dialog";
 import PropTypes from "prop-types";
+
+import { Loading } from "../Loading";
 
 interface DialogProps {
   title?: string;

@@ -28,6 +28,8 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+/env
+.env.development
 
 # vercel
 .vercel
@@ -39,5 +41,13 @@ next-env.d.ts
 # history
 .history
 
+.vscode/
+
 # dependencies
 public/contracts/
+
+.vscode/
+.env.development
+.env.development
+
+yarn.lock

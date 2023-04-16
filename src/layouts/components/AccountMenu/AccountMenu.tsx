@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  Chip,
   Divider,
   Grid,
   IconButton,
@@ -21,72 +22,115 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
+import SwitchAccountOutlinedIcon from "@mui/icons-material/SwitchAccountOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import { Dialog } from "@shared/Dialog";
 import { StyledButton } from "@styles/components/Button";
+import { signOut } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 
+import images from "@/assets/images";
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
+import { StyledChip } from "@/styles/components/Chip";
 import { truncate } from "@/utils/truncate";
 
 interface AccountMenuProps {
   account?: string;
   open: boolean;
   onClose(...args: unknown[]): unknown;
+  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
+  isAuthor: boolean;
 }
 
 const AccountMenu = ({
   account,
   open,
   onClose,
-  disconnect
+  switchAccount,
+  disconnect,
+  isAuthor
 }: AccountMenuProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const accountItems = [
     {
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
-      content: "My Profile",
+      content: t("navbar:my_profile") as string,
       onClick: () => {
         router.push("/account/profile");
       }
     },
-    {
-      icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
-      content: "Favorites",
-      onClick: () => {
-        console.log("Favorites");
-      }
-    },
+    // {
+    //   icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
+    //   content: t("navbar:favorites") as string,
+    //   onClick: () => {
+    //     router.push("/account/favorites");
+    //   }
+    // },
     {
       icon: <VisibilityOutlinedIcon color="primary" fontSize="small" />,
-      content: "Watchlist",
+      content: t("navbar:watchlist") as string,
       onClick: () => {
-        console.log("Watchlist");
+        router.push("/account/watchlist");
       }
     },
     {
       icon: (
         <CollectionsBookmarkOutlinedIcon color="primary" fontSize="small" />
       ),
-      content: "My Bookshelf",
+      content: t("navbar:my_bookshelf") as string,
       onClick: () => {
         router.push("/account/bookshelf");
       }
     },
     {
+      icon: <SwitchAccountOutlinedIcon color="primary" fontSize="small" />,
+      content: t("navbar:switchAccount") as string,
+      onClick: () => {
+        switchAccount();
+      }
+    },
+    {
       icon: <LogoutOutlinedIcon color="primary" fontSize="small" />,
-      content: "Disconnect",
+      content: t("navbar:disconnect") as string,
       onClick: () => {
         disconnect();
+        signOut({ redirect: false });
       }
     }
   ];
 
   return (
-    <Dialog title="Account" open={open} onClose={onClose}>
+    <Dialog
+      title={t("navbar:title_account") as string}
+      open={open}
+      onClose={onClose}
+    >
+      <Stack direction="row" sx={{ mb: 3 }} spacing={3}>
+        {isAuthor ? (
+          <StyledChip
+            label={t("navbar:authorAccount")}
+            background={images.gradient1}
+          />
+        ) : (
+          <Stack direction="row" spacing={3}>
+            <Chip label={t("navbar:readerAccount")} />
+            <StyledButton
+              size="small"
+              onClick={() => {
+                router.push("/author/request");
+              }}
+            >
+              {t("navbar:becomeAnAuthor")}
+            </StyledButton>
+          </Stack>
+        )}
+      </Stack>
       <Grid container spacing={3} columns={{ xs: 4, sm: 4, md: 12 }}>
         <Grid item xs={4} md={6}>
           <Stack
@@ -112,7 +156,7 @@ const AccountMenu = ({
               >
                 <Avatar
                   alt="Tho Le"
-                  src="TL"
+                  src=""
                   sx={{
                     width: 56,
                     height: 56,
@@ -138,7 +182,7 @@ const AccountMenu = ({
                 >
                   <Avatar
                     alt="Tho Le"
-                    src="TL"
+                    src=""
                     sx={{
                       width: 56,
                       height: 56,

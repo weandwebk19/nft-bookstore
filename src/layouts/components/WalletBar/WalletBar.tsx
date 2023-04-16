@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Avatar,
-  Badge,
   Box,
   Chip,
   IconButton,
@@ -14,12 +13,17 @@ import {
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 
+// import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { List as CustomList } from "@shared/List";
 import { StyledButton } from "@styles/components/Button";
+import { getCsrfToken } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
 
+import images from "@/assets/images";
+import { StyledChip } from "@/styles/components/Chip";
 import { ListItemProps } from "@/types/list";
 import { truncate } from "@/utils/truncate";
 
@@ -30,7 +34,11 @@ interface WalletBarProps {
   isLoading: boolean;
   account?: string;
   connect(...args: unknown[]): unknown;
+  handleLogin: () => Promise<void>;
+  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
+  isConnected: boolean;
+  isAuthor: boolean;
 }
 
 const WalletBar = ({
@@ -38,8 +46,16 @@ const WalletBar = ({
   isLoading,
   connect,
   account,
-  disconnect
+  handleLogin,
+  switchAccount,
+  disconnect,
+  isConnected,
+  isAuthor
 }: WalletBarProps) => {
+  const { t } = useTranslation();
+  const { data, status } = useSession();
+  const [address, setAddress] = useState(data?.address as string);
+
   const createList: ListItemProps[] = [
     {
       type: "button",
@@ -93,10 +109,22 @@ const WalletBar = ({
     alert("Create Rental");
   };
 
+  useEffect(() => {
+    if (account) {
+      setAddress(account);
+    }
+  }, [account]);
+
+  useEffect(() => {
+    if (data?.address) {
+      setAddress(data.address);
+    }
+  }, [data]);
+
   if (isLoading)
     return <StyledButton customVariant="secondary">Loading...</StyledButton>;
 
-  if (account)
+  if (data)
     return (
       <Stack direction="row" alignItems="center" sx={{ flexGrow: 0 }}>
         <Stack
@@ -104,12 +132,20 @@ const WalletBar = ({
           alignItems="center"
           sx={{ display: { xs: "none", md: "flex" } }}
         >
-          <Chip
-            avatar={<AdjustIcon />}
-            label={truncate(account, 6, -4)}
-            variant="outlined"
-          />
-          <Tooltip title="Account menu">
+          {isAuthor ? (
+            <StyledChip
+              avatar={<AdjustIcon color="primary" />}
+              label={truncate(account ? account : "", 6, -4)}
+              background={images.gradient1}
+            />
+          ) : (
+            <Chip
+              avatar={<AdjustIcon />}
+              label={truncate(account ? account : "", 6, -4)}
+              variant="outlined"
+            />
+          )}
+          <Tooltip title={t("navbar:toolTip_accountMenu")}>
             <IconButton onClick={handleAccountMenuClick}>
               <Avatar alt="Remy Sharp" src="" />
             </IconButton>
@@ -119,9 +155,16 @@ const WalletBar = ({
           account={account}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
+          switchAccount={() => {
+            switchAccount();
+          }}
           disconnect={() => {
             disconnect();
+            signOut({
+              redirect: false
+            });
           }}
+          isAuthor={isAuthor}
         />
         <Box
           sx={{
@@ -181,13 +224,13 @@ const WalletBar = ({
             <CustomList items={createList} />
           </Menu>
         </Box>
-        <Tooltip title="Shopping bag">
+        {/* <Tooltip title={t("navbar:toolTip_shoppingBag")}>
           <IconButton>
             <Badge badgeContent={3} color="secondary">
               <ShoppingBagOutlinedIcon color="primary" />
             </Badge>
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
       </Stack>
     );
 
@@ -197,7 +240,11 @@ const WalletBar = ({
         <StyledButton
           customVariant="primary"
           onClick={() => {
-            connect();
+            if (!isConnected) {
+              connect();
+            } else {
+              handleLogin();
+            }
           }}
           sx={{
             display: {
@@ -206,11 +253,15 @@ const WalletBar = ({
             }
           }}
         >
-          Connect wallet
+          {t("navbar:connectWallet")}
         </StyledButton>
         <IconButton
           onClick={() => {
-            connect();
+            if (!isConnected) {
+              connect();
+            } else {
+              handleLogin();
+            }
           }}
           sx={{
             display: {
@@ -250,3 +301,11 @@ WalletBar.defaultProps = {
 };
 
 export default WalletBar;
+
+export async function getServerSideProps(context: any) {
+  return {
+    props: {
+      csrfToken: await getCsrfToken(context)
+    }
+  };
+}

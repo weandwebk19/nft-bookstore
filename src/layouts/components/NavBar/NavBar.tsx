@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import {
   Avatar,
@@ -19,16 +20,29 @@ import LanguageIcon from "@mui/icons-material/Language";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 
+// import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { ListItemProps } from "@_types/list";
 import { Drawer } from "@shared/Drawer";
 import { List as CustomList } from "@shared/List";
 import { StyledAppBar } from "@styles/components/AppBar";
-import { StyledButton } from "@styles/components/Button";
+import axios from "axios";
 import { motion } from "framer-motion";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+import { SiweMessage } from "siwe";
+import {
+  useConnect,
+  useDisconnect,
+  useNetwork,
+  useSignMessage,
+  useAccount as useWagmiAccount
+} from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
+import { useLocalStorage } from "@/components/hooks/common";
 import { useAccount } from "@/components/hooks/web3";
 import { ActiveLink } from "@/components/shared/ActiveLink";
 import { DropdownMenu } from "@/components/shared/DropdownMenu";
@@ -69,17 +83,110 @@ interface SyntheticEvent {
 }
 
 const NavBar = () => {
+  const { t } = useTranslation();
+  const router = useRouter();
+
+  const { disconnect } = useDisconnect();
+  // const { disconnect: switchAccount } = useAccount();
+
+  const { data: session, status } = useSession();
+
+  const { signMessageAsync } = useSignMessage();
+
+  const { chain } = useNetwork();
+  const { connect: wagmiConnect } = useConnect({
+    connector: new InjectedConnector()
+  });
+  const { address: wagmiAddress, isConnected } = useWagmiAccount();
+  const [address, setAddress] = useState(wagmiAddress as string);
+
+  useEffect(() => {
+    if (wagmiAddress) {
+      setAddress(wagmiAddress);
+    }
+  }, [wagmiAddress]);
+
+  const handleLogin = async () => {
+    try {
+      const callbackUrl =
+        (router.query?.callbackUrl as string) ?? router.pathname ?? "/";
+
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: wagmiAddress,
+        statement: "Sign in with Ethereum to NFT Bookstore.",
+        uri: window.location.origin,
+        version: "1",
+        chainId: chain?.id,
+        nonce: await getCsrfToken()
+      });
+
+      const signature = await signMessageAsync({
+        message: message.prepareMessage()
+      });
+
+      const result = await signIn("credentials", {
+        message: JSON.stringify(message),
+        redirect: false,
+        signature,
+        callbackUrl
+      });
+
+      if (result?.error) {
+        console.error(result.error);
+      } else {
+        router.push(callbackUrl);
+      }
+      //create new account
+      await axios
+        .post("/api/users/create", {
+          wallet_address: wagmiAddress?.toLowerCase(),
+          fullname: "Anonymous"
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    } catch (error) {
+      // window.alert(error);
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (isConnected && !session) {
+      handleLogin();
+    }
+  }, [isConnected, wagmiAddress]);
+
   const [clientTheme, setClientTheme] = useMyTheme();
+  const [clientLocale, setClientLocale] = useLocalStorage("locale", "en");
 
   const setStoredTheme = useSetMyThemeContext();
 
-  const router = useRouter();
+  const { pathname, asPath, query } = router;
   const { account } = useAccount();
-  const [address, setAddress] = useState("");
+  const { data: userInfo } = useUserInfo();
+
+  const [isAuthor, setIsAuthor] = useState<boolean>(
+    Boolean(userInfo?.isAuthor)
+  );
 
   useEffect(() => {
-    account.data && setAddress(truncate(account.data, 6, -4));
-  }, [account]);
+    if (userInfo?.isAuthor !== undefined) {
+      setIsAuthor(userInfo?.isAuthor);
+      console.log(userInfo?.isAuthor);
+    } else {
+      setIsAuthor(false);
+    }
+  }, [userInfo?.isAuthor]);
+
+  // useEffect(() => {
+  //   account.data && setAddress(truncate(account.data, 6, -4));
+  // }, [account]);
+
+  // useEffect(() => {
+  //   wagmiAddress && setAddress(truncate(wagmiAddress, 6, -4));
+  // }, [wagmiAddress]);
 
   const [anchorAccountMenu, setAnchorAccountMenu] = useState<Element | null>(
     null
@@ -92,7 +199,7 @@ const NavBar = () => {
   const openSettingsMenu = Boolean(anchorSettingsMenu);
 
   const [openLanguage, setOpenLanguage] = useState({
-    currentState: "English",
+    currentState: clientLocale,
     isOpen: true
   });
 
@@ -104,25 +211,28 @@ const NavBar = () => {
   const [anchorNavMenu, setAnchorNavMenu] = useState<Element | null>(null);
   const openNavMenu = Boolean(anchorNavMenu);
 
-  const handleHomeClick = () => {
+  const handleHomeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/");
   };
 
-  const handleAboutClick = () => {
+  const handleAboutClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/about");
   };
 
-  const handleContactClick = () => {
+  const handleContactClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     router.push("/contact");
   };
 
   const handleNavMenuItemClick = (key: string) => {
     switch (key) {
       case "About Us":
-        handleAboutClick();
+        (e: React.MouseEvent<HTMLButtonElement>) => handleAboutClick(e);
         break;
       case "Contact":
-        handleContactClick();
+        (e: React.MouseEvent<HTMLButtonElement>) => handleContactClick(e);
         break;
       default:
         setAnchorNavMenu(null);
@@ -157,19 +267,25 @@ const NavBar = () => {
   };
 
   const handleLanguageClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const locale = e.currentTarget.innerText.slice(0, 2).toLowerCase();
+    setClientLocale(locale);
     setOpenLanguage({
       ...openLanguage,
-      currentState: e.currentTarget.innerText.slice(3)
+      currentState: locale
+    });
+
+    router.push({ pathname, query }, asPath, {
+      locale
     });
   };
 
-  const handleModeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const currentTheme = e.currentTarget.innerText;
+  const handleModeClick = (e: React.SyntheticEvent<HTMLButtonElement>) => {
+    const currentTheme = e.currentTarget.dataset.value;
     setOpenMode({
       ...openMode,
       currentState: currentTheme
     });
-    setStoredTheme(currentTheme.toLowerCase());
+    setStoredTheme(currentTheme!.toLowerCase());
   };
 
   const handlePublishABookClick = () => {
@@ -177,19 +293,19 @@ const NavBar = () => {
   };
 
   const handleCreateListingClick = () => {
-    alert("Create Listing");
+    router.push("/account/bookshelf/owned-books");
   };
 
   const handleCreateRentalClick = () => {
-    alert("Create Rental");
+    router.push("/rental/create");
   };
 
   const handlePublishingClick = () => {
     router.push("/publishing");
   };
 
-  const handleTradeInClick = () => {
-    router.push("/trade-in");
+  const handleShareClick = () => {
+    router.push("/share");
   };
 
   const handleBorrowClick = () => {
@@ -200,7 +316,7 @@ const NavBar = () => {
     {
       type: "button",
       icon: <HelpOutlineOutlinedIcon color="primary" />,
-      content: "Guide",
+      content: t("navbar:guide") as string,
       onClick: () => {
         console.log("Guide");
       },
@@ -216,12 +332,13 @@ const NavBar = () => {
       type: "dropdown",
       isOpen: openSettingsMenu,
       icon: <Brightness4Icon color="primary" />,
-      content: "Mode",
+      content: t("navbar:mode") as string,
       subList: [
         {
           type: "button",
           icon: <LightModeOutlinedIcon color="primary" />,
-          content: "Light",
+          content: t("navbar:light") as string,
+          value: "light",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
           },
@@ -231,7 +348,8 @@ const NavBar = () => {
         {
           type: "button",
           icon: <DarkModeOutlinedIcon color="primary" />,
-          content: "Dark",
+          content: t("navbar:dark") as string,
+          value: "dark",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleModeClick(e);
           },
@@ -243,12 +361,13 @@ const NavBar = () => {
     {
       type: "dropdown",
       icon: <LanguageIcon color="primary" />,
-      content: "Language",
+      content: t("navbar:language") as string,
       subList: [
         {
           type: "button",
           icon: "EN",
           content: "English",
+          value: "en",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleLanguageClick(e);
           },
@@ -259,6 +378,7 @@ const NavBar = () => {
           type: "button",
           icon: "VI",
           content: "Tiếng Việt",
+          value: "vi",
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleLanguageClick(e);
           },
@@ -270,8 +390,8 @@ const NavBar = () => {
   ];
 
   const pages = [
-    { name: "About Us", href: "/about", current: false },
-    { name: "Contact", href: "/contact", current: false }
+    { name: t("navbar:about"), href: "/about", current: false },
+    { name: t("navbar:contact"), href: "/contact", current: false }
   ];
 
   const bookStoreList: ListItemProps[] = [
@@ -279,17 +399,8 @@ const NavBar = () => {
       type: "link",
       href: "/publishing",
       icon: null,
-      content: "Publishing",
+      content: t("navbar:publishing") as string,
       onClick: () => handlePublishingClick(),
-      disabled: false,
-      subList: []
-    },
-    {
-      type: "link",
-      href: "/trade-in",
-      icon: null,
-      content: "Trade-in",
-      onClick: () => handleTradeInClick(),
       disabled: false,
       subList: []
     },
@@ -297,15 +408,24 @@ const NavBar = () => {
       type: "link",
       href: "/borrow",
       icon: null,
-      content: "Borrow",
+      content: t("navbar:borrow") as string,
       onClick: () => handleBorrowClick(),
+      disabled: false,
+      subList: []
+    },
+    {
+      type: "link",
+      href: "/share",
+      icon: null,
+      content: t("navbar:share") as string,
+      onClick: () => handleShareClick(),
       disabled: false,
       subList: []
     }
   ];
 
   const navItems: ListItemProps[] = [
-    account.data
+    session
       ? {
           type: "button",
           icon: <Avatar alt="Remy Sharp" src="" />,
@@ -320,19 +440,19 @@ const NavBar = () => {
           type: "divider",
           subList: []
         },
-    account.data
-      ? {
-          type: "button",
-          icon: <ShoppingBagOutlinedIcon color="primary" />,
-          content: "Shopping Bag",
-          onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
-          disabled: false,
-          subList: []
-        }
-      : {
-          type: "divider",
-          subList: []
-        },
+    // account.data
+    //   ? {
+    //       type: "button",
+    //       icon: <ShoppingBagOutlinedIcon color="primary" />,
+    //       content: t("navbar:shoppingBag") as string,
+    //       onClick: (e: React.MouseEvent<HTMLButtonElement>) => {},
+    //       disabled: false,
+    //       subList: []
+    //     }
+    //   : {
+    //       type: "divider",
+    //       subList: []
+    //     },
     {
       type: "divider",
       content: "",
@@ -362,28 +482,33 @@ const NavBar = () => {
   ];
 
   const createList: ListItemProps[] = [
+    userInfo?.isAuthor !== undefined
+      ? {
+          type: "button",
+          icon: null,
+          content: t("navbar:newBook") as string,
+          onClick: () => handlePublishABookClick(),
+          disabled: false,
+          subList: [],
+          href: "/author/create"
+        }
+      : {
+          type: "divider",
+          subList: []
+        },
     {
       type: "button",
       icon: null,
-      content: "Publish a Book",
-      onClick: () => handlePublishABookClick(),
-      disabled: false,
-      subList: [],
-      href: "/author/publishing"
-    },
-    {
-      type: "button",
-      icon: null,
-      content: "Create Listing",
+      content: t("navbar:createListing") as string,
       onClick: () => handleCreateListingClick(),
       disabled: false,
       subList: [],
-      href: "/account/create-listing"
+      href: "/account/owned-books"
     },
     {
       type: "button",
       icon: null,
-      content: "Create Rental",
+      content: t("navbar:createRental") as string,
       onClick: () => handleCreateRentalClick(),
       disabled: false,
       subList: [],
@@ -478,19 +603,19 @@ const NavBar = () => {
                 ))}
                 <Box sx={{ mr: 2 }}>
                   <DropdownMenu
-                    tooltipTitle="Marketplace"
-                    buttonVariant="outlined"
-                    buttonName="Book store"
+                    buttonVariant="contained"
+                    tooltipTitle={t("navbar:toolTip_bookstore") as string}
+                    buttonName={t("navbar:bookstore")}
                     items={bookStoreList}
                   />
                 </Box>
 
-                {account.data && (
+                {session && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
-                      tooltipTitle="Open Listing/Renting"
-                      buttonVariant="contained"
-                      buttonName="Create"
+                      buttonVariant="outlined"
+                      tooltipTitle={t("navbar:toolTip_create") as string}
+                      buttonName={t("navbar:create")}
                       items={createList}
                     />
                   </Box>
@@ -501,15 +626,22 @@ const NavBar = () => {
                 <WalletBar
                   isInstalled={account.isInstalled}
                   isLoading={account.isLoading}
-                  connect={account.connect}
-                  account={account.data}
-                  disconnect={account.disconnect}
+                  connect={wagmiConnect}
+                  // account={account.data}
+                  account={wagmiAddress}
+                  switchAccount={account.switchAccount}
+                  disconnect={disconnect}
+                  handleLogin={handleLogin}
+                  isConnected={isConnected}
+                  isAuthor={isAuthor}
                 />
                 <AccountMenu
-                  account={account.data}
+                  account={wagmiAddress}
                   open={openAccountMenu}
                   onClose={handleAccountMenuClose}
-                  disconnect={account.disconnect}
+                  switchAccount={account.switchAccount}
+                  disconnect={disconnect}
+                  isAuthor={isAuthor}
                 />
                 {/* <Tooltip title="Toggle theme">
                 <IconButton
@@ -527,7 +659,7 @@ const NavBar = () => {
                 </IconButton>
               </Tooltip> */}
 
-                <Tooltip title="App settings">
+                <Tooltip title={t("navbar:toolTip_appSettings")}>
                   <IconButton
                     onClick={handleSettingsMenuClick}
                     sx={{
@@ -592,5 +724,13 @@ const NavBar = () => {
     </motion.div>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  return {
+    props: {
+      csrfToken: await getCsrfToken(context)
+    }
+  };
+}
 
 export default NavBar;

@@ -4,7 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 
 import { darkTheme, lightTheme } from "@styles/theme";
 
-import { useLocalStorage } from "@/components/hooks/common/useLocalStorage";
+import { useLocalStorage } from "@/components/hooks/common";
 
 export function useMyTheme() {
   return useLocalStorage("theme", "light");

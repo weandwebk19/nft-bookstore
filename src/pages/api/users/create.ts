@@ -1,8 +1,7 @@
+import clientPromise from "@lib/mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
-
-import clientPromise from "../../../lib/mongodb";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,11 +11,11 @@ export default async function handler(
     try {
       const client = await clientPromise;
       const db = client.db("NftBookStore");
-      const { address, username } = req.body;
+      const { wallet_address, fullname } = req.body;
 
       // Check if the address is exists
       const countAccount = await db.collection("users").count({
-        address: address
+        wallet_address
       });
 
       if (countAccount > 0) {
@@ -26,9 +25,13 @@ export default async function handler(
           data: null
         });
       } else {
+        db.collection("users").createIndex(
+          { wallet_address: 1 },
+          { unique: true }
+        );
         const newAccount = await db
           .collection("users")
-          .insertOne({ address, username });
+          .insertOne({ wallet_address, fullname });
 
         return res.json({
           success: true,
@@ -38,7 +41,6 @@ export default async function handler(
       }
     } catch (e: any) {
       console.error(e);
-      throw new Error(e).message;
     }
   } else {
     return res.status(400).json({

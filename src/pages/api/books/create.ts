@@ -1,81 +1,60 @@
+import clientPromise from "@lib/mongodb";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { ResponseData } from "@/types/api";
 import { BookInfo } from "@/types/nftBook";
-
-import clientPromise from "../../../lib/mongodb";
-
-type ResponseData = {
-  success: boolean;
-  message: string;
-  data: object | null;
-};
+import { toSnake } from "@/utils/nomalizer";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) {
-  try {
-    const client = await clientPromise;
-    const db = client.db("NftBookStore");
-    const {
-      token_id,
-      description,
-      external_link,
-      version,
-      max_supply,
-      genres,
-      languages,
-      total_pages,
-      keywords,
-      publishing_time
-    }: BookInfo = req.body;
+  if (req.method === "POST") {
+    try {
+      const client = await clientPromise;
+      const db = client.db("NftBookStore");
+      const bookInfo: BookInfo = req.body.bookInfo;
+      const { languages, genres, ...rest } = bookInfo;
 
-    // Insert book into database
-    const newBooks = await db.collection("books").insertOne({
-      token_id,
-      description,
-      external_link,
-      version,
-      max_supply,
-      total_pages,
-      keywords,
-      publishing_time
-    });
+      // Create index to ensure that tokenId is unique
+      db.collection("books").createIndex({ token_id: 1 }, { unique: true });
 
-    const newBookId: ObjectId = newBooks.insertedId;
+      // Insert book into database
+      const newBooks = await db.collection("books").insertOne(toSnake(rest));
 
-    // Insert languages into database
-    languages.map(async (language) => {
-      const languageDetail = await db
-        .collection("languages")
-        .findOne({ language });
-      if (languageDetail) {
+      const newBookId: ObjectId = newBooks.insertedId;
+
+      // Insert languages into database
+      languages.map(async (language) => {
         db.collection("book_languages").insertOne({
-          language_id: languageDetail._id,
+          language_id: new ObjectId(language),
           book_id: newBookId
         });
-      }
-    });
+      });
 
-    // Insert genres into database
-    genres.map(async (genre) => {
-      const genreDetail = await db.collection("genres").findOne({ genre });
-      if (genreDetail) {
+      // Insert genres into database
+      genres.map(async (genre) => {
         db.collection("book_genres").insertOne({
-          genre_id: genreDetail._id,
+          genre_id: new ObjectId(genre),
           book_id: newBookId
         });
-      }
-    });
+      });
 
-    return res.json({
-      success: true,
-      message: "Book created",
-      data: newBooks
+      return res.json({
+        success: true,
+        message: "Book created",
+        data: newBooks
+      });
+    } catch (e: any) {
+      console.error(e);
+      throw new Error(e).message;
+    }
+  } else {
+    return res.status(400).json({
+      message: "Invalid api route",
+      success: false,
+      data: null
     });
-  } catch (e: any) {
-    console.error(e);
-    throw new Error(e).message;
   }
 }

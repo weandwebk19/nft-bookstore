@@ -73,14 +73,23 @@ const List = ({ items, size }: ListProps) => {
                       timeout="auto"
                       unmountOnExit
                     >
+                      {/* {console.log(
+                        "currentState",
+                        itemInSubList?.selected?.currentState.toLowerCase()
+                      )}
+                      {console.log(
+                        "value",
+                        itemInSubList?.value?.toLowerCase()
+                      )} */}
                       <ListItemButton
                         sx={{ pl: 4 }}
                         onClick={itemInSubList?.onClick}
                         selected={
-                          itemInSubList?.content?.toLowerCase() ===
+                          itemInSubList?.value?.toLowerCase() ===
                             itemInSubList?.selected?.currentState.toLowerCase() &&
                           itemInSubList?.selected.isOpen
                         }
+                        data-value={itemInSubList.value}
                       >
                         <ListItemIcon>{itemInSubList?.icon}</ListItemIcon>
                         <ListItemText>{itemInSubList?.content}</ListItemText>
