@@ -16,7 +16,6 @@ const BookDetail = () => {
   const { bookDetail } = useBookDetail(bookId as string, seller as string);
 
   const title = bookDetail.data?.meta.title + " - NFT Bookstore";
-
   return (
     <>
       <Head>

@@ -610,7 +610,7 @@ const NavBar = () => {
                   />
                 </Box>
 
-                {session && (
+                {session && wagmiAddress && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
                       buttonVariant="outlined"

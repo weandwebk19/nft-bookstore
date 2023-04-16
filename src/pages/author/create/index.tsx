@@ -40,6 +40,7 @@ import {
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAX_BOOKFILE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKFILE_SIZE;
 const MAX_BOOKCOVER_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKCOVER_SIZE;
@@ -81,7 +82,7 @@ const defaultValues = {
   genres: [],
   languages: [],
   totalPages: 1,
-  keywords: "",
+  keywords: [""],
 
   // Final step
   termsOfService: false,
@@ -99,9 +100,6 @@ const CreateBook = () => {
   const [bookFileLink, setBookFileLink] = useState("");
   const [bookCoverLink, setBookCoverLink] = useState("");
   const [bookSampleLink, setBookSampleLink] = useState("");
-
-  // const { data } = useUserInfo();
-  // console.log(data.isAuthor);
 
   const steps = [
     t("titleStep1") as string,
@@ -190,7 +188,7 @@ const CreateBook = () => {
         .typeError(t("textError20") as string)
         .min(0, `${t("textError16") as string}`)
         .required(t("textError17") as string),
-      keywords: yup.string()
+      keywords: yup.array().of(yup.string())
     }),
 
     // validate for final step (Accept the terms and conditions)
@@ -737,8 +735,7 @@ export async function getStaticProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
-        "navbar",
-        "footer",
+        ...namespaceDefaultLanguage(),
         "createBook"
       ]))
     }

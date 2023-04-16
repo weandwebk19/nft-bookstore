@@ -23,6 +23,7 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import RecallLeasingButton from "@/components/ui/account/bookshelf/leasing-books/RecallLeasingButton";
 import { StyledButton } from "@/styles/components/Button";
 import { BorrowedBook, LeaseBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
@@ -197,8 +198,7 @@ const LeasingBooks = () => {
                                 amount={book?.amount}
                                 buttons={
                                   <>
-                                    <RecallButton
-                                      buttonName="Recall leasing"
+                                    <RecallLeasingButton
                                       tokenId={book?.tokenId}
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}

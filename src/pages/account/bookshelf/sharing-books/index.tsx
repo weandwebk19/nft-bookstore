@@ -18,6 +18,7 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import RecallSharingButton from "@/components/ui/account/bookshelf/sharing-books/RecallSharingButton";
 import { bookList } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
 import { BookSharing } from "@/types/nftBook";
@@ -178,8 +179,7 @@ const SharingBooks = () => {
                               onClick={handleBookClick}
                               buttons={
                                 <>
-                                  <RecallButton
-                                    buttonName="Recall sharing"
+                                  <RecallSharingButton
                                     borrower={book?.sharedPer}
                                     isEnded={book?.endTime - nowTime === 0}
                                     countDown={secondsToDhms(
