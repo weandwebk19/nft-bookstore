@@ -13,8 +13,6 @@ const About = () => {
 
   const theme = useTheme();
 
-  console.log("data:", [...namespaceDefaultLanguage(), "about"]);
-
   return (
     <>
       <Head>

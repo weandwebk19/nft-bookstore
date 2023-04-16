@@ -1,5 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Box,
@@ -21,6 +23,7 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/ContentContainer.module.scss";
+import axios from "axios";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -36,6 +39,7 @@ import {
 } from "@/components/shared/FormController";
 import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { uploadImage } from "@/lib/cloudinary";
 import { StyledButton } from "@/styles/components/Button";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
@@ -65,6 +69,8 @@ const Profile = () => {
   const { t } = useTranslation("profile");
   const { ethereum, contract } = useWeb3();
   const { account } = useAccount();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const schema = yup
     .object({
@@ -126,7 +132,19 @@ const Profile = () => {
   };
 
   const onSubmit = (data: any) => {
-    console.log("data:", data);
+    (async () => {
+      try {
+        setIsLoading(true);
+
+        const { picture, ...authorInfo } = data;
+
+        // handleCancel();
+        setIsLoading(false);
+      } catch (error: any) {
+        console.log("error:", error);
+        setIsLoading(false);
+      }
+    })();
   };
 
   useEffect(() => {
@@ -180,7 +198,7 @@ const Profile = () => {
                         />
                       ) : (
                         <Avatar
-                          alt="Remy Sharp"
+                          alt="avatar"
                           src=""
                           sx={{
                             display: "flex",
@@ -194,14 +212,19 @@ const Profile = () => {
                         />
                       )}
                       <Stack spacing={3} sx={{ justifyContent: "center" }}>
-                        <StyledButton customVariant="primary" component="label">
+                        <StyledButton
+                          customVariant="primary"
+                          component={isLoading ? "button" : "label"}
+                          disabled={isLoading}
+                        >
                           {t("uploadPhotoBtn") as string}
-                          <FileController name="picture" />
+                          <FileController name="picture" readOnly={isLoading} />
                         </StyledButton>
 
                         <StyledButton
                           customVariant="secondary"
                           onClick={handleRemoveImage}
+                          disabled={isLoading}
                         >
                           {t("removeBtn") as string}
                         </StyledButton>
@@ -227,25 +250,28 @@ const Profile = () => {
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="userName" />
+                          <InputController
+                            name="userName"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={t("email") as string}
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="email" />
+                          <InputController name="email" readOnly={isLoading} />
                         </FormGroup>
                       </Stack>
                       <FormGroup label={t("bio") as string}>
-                        <TextAreaController name="bio" />
+                        <TextAreaController name="bio" readOnly={isLoading} />
                       </FormGroup>
                     </Stack>
                   </ContentGroup>
                   <ContentGroup title={t("titleSocial") as string}>
                     <Stack direction="column" spacing={3}>
                       <FormGroup label={t("website") as string}>
-                        <InputController name="website" />
+                        <InputController name="website" readOnly={isLoading} />
                       </FormGroup>
                       <FormGroup label={t("walletAddress") as string}>
                         <InputController
@@ -290,7 +316,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="facebook" />
+                          <InputController
+                            name="facebook"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -308,7 +337,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="twitter" />
+                          <InputController
+                            name="twitter"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                       </Stack>
                       <Stack
@@ -331,7 +363,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="linkedIn" />
+                          <InputController
+                            name="linkedIn"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -349,7 +384,10 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="instagram" />
+                          <InputController
+                            name="instagram"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                       </Stack>
                     </Stack>
@@ -367,6 +405,7 @@ const Profile = () => {
                   <StyledButton
                     customVariant="secondary"
                     onClick={handleCancel}
+                    disabled={isLoading}
                   >
                     {t("cancel") as string}
                   </StyledButton>
@@ -374,6 +413,7 @@ const Profile = () => {
                     customVariant="primary"
                     type="submit"
                     onClick={handleSubmit(onSubmit)}
+                    disabled={isLoading}
                   >
                     {t("saveChanges") as string}
                   </StyledButton>
@@ -382,6 +422,7 @@ const Profile = () => {
             </FormProvider>
           </Box>
         </ContentContainer>
+        <ToastContainer />
       </main>
     </>
   );

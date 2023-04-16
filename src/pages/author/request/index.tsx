@@ -4,14 +4,11 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import {
-  Alert,
-  AlertColor,
   Box,
   FormHelperText,
   IconButton,
   InputAdornment,
   Link,
-  Snackbar,
   Stack,
   Typography
 } from "@mui/material";
@@ -80,9 +77,6 @@ const AuthorRequest = () => {
   const { account } = useAccount();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("success");
 
   const schema = yup.object().shape({
     pseudonym: yup.string().required(t("textError1") as string),
@@ -174,18 +168,6 @@ const AuthorRequest = () => {
     }));
   };
 
-  const handleClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setOpen(false);
-    setMessage("");
-  };
-
   const onSubmit = (data: any) => {
     (async () => {
       try {
@@ -197,7 +179,7 @@ const AuthorRequest = () => {
         const frontDocumentLink = await uploadImage(frontDocument);
         const backDocumentLink = await uploadImage(backDocument);
 
-        const res = await axios.post("/api/authors/request", {
+        const promise = axios.post("/api/authors/request", {
           ...authorInfo,
           frontDocument: {
             secure_url: frontDocumentLink.secure_url,
@@ -212,22 +194,22 @@ const AuthorRequest = () => {
             public_id: pictureLink.public_id
           }
         });
-
-        if (res.data.success) {
-          setMessage(t("messageSuccessCreated") as string);
-          setSeverity("success");
-          handleCancel();
-        } else {
-          setMessage(t("messageErrorCreated") as string);
-          setSeverity("error");
-        }
+        const res = await toast.promise(
+          promise,
+          {
+            pending: t("pendingAuthorRequest") as string,
+            success: t("messageSuccessCreated") as string,
+            error: t("messageErrorCreated") as string
+          },
+          {
+            position: toast.POSITION.TOP_CENTER
+          }
+        );
+        handleCancel();
         setIsLoading(false);
-        setOpen(true);
-      } catch (error) {
-        setMessage(t("messageErrorCreated") as string);
-        setSeverity("error");
+      } catch (error: any) {
+        console.log("error:", error);
         setIsLoading(false);
-        setOpen(true);
       }
     })();
   };
@@ -285,7 +267,7 @@ const AuthorRequest = () => {
                         />
                       ) : (
                         <Avatar
-                          alt="Remy Sharp"
+                          alt="avatar"
                           src={""}
                           sx={{
                             display: "flex",
@@ -558,18 +540,9 @@ const AuthorRequest = () => {
                 </Stack>
               </form>
             </FormProvider>
-            <ToastContainer />
           </Box>
         </ContentContainer>
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-          <Alert
-            onClose={handleClose}
-            severity={severity as AlertColor}
-            sx={{ width: "100%" }}
-          >
-            {message}
-          </Alert>
-        </Snackbar>
+        <ToastContainer />
       </main>
     </>
   );
