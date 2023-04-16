@@ -88,10 +88,10 @@ const CreatedBooks = () => {
                         <Grid
                           item
                           key={book.tokenId}
-                          xs={2}
-                          sm={8}
-                          md={12}
-                          lg={6}
+                          xs={4}
+                          sm={4}
+                          md={6}
+                          lg={4}
                         >
                           <ActionableBookItem
                             status="isCreated"
