@@ -19,7 +19,7 @@ export default async function handler(
       });
     } catch (e: any) {
       console.error("e", e);
-      return res.status(500).json({
+      return res.status(400).json({
         message: "Something went wrong.",
         success: false,
         data: e

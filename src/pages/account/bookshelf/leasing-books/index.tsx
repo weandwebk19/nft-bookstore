@@ -1,10 +1,13 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Divider, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
+import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -16,6 +19,7 @@ import {
   useOwnedLeasedOutBooks,
   useOwnedLeasingBooks
 } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { RecallButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
@@ -44,6 +48,8 @@ const LeasingBooks = () => {
   ];
 
   const router = useRouter();
+  const { account } = useAccount();
+  const { ethereum, contract } = useWeb3();
 
   const { nfts: leaseNfts } = useOwnedLeasingBooks();
   const leasingBooks = leaseNfts.data as LeaseBook[];
@@ -73,6 +79,67 @@ const LeasingBooks = () => {
         router.push(`/books/${bookId}`);
       }
     })();
+  };
+
+  const handleUnLease = async (tokenId: number, renter: string) => {
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const tx = await contract?.updateBookFromRenting(tokenId, 0, 0, renter);
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Un lease NftBook successfully",
+        error: "Oops! There's a problem with un lease process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
+
+  const handleRecallBorrowedBooks = async (
+    tokenId: number,
+    renter: string,
+    borrower: string,
+    startTime: number,
+    endTime: number
+  ) => {
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const idBorrowedBook = await contract!.getIdBorrowedBook(
+        tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Recall leased out book successfully",
+        error: "Oops! There's a problem with leased out process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
   };
 
   const [anchorRecallButton, setAnchorRecallButton] = useState<Element | null>(
@@ -198,12 +265,18 @@ const LeasingBooks = () => {
                                 buttons={
                                   <>
                                     <RecallButton
-                                      buttonName="Recall leasing"
+                                      buttonName="Un Lease"
                                       tokenId={book?.tokenId}
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
+                                      handleRecall={async () => {
+                                        return handleUnLease(
+                                          book?.tokenId,
+                                          book?.renter
+                                        );
+                                      }}
                                     />
                                   </>
                                 }
@@ -317,6 +390,15 @@ const LeasingBooks = () => {
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
+                                      handleRecall={async () => {
+                                        return handleRecallBorrowedBooks(
+                                          book?.tokenId,
+                                          book?.renter,
+                                          book?.borrower,
+                                          book?.startTime,
+                                          book?.endTime
+                                        );
+                                      }}
                                     />
                                   </>
                                 }
@@ -347,6 +429,7 @@ const LeasingBooks = () => {
             </ContentPaper>
           </Grid>
         </Grid>
+        <ToastContainer />
       </Stack>
     </>
   );

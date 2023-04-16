@@ -179,7 +179,7 @@ const SharingBooks = () => {
                               buttons={
                                 <>
                                   <RecallButton
-                                    buttonName="Recall sharing"
+                                    buttonName="Un share"
                                     borrower={book?.sharedPer}
                                     isEnded={book?.endTime - nowTime === 0}
                                     countDown={secondsToDhms(
@@ -190,6 +190,7 @@ const SharingBooks = () => {
                                     bookCover={book?.meta.bookCover}
                                     renter={book?.sharer}
                                     amount={book?.amount}
+                                    handleRecall={() => {}}
                                   />
                                 </>
                               }
@@ -281,6 +282,7 @@ const SharingBooks = () => {
                                     bookCover={book?.meta.bookCover}
                                     renter={book?.sharer}
                                     amount={book?.amount}
+                                    handleRecall={() => {}}
                                   />
                                 </>
                               }
