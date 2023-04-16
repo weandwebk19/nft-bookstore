@@ -188,6 +188,7 @@ const ListingBooks = () => {
                                     bookCover={book?.meta.bookCover}
                                     renter={book?.renter}
                                     amount={book?.amount}
+                                    handleRecall={() => {}}
                                   />
                                 </>
                               }

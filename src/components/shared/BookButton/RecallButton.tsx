@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { Id, toast } from "react-toastify";
 
 import { AlertColor, Box, Grid, Stack, Typography } from "@mui/material";
 
@@ -26,6 +26,7 @@ interface RecallButtonProps {
   bookCover: string;
   renter: string;
   tokenId: number;
+  handleRecall: () => Promise<any>;
   buttonName?: string;
 }
 
@@ -56,6 +57,7 @@ const RecallButton = ({
   title,
   renter,
   tokenId,
+  handleRecall,
   buttonName = "Recall"
 }: RecallButtonProps) => {
   const [renterName, setRenterName] = useState();
@@ -96,34 +98,7 @@ const RecallButton = ({
 
   const onSubmit = async (data: any) => {
     try {
-      const listingPrice = await contract!.listingPrice();
-      // const tx = await contract?.sellBooks(
-      //   tokenId,
-      //   ethers.utils.parseEther(data.price.toString()),
-      //   data.amount,
-      //   {
-      //     value: listingPrice
-      //   }
-      // );
-      const tx = await contract?.sellBooks(
-        tokenId,
-        ethers.utils.parseEther(data.price.toString()),
-        data.amount,
-        {
-          value: listingPrice
-        }
-      );
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Recall NftBook Token",
-        success: "NftBook has been recalled successfully!",
-        error: "Recall error"
-      });
-
-      console.log("recall info", receipt);
-      setSeverity("success" as AlertColor);
-      setAlertMessage("Successfully recalled!");
-      setOpenSnackbar(true);
+      await handleRecall();
     } catch (e: any) {
       console.error(e);
       setSeverity("error" as AlertColor);

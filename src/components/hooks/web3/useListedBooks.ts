@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
 import { ListedBook } from "@_types/nftBook";
+import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
@@ -33,9 +34,14 @@ export const hookFactory: ListedBooksHookFactory =
         for (let i = 0; i < coreListedBooks.length; i++) {
           const listedBook = coreListedBooks[i];
           // const nftBook = await contract!.getNftBook(listedBook.tokenId);
-          const tokenURI = await contract!.uri(listedBook.tokenId);
-          const metaRes = await fetch(tokenURI);
-          const meta = await metaRes.json();
+          const tokenURI = await contract!.getUri(listedBook.tokenId);
+          const metaRes = await (
+            await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
+          ).data;
+          let meta = null;
+          if (metaRes.success === true) {
+            meta = metaRes.data;
+          }
 
           listedBooks.push({
             tokenId: listedBook.tokenId.toNumber(),
