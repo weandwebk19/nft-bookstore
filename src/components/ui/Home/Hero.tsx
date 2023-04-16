@@ -71,7 +71,6 @@ const Hero = () => {
         </Stack>
       </Box>
 
-      <Suspense fallback={<div>Loading...</div>}></Suspense>
       <Spline scene="https://prod.spline.design/juq9OBGTG4B5Kmx1/scene.splinecode" />
 
       <Box

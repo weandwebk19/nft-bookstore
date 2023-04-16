@@ -40,7 +40,7 @@ export type BookInfo = {
   genres: string[];
   externalLink?: string;
   totalPages?: number;
-  keywords?: string;
+  keywords?: string | string[];
   publishingTime?: Date;
 };
 

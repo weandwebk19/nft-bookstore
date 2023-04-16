@@ -1,42 +1,65 @@
 import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { AlertColor, Box, Grid, Stack, Typography } from "@mui/material";
 
+import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { ethers } from "ethers";
+import * as yup from "yup";
 
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
+import { Image } from "@/components/shared/Image";
+import { Snackbar } from "@/components/shared/Snackbar";
 import { StyledButton } from "@/styles/components/Button";
 
-import { Image } from "../Image";
-
-interface RecallButtonProps {
-  borrower?: string;
+interface RecallSharingButtonProps {
+  sharedPer?: string;
   amount: number;
   isEnded?: boolean;
   countDown?: string;
   title: string;
   bookCover: string;
-  renter: string;
+  sharer: string;
   tokenId: number;
-  handleRecall: () => Promise<any>;
   buttonName?: string;
+  handleRecall: () => Promise<any>;
 }
 
-const RecallButton = ({
-  borrower,
+// const schema = yup
+//   .object({
+//     price: yup
+//       .number()
+//       .min(0, `The price must be higher than 0.`)
+//       .typeError("Price must be a number"),
+//     amount: yup
+//       .number()
+//       .min(1, `The price must be higher than 0.`)
+//       .typeError("Amount must be a number")
+//   })
+//   .required();
+
+// const defaultValues = {
+//   price: 0,
+//   amount: 1
+// };
+
+const RecallSharingButton = ({
+  sharedPer,
   amount,
   isEnded,
   countDown,
   bookCover,
   title,
-  renter,
+  sharer,
   tokenId,
-  handleRecall,
-  buttonName = "Recall"
-}: RecallButtonProps) => {
-  const [renterName, setRenterName] = useState();
+  buttonName = "Recall",
+  handleRecall
+}: RecallSharingButtonProps) => {
+  const [sharerName, setSharerName] = useState();
 
   const [anchorRecallDiaglog, setAnchorRecallDiaglog] =
     useState<Element | null>(null);
@@ -76,18 +99,18 @@ const RecallButton = ({
   useEffect(() => {
     (async () => {
       try {
-        if (renter) {
-          const userRes = await axios.get(`/api/users/wallet/${renter}`);
+        if (sharer) {
+          const userRes = await axios.get(`/api/users/wallet/${sharer}`);
 
           if (userRes.data.success === true) {
-            setRenterName(userRes.data.data.fullname);
+            setSharerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [renter]);
+  }, [sharer]);
 
   return (
     <>
@@ -95,7 +118,7 @@ const RecallButton = ({
         onClick={handleRecallDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        {buttonName}
+        Recall Sharing
       </StyledButton>
 
       {!isEnded && (
@@ -114,7 +137,7 @@ const RecallButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{renterName}</Typography>
+                <Typography>{sharerName}</Typography>
                 <Typography>Amount: {amount}</Typography>
               </Stack>
             </Grid>
@@ -125,10 +148,10 @@ const RecallButton = ({
                   mb: 5
                 }}
               >
-                {borrower && !isEnded && (
+                {sharedPer && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} is in a rental term duration. Are you sure you
+                      {sharedPer} is in a rental term duration. Are you sure you
                       want to recall this?
                     </Typography>
                     <Typography>{countDown} left</Typography>
@@ -155,4 +178,4 @@ const RecallButton = ({
   );
 };
 
-export default RecallButton;
+export default RecallSharingButton;

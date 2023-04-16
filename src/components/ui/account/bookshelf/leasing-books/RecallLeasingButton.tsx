@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
+import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { ethers } from "ethers";
+import * as yup from "yup";
 
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
+import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-import { Image } from "../Image";
-
-interface RecallButtonProps {
+interface RecallLeasingButtonProps {
   borrower?: string;
   amount: number;
   isEnded?: boolean;
@@ -20,11 +24,29 @@ interface RecallButtonProps {
   bookCover: string;
   renter: string;
   tokenId: number;
-  handleRecall: () => Promise<any>;
   buttonName?: string;
+  handleRecall: () => Promise<any>;
 }
 
-const RecallButton = ({
+// const schema = yup
+//   .object({
+//     price: yup
+//       .number()
+//       .min(0, `The price must be higher than 0.`)
+//       .typeError("Price must be a number"),
+//     amount: yup
+//       .number()
+//       .min(1, `The price must be higher than 0.`)
+//       .typeError("Amount must be a number")
+//   })
+//   .required();
+
+// const defaultValues = {
+//   price: 0,
+//   amount: 1
+// };
+
+const RecallLeasingButton = ({
   borrower,
   amount,
   isEnded,
@@ -33,10 +55,11 @@ const RecallButton = ({
   title,
   renter,
   tokenId,
-  handleRecall,
-  buttonName = "Recall"
-}: RecallButtonProps) => {
+  buttonName = "Recall",
+  handleRecall
+}: RecallLeasingButtonProps) => {
   const [renterName, setRenterName] = useState();
+  const { contract } = useWeb3();
 
   const [anchorRecallDiaglog, setAnchorRecallDiaglog] =
     useState<Element | null>(null);
@@ -61,6 +84,15 @@ const RecallButton = ({
   const handleRecallDiaglogClose = () => {
     setAnchorRecallDiaglog(null);
   };
+
+  // const methods = useForm({
+  //   shouldUnregister: false,
+  //   defaultValues,
+  //   resolver: yupResolver(schema),
+  //   mode: "all"
+  // });
+
+  // const { handleSubmit } = methods;
 
   const handleRecallClick = async () => {
     try {
@@ -95,7 +127,7 @@ const RecallButton = ({
         onClick={handleRecallDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        {buttonName}
+        Recall Leasing
       </StyledButton>
 
       {!isEnded && (
@@ -155,4 +187,4 @@ const RecallButton = ({
   );
 };
 
-export default RecallButton;
+export default RecallLeasingButton;

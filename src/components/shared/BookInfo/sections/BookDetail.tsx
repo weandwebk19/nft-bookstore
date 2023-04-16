@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 
@@ -12,6 +12,7 @@ interface BookDetailProps {
   maxSupply: number;
   publishingTime: Date | undefined;
   owners: string | string[];
+  keywords?: string | string[];
 }
 
 const BookDetail = ({
@@ -23,7 +24,8 @@ const BookDetail = ({
   version,
   maxSupply,
   publishingTime,
-  owners
+  owners,
+  keywords
 }: BookDetailProps) => {
   const { t } = useTranslation("bookDetail");
 
@@ -75,6 +77,29 @@ const BookDetail = ({
               .join(" | ")} */}
             {genres?.join(" | ")}
           </Typography>
+        </Stack>
+
+        {/* Keywords */}
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography variant="label">{t("keywords")}:</Typography>
+          <Box>
+            {(() => {
+              if (typeof keywords === "string") {
+                return <Typography>{keywords}</Typography>;
+              }
+              return keywords?.map((keyword) => {
+                return (
+                  <Chip
+                    key={keyword}
+                    label={<Typography>{keyword}</Typography>}
+                    sx={{ m: 0.5 }}
+                  />
+                );
+              });
+
+              // return keywords?.join(" | ");
+            })()}
+          </Box>
         </Stack>
 
         {/* Edition version */}
