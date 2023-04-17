@@ -1,7 +1,7 @@
 {
   "titlePage": "Leasing books - NFT Bookstore",
   "leasingBooksTitle": "Leasing books",
-  "leasedOutBooksTitle": "Leased out books",
+  "leasedOutBooksTitle": "Lent out books",
   "emptyMessage": "You haven't lease any books!",
   "emptyMessage__leasedOutBooks": "No books have been borrowed yet",
   "loadingMessage": "Putting books on the shelves...",

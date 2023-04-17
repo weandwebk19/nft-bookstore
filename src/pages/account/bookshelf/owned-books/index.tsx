@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedNfts } from "@/components/hooks/web3";
 import {
-  LeaseButton,
   RatingButton,
   ReadButton,
   SellButton

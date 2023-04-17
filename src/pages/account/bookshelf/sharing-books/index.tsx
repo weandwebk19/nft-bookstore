@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
@@ -10,23 +11,25 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useOwnedSharingBooks } from "@/components/hooks/web3";
-import { RecallButton } from "@/components/shared/BookButton";
+import { useAccount, useOwnedSharingBooks } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
-import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { bookList } from "@/mocks";
-import { StyledButton } from "@/styles/components/Button";
+import RevokeAllSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeAllSharedOutButton";
+import RevokeAllSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeAllSharingButton";
+import RevokeSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharedOutButton";
+import RevokeSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharingButton";
 import { BookSharing } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
-import pluralize from "@/utils/pluralize";
 import { secondsToDhms } from "@/utils/secondsToDhms";
 
 const SharingBooks = () => {
   const { t } = useTranslation("sharingBooks");
+  const { account } = useAccount();
+  const { contract } = useWeb3();
 
   const breadCrumbs = [
     {
@@ -50,37 +53,6 @@ const SharingBooks = () => {
     setNowTime(seconds);
   }, []);
 
-  const handleOpenRecallDialogClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(e.currentTarget);
-  };
-
-  const [anchorRecallButton, setAnchorRecallButton] = useState<Element | null>(
-    null
-  );
-
-  const openRecallDialog = Boolean(anchorRecallButton);
-
-  const handleRecallClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(null);
-  };
-
-  const handleCancelClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(null);
-  };
-
-  const handleRecallClose = () => {
-    setAnchorRecallButton(null);
-  };
-
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
@@ -89,6 +61,67 @@ const SharingBooks = () => {
         router.push(`/books/${bookId}`);
       }
     })();
+  };
+
+  const handleRevokeSharingClick = async (tokenId: number, renter: string) => {
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const tx = await contract?.updateBookFromRenting(tokenId, 0, 0, renter);
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Revoke Sharing NftBook successfully",
+        error: "Oops! There's a problem with sharing revoke process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
+
+  const handleRevokeSharedOutClick = async (
+    tokenId: number,
+    renter: string,
+    borrower: string,
+    startTime: number,
+    endTime: number
+  ) => {
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const idBorrowedBook = await contract!.getIdBorrowedBook(
+        tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Revoke shared out book successfully",
+        error: "Oops! There's a problem with shared out process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
   };
 
   return (
@@ -110,36 +143,7 @@ const SharingBooks = () => {
               {/* Shared books that have not been borrowed by anyone */}
               <ContentPaper
                 title={t("sharingBooksTitle")}
-                button={
-                  <>
-                    <StyledButton
-                      customVariant="secondary"
-                      onClick={(e) => handleOpenRecallDialogClick(e)}
-                    >
-                      Recall All
-                    </StyledButton>
-                    <Dialog
-                      title={t("dialogTitle") as string}
-                      open={openRecallDialog}
-                      onClose={handleRecallClose}
-                    >
-                      <Stack spacing={3}>
-                        <Typography>{t("message")}</Typography>
-                        <Stack direction="row" spacing={3} justifyContent="end">
-                          <StyledButton
-                            customVariant="secondary"
-                            onClick={(e) => handleCancelClick(e)}
-                          >
-                            {t("button_cancel")}
-                          </StyledButton>
-                          <StyledButton onClick={(e) => handleRecallClick(e)}>
-                            {t("button_recall")}
-                          </StyledButton>
-                        </Stack>
-                      </Stack>
-                    </Dialog>
-                  </>
-                }
+                button={<RevokeAllSharingButton />}
               >
                 {(() => {
                   if (nfts.isLoading) {
@@ -178,9 +182,8 @@ const SharingBooks = () => {
                               onClick={handleBookClick}
                               buttons={
                                 <>
-                                  <RecallButton
-                                    buttonName="Un share"
-                                    borrower={book?.sharedPer}
+                                  <RevokeSharingButton
+                                    sharedPer={book?.sharedPer}
                                     isEnded={book?.endTime - nowTime === 0}
                                     countDown={secondsToDhms(
                                       book?.endTime - nowTime
@@ -188,9 +191,14 @@ const SharingBooks = () => {
                                     tokenId={book?.tokenId}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
-                                    renter={book?.sharer}
+                                    sharer={book?.sharer}
                                     amount={book?.amount}
-                                    handleRecall={() => {}}
+                                    handleRevoke={async () => {
+                                      return handleRevokeSharingClick(
+                                        book?.tokenId,
+                                        book?.sharer
+                                      );
+                                    }}
                                   />
                                 </>
                               }
@@ -206,36 +214,7 @@ const SharingBooks = () => {
               {/* Shared books that have been borrowed by others */}
               <ContentPaper
                 title={t("sharedOutBooksTitle")}
-                button={
-                  <>
-                    <StyledButton
-                      customVariant="secondary"
-                      onClick={(e) => handleOpenRecallDialogClick(e)}
-                    >
-                      Recall All
-                    </StyledButton>
-                    <Dialog
-                      title={t("dialogTitle") as string}
-                      open={openRecallDialog}
-                      onClose={handleRecallClose}
-                    >
-                      <Stack spacing={3}>
-                        <Typography>{t("message")}</Typography>
-                        <Stack direction="row" spacing={3} justifyContent="end">
-                          <StyledButton
-                            customVariant="secondary"
-                            onClick={(e) => handleCancelClick(e)}
-                          >
-                            {t("button_cancel")}
-                          </StyledButton>
-                          <StyledButton onClick={(e) => handleRecallClick(e)}>
-                            {t("button_recall")}
-                          </StyledButton>
-                        </Stack>
-                      </Stack>
-                    </Dialog>
-                  </>
-                }
+                button={<RevokeAllSharedOutButton />}
               >
                 {(() => {
                   if (nfts.isLoading) {
@@ -276,13 +255,21 @@ const SharingBooks = () => {
                               onClick={handleBookClick}
                               buttons={
                                 <>
-                                  <RecallButton
+                                  <RevokeSharedOutButton
                                     tokenId={book?.tokenId}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
                                     renter={book?.sharer}
                                     amount={book?.amount}
-                                    handleRecall={() => {}}
+                                    handleRevoke={async () => {
+                                      return handleRevokeSharedOutClick(
+                                        book?.tokenId,
+                                        book?.sharer,
+                                        book?.sharedPer,
+                                        book?.startTime,
+                                        book?.endTime
+                                      );
+                                    }}
                                   />
                                 </>
                               }

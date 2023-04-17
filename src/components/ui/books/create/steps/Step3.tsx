@@ -1,6 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 
 import {
+  AutoCompleteController,
   InputController,
   MultipleSelectController
 } from "@shared/FormController";
@@ -66,7 +67,7 @@ const Step3 = () => {
               label={t("keywords") as string}
               className={styles["form__formGroup-half"]}
             >
-              <InputController name="keywords" />
+              <AutoCompleteController name="keywords" />
             </FormGroup>
           </Stack>
         </Stack>

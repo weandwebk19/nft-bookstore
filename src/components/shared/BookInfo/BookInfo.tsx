@@ -164,6 +164,7 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
                     ? bookDetail?.listedCore?.seller!
                     : bookDetail?.meta.author!
                 }
+                keywords={bookDetail?.info.keywords}
               />
             </Box>
           </Box>

@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Box, Grid, Link, Stack, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -10,6 +11,7 @@ import styles from "@/styles/NotFound.module.scss";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const NotFoundPage = () => {
+  const theme = useTheme();
   const { t } = useTranslation("notFound");
 
   const router = useRouter();
@@ -88,13 +90,26 @@ const NotFoundPage = () => {
               "rgba(0, 0, 0, 0.09) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px"
           }}
         >
-          <Typography variant="h6" gutterBottom>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{
+              color: `${theme.palette.common.black} !important`
+            }}
+          >
             {t("story15")}
           </Typography>
-          <Typography>
+          <Typography
+            sx={{
+              color: `${theme.palette.common.black} !important`
+            }}
+          >
             {t("story16")}{" "}
             <Link
-              sx={{ cursor: "pointer" }}
+              sx={{
+                cursor: "pointer",
+                color: `${theme.palette.common.black} !important`
+              }}
               onClick={() => {
                 router.push("/");
               }}

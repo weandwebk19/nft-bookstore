@@ -3,9 +3,9 @@ import { Web3Dependencies } from "@_types/hooks";
 
 import { UseAccountHook, hookFactory as createAccountHook } from "./useAccount";
 import {
-  UseAllLeasingBooksHook,
-  hookFactory as createAllLeasingBooksHook
-} from "./useAllLeasingBooks";
+  UseAllLendingBooksHook,
+  hookFactory as createAllLendingBooksHook
+} from "./useAllLendingBooks";
 import {
   UseBookDetailHook,
   hookFactory as createBookDetailHook
@@ -24,13 +24,13 @@ import {
   hookFactory as createOwnedBorrowedBooksHook
 } from "./useOwnedBorrowedBooks";
 import {
-  UseOwnedLeasedOutBooksHook,
-  hookFactory as createOwnedLeasedOutBooksHook
-} from "./useOwnedLeasedOutBooks";
+  UseOwnedLendingBooksHook,
+  hookFactory as createOwnedLendingBooksHook
+} from "./useOwnedLendingBooks";
 import {
-  UseOwnedLeasingBooksHook,
-  hookFactory as createOwnedLeasingBooksHook
-} from "./useOwnedLeasingBooks";
+  UseOwnedLentOutBooksHook,
+  hookFactory as createOwnedLentOutBooksHook
+} from "./useOwnedLentOutBooks";
 import {
   UseOwnedListedBooksHook,
   hookFactory as createOwnedListedBooksHook
@@ -60,14 +60,14 @@ export type Web3Hooks = {
   useAccount: UseAccountHook;
   useNetwork: UseNetworkHook;
   useListedBooks: UseListedBooksHook;
-  useAllLeasingBooks: UseAllLeasingBooksHook;
+  useAllLendingBooks: UseAllLendingBooksHook;
   useOwnedNfts: UseOwnedNftsHook;
   useCreatedBooks: UseCreatedBooksHook;
   useOwnedListedBooks: UseOwnedListedBooksHook;
   useOwnedPurchasedBooks: UseOwnedPurchasedBooksHook;
   useOwnedBorrowedBooks: UseOwnedBorrowedBooksHook;
-  useOwnedLeasingBooks: UseOwnedLeasingBooksHook;
-  useOwnedLeasedOutBooks: UseOwnedLeasedOutBooksHook;
+  useOwnedLendingBooks: UseOwnedLendingBooksHook;
+  useOwnedLentOutBooks: UseOwnedLentOutBooksHook;
   useOwnedSharingBooks: UseOwnedSharingBooksHook;
   useOwnedSharedBooks: UseOwnedSharedBooksHook;
   useBookDetail: UseBookDetailHook;
@@ -83,13 +83,13 @@ export const setupHooks: SetupHooks = (deps) => {
     useAccount: createAccountHook(deps),
     useNetwork: createNetworkHook(deps),
     useListedBooks: createListedBooksHook(deps),
-    useAllLeasingBooks: createAllLeasingBooksHook(deps),
+    useAllLendingBooks: createAllLendingBooksHook(deps),
     useOwnedNfts: createOwnedBooksHook(deps),
     useCreatedBooks: createCreatedBooksHook(deps),
     useOwnedListedBooks: createOwnedListedBooksHook(deps),
     useOwnedPurchasedBooks: createOwnedPurchasedBooksHook(deps),
-    useOwnedLeasingBooks: createOwnedLeasingBooksHook(deps),
-    useOwnedLeasedOutBooks: createOwnedLeasedOutBooksHook(deps),
+    useOwnedLendingBooks: createOwnedLendingBooksHook(deps),
+    useOwnedLentOutBooks: createOwnedLentOutBooksHook(deps),
     useOwnedBorrowedBooks: createOwnedBorrowedBooksHook(deps),
     useOwnedSharingBooks: createOwnedSharingBooksHook(deps),
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),

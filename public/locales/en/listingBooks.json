@@ -6,8 +6,8 @@
   "button_createdBooks": "My created books",
   "breadcrumbs_bookshelf": "Bookshelf",
   "breadcrumbs_listingBooks": "Listing books",
-  "dialogTitle": "Recall all",
-  "message": "Are you sure to recall all the books?",
+  "dialogTitle": "Revoke all",
+  "message": "Are you sure to revoke all the books?",
   "button_cancel": "Cancel",
-  "button_recall": "Recall"
+  "button_revoke": "Revoke"
 }

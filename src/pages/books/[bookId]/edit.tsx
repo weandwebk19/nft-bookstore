@@ -31,7 +31,7 @@ import {
   Step1,
   Step2,
   Step3
-} from "@/components/ui/author/create/steps";
+} from "@/components/ui/books/create/steps";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";

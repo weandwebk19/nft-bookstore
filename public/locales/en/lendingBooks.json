@@ -1,0 +1,15 @@
+{
+  "titlePage": "Lending books - NFT Bookstore",
+  "lendingBooksTitle": "Lending books",
+  "lentOutBooksTitle": "Lent out books",
+  "emptyMessage": "You haven't lease any books!",
+  "emptyMessage__lentOutBooks": "No books have been borrowed yet",
+  "loadingMessage": "Putting books on the shelves...",
+  "button_ownedBooks": "My owned books",
+  "breadcrumbs_bookshelf": "Bookshelf",
+  "breadcrumbs_lendingBooks": "Lending books",
+  "dialogTitle": "Revoke all",
+  "message": "Are you sure to revoke all the books?",
+  "button_cancel": "Cancel",
+  "button_revoke": "Revoke"
+}

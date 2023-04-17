@@ -31,7 +31,7 @@ contract BookSellingStorage {
   mapping(address => mapping(uint => BookSelling)) private _ownedPurchasedBooks;
   mapping(address => uint) private _totalOwnedPurchasedBook;
 
-  function isListed(uint tokenId, address seller) public view returns (bool) {
+  function isListing(uint tokenId, address seller) public view returns (bool) {
     uint idListedBook = getIdListedBook(tokenId, seller);
     if (idListedBook > 0) {
       return true;

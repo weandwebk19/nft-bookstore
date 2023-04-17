@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedPurchasedBooks } from "@/components/hooks/web3";
 import {
-  LeaseButton,
+  LendButton,
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
@@ -116,7 +116,7 @@ const BoughtBooks = () => {
                                   owner={book?.listedBook.seller}
                                   amountTradeable={book?.amountTradeable!}
                                 />
-                                <LeaseButton
+                                <LendButton
                                   tokenId={book?.listedBook.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}

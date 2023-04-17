@@ -23,8 +23,8 @@ const Loading = forwardRef<HTMLDivElement>(
       };
 
       const handleComplete = (url: string) => {
-        console.log("url", String(url).split("?")[0]);
-        console.log("router.asPath", router.pathname.split("?")[0]);
+        // console.log("url", String(url).split("?")[0]);
+        // console.log("router.asPath", router.pathname.split("?")[0]);
         if (router.locale === "en") {
           if (!url && !router.asPath) {
             setLoading(false);
