@@ -87,7 +87,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
   const onSubmitSeller = (data: any) => {
     console.log("data:", data);
 
-    // handle set isListed is true
+    // handle set isListing is true
   };
 
   useEffect(() => {
@@ -248,7 +248,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
           {/* {isPublished && !isSelled && (
             <Stack direction="row" spacing={2}>
               <StyledButton customVariant="secondary">Edit book</StyledButton>
-              {isListed ? (
+              {isListing ? (
                 <StyledButton customVariant="primary" onClick={() => {}}>
                   Edit listing
                 </StyledButton>

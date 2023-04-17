@@ -124,7 +124,7 @@ const BookBanner = ({
               sx={{ textAlign: "end" }}
               className={styles["book-banner__open"]}
             >
-              {isListed ? "Openning" : "Closed"}
+              {isListing ? "Openning" : "Closed"}
             </Typography>
           </Box> */}
         </Grid>

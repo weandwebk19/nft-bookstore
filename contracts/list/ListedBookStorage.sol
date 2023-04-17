@@ -25,7 +25,7 @@ contract ListedBookStorage {
   mapping(uint => ListedBook) private _idToListedBook; // (ID -> ListedBook))
   Counters.Counter private _listedBooks;
 
-  function isListed(uint tokenId, address seller) public view returns (bool) {
+  function isListing(uint tokenId, address seller) public view returns (bool) {
     uint idListedBook = getIdListedBook(tokenId, seller);
     if (idListedBook > 0) {
       return true;

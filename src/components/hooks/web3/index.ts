@@ -73,18 +73,18 @@ export const useOwnedBorrowedBooks = () => {
   };
 };
 
-export const useOwnedLeasingBooks = () => {
+export const useOwnedLendingBooks = () => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedLeasingBooks();
+  const swrRes = hooks.useOwnedLendingBooks();
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedLeasedOutBooks = () => {
+export const useOwnedLentOutBooks = () => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedLeasedOutBooks();
+  const swrRes = hooks.useOwnedLentOutBooks();
 
   return {
     nfts: swrRes
@@ -125,9 +125,9 @@ export const useRealOwnerOfTokens = (tokenId: number) => {
   };
 };
 
-export const useAllLeasingBooks = () => {
+export const useAllLendingBooks = () => {
   const hooks = useHooks();
-  const swrRes = hooks.useAllLeasingBooks();
+  const swrRes = hooks.useAllLendingBooks();
 
   return {
     nfts: swrRes
