@@ -3,7 +3,7 @@ import { FunctionComponent } from "react";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
-import { useListedBooks } from "@hooks/web3";
+import { useAllSharingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
@@ -15,13 +15,14 @@ import BuyButton from "@/components/shared/BookButton/BuyButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { BookSharing } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const { t } = useTranslation("shareBooks");
 
   const router = useRouter();
 
-  const { listedBooks } = useListedBooks();
+  const { nfts } = useAllSharingBooks();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -41,14 +42,11 @@ const DisplayBox: FunctionComponent = () => {
           <Stack spacing={3}>
             <ContentPaper isPaginate={true} title={t("shareBooksTitle")}>
               {(() => {
-                if (listedBooks.isLoading) {
+                if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (
-                  listedBooks?.data?.length === 0 ||
-                  listedBooks.error
-                ) {
+                } else if (nfts?.data?.length === 0 || nfts.error) {
                   return <FallbackNode />;
                 }
                 return (
@@ -61,7 +59,7 @@ const DisplayBox: FunctionComponent = () => {
                   `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
                   title, bookCover, author,... */}
 
-                    {listedBooks?.data?.map((book) => {
+                    {nfts?.data?.map((book: BookSharing) => {
                       return (
                         <Grid
                           item
@@ -77,7 +75,7 @@ const DisplayBox: FunctionComponent = () => {
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.seller}
+                            author={book?.sharedPer}
                             onClick={handleBookClick}
                             buttons={
                               <>
@@ -85,7 +83,7 @@ const DisplayBox: FunctionComponent = () => {
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  seller={book?.seller}
+                                  seller={book?.sharedPer}
                                   price={book?.price}
                                   supplyAmount={book?.amount}
                                 />

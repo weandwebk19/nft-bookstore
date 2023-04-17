@@ -133,3 +133,12 @@ export const useAllLendingBooks = () => {
     nfts: swrRes
   };
 };
+
+export const useAllSharingBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useAllSharingBooks();
+
+  return {
+    nfts: swrRes
+  };
+};
