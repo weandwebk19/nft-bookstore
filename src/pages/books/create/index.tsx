@@ -36,7 +36,7 @@ import {
   Step1,
   Step2,
   Step3
-} from "@/components/ui/author/create/steps";
+} from "@/components/ui/books/create/steps";
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
