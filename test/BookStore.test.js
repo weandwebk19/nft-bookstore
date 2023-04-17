@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 const BookStore = artifacts.require("BookStore");
-const ListedBookStorage = artifacts.require("ListedBookStorage");
+const BookSellingStorage = artifacts.require("BookSellingStorage");
 const BookTemporary = artifacts.require("BookTemporary");
 const Timelock = artifacts.require("Timelock");
 const Error = artifacts.require("Error");
@@ -19,7 +19,7 @@ contract("BookStore", (accounts) => {
   let _convertPrice = ethers.utils.parseEther("0.000005").toString();
 
   before(async () => {
-    await ListedBookStorage.deployed();
+    await BookSellingStorage.deployed();
     await Error.deployed();
     await Timelock.deployed();
     await ExtendTime.deployed();
@@ -31,7 +31,7 @@ contract("BookStore", (accounts) => {
       BookSharingStorage.address
     );
     _contract = await BookStore.deployed(
-      ListedBookStorage.address,
+      BookSellingStorage.address,
       BookTemporary.address,
       ListRealOwners.address
     );
@@ -227,6 +227,7 @@ contract("BookStore", (accounts) => {
       const ownedPurchasedBooks = await _contract.getOwnedPurchasedBooks({
         from: accounts[1]
       });
+      console.log('ownedPurchasedBooks: ', ownedPurchasedBooks);
       assert.equal(
         ownedPurchasedBooks.length,
         1,
