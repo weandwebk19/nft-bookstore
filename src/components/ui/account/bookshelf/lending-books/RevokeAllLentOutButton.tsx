@@ -9,27 +9,27 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
 
-const RecallAllSharedOutButton = () => {
-  const { t } = useTranslation("leasingBooks");
+const RevokeAllLentOutButton = () => {
+  const { t } = useTranslation("lendingBooks");
   const { contract } = useWeb3();
 
-  const [anchorRecallButton, setAnchorRecallButton] = useState<Element | null>(
+  const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
     null
   );
 
-  const openRecallDialog = Boolean(anchorRecallButton);
+  const openRevokeDialog = Boolean(anchorRevokeButton);
 
-  const handleRecallClick = async (
+  const handleRevokeClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
     try {
-      const tx = await contract?.recallAllSharedBooks();
+      const tx = await contract?.recallAllBorrowedBooks();
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Recall shared out book successfully",
-        error: "Oops! There's a problem with shared out process!"
+        success: "Revoke lent out book successfully",
+        error: "Oops! There's a problem with lent out process!"
       });
     } catch (e: any) {
       console.error(e);
@@ -37,39 +37,39 @@ const RecallAllSharedOutButton = () => {
         position: toast.POSITION.TOP_CENTER
       });
     }
-    setAnchorRecallButton(null);
+    setAnchorRevokeButton(null);
   };
 
   const handleCancelClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setAnchorRecallButton(null);
+    setAnchorRevokeButton(null);
   };
 
-  const handleRecallClose = () => {
-    setAnchorRecallButton(null);
+  const handleRevokeClose = () => {
+    setAnchorRevokeButton(null);
   };
 
-  const handleOpenRecallDialogClick = (
+  const handleOpenRevokeDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setAnchorRecallButton(e.currentTarget);
+    setAnchorRevokeButton(e.currentTarget);
   };
 
   return (
     <>
       <StyledButton
         customVariant="secondary"
-        onClick={(e) => handleOpenRecallDialogClick(e)}
+        onClick={(e) => handleOpenRevokeDialogClick(e)}
       >
-        Recall All
+        Revoke All
       </StyledButton>
       <Dialog
         title={t("dialogTitle") as string}
-        open={openRecallDialog}
-        onClose={handleRecallClose}
+        open={openRevokeDialog}
+        onClose={handleRevokeClose}
       >
         <Stack spacing={3}>
           <Typography>{t("message")}</Typography>
@@ -80,8 +80,8 @@ const RecallAllSharedOutButton = () => {
             >
               {t("button_cancel")}
             </StyledButton>
-            <StyledButton onClick={(e) => handleRecallClick(e)}>
-              {t("button_recall")}
+            <StyledButton onClick={(e) => handleRevokeClick(e)}>
+              {t("button_revoke")}
             </StyledButton>
           </Stack>
         </Stack>
@@ -90,4 +90,4 @@ const RecallAllSharedOutButton = () => {
   );
 };
 
-export default RecallAllSharedOutButton;
+export default RevokeAllLentOutButton;

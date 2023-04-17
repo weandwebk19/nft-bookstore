@@ -18,7 +18,7 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-interface LeaseButtonProps {
+interface LendButtonProps {
   title: string;
   bookCover: string;
   owner: string;
@@ -44,13 +44,13 @@ const defaultValues = {
   amount: 1
 };
 
-const LeaseButton = ({
+const LendButton = ({
   bookCover,
   title,
   owner,
   tokenId,
   amountTradeable
-}: LeaseButtonProps) => {
+}: LendButtonProps) => {
   const [ownerName, setOwnerName] = useState();
   const { ethereum, contract } = useWeb3();
 
@@ -83,20 +83,20 @@ const LeaseButton = ({
         });
       }
 
-      const leasingPrice = await contract!.leasingPrice();
+      const lendingPrice = await contract!.leasingPrice();
       const tx = await contract?.leaseBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
         data.amount,
         {
-          value: leasingPrice
+          value: lendingPrice
         }
       );
 
       const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Lease NftBook Token",
-        success: "NftBook is successfully leased out!",
-        error: "Oops! There's a problem with leasing process!"
+        pending: "Lend NftBook Token",
+        success: "NftBook is successfully lent out!",
+        error: "Oops! There's a problem with lending process!"
       });
     } catch (e: any) {
       console.log(e.message);
@@ -124,10 +124,10 @@ const LeaseButton = ({
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Lease</StyledButton>
+      <StyledButton onClick={handleBookCardClick}>Lend</StyledButton>
 
       <Dialog
-        title="Open for lease"
+        title="Open for lend"
         open={openBookCard}
         onClose={handleBookCardClose}
       >
@@ -153,7 +153,7 @@ const LeaseButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Leasing price/day" required>
+                <FormGroup label="Lending price/day" required>
                   <InputController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
@@ -169,7 +169,7 @@ const LeaseButton = ({
                   Cancel
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Lease out
+                  Lend out
                 </StyledButton>
               </Box>
             </Grid>
@@ -181,4 +181,4 @@ const LeaseButton = ({
   );
 };
 
-export default LeaseButton;
+export default LendButton;

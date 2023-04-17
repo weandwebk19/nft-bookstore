@@ -11,7 +11,7 @@ import withAuth from "@/components/HOC/withAuth";
 import { useCreatedBooks } from "@/components/hooks/web3";
 import {
   EditButton,
-  LeaseButton,
+  LendButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";

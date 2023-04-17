@@ -18,8 +18,8 @@ type ActionableBookItemStatus =
   | "isBorrowed"
   | "isSharing"
   | "isListing"
-  | "isLeasing"
-  | "isBought";
+  | "isLending"
+  | "isPurchased";
 
 interface ActionableBookItemProps {
   bookCover: string;
@@ -211,7 +211,7 @@ const ActionableBookItem = ({
                 <Typography variant="label">{sharerName}</Typography>
               </Stack>
             )}
-            {status === "isLeasing" && borrower && (
+            {status === "isLending" && borrower && (
               <Stack>
                 <Typography variant="subtitle2">Borrowed by:</Typography>
                 <Typography variant="label">{borrowerName}</Typography>
@@ -235,7 +235,7 @@ const ActionableBookItem = ({
               >
                 {status !== "isCreated" &&
                   status !== "isOwned" &&
-                  status !== "isBought" && (
+                  status !== "isPurchased" && (
                     <Stack>
                       <Typography variant="subtitle2">Price:</Typography>
                       <Typography variant="label">{price} ETH</Typography>
@@ -243,7 +243,7 @@ const ActionableBookItem = ({
                   )}
                 {status !== "isCreated" &&
                   status !== "isOwned" &&
-                  status === "isBought" && (
+                  status === "isPurchased" && (
                     <Stack>
                       <Typography variant="subtitle2">Amount:</Typography>
                       <Typography variant="label">{amount}</Typography>
@@ -253,7 +253,7 @@ const ActionableBookItem = ({
               {(status === "isBorrowed" ||
                 status === "isShared" ||
                 status === "isSharing" ||
-                (status === "isLeasing" && borrower)) && (
+                (status === "isLending" && borrower)) && (
                 <Stack>
                   <Typography variant="subtitle2">Return in:</Typography>
                   <Typography variant="label">
@@ -269,7 +269,7 @@ const ActionableBookItem = ({
               )}
               {(status === "isOwned" ||
                 status === "isCreated" ||
-                status === "isBought") && (
+                status === "isPurchased") && (
                 <Stack>
                   <Typography variant="subtitle2">Tradeable amount:</Typography>
                   <Typography variant="label">{amountTradeable}</Typography>

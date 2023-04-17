@@ -7,11 +7,10 @@ import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
 import { Dialog } from "@/components/shared/Dialog";
+import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-import { Image } from "../Image";
-
-interface RecallButtonProps {
+interface RevokeLentOutButtonProps {
   borrower?: string;
   amount: number;
   isEnded?: boolean;
@@ -20,11 +19,11 @@ interface RecallButtonProps {
   bookCover: string;
   renter: string;
   tokenId: number;
-  handleRecall: () => Promise<any>;
+  handleRevoke: () => Promise<any>;
   buttonName?: string;
 }
 
-const RecallButton = ({
+const RevokeLentOutButton = ({
   borrower,
   amount,
   isEnded,
@@ -33,22 +32,22 @@ const RecallButton = ({
   title,
   renter,
   tokenId,
-  handleRecall,
-  buttonName = "Recall"
-}: RecallButtonProps) => {
+  handleRevoke,
+  buttonName = "Revoke"
+}: RevokeLentOutButtonProps) => {
   const [renterName, setRenterName] = useState();
 
-  const [anchorRecallDiaglog, setAnchorRecallDiaglog] =
+  const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
-  const openRecallDiaglog = Boolean(anchorRecallDiaglog);
+  const openRevokeDiaglog = Boolean(anchorRevokeDiaglog);
 
-  const handleRecallDiaglogClick = async (
+  const handleRevokeDiaglogClick = async (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    setAnchorRecallDiaglog(e.currentTarget);
+    setAnchorRevokeDiaglog(e.currentTarget);
     if (isEnded) {
       try {
-        await handleRecall();
+        await handleRevoke();
       } catch (e: any) {
         console.error(e);
         toast.error(`${e.message}.`, {
@@ -58,13 +57,13 @@ const RecallButton = ({
     }
   };
 
-  const handleRecallDiaglogClose = () => {
-    setAnchorRecallDiaglog(null);
+  const handleRevokeDiaglogClose = () => {
+    setAnchorRevokeDiaglog(null);
   };
 
-  const handleRecallClick = async () => {
+  const handleRevokeClick = async () => {
     try {
-      await handleRecall();
+      await handleRevoke();
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {
@@ -92,7 +91,7 @@ const RecallButton = ({
   return (
     <>
       <StyledButton
-        onClick={handleRecallDiaglogClick}
+        onClick={handleRevokeDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
         {buttonName}
@@ -101,8 +100,8 @@ const RecallButton = ({
       {!isEnded && (
         <Dialog
           title={buttonName}
-          open={openRecallDiaglog}
-          onClose={handleRecallDiaglogClose}
+          open={openRevokeDiaglog}
+          onClose={handleRevokeDiaglogClose}
         >
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
@@ -129,7 +128,7 @@ const RecallButton = ({
                   <>
                     <Typography>
                       {borrower} is in a rental term duration. Are you sure you
-                      want to recall this?
+                      want to revoke this?
                     </Typography>
                     <Typography>{countDown} left</Typography>
                   </>
@@ -139,12 +138,12 @@ const RecallButton = ({
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}
-                  onClick={handleRecallDiaglogClose}
+                  onClick={handleRevokeDiaglogClose}
                 >
                   Cancel
                 </StyledButton>
-                <StyledButton onClick={() => handleRecallClick()}>
-                  Recall
+                <StyledButton onClick={() => handleRevokeClick()}>
+                  Revoke
                 </StyledButton>
               </Box>
             </Grid>
@@ -155,4 +154,4 @@ const RecallButton = ({
   );
 };
 
-export default RecallButton;
+export default RevokeLentOutButton;

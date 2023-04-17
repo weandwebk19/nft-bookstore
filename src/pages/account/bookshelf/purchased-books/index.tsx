@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedPurchasedBooks } from "@/components/hooks/web3";
 import {
-  LeaseButton,
+  LendButton,
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";
@@ -23,8 +23,8 @@ import { FilterBar } from "@/components/shared/FilterBar";
 import { PurchasedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
-const BoughtBooks = () => {
-  const { t } = useTranslation("boughtBooks");
+const PurchasedBooks = () => {
+  const { t } = useTranslation("purchasedBooks");
 
   const breadCrumbs = [
     {
@@ -32,14 +32,14 @@ const BoughtBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_boughtBooks") as string,
+      content: t("breadcrumbs_purchasedBooks") as string,
       href: "/account/bookshelf/owned-books"
     }
   ];
 
   const { nfts } = useOwnedPurchasedBooks();
   const router = useRouter();
-  const boughtBooks = nfts.data;
+  const purchasedBooks = nfts.data;
   // console.log(nfts);
 
   const handleBookClick = (tokenId: number | string) => {
@@ -68,13 +68,13 @@ const BoughtBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("boughtBooksTitle")}>
+            <ContentPaper title={t("purchasedBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (boughtBooks?.length === 0 || nfts.error) {
+                } else if (purchasedBooks?.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
                       <Typography>{t("emptyMessage") as string}</Typography>
@@ -87,7 +87,7 @@ const BoughtBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {boughtBooks!.map((book: PurchasedBook) => {
+                    {purchasedBooks!.map((book: PurchasedBook) => {
                       return (
                         <Grid
                           item
@@ -98,7 +98,7 @@ const BoughtBooks = () => {
                           lg={12}
                         >
                           <ActionableBookItem
-                            status="isBought"
+                            status="isPurchased"
                             tokenId={book?.listedBook.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
@@ -116,7 +116,7 @@ const BoughtBooks = () => {
                                   owner={book?.listedBook.seller}
                                   amountTradeable={book?.amountTradeable!}
                                 />
-                                <LeaseButton
+                                <LendButton
                                   tokenId={book?.listedBook.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
@@ -145,7 +145,7 @@ const BoughtBooks = () => {
   );
 };
 
-export default withAuth(BoughtBooks);
+export default withAuth(PurchasedBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -153,7 +153,7 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "boughtBooks"
+        "purchasedBooks"
       ]))
     }
   };

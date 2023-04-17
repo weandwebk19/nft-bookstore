@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedBorrowedBooks } from "@/components/hooks/web3";
 import {
-  LeaseButton,
+  LendButton,
   ReadButton,
   SellButton
 } from "@/components/shared/BookButton";

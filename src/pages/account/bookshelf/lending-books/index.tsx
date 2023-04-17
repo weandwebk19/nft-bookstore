@@ -19,21 +19,21 @@ import {
   useOwnedLeasingBooks
 } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
-import { RecallButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import RecallAllLeasedOutButton from "@/components/ui/account/bookshelf/leasing-books/RecallAllLeasedOutButton";
-import RecallAllLeasingButton from "@/components/ui/account/bookshelf/leasing-books/RecallAllLeasingButton";
-import RecallLeasingButton from "@/components/ui/account/bookshelf/leasing-books/RecallLeasingButton";
+import RevokeAllLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLendingButton";
+import RevokeAllLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLentOutButton";
+import RevokeLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeLendingButton";
+import RevokeLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeLentOutButton";
 import { BorrowedBook, LeaseBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import { secondsToDhms } from "@/utils/secondsToDhms";
 
-const LeasingBooks = () => {
-  const { t } = useTranslation("leasingBooks");
+const LendingBooks = () => {
+  const { t } = useTranslation("lendingBooks");
 
   const breadCrumbs = [
     {
@@ -41,8 +41,8 @@ const LeasingBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_leasingBooks") as string,
-      href: "/account/bookshelf/leasing-books"
+      content: t("breadcrumbs_lendingBooks") as string,
+      href: "/account/bookshelf/lending-books"
     }
   ];
 
@@ -50,11 +50,11 @@ const LeasingBooks = () => {
   const { account } = useAccount();
   const { contract } = useWeb3();
 
-  const { nfts: leaseNfts } = useOwnedLeasingBooks();
-  const leasingBooks = leaseNfts.data as LeaseBook[];
+  const { nfts: lendNfts } = useOwnedLeasingBooks();
+  const lendingBooks = lendNfts.data as LeaseBook[];
 
-  const { nfts: leasedOutNfts } = useOwnedLeasedOutBooks();
-  const leasedOutBooks = leasedOutNfts.data as BorrowedBook[];
+  const { nfts: lentOutNfts } = useOwnedLeasedOutBooks();
+  const lentOutBooks = lentOutNfts.data as BorrowedBook[];
 
   const [nowTime, setNowTime] = useState<number>(0);
 
@@ -73,7 +73,7 @@ const LeasingBooks = () => {
     })();
   };
 
-  const handleRecallLeasingClick = async (tokenId: number, renter: string) => {
+  const handleRevokeLendingClick = async (tokenId: number, renter: string) => {
     try {
       // handle errors
       if (renter !== account.data) {
@@ -86,8 +86,8 @@ const LeasingBooks = () => {
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Recall Leasing NftBook successfully",
-        error: "Oops! There's a problem with leasing recall process!"
+        success: "Revoke Lending NftBook successfully",
+        error: "Oops! There's a problem with lending revoke process!"
       });
     } catch (e: any) {
       console.error(e);
@@ -97,7 +97,7 @@ const LeasingBooks = () => {
     }
   };
 
-  const handleRecallBorrowedBooks = async (
+  const handleRevokeBorrowedBooks = async (
     tokenId: number,
     renter: string,
     borrower: string,
@@ -123,8 +123,8 @@ const LeasingBooks = () => {
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Recall leased out book successfully",
-        error: "Oops! There's a problem with leased out process!"
+        success: "Revoke lent out book successfully",
+        error: "Oops! There's a problem with lent out process!"
       });
     } catch (e: any) {
       console.error(e);
@@ -152,15 +152,15 @@ const LeasingBooks = () => {
             <Stack spacing={3}>
               {/* Lease books that have not been borrowed by anyone */}
               <ContentPaper
-                title={t("leasingBooksTitle")}
-                button={<RecallAllLeasingButton />}
+                title={t("lendingBooksTitle")}
+                button={<RevokeAllLendingButton />}
               >
                 {(() => {
-                  if (leaseNfts.isLoading) {
+                  if (lendNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (leasingBooks?.length === 0 || leaseNfts.error) {
+                  } else if (lendingBooks?.length === 0 || lendNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>{t("emptyMessage") as string}</Typography>
@@ -174,7 +174,7 @@ const LeasingBooks = () => {
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
                       <>
-                        {leasingBooks!.map((book: LeaseBook) => {
+                        {lendingBooks!.map((book: LeaseBook) => {
                           return (
                             <Grid
                               item
@@ -185,7 +185,7 @@ const LeasingBooks = () => {
                               lg={12}
                             >
                               <ActionableBookItem
-                                status="isLeasing"
+                                status="isLending"
                                 tokenId={book?.tokenId}
                                 bookCover={book?.meta.bookCover}
                                 title={book?.meta.title}
@@ -196,14 +196,14 @@ const LeasingBooks = () => {
                                 amount={book?.amount}
                                 buttons={
                                   <>
-                                    <RecallLeasingButton
+                                    <RevokeLendingButton
                                       tokenId={book?.tokenId}
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
-                                      handleRecall={async () => {
-                                        return handleRecallLeasingClick(
+                                      handleRevoke={async () => {
+                                        return handleRevokeLendingClick(
                                           book?.tokenId,
                                           book?.renter
                                         );
@@ -218,7 +218,7 @@ const LeasingBooks = () => {
                                 //           book?.endRentalDay,
                                 //           "day"
                                 //         )} left`
-                                //       : "Ended" // End of leasing term
+                                //       : "Ended" // End of lending term
                                 //     : undefined
                                 // }
                               />
@@ -233,22 +233,19 @@ const LeasingBooks = () => {
 
               {/* Lease books that have been borrowed by others */}
               <ContentPaper
-                title={t("leasedOutBooksTitle")}
-                button={<RecallAllLeasedOutButton />}
+                title={t("lentOutBooksTitle")}
+                button={<RevokeAllLentOutButton />}
               >
                 {(() => {
-                  if (leasedOutNfts.isLoading) {
+                  if (lentOutNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (
-                    leasedOutBooks?.length === 0 ||
-                    leasedOutNfts.error
-                  ) {
+                  } else if (lentOutBooks?.length === 0 || lentOutNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>
-                          {t("emptyMessage__leasedOutBooks") as string}
+                          {t("emptyMessage__lentOutBooks") as string}
                         </Typography>
                       </FallbackNode>
                     );
@@ -260,7 +257,7 @@ const LeasingBooks = () => {
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
                       <>
-                        {leasedOutBooks!.map((book) => {
+                        {lentOutBooks!.map((book) => {
                           return (
                             <Grid
                               item
@@ -271,7 +268,7 @@ const LeasingBooks = () => {
                               lg={12}
                             >
                               <ActionableBookItem
-                                status="isLeasing"
+                                status="isLending"
                                 tokenId={book?.tokenId}
                                 bookCover={book?.meta.bookCover}
                                 title={book?.meta.title}
@@ -286,14 +283,14 @@ const LeasingBooks = () => {
                                 )}
                                 buttons={
                                   <>
-                                    <RecallButton
+                                    <RevokeLentOutButton
                                       tokenId={book?.tokenId}
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
-                                      handleRecall={async () => {
-                                        return handleRecallBorrowedBooks(
+                                      handleRevoke={async () => {
+                                        return handleRevokeBorrowedBooks(
                                           book?.tokenId,
                                           book?.renter,
                                           book?.borrower,
@@ -327,7 +324,7 @@ const LeasingBooks = () => {
   );
 };
 
-export default withAuth(LeasingBooks);
+export default withAuth(LendingBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -335,7 +332,7 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "leasingBooks"
+        "lendingBooks"
       ]))
     }
   };

@@ -28,7 +28,7 @@ const BookListActionable = ({
       )}
       {isOpenForBorrow && (
         <Typography variant="h5" gutterBottom>
-          {t("leasings")}
+          {t("lendings")}
         </Typography>
       )}
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>

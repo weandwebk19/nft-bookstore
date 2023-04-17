@@ -211,13 +211,13 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
           </Button>
           <Button
             variant={
-              router.query.filter === "leasings" ? "contained" : "outlined"
+              router.query.filter === "lendings" ? "contained" : "outlined"
             }
             onClick={() => {
-              router.push("/account/watchlist?filter=leasings");
+              router.push("/account/watchlist?filter=lendings");
             }}
           >
-            {t("leasings")}
+            {t("lendings")}
           </Button>
           <Button
             variant={
