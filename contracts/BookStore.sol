@@ -34,7 +34,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   uint MAX_BALANCE = 500;
   uint MIN_TIME = 604800; // Rental period is at least one week
   uint public listingPrice = 0.025 ether;
-  uint public leasingPrice = 0.001 ether;
+  uint public lendingPrice = 0.001 ether;
   uint public sharingPrice = 0.0005 ether;
   uint public convertPrice = 0.000005 ether;
 
@@ -71,11 +71,11 @@ contract BookStore is ERC1155URIStorage, Ownable {
     listingPrice = newPrice;
   }
 
-  function setLeasingPrice(uint newPrice) external onlyOwner {
+  function setLendingPrice(uint newPrice) external onlyOwner {
     if (newPrice == 0) {
       revert Error.InvalidPriceError(newPrice);
     }
-    leasingPrice = newPrice;
+    lendingPrice = newPrice;
   }
 
   function setSharingPrice(uint newPrice) external onlyOwner {
@@ -85,12 +85,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     sharingPrice = newPrice;
   }
 
-  function isListed(uint tokenId, address seller) public view returns (bool) {
-    return _listedBookStorage.isListed(tokenId, seller);
+  function isListing(uint tokenId, address seller) public view returns (bool) {
+    return _listedBookStorage.isListing(tokenId, seller);
   }
 
-  function isLeased(uint tokenId, address renter) public view returns (bool) {
-    return _bookRentingStorage.isLeased(tokenId, renter);
+  function isLending(uint tokenId, address renter) public view returns (bool) {
+    return _bookRentingStorage.isLending(tokenId, renter);
   }
 
   function _beforeTokenTransfer(
@@ -300,23 +300,25 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _purchasedBookStorage.getOwnedPurchasedBooks(msg.sender);
   }
 
-  function getOwnedLeasingBooks()
+  function getOwnedLendingBooks()
     public
     view
-    returns (BookRentingStorage.LeaseBook[] memory)
+    returns (BookRentingStorage.LendBook[] memory)
   {
-    uint ownedLeaseBookCount = _bookRentingStorage.getTotalOwnedLeaseBook(
+    uint ownedLendBookCount = _bookRentingStorage.getTotalOwnedLendBook(
       msg.sender
     );
     uint ownedItemsCount = _totalOwnedToken[msg.sender];
-    BookRentingStorage.LeaseBook[]
-      memory books = new BookRentingStorage.LeaseBook[](ownedLeaseBookCount);
+    BookRentingStorage.LendBook[]
+      memory books = new BookRentingStorage.LendBook[](ownedLendBookCount);
 
     uint currentIndex = 0;
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
-      BookRentingStorage.LeaseBook memory book = _bookRentingStorage
-        .getLeaseBook(tokenId, msg.sender);
+      BookRentingStorage.LendBook memory book = _bookRentingStorage.getLendBook(
+        tokenId,
+        msg.sender
+      );
       if (book.tokenId != 0 && book.renter != address(0)) {
         books[currentIndex] = book;
         currentIndex++;
@@ -371,7 +373,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     _listedBookStorage.sellListedBooks(tokenId, price, amount, msg.sender);
   }
 
-  function leaseBooks(
+  function lendBooks(
     uint256 tokenId,
     uint price,
     uint256 amount
@@ -386,10 +388,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
     ) {
       revert Error.InvalidAmountError(amount);
     }
-    if (msg.value != leasingPrice) {
+    if (msg.value != lendingPrice) {
       revert Error.InvalidPriceError(msg.value);
     }
-    _bookRentingStorage.leaseBooks(tokenId, msg.sender, price, amount);
+    _bookRentingStorage.lendBooks(tokenId, msg.sender, price, amount);
   }
 
   function updateBookFromSale(
@@ -425,7 +427,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
       revert Error.InvalidAddressError(msg.sender);
     }
 
-    _bookRentingStorage.updateLeaseBookFromRenting(
+    _bookRentingStorage.updateLendBookFromRenting(
       tokenId,
       newPrice,
       newAmount,
@@ -441,12 +443,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _listedBookStorage.getAllListedBooks();
   }
 
-  function getAllBooksOnLeasing()
+  function getAllBooksOnLending()
     public
     view
-    returns (BookRentingStorage.LeaseBook[] memory)
+    returns (BookRentingStorage.LendBook[] memory)
   {
-    return _bookRentingStorage.getAllLeaseBooks();
+    return _bookRentingStorage.getAllLendBooks();
   }
 
   function buyBooks(

@@ -3,27 +3,20 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { BorrowedBook } from "@/types/nftBook";
+import { LendBook } from "@/types/nftBook";
 
-import { useAccount } from ".";
+type OwnedLendingBooksHookFactory = CryptoHookFactory<LendBook[]>;
 
-type OwnedLeasedOutBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
+export type UseOwnedLendingBooksHook = ReturnType<OwnedLendingBooksHookFactory>;
 
-export type UseOwnedLeasedOutBooksHook =
-  ReturnType<OwnedLeasedOutBooksHookFactory>;
-
-export const hookFactory: OwnedLeasedOutBooksHookFactory =
+export const hookFactory: OwnedLendingBooksHookFactory =
   ({ contract }) =>
   () => {
-    const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedLeasedOutBooks" : null,
+      contract ? "web3/useOwnedLendingBooks" : null,
       async () => {
-        const nfts = [] as BorrowedBook[];
-        const allBorrowedBooks = await contract!.getAllBorrowedBooks();
-        const coreNfts = allBorrowedBooks.filter((nft) => {
-          return nft.renter == account.data;
-        });
+        const nfts = [] as LendBook[];
+        const coreNfts = await contract!.getOwnedLendingBooks();
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
@@ -41,9 +34,6 @@ export const hookFactory: OwnedLeasedOutBooksHookFactory =
               renter: item?.renter,
               amount: item?.amount?.toNumber(),
               price: parseFloat(ethers.utils.formatEther(item?.price)),
-              borrower: item?.borrower,
-              startTime: item?.startTime?.toNumber(),
-              endTime: item?.endTime?.toNumber(),
               meta
             });
           } catch (err) {

@@ -89,7 +89,7 @@ export type PurchasedBookCore = {
   amount: number;
 };
 
-export type LeaseBookCore = {
+export type LendBookCore = {
   tokenId: number;
   renter: string;
   price: number;
@@ -140,9 +140,9 @@ export type PurchasedBook = {
   meta: NftBookMeta;
 } & PurchasedBookCore;
 
-export type LeaseBook = {
+export type LendBook = {
   meta: NftBookMeta;
-} & LeaseBookCore;
+} & LendBookCore;
 
 export type BorrowedBook = {
   meta: NftBookMeta;
