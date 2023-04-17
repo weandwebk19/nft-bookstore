@@ -40,7 +40,7 @@ const PurchasedBooks = () => {
   const { nfts } = useOwnedPurchasedBooks();
   const router = useRouter();
   const purchasedBooks = nfts.data;
-  // console.log(nfts);
+  console.log(nfts);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {

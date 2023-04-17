@@ -21,15 +21,18 @@ contract PurchasedBookStorage {
     uint amount
   ) public {
     uint length = _totalOwnedPurchasedBook[buyer];
-    if (length >= 0) {
+    if (length > 0) {
       _ownedPurchasedBooks[buyer][length] = PurchasedBook(
         listedId,
         buyer,
         amount
       );
-      _totalOwnedPurchasedBook[buyer]++;
-      emit PurchasedBookCreated(listedId, buyer, amount);
+    } else {
+      _totalOwnedPurchasedBook[buyer] = 0;
+      _ownedPurchasedBooks[buyer][0] = PurchasedBook(listedId, buyer, amount);
     }
+    _totalOwnedPurchasedBook[buyer]++;
+    emit PurchasedBookCreated(listedId, buyer, amount);
   }
 
   function getTotalOwnedPurchasedBook(

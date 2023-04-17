@@ -60,7 +60,7 @@ const ShareButton = ({
   borrowedAmount
 }: ShareButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { ethereum, contract } = useWeb3();
+  const { contract } = useWeb3();
   const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
@@ -104,6 +104,10 @@ const ShareButton = ({
         startTime,
         endTime
       );
+      console.log("idBorrowedBook", idBorrowedBook.toNumber());
+      console.log("price", ethers.utils.parseEther(data.price.toString()));
+      console.log("data.amount", data.amount);
+      console.log("sharingPrice", sharingPrice.toNumber());
       const tx = await contract?.shareBooks(
         idBorrowedBook.toNumber(),
         ethers.utils.parseEther(data.price.toString()),

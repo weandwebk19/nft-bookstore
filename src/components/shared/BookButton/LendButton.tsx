@@ -83,8 +83,8 @@ const LendButton = ({
         });
       }
 
-      const lendingPrice = await contract!.leasingPrice();
-      const tx = await contract?.leaseBooks(
+      const lendingPrice = await contract!.lendingPrice();
+      const tx = await contract?.lendBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
         data.amount,

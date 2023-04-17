@@ -73,67 +73,6 @@ const LendingBooks = () => {
     })();
   };
 
-  const handleRevokeLendingClick = async (tokenId: number, renter: string) => {
-    try {
-      // handle errors
-      if (renter !== account.data) {
-        return toast.error("Renter address is not valid.", {
-          position: toast.POSITION.TOP_CENTER
-        });
-      }
-
-      const tx = await contract?.updateBookFromRenting(tokenId, 0, 0, renter);
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Pending.",
-        success: "Revoke Lending NftBook successfully",
-        error: "Oops! There's a problem with lending revoke process!"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
-  };
-
-  const handleRevokeBorrowedBooks = async (
-    tokenId: number,
-    renter: string,
-    borrower: string,
-    startTime: number,
-    endTime: number
-  ) => {
-    try {
-      // handle errors
-      if (renter !== account.data) {
-        return toast.error("Renter address is not valid.", {
-          position: toast.POSITION.TOP_CENTER
-        });
-      }
-
-      const idBorrowedBook = await contract!.getIdBorrowedBook(
-        tokenId,
-        renter,
-        borrower,
-        startTime,
-        endTime
-      );
-      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Pending.",
-        success: "Revoke lent out book successfully",
-        error: "Oops! There's a problem with lent out process!"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
-  };
-
   return (
     <>
       <Head>
@@ -153,7 +92,7 @@ const LendingBooks = () => {
               {/* Lease books that have not been borrowed by anyone */}
               <ContentPaper
                 title={t("lendingBooksTitle")}
-                button={<RevokeAllLendingButton />}
+                button={<RevokeAllLendingButton allBooks={lendingBooks} />}
               >
                 {(() => {
                   if (lendNfts.isLoading) {
@@ -202,12 +141,6 @@ const LendingBooks = () => {
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
-                                      handleRevoke={async () => {
-                                        return handleRevokeLendingClick(
-                                          book?.tokenId,
-                                          book?.renter
-                                        );
-                                      }}
                                     />
                                   </>
                                 }
@@ -288,16 +221,10 @@ const LendingBooks = () => {
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
+                                      borrower={book?.borrower}
                                       amount={book?.amount}
-                                      handleRevoke={async () => {
-                                        return handleRevokeBorrowedBooks(
-                                          book?.tokenId,
-                                          book?.renter,
-                                          book?.borrower,
-                                          book?.startTime,
-                                          book?.endTime
-                                        );
-                                      }}
+                                      startTime={book?.startTime}
+                                      endTime={book?.endTime}
                                     />
                                   </>
                                 }

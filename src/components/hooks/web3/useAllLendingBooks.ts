@@ -76,7 +76,7 @@ export const hookFactory: AllLendingBooksHookFactory =
             });
           } else if (account.data == renter) {
             return toast.error(
-              "You are not allowed to borrow the book lendd by yourself.",
+              "You are not allowed to borrow the book lent by yourself.",
               {
                 position: toast.POSITION.TOP_CENTER
               }
