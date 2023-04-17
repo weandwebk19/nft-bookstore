@@ -802,10 +802,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
     );
   }
 
-  function takeBooksOnSharing(
-    uint idBooksOnSharing,
-    uint amount
-  ) public payable {
+  function takeBooksOnSharing(uint idBooksOnSharing) 
+    public payable {
     if (msg.sender == address(0)) {
       revert Error.InvalidAddressError(msg.sender);
     }
@@ -816,21 +814,19 @@ contract BookStore is ERC1155URIStorage, Ownable {
       .getBooksOnSharing(idBooksOnSharing);
     uint price = _bookSharingStorage.takeBooksOnSharing(
       idBooksOnSharing,
-      msg.sender,
-      amount
+      msg.sender
     );
     if (price != 0 && booksOnSharing.tokenId != 0) {
       _safeTransferFrom(
         booksOnSharing.sharer,
         msg.sender,
         booksOnSharing.tokenId,
-        amount,
+        1,
         ""
       );
       // The amount you pay for this transaction will not depend on the period of borrowing the book,
       // the price will be set by the sharer
-      uint totalPrice = price * amount;
-      payable(booksOnSharing.sharer).transfer(totalPrice);
+      payable(booksOnSharing.sharer).transfer(price);
     } else {
       revert Error.ExecutionError();
     }
