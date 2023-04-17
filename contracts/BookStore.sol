@@ -82,7 +82,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function isListing(uint tokenId, address seller) public view returns (bool) {
-    return _listedBookStorage.isListing(tokenId, seller);
+    return _bookSellingStorage.isListing(tokenId, seller);
   }
 
   function isLending(uint tokenId, address renter) public view returns (bool) {
