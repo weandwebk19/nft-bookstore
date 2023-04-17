@@ -6,12 +6,11 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./list/ListedBookStorage.sol";
+import "./sell/BookSellingStorage.sol";
 import "./rent/BookRentingStorage.sol";
 import "./share/BookSharingStorage.sol";
 import "./BookTemporary.sol";
 import "./ListRealOwners.sol";
-import "./purchase/PurchasedBookStorage.sol";
 
 contract BookStore is ERC1155URIStorage, Ownable {
   using Counters for Counters.Counter;
@@ -24,8 +23,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   event NFTBookCreated(uint256 tokenId, address author, uint256 quantity);
 
-  ListedBookStorage private _listedBookStorage;
-  PurchasedBookStorage private _purchasedBookStorage;
+  BookSellingStorage private _bookSellingStorage;
   BookTemporary private _bookTemporary;
   BookRentingStorage private _bookRentingStorage;
   BookSharingStorage private _bookSharingStorage;
@@ -47,13 +45,11 @@ contract BookStore is ERC1155URIStorage, Ownable {
   mapping(address => uint) private _totalOwnedToken;
 
   constructor(
-    ListedBookStorage listedBookStorage,
-    PurchasedBookStorage purchasedBookStorage,
+    BookSellingStorage bookSellingStorage,
     BookTemporary bookTemporary,
     ListRealOwners listRealOwners
   ) ERC1155("https://example.com/api/{id}.json") {
-    _listedBookStorage = listedBookStorage;
-    _purchasedBookStorage = purchasedBookStorage;
+    _bookSellingStorage = bookSellingStorage;
     _bookTemporary = bookTemporary;
     _bookRentingStorage = _bookTemporary.getBookRentingStorage();
     _bookSharingStorage = bookTemporary.getBookSharingStorage();
@@ -86,7 +82,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function isListing(uint tokenId, address seller) public view returns (bool) {
-    return _listedBookStorage.isListing(tokenId, seller);
+    return _bookSellingStorage.isListing(tokenId, seller);
   }
 
   function isLending(uint tokenId, address renter) public view returns (bool) {
@@ -201,14 +197,14 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getListedBook(
     uint tokenId,
     address seller
-  ) public view returns (ListedBookStorage.ListedBook memory) {
-    return _listedBookStorage.getListedBook(tokenId, seller);
+  ) public view returns (BookSellingStorage.BookSelling memory) {
+    return _bookSellingStorage.getListedBook(tokenId, seller);
   }
 
   function getListedBookById(
     uint idListedBook
-  ) public view returns (ListedBookStorage.ListedBook memory) {
-    return _listedBookStorage.getListedBookById(idListedBook);
+  ) public view returns (BookSellingStorage.BookSelling  memory) {
+    return _bookSellingStorage.getListedBookById(idListedBook);
   }
 
   function isTokenURIExist(string memory tokenURI) public view returns (bool) {
@@ -269,19 +265,19 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getOwnedListedBooks()
     public
     view
-    returns (ListedBookStorage.ListedBook[] memory)
+    returns (BookSellingStorage.BookSelling[] memory)
   {
-    uint ownedListedBookCount = _listedBookStorage.getTotalOwnedListedBook(
+    uint ownedListedBookCount = _bookSellingStorage.getTotalOwnedListedBook(
       msg.sender
     );
     uint ownedItemsCount = _totalOwnedToken[msg.sender];
-    ListedBookStorage.ListedBook[]
-      memory books = new ListedBookStorage.ListedBook[](ownedListedBookCount);
+    BookSellingStorage.BookSelling[]
+      memory books = new BookSellingStorage.BookSelling[](ownedListedBookCount);
 
     uint currentIndex = 0;
     for (uint i = 0; i < ownedItemsCount; i++) {
       uint tokenId = _ownedTokens[msg.sender][i];
-      ListedBookStorage.ListedBook memory book = _listedBookStorage
+      BookSellingStorage.BookSelling memory book = _bookSellingStorage
         .getListedBook(tokenId, msg.sender);
       if (book.tokenId != 0 && book.seller != address(0)) {
         books[currentIndex] = book;
@@ -295,9 +291,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getOwnedPurchasedBooks()
     public
     view
-    returns (PurchasedBookStorage.PurchasedBook[] memory)
+    returns (BookSellingStorage.BookSelling[] memory)
   {
-    return _purchasedBookStorage.getOwnedPurchasedBooks(msg.sender);
+    return _bookSellingStorage.getOwnedPurchasedBooks(msg.sender);
   }
 
   function getOwnedLendingBooks()
@@ -348,7 +344,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     uint256 tokenId
   ) public view returns (uint) {
     return
-      _listedBookStorage.getAmountOfListedBooks(tokenId, msg.sender) +
+      _bookSellingStorage.getAmountOfListedBooks(tokenId, msg.sender) +
       _bookTemporary.getAmountOfAllTypeBooksInTemporary(tokenId, msg.sender);
   }
 
@@ -370,7 +366,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     if (msg.value != listingPrice) {
       revert Error.InvalidPriceError(msg.value);
     }
-    _listedBookStorage.sellListedBooks(tokenId, price, amount, msg.sender);
+    _bookSellingStorage.sellListedBooks(tokenId, price, amount, msg.sender);
   }
 
   function lendBooks(
@@ -406,7 +402,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     if (seller != msg.sender) {
       revert Error.InvalidAddressError(msg.sender);
     }
-    _listedBookStorage.updateListedBookFromSale(
+    _bookSellingStorage.updateListedBookFromSale(
       tokenId,
       newPrice,
       newAmount,
@@ -438,9 +434,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
   function getAllBooksOnSale()
     public
     view
-    returns (ListedBookStorage.ListedBook[] memory)
+    returns (BookSellingStorage.BookSelling[] memory)
   {
-    return _listedBookStorage.getAllListedBooks();
+    return _bookSellingStorage.getAllListedBooks();
   }
 
   function getAllBooksOnLending()
@@ -456,7 +452,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     address seller,
     uint256 amount
   ) public payable {
-    uint totalPrice = _listedBookStorage.buyListedBooks(
+    uint totalPrice = _bookSellingStorage.buyListedBooks(
       tokenId,
       seller,
       amount,
@@ -464,13 +460,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
       msg.value
     );
     if (totalPrice != 0) {
-      uint idListedBook = _listedBookStorage.getIdListedBook(tokenId, seller);
-      _purchasedBookStorage.createPurchasedBook(
-        idListedBook,
-        msg.sender,
-        amount
-      );
-
       _safeTransferFrom(seller, msg.sender, tokenId, amount, "");
       payable(seller).transfer(totalPrice);
     }
@@ -804,10 +793,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
     );
   }
 
-  function takeBooksOnSharing(
-    uint idBooksOnSharing,
-    uint amount
-  ) public payable {
+  function takeBooksOnSharing(uint idBooksOnSharing) 
+    public payable {
     if (msg.sender == address(0)) {
       revert Error.InvalidAddressError(msg.sender);
     }
@@ -818,21 +805,19 @@ contract BookStore is ERC1155URIStorage, Ownable {
       .getBooksOnSharing(idBooksOnSharing);
     uint price = _bookSharingStorage.takeBooksOnSharing(
       idBooksOnSharing,
-      msg.sender,
-      amount
+      msg.sender
     );
     if (price != 0 && booksOnSharing.tokenId != 0) {
       _safeTransferFrom(
         booksOnSharing.sharer,
         msg.sender,
         booksOnSharing.tokenId,
-        amount,
+        1,
         ""
       );
       // The amount you pay for this transaction will not depend on the period of borrowing the book,
       // the price will be set by the sharer
-      uint totalPrice = price * amount;
-      payable(booksOnSharing.sharer).transfer(totalPrice);
+      payable(booksOnSharing.sharer).transfer(price);
     } else {
       revert Error.ExecutionError();
     }

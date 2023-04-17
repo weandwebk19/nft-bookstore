@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 const BookStore = artifacts.require("BookStore");
-const ListedBookStorage = artifacts.require("ListedBookStorage");
+const BookSellingStorage = artifacts.require("BookSellingStorage");
 const BookTemporary = artifacts.require("BookTemporary");
 const Timelock = artifacts.require("Timelock");
 const ExtendTime = artifacts.require("ExtendTime");
@@ -8,11 +8,9 @@ const Error = artifacts.require("Error");
 const BookSharingStorage = artifacts.require("BookSharingStorage");
 const BookRentingStorage = artifacts.require("BookRentingStorage");
 const ListRealOwners = artifacts.require("ListRealOwners");
-const PurchasedBookStorage = artifacts.require("PurchasedBookStorage");
-
 module.exports = function (deployer) {
   deployer
-    .deploy(ListedBookStorage)
+    .deploy(BookSellingStorage)
     .then(function () {
       return deployer.deploy(ExtendTime);
     })
@@ -41,17 +39,15 @@ module.exports = function (deployer) {
     })
     .then(function () {
       return Promise.all([
-        ListedBookStorage.deployed(),
+        BookSellingStorage.deployed(),
         BookTemporary.deployed()
       ]);
     })
-    .then(async function ([listedBookStorage, bookTemporary]) {
+    .then(async function ([bookSellingStorage, bookTemporary]) {
       await deployer.deploy(ListRealOwners);
-      await deployer.deploy(PurchasedBookStorage);
       return deployer.deploy(
         BookStore,
-        listedBookStorage.address,
-        PurchasedBookStorage.address,
+        bookSellingStorage.address,
         bookTemporary.address,
         ListRealOwners.address
       );

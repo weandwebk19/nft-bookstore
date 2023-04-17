@@ -2,19 +2,21 @@
 pragma solidity >=0.4.22 <0.9.0;
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract ListedBookStorage {
+contract BookSellingStorage {
   using Counters for Counters.Counter;
 
-  struct ListedBook {
+  struct BookSelling {
     uint256 tokenId;
     address seller;
+    address buyer;
     uint price;
     uint amount;
   }
 
-  event ListedBookCreated(
+  event BookSellingCreated(
     uint tokenId,
     address seller,
+    address buyer,
     uint price,
     uint amount
   );
@@ -22,8 +24,12 @@ contract ListedBookStorage {
   // Variable for Listed Books
   mapping(uint => mapping(address => uint)) _allListedBook; // (tokenID -> (seller -> ID))
   mapping(address => uint) private _totalOwnedListedBook;
-  mapping(uint => ListedBook) private _idToListedBook; // (ID -> ListedBook))
+  mapping(uint => BookSelling) private _idToListedBook; // (ID -> BookSelling))
   Counters.Counter private _listedBooks;
+
+    // Variable for Purchased Books
+  mapping(address => mapping(uint => BookSelling)) private _ownedPurchasedBooks;
+  mapping(address => uint) private _totalOwnedPurchasedBook;
 
   function isListing(uint tokenId, address seller) public view returns (bool) {
     uint idListedBook = getIdListedBook(tokenId, seller);
@@ -37,14 +43,14 @@ contract ListedBookStorage {
   function getListedBook(
     uint tokenId,
     address seller
-  ) public view returns (ListedBook memory) {
+  ) public view returns (BookSelling memory) {
     uint idListedBook = getIdListedBook(tokenId, seller);
     return _idToListedBook[idListedBook];
   }
 
   function getListedBookById(
     uint idListedBook
-  ) public view returns (ListedBook memory) {
+  ) public view returns (BookSelling memory) {
     return _idToListedBook[idListedBook];
   }
 
@@ -52,22 +58,36 @@ contract ListedBookStorage {
     return _totalOwnedListedBook[seller];
   }
 
-  function _createListedBook(
+  function _createBookSelling(
     uint tokenId,
     address seller,
+    address buyer,
     uint256 price,
     uint amount
   ) private {
-    _listedBooks.increment();
-    _allListedBook[tokenId][seller] = _listedBooks.current();
-    _idToListedBook[_listedBooks.current()] = ListedBook(
-      tokenId,
-      seller,
-      price,
-      amount
-    );
-    _totalOwnedListedBook[seller]++;
-    emit ListedBookCreated(tokenId, seller, price, amount);
+    if (buyer == address(0)) {
+      _listedBooks.increment();
+      _allListedBook[tokenId][seller] = _listedBooks.current();
+      _idToListedBook[_listedBooks.current()] = BookSelling(
+        tokenId,
+        seller,
+        buyer,
+        price,
+        amount
+      );
+      _totalOwnedListedBook[seller]++;
+    } else {
+      _totalOwnedPurchasedBook[buyer]++;
+      uint length = _totalOwnedPurchasedBook[buyer];
+      _ownedPurchasedBooks[buyer][length] = BookSelling(
+        tokenId,
+        seller,
+        buyer,
+        price,
+        amount
+      );
+    }
+    emit BookSellingCreated(tokenId, seller, buyer, price, amount);
   }
 
   // ===================================LISTING============================================
@@ -105,9 +125,9 @@ contract ListedBookStorage {
   ) public payable {
     uint idListedBook = getIdListedBook(tokenId, seller);
     if (idListedBook == 0) {
-      _createListedBook(tokenId, seller, price, amount);
+      _createBookSelling(tokenId, seller, address(0), price, amount);
     } else if (idListedBook != 0) {
-      ListedBook memory listedBook = _idToListedBook[idListedBook];
+      BookSelling memory listedBook = _idToListedBook[idListedBook];
       _idToListedBook[idListedBook].amount += amount;
 
       // Update price of listed book if need
@@ -120,7 +140,7 @@ contract ListedBookStorage {
   function _removeItemFromAllListedBooks(uint tokenId, address seller) private {
     uint idListedBook = getIdListedBook(tokenId, seller);
     uint lastIdListedBook = _listedBooks.current();
-    ListedBook memory lastListedBook = _idToListedBook[lastIdListedBook];
+    BookSelling memory lastListedBook = _idToListedBook[lastIdListedBook];
     uint lastTokenId = lastListedBook.tokenId;
     address lastSeller = lastListedBook.seller;
     if (idListedBook != 0) {
@@ -154,11 +174,11 @@ contract ListedBookStorage {
     }
   }
 
-  function getAllListedBooks() public view returns (ListedBook[] memory) {
-    ListedBook[] memory books = new ListedBook[](_listedBooks.current());
+  function getAllListedBooks() public view returns (BookSelling[] memory) {
+    BookSelling[] memory books = new BookSelling[](_listedBooks.current());
 
     for (uint i = 1; i <= _listedBooks.current(); i++) {
-      ListedBook memory book = _idToListedBook[i];
+      BookSelling memory book = _idToListedBook[i];
       books[i - 1] = book;
     }
 
@@ -174,7 +194,7 @@ contract ListedBookStorage {
   ) public payable returns (uint) {
     uint idListedBook = getIdListedBook(tokenId, seller);
     if (idListedBook != 0) {
-      ListedBook memory listedBook = _idToListedBook[idListedBook];
+      BookSelling memory listedBook = _idToListedBook[idListedBook];
       require(
         buyer != listedBook.seller,
         "You can't buy your own books on sale"
@@ -186,17 +206,42 @@ contract ListedBookStorage {
       require(amount <= listedBook.amount && amount > 0, "Amount is invalid");
 
       uint256 totalPrice = amount * listedBook.price;
-
+      
       updateListedBookFromSale(
         tokenId,
         listedBook.price,
         listedBook.amount - amount,
         seller
       );
+      _createBookSelling(tokenId, seller, buyer, listedBook.price, amount);
 
       return totalPrice;
     }
 
     return 0;
+  }
+
+  function getTotalOwnedPurchasedBook(
+    address buyer
+  ) public view returns (uint) {
+    return _totalOwnedPurchasedBook[buyer];
+  }
+
+  function getOwnedPurchasedBooks(
+    address owner
+  ) public view returns (BookSelling[] memory) {
+    uint ownedPurchasedBookCount = getTotalOwnedPurchasedBook(owner);
+    BookSelling[] memory books = new BookSelling[](ownedPurchasedBookCount);
+
+    uint currentIndex = 0;
+    for (uint i = 1; i <= ownedPurchasedBookCount; i++) {
+      BookSelling memory book = _ownedPurchasedBooks[owner][i];
+      if (book.tokenId != 0 && book.buyer == owner) {
+        books[currentIndex] = book;
+        currentIndex++;
+      }
+    }
+
+    return books;
   }
 }
