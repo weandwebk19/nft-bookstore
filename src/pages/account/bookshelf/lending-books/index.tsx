@@ -15,8 +15,8 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import {
   useAccount,
-  useOwnedLeasedOutBooks,
-  useOwnedLeasingBooks
+  useOwnedLendingBooks,
+  useOwnedLentOutBooks
 } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -28,7 +28,7 @@ import RevokeAllLendingButton from "@/components/ui/account/bookshelf/lending-bo
 import RevokeAllLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLentOutButton";
 import RevokeLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeLendingButton";
 import RevokeLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeLentOutButton";
-import { BorrowedBook, LeaseBook } from "@/types/nftBook";
+import { BorrowedBook, LendBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import { secondsToDhms } from "@/utils/secondsToDhms";
 
@@ -50,10 +50,10 @@ const LendingBooks = () => {
   const { account } = useAccount();
   const { contract } = useWeb3();
 
-  const { nfts: lendNfts } = useOwnedLeasingBooks();
-  const lendingBooks = lendNfts.data as LeaseBook[];
+  const { nfts: lendNfts } = useOwnedLendingBooks();
+  const lendingBooks = lendNfts.data as LendBook[];
 
-  const { nfts: lentOutNfts } = useOwnedLeasedOutBooks();
+  const { nfts: lentOutNfts } = useOwnedLentOutBooks();
   const lentOutBooks = lentOutNfts.data as BorrowedBook[];
 
   const [nowTime, setNowTime] = useState<number>(0);
@@ -174,7 +174,7 @@ const LendingBooks = () => {
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
                       <>
-                        {lendingBooks!.map((book: LeaseBook) => {
+                        {lendingBooks!.map((book: LendBook) => {
                           return (
                             <Grid
                               item

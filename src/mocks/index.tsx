@@ -11,7 +11,7 @@ export const book = {
   tokenId: "0",
   price: 0.5,
   author: "Markus Zusak",
-  isListed: true,
+  isListing: true,
   meta: {
     title: "The Book Thief",
     bookFile: "epub",
@@ -52,7 +52,7 @@ export const bookList: NftBook[] = [
     tokenId: "0",
     price: 0.5,
     author: "Markus Zusak",
-    isListed: true,
+    isListing: true,
     endRentalDay: 3,
     rentee: "Bà nào đó",
     meta: {
@@ -95,7 +95,7 @@ export const bookList: NftBook[] = [
     tokenId: "1",
     price: 0.5,
     author: "Khaled Hosseini",
-    isListed: true,
+    isListing: true,
     endRentalDay: 0,
     rentee: "Ông nào đó",
     meta: {
@@ -137,7 +137,7 @@ export const bookList: NftBook[] = [
     tokenId: "2",
     price: 0.5,
     author: "Markus Zusak",
-    isListed: true,
+    isListing: true,
     meta: {
       title: "The Boy in the Striped Pajamas",
       bookFile: "epub",
@@ -177,7 +177,7 @@ export const bookList: NftBook[] = [
     tokenId: "3",
     price: 0.5,
     author: "Louis Lowry",
-    isListed: true,
+    isListing: true,
     meta: {
       title: "The Giver",
       bookFile: "epub",
@@ -217,7 +217,7 @@ export const bookList: NftBook[] = [
     tokenId: "4",
     price: 0.8,
     author: "Harper Lee",
-    isListed: true,
+    isListing: true,
     meta: {
       title: "Life of Pi",
       bookFile: "pdf",
@@ -257,7 +257,7 @@ export const bookList: NftBook[] = [
 
 type BookDetailsProps = {
   onClick: () => void;
-  isListed?: boolean;
+  isListing?: boolean;
   isPublished?: boolean;
   isSelled?: boolean;
   setIsSelled?: (flag: boolean) => void;
