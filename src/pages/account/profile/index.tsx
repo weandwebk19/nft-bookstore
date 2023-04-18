@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -120,18 +120,18 @@ const Profile = () => {
   } = methods;
   const watchPicture = watch("picture");
 
-  const handleRemoveImage = async () => {
+  const handleRemoveImage = useCallback(async () => {
     setValue("picture", "");
-  };
+  }, []);
 
-  const handleCancel = async () => {
+  const handleCancel = useCallback(async () => {
     reset((formValues) => ({
       ...defaultValues,
       walletAddress: formValues.walletAddress
     }));
-  };
+  }, []);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = useCallback((data: any) => {
     console.log("data:", data);
     (async () => {
       try {
@@ -146,7 +146,7 @@ const Profile = () => {
         setIsLoading(false);
       }
     })();
-  };
+  }, []);
 
   useEffect(() => {
     setValue("walletAddress", account.data);
