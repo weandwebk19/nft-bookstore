@@ -1,13 +1,6 @@
 import { Controller, useFormContext } from "react-hook-form";
 
-import {
-  FormHelperText,
-  IconButton,
-  InputAdornment,
-  TextField
-} from "@mui/material";
-
-import { ContentCopy as ContentCopyIcon } from "@mui/icons-material";
+import { FormHelperText, TextField } from "@mui/material";
 
 interface InputControllerProps {
   type?: string;
@@ -33,7 +26,7 @@ const InputController = ({
   endAdornment,
   ...rest
 }: InputControllerProps) => {
-  const { control, getValues } = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <Controller
@@ -45,24 +38,6 @@ const InputController = ({
             label={label}
             error={invalid}
             InputProps={{ readOnly, endAdornment }}
-            // InputProps={{ readOnly, endAdornment, ...InputProps }}
-            // InputProps={{
-            //   readOnly: true,
-            //   endAdornment: (
-            //     <InputAdornment position="end">
-            //       <IconButton
-            //         edge="end"
-            //         onClick={() => {
-            //           navigator.clipboard.writeText(
-            //             `${getValues("walletAddress")}`
-            //           );
-            //         }}
-            //       >
-            //         <ContentCopyIcon />
-            //       </IconButton>
-            //     </InputAdornment>
-            //   )
-            // }}
             {...field}
             onChange={(e) => {
               if (onChange) {

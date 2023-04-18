@@ -295,9 +295,7 @@ const SharingBooks = () => {
             </Stack>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar />
           </Grid>
         </Grid>
       </Stack>

@@ -19,6 +19,7 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 import { Language } from "@/types/languages";
 
+import { ContentPaper } from "../ContentPaper";
 import {
   InputController,
   RangeSliderController,
@@ -103,82 +104,84 @@ const FilterBar = () => {
   }
 
   return (
-    <FormProvider {...methods}>
-      <Stack
-        direction="column"
-        divider={<Divider orientation="horizontal" />}
-        spacing={3}
-        sx={{ marginTop: 4 }}
-        className={styles["filter-bar"]}
-      >
-        <FormGroup
-          label={
-            <Stack
-              direction={{ xs: "row" }}
-              spacing={{ xs: 2 }}
-              sx={{
-                alignItems: "center",
-                justifyContent: "space-between"
-              }}
-            >
-              {t("genres")}
-              <Stack direction={{ xs: "row" }}>
-                <Tooltip title={t("tooltip_reset") as string}>
-                  <IconButton onClick={handleResetGenres}>
-                    <RestartAltOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t("tooltip_selectAll") as string}>
-                  <IconButton onClick={handleSelectAllGenres}>
-                    <SelectAllOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
+    <ContentPaper title={t("filter") as string}>
+      <FormProvider {...methods}>
+        <Stack
+          direction="column"
+          divider={<Divider orientation="horizontal" />}
+          spacing={3}
+          sx={{ marginTop: 4 }}
+          className={styles["filter-bar"]}
+        >
+          <FormGroup
+            label={
+              <Stack
+                direction={{ xs: "row" }}
+                spacing={{ xs: 2 }}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }}
+              >
+                {t("genres")}
+                <Stack direction={{ xs: "row" }}>
+                  <Tooltip title={t("tooltip_reset") as string}>
+                    <IconButton onClick={handleResetGenres}>
+                      <RestartAltOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("tooltip_selectAll") as string}>
+                    <IconButton onClick={handleSelectAllGenres}>
+                      <SelectAllOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
               </Stack>
-            </Stack>
-          }
-        >
-          {genres.isLoading && "Loading..."}
-          {genres.error &&
-            "Oops! There was a problem loading genres \n Try refresh the page."}
-          <TreeViewController name="genre" items={genres.data} />
-        </FormGroup>
-        <FormGroup label={t("searchBook") as string}>
-          <InputController name="title" />
-        </FormGroup>
-        <FormGroup label={t("rating") as string}>
-          <RatingController
-            name="rating"
-            getLabelText={getLabelText}
-            labels={labels}
-          />
-        </FormGroup>
-        <FormGroup label={t("price") as string}>
-          <RangeSliderController
-            name="priceRange"
-            min={MIN_PRICE}
-            max={MAX_PRICE}
-            step={0.5}
-          />
-        </FormGroup>
-        <FormGroup label={t("searchByAuthor") as string}>
-          <InputController name="author" />
-        </FormGroup>
-        <FormGroup label={t("languagesSupport") as string}>
-          <SelectController
-            name="language"
-            items={languages.data}
-            itemValue="_id"
-          />
-        </FormGroup>
-        <StyledButton
-          customVariant="primary"
-          type="submit"
-          onClick={handleSubmit(onSubmit)}
-        >
-          {t("apply") as string}
-        </StyledButton>
-      </Stack>
-    </FormProvider>
+            }
+          >
+            {genres.isLoading && "Loading..."}
+            {genres.error &&
+              "Oops! There was a problem loading genres \n Try refresh the page."}
+            <TreeViewController name="genre" items={genres.data} />
+          </FormGroup>
+          <FormGroup label={t("searchBook") as string}>
+            <InputController name="title" />
+          </FormGroup>
+          <FormGroup label={t("rating") as string}>
+            <RatingController
+              name="rating"
+              getLabelText={getLabelText}
+              labels={labels}
+            />
+          </FormGroup>
+          <FormGroup label={t("price") as string}>
+            <RangeSliderController
+              name="priceRange"
+              min={MIN_PRICE}
+              max={MAX_PRICE}
+              step={0.5}
+            />
+          </FormGroup>
+          <FormGroup label={t("searchByAuthor") as string}>
+            <InputController name="author" />
+          </FormGroup>
+          <FormGroup label={t("languagesSupport") as string}>
+            <SelectController
+              name="language"
+              items={languages.data}
+              itemValue="_id"
+            />
+          </FormGroup>
+          <StyledButton
+            customVariant="primary"
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+          >
+            {t("apply") as string}
+          </StyledButton>
+        </Stack>
+      </FormProvider>
+    </ContentPaper>
   );
 };
 

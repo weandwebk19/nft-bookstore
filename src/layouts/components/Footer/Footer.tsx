@@ -106,8 +106,7 @@ const Footer = () => {
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              padding: "24px"
+              flexDirection: "column"
             }}
           >
             <Link href="/">
@@ -123,7 +122,7 @@ const Footer = () => {
           <Grid
             container
             spacing={{ xs: 2, md: 3, lg: 4 }}
-            columns={{ xs: 4, sm: 8, md: 12 }}
+            columns={{ xs: 4, sm: 8, md: 12, lg: 20 }}
             className={styles.footer__list}
           >
             {footerItems.length > 0 &&
@@ -132,7 +131,8 @@ const Footer = () => {
                   item
                   xs={4}
                   sm={4}
-                  md={2}
+                  md={3}
+                  lg={4}
                   key={item.content}
                   className="footer__item"
                 >
