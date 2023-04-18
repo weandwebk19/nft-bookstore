@@ -524,8 +524,8 @@ contract BookSharingStorage {
     }
 
     function takeBooksOnSharing(uint idBooksOnSharing,
-                                address sender,
-                                uint amount) public payable returns(uint) {
+                                address sender) 
+        public payable returns(uint) {
         BookSharing memory booksOnSharing = getBooksOnSharing(idBooksOnSharing);
         if (booksOnSharing.tokenId == 0) {
             revert Error.InvalidIdError(booksOnSharing.tokenId);
@@ -536,8 +536,8 @@ contract BookSharingStorage {
         if (booksOnSharing.sharer == sender) {
             revert Error.InvalidAddressError(sender);
         }
-        if (amount > booksOnSharing.amount && amount == 0) {
-            revert Error.InvalidAmountError(amount);
+        if (booksOnSharing.amount == 0) {
+            revert Error.InvalidAmountError(0);
         }
         uint tokenId = booksOnSharing.tokenId;
         address sharer = booksOnSharing.sharer;
@@ -554,7 +554,7 @@ contract BookSharingStorage {
                               sender, 
                               booksOnSharing.priceOfBB,
                               booksOnSharing.price, 
-                              amount, 
+                              1, 
                               booksOnSharing.startTime, 
                               booksOnSharing.endTime);
 
@@ -564,10 +564,10 @@ contract BookSharingStorage {
                                        sender,
                                        tokenId,
                                        booksOnSharing.price, 
-                                       sharedBooks.amount + amount);
+                                       sharedBooks.amount + 1);
         }
 
-        if (amount == booksOnSharing.amount) {
+        if (booksOnSharing.amount == 1) {
             bytes32 hashId = getHashIdForBookOnSharing(tokenId,
                                                        booksOnSharing.fromRenter,
                                                        sharer, 
@@ -582,7 +582,7 @@ contract BookSharingStorage {
                                           sharer,
                                           tokenId,
                                           booksOnSharing.price, 
-                                          booksOnSharing.amount - amount);
+                                          booksOnSharing.amount - 1);
         }
 
         // Return price of books on sharing to transfer to sharer 

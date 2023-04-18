@@ -2,6 +2,7 @@ import React from "react";
 
 import {
   Avatar,
+  Box,
   Card,
   CardContent,
   CardHeader,
@@ -9,6 +10,7 @@ import {
   ListItemIcon,
   Menu,
   MenuItem,
+  OutlinedInput,
   Stack,
   Typography
 } from "@mui/material";
@@ -27,9 +29,10 @@ import { ReadMore } from "../ReadMore";
 interface CommentProps {
   avatar?: string;
   username: string;
-  date: string;
-  rating: number;
+  date?: string;
+  rating?: number;
   comment?: string;
+  canComment?: boolean;
 }
 
 const Comment = ({
@@ -37,7 +40,8 @@ const Comment = ({
   username,
   date,
   rating,
-  comment = ""
+  comment = "",
+  canComment = false
 }: CommentProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -49,7 +53,7 @@ const Comment = ({
   };
 
   return (
-    <Card>
+    <Box sx={{ m: 2, pt: 2, border: "1px solid black", borderRadius: "1em" }}>
       <Stack direction="row">
         {/* <Stack sx={{ p: 2 }}>
           <Avatar alt={username} src={avatar} />
@@ -66,9 +70,16 @@ const Comment = ({
           </Typography>
         </Stack> */}
 
-        <Stack>
+        <Stack sx={{ width: "100%" }}>
           <CardHeader
-            avatar={<Avatar alt={username} src={avatar} />}
+            sx={{ py: "0 !important" }}
+            avatar={
+              <Avatar
+                alt={username}
+                src={avatar}
+                sx={{ width: 24, height: 24 }}
+              />
+            }
             action={
               <>
                 <IconButton
@@ -101,12 +112,16 @@ const Comment = ({
             subheader={date}
           />
           <CardContent>
-            {StaticRating(rating)}
-            <ReadMore>{comment}</ReadMore>
+            {rating && StaticRating(rating)}
+            {canComment ? (
+              <OutlinedInput sx={{ width: "100%" }} />
+            ) : (
+              <ReadMore>{comment}</ReadMore>
+            )}
           </CardContent>
         </Stack>
       </Stack>
-    </Card>
+    </Box>
   );
 };
 
