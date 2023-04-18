@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   Box,
   FormHelperText,
+  Grid,
   IconButton,
   InputAdornment,
   Link,
@@ -23,7 +24,6 @@ import {
 } from "@mui/icons-material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import styles from "@styles/ContentContainer.module.scss";
 import axios from "axios";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -227,321 +227,355 @@ const AuthorRequest = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <ContentContainer
-          titles={[t("titleContent1") as string, t("titleContent2") as string]}
-        >
-          <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
-            <Box sx={{ my: 2 }}>
-              <Typography
-                variant="caption"
-                className="form-label required"
-                sx={{ fontSize: "14px" }}
-              >
-                {t("required") as string}
-              </Typography>
-            </Box>
-            <FormProvider {...methods}>
-              <form>
-                <Stack spacing={6}>
-                  <ContentGroup
-                    title={t("titleUpload") as string}
-                    classTitle="required"
-                  >
-                    <Stack
-                      direction={{ xs: "column", sm: "column", md: "row" }}
-                      spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
-                      className={styles["profile__avatar"]}
+        <Box sx={{ pt: 6 }}>
+          <ContentContainer
+            titles={[
+              t("titleContent1") as string,
+              t("titleContent2") as string
+            ]}
+          >
+            <Box sx={{ flexGrow: 1, width: "100%", maxWidth: "720px" }}>
+              <Box sx={{ my: 2 }}>
+                <Typography
+                  variant="caption"
+                  className="form-label required"
+                  sx={{ fontSize: "14px" }}
+                >
+                  {t("required") as string}
+                </Typography>
+              </Box>
+              <FormProvider {...methods}>
+                <Grid container spacing={6}>
+                  <Grid item xs={12}>
+                    <ContentGroup
+                      title={t("titleUpload") as string}
+                      classTitle="required"
                     >
-                      {!errors.picture && watchPicture ? (
-                        <Box
-                          component="img"
-                          src={URL.createObjectURL(watchPicture as any)}
-                          sx={{
-                            width: "100%",
-                            maxWidth: "400px",
-                            aspectRatio: "1 / 1",
-                            borderRadius: "100rem",
-                            objectFit: "cover",
-                            margin: "auto"
-                          }}
-                        />
-                      ) : (
-                        <Avatar
-                          alt="avatar"
-                          src={""}
-                          sx={{
-                            display: "flex",
-                            maxWidth: "400px",
-                            width: "100%",
-                            height: "100%",
-                            aspectRatio: "1 / 1",
-                            borderRadius: "100rem",
-                            margin: "auto"
-                          }}
-                        />
-                      )}
-
-                      <Stack spacing={3} sx={{ justifyContent: "center" }}>
-                        <StyledButton
-                          customVariant="primary"
-                          component={isLoading ? "button" : "label"}
-                          disabled={isLoading}
-                        >
-                          {t("uploadPhotoBtn") as string}
-                          <FileController name="picture" readOnly={isLoading} />
-                        </StyledButton>
-
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <Grid
+                            container
+                            spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
+                          >
+                            <Grid item xs={12} md={8}>
+                              {!errors.picture && watchPicture ? (
+                                <Box
+                                  component="img"
+                                  src={URL.createObjectURL(watchPicture as any)}
+                                  sx={{
+                                    width: "100%",
+                                    maxWidth: "400px",
+                                    aspectRatio: "1 / 1",
+                                    borderRadius: "100rem",
+                                    objectFit: "cover",
+                                    margin: "auto"
+                                  }}
+                                />
+                              ) : (
+                                <Avatar
+                                  alt="avatar"
+                                  src=""
+                                  sx={{
+                                    display: "flex",
+                                    maxWidth: "400px",
+                                    width: "100%",
+                                    height: "100%",
+                                    aspectRatio: "1 / 1",
+                                    borderRadius: "100rem",
+                                    margin: "auto"
+                                  }}
+                                />
+                              )}
+                            </Grid>
+                            <Grid
+                              item
+                              xs={12}
+                              md={4}
+                              sx={{
+                                margin: "auto"
+                              }}
+                            >
+                              <Stack spacing={3}>
+                                <StyledButton
+                                  customVariant="primary"
+                                  component={isLoading ? "button" : "label"}
+                                  disabled={isLoading}
+                                >
+                                  {t("uploadPhotoBtn") as string}
+                                  <FileController
+                                    name="picture"
+                                    readOnly={isLoading}
+                                  />
+                                </StyledButton>
+                                <StyledButton
+                                  customVariant="secondary"
+                                  onClick={handleRemoveImage}
+                                  disabled={isLoading}
+                                >
+                                  {t("removeBtn") as string}
+                                </StyledButton>
+                              </Stack>
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                        {errors && errors.picture && (
+                          <Grid item xs={12}>
+                            <FormHelperText
+                              error
+                              sx={{ marginTop: "24px", fontSize: "14px" }}
+                            >
+                              {errors?.picture?.message}
+                            </FormHelperText>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </ContentGroup>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ContentGroup title={t("titleInfo") as string}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <FormGroup label={t("pseudonym") as string} required>
+                            <InputController
+                              name="pseudonym"
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormGroup label={t("about") as string}>
+                            <TextAreaController
+                              name="about"
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <FormGroup label={t("email") as string} required>
+                            <InputController name="email" />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <FormGroup
+                            label={t("phoneNumber") as string}
+                            required
+                          >
+                            <InputController
+                              name="phoneNumber"
+                              onChange={(e) => {
+                                e.target.value = e.target.value.trim();
+                              }}
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormGroup label={t("idDocument") as string} required>
+                            <Stack
+                              direction={{ xs: "column", md: "row" }}
+                              spacing={{ xs: 3 }}
+                              sx={{ width: "100%" }}
+                            >
+                              <AttachmentController
+                                name="frontDocument"
+                                desc={`${
+                                  t("descAttachment1") as string
+                                } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
+                                readOnly={isLoading}
+                              />
+                              <AttachmentController
+                                name="backDocument"
+                                desc={`${
+                                  t("descAttachment1") as string
+                                } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
+                                readOnly={isLoading}
+                              />
+                            </Stack>
+                          </FormGroup>
+                        </Grid>
+                      </Grid>
+                    </ContentGroup>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ContentGroup title={t("titleSocial") as string}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <FormGroup label={t("website") as string}>
+                            <InputController
+                              name="website"
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormGroup label={t("walletAddress") as string}>
+                            <InputController
+                              name="walletAddress"
+                              readOnly={true}
+                              endAdornment={
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    edge="end"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(
+                                        `${getValues("walletAddress")}`
+                                      );
+                                    }}
+                                  >
+                                    <ContentCopyIcon />
+                                  </IconButton>
+                                </InputAdornment>
+                              }
+                            />
+                          </FormGroup>
+                        </Grid>
+                      </Grid>
+                    </ContentGroup>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <ContentGroup title={t("socialMedia") as string}>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <FormGroup
+                            label={
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px"
+                                }}
+                              >
+                                <FacebookRoundedIcon />
+                                Facebook
+                              </Box>
+                            }
+                          >
+                            <InputController
+                              name="facebook"
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <FormGroup
+                            label={
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px"
+                                }}
+                              >
+                                <TwitterIcon />
+                                Twitter
+                              </Box>
+                            }
+                          >
+                            <InputController
+                              name="twitter"
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <FormGroup
+                            label={
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px"
+                                }}
+                              >
+                                <LinkedInIcon />
+                                LinkedIn
+                              </Box>
+                            }
+                          >
+                            <InputController
+                              name="linkedIn"
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <FormGroup
+                            label={
+                              <Box
+                                component="span"
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px"
+                                }}
+                              >
+                                <InstagramIcon />
+                                Instagram
+                              </Box>
+                            }
+                          >
+                            <InputController
+                              name="instagram"
+                              readOnly={isLoading}
+                            />
+                          </FormGroup>
+                        </Grid>
+                      </Grid>
+                    </ContentGroup>
+                  </Grid>
+                  <Grid item xs={12} justifyContent="flex-end">
+                    <Stack spacing={3}>
+                      <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                          alignItems: "center",
+                          justifyContent: "flex-end"
+                        }}
+                      >
                         <StyledButton
                           customVariant="secondary"
-                          onClick={handleRemoveImage}
+                          onClick={handleCancel}
                           disabled={isLoading}
                         >
-                          {t("removeBtn") as string}
+                          {t("cancel") as string}
+                        </StyledButton>
+                        <StyledButton
+                          customVariant="primary"
+                          type="submit"
+                          onClick={handleSubmit(onSubmit)}
+                          disabled={isLoading}
+                        >
+                          {t("submit") as string}
                         </StyledButton>
                       </Stack>
+                      <Typography
+                        sx={{ fontStyle: "italic", mt: "32px !important" }}
+                      >
+                        {t("termsAndConditions1") as string}{" "}
+                        <b>
+                          <i>{t("termsAndConditions2") as string}</i>
+                        </b>
+                        , {t("termsAndConditions3") as string}{" "}
+                        <Link href="/terms-of-service">
+                          {t("termsAndConditions4") as string}
+                        </Link>{" "}
+                        {t("termsAndConditions5") as string}{" "}
+                        <Link href="/term-of-service">
+                          {t("termsAndConditions6") as string}
+                        </Link>
+                        {t("termsAndConditions7") as string}
+                      </Typography>
                     </Stack>
-                    {errors && errors.picture && (
-                      <FormHelperText
-                        error
-                        sx={{ marginTop: "24px", fontSize: "16px" }}
-                      >
-                        {errors?.picture?.message}
-                      </FormHelperText>
-                    )}
-                  </ContentGroup>
-                  <ContentGroup title={t("titleInfo") as string}>
-                    <Stack direction="column" spacing={3}>
-                      <FormGroup label={t("pseudonym") as string} required>
-                        <InputController
-                          name="pseudonym"
-                          readOnly={isLoading}
-                        />
-                      </FormGroup>
-                      <FormGroup label="More about you">
-                        <TextAreaController name="about" readOnly={isLoading} />
-                      </FormGroup>
-                      <Stack
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={{ xs: 2 }}
-                      >
-                        <FormGroup
-                          label={t("email") as string}
-                          required
-                          className={styles["form__group-half"]}
-                        >
-                          <InputController name="email" readOnly={isLoading} />
-                        </FormGroup>
-                        <FormGroup
-                          label={t("phoneNumber") as string}
-                          required
-                          className={styles["form__group-half"]}
-                        >
-                          <InputController
-                            name="phoneNumber"
-                            onChange={(e) => {
-                              e.target.value = e.target.value.trim();
-                            }}
-                            readOnly={isLoading}
-                          />
-                        </FormGroup>
-                      </Stack>
-                      <FormGroup label={t("idDocument") as string} required>
-                        <Stack
-                          direction={{ xs: "column", md: "row" }}
-                          spacing={{ xs: 3 }}
-                          sx={{ width: "100%" }}
-                        >
-                          <AttachmentController
-                            name="frontDocument"
-                            desc={`${
-                              t("descAttachment1") as string
-                            } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
-                            readOnly={isLoading}
-                          />
-                          <AttachmentController
-                            name="backDocument"
-                            desc={`${
-                              t("descAttachment1") as string
-                            } ${formatBytes(MAXIMUM_ATTACHMENTS_SIZE)}`}
-                            readOnly={isLoading}
-                          />
-                        </Stack>
-                      </FormGroup>
-                    </Stack>
-                  </ContentGroup>
-                  <ContentGroup title={t("titleSocial") as string}>
-                    <Stack direction="column" spacing={3}>
-                      <FormGroup label={t("website") as string}>
-                        <InputController name="website" readOnly={isLoading} />
-                      </FormGroup>
-                      <FormGroup label={t("walletAddress") as string}>
-                        <InputController
-                          name="walletAddress"
-                          InputProps={{
-                            readOnly: true,
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  edge="end"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(
-                                      `${getValues("walletAddress")}`
-                                    );
-                                  }}
-                                >
-                                  <ContentCopyIcon />
-                                </IconButton>
-                              </InputAdornment>
-                            )
-                          }}
-                        />
-                      </FormGroup>
-                      <FormGroup label={t("socialMedia") as string} />
-                      <Stack
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={{ xs: 2 }}
-                      >
-                        <FormGroup
-                          label={
-                            <Box
-                              component="span"
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px"
-                              }}
-                            >
-                              <FacebookRoundedIcon />
-                              Facebook
-                            </Box>
-                          }
-                          className={styles["form__group-half"]}
-                        >
-                          <InputController
-                            name="facebook"
-                            readOnly={isLoading}
-                          />
-                        </FormGroup>
-                        <FormGroup
-                          label={
-                            <Box
-                              component="span"
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px"
-                              }}
-                            >
-                              <TwitterIcon />
-                              Twitter
-                            </Box>
-                          }
-                          className={styles["form__group-half"]}
-                        >
-                          <InputController
-                            name="twitter"
-                            readOnly={isLoading}
-                          />
-                        </FormGroup>
-                      </Stack>
-                      <Stack
-                        direction={{ xs: "column", md: "row" }}
-                        spacing={{ xs: 2 }}
-                      >
-                        <FormGroup
-                          label={
-                            <Box
-                              component="span"
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px"
-                              }}
-                            >
-                              <LinkedInIcon />
-                              LinkedIn
-                            </Box>
-                          }
-                          className={styles["form__group-half"]}
-                        >
-                          <InputController
-                            name="linkedIn"
-                            readOnly={isLoading}
-                          />
-                        </FormGroup>
-                        <FormGroup
-                          label={
-                            <Box
-                              component="span"
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px"
-                              }}
-                            >
-                              <InstagramIcon />
-                              Instagram
-                            </Box>
-                          }
-                          className={styles["form__group-half"]}
-                        >
-                          <InputController
-                            name="instagram"
-                            readOnly={isLoading}
-                          />
-                        </FormGroup>
-                      </Stack>
-                    </Stack>
-                  </ContentGroup>
-                </Stack>
-                <Stack spacing={3}>
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    sx={{
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                      mt: 6
-                    }}
-                  >
-                    <StyledButton
-                      customVariant="secondary"
-                      onClick={handleCancel}
-                      disabled={isLoading}
-                    >
-                      {t("cancel") as string}
-                    </StyledButton>
-                    <StyledButton
-                      customVariant="primary"
-                      type="submit"
-                      onClick={handleSubmit(onSubmit)}
-                      disabled={isLoading}
-                    >
-                      {t("submit") as string}
-                    </StyledButton>
-                  </Stack>
-                  <Typography
-                    sx={{ fontStyle: "italic", mt: "32px !important" }}
-                  >
-                    {t("termsAndConditions1") as string}{" "}
-                    <b>
-                      <i>{t("termsAndConditions2") as string}</i>
-                    </b>
-                    , {t("termsAndConditions3") as string}{" "}
-                    <Link href="/terms-of-service">
-                      {t("termsAndConditions4") as string}
-                    </Link>{" "}
-                    {t("termsAndConditions5") as string}{" "}
-                    <Link href="/term-of-service">
-                      {t("termsAndConditions6") as string}
-                    </Link>
-                    {t("termsAndConditions7") as string}
-                  </Typography>
-                </Stack>
-              </form>
-            </FormProvider>
-          </Box>
-        </ContentContainer>
+                  </Grid>
+                </Grid>
+              </FormProvider>
+            </Box>
+          </ContentContainer>
+        </Box>
         <ToastContainer />
       </main>
     </>

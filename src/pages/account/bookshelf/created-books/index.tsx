@@ -81,7 +81,7 @@ const CreatedBooks = () => {
                   <Grid
                     container
                     spacing={3}
-                    columns={{ xs: 4, sm: 8, md: 12, lg: 12 }}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
                     {createdBooks!.map((book) => {
                       return (
@@ -91,7 +91,7 @@ const CreatedBooks = () => {
                           xs={4}
                           sm={4}
                           md={6}
-                          lg={4}
+                          lg={8}
                         >
                           <ActionableBookItem
                             status="isCreated"

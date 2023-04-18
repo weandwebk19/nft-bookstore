@@ -262,9 +262,9 @@ const SharingBooks = () => {
                             item
                             key={book.tokenId}
                             xs={4}
-                            sm={8}
+                            sm={4}
                             md={6}
-                            lg={12}
+                            lg={8}
                           >
                             <ActionableBookItem
                               status="isSharing"
