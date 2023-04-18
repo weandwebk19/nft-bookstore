@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedNfts } from "@/components/hooks/web3";
 import {
-  LeaseButton,
   RatingButton,
   ReadButton,
   SellButton
@@ -102,7 +101,7 @@ const OwnedBooks = () => {
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.author}
+                            owner={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
                             amountOwned={book?.amountOwned}

@@ -18,6 +18,7 @@
   "noPages": "Nº pages",
   "languages": "Languages",
   "genres": "Genres",
+  "keywords": "Keywords",
   "editionVersion": "Edition version",
   "quantity": "Quantity",
   "owners": "Owners",
@@ -28,6 +29,6 @@
   "lowest": "Lowest",
   "lasted": "Lasted",
   "listings": "Listings",
-  "leasings": "Leasings",
+  "lendings": "Lendings",
   "recommended": "You may love"
 }

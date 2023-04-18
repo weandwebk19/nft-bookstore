@@ -2,13 +2,13 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
-import { LeaseBook } from "@_types/nftBook";
+import { LendBook } from "@_types/nftBook";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
 import { useAccount } from ".";
 
-type UseAllLeasingBooksResponse = {
+type UseAllLendingBooksResponse = {
   borrowBooks: (
     tokenId: number,
     renter: string,
@@ -18,39 +18,39 @@ type UseAllLeasingBooksResponse = {
     supplyAmount: number
   ) => Promise<void>;
 };
-type AllLeasingBooksHookFactory = CryptoHookFactory<
-  LeaseBook[],
-  UseAllLeasingBooksResponse
+type AllLendingBooksHookFactory = CryptoHookFactory<
+  LendBook[],
+  UseAllLendingBooksResponse
 >;
 
-export type UseAllLeasingBooksHook = ReturnType<AllLeasingBooksHookFactory>;
+export type UseAllLendingBooksHook = ReturnType<AllLendingBooksHookFactory>;
 
-export const hookFactory: AllLeasingBooksHookFactory =
+export const hookFactory: AllLendingBooksHookFactory =
   ({ contract }) =>
   () => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      contract ? "web3/useAllLeasingBooks" : null,
+      contract ? "web3/useAllLendingBooks" : null,
       async () => {
-        const allLeasingBooks = [] as LeaseBook[];
-        const coreLeaseBooks = await contract!.getAllBooksOnLeasing();
+        const allLendingBooks = [] as LendBook[];
+        const coreLendBooks = await contract!.getAllBooksOnLending();
 
-        for (let i = 0; i < coreLeaseBooks.length; i++) {
-          const leaseBook = coreLeaseBooks[i];
-          const tokenURI = await contract!.uri(leaseBook.tokenId);
+        for (let i = 0; i < coreLendBooks.length; i++) {
+          const lendBook = coreLendBooks[i];
+          const tokenURI = await contract!.getUri(lendBook.tokenId);
           const metaRes = await fetch(tokenURI);
           const meta = await metaRes.json();
 
-          allLeasingBooks.push({
-            tokenId: leaseBook.tokenId.toNumber(),
-            renter: leaseBook.renter,
-            price: parseFloat(ethers.utils.formatEther(leaseBook.price)),
-            amount: leaseBook.amount.toNumber(),
+          allLendingBooks.push({
+            tokenId: lendBook.tokenId.toNumber(),
+            renter: lendBook.renter,
+            price: parseFloat(ethers.utils.formatEther(lendBook.price)),
+            amount: lendBook.amount.toNumber(),
             meta
           });
         }
 
-        return allLeasingBooks;
+        return allLendingBooks;
       }
     );
 
@@ -76,7 +76,7 @@ export const hookFactory: AllLeasingBooksHookFactory =
             });
           } else if (account.data == renter) {
             return toast.error(
-              "You are not allowed to borrow the book leased by yourself.",
+              "You are not allowed to borrow the book lendd by yourself.",
               {
                 position: toast.POSITION.TOP_CENTER
               }

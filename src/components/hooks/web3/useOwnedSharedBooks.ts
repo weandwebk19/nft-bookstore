@@ -24,7 +24,7 @@ export const hookFactory: OwnedSharedBooksHookFactory =
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
-          const tokenURI = await contract!.uri(item.tokenId);
+          const tokenURI = await contract!.getUri(item.tokenId);
           const metaRes = await (
             await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
           ).data;

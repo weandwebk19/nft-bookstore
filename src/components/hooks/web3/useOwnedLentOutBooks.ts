@@ -7,17 +7,16 @@ import { BorrowedBook } from "@/types/nftBook";
 
 import { useAccount } from ".";
 
-type OwnedLeasedOutBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
+type OwnedLentOutBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
 
-export type UseOwnedLeasedOutBooksHook =
-  ReturnType<OwnedLeasedOutBooksHookFactory>;
+export type UseOwnedLentOutBooksHook = ReturnType<OwnedLentOutBooksHookFactory>;
 
-export const hookFactory: OwnedLeasedOutBooksHookFactory =
+export const hookFactory: OwnedLentOutBooksHookFactory =
   ({ contract }) =>
   () => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedLeasedOutBooks" : null,
+      contract ? "web3/useOwnedLentOutBooks" : null,
       async () => {
         const nfts = [] as BorrowedBook[];
         const allBorrowedBooks = await contract!.getAllBorrowedBooks();
@@ -27,7 +26,7 @@ export const hookFactory: OwnedLeasedOutBooksHookFactory =
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
-          const tokenURI = await contract!.uri(item.tokenId);
+          const tokenURI = await contract!.getUri(item.tokenId);
           const metaRes = await (
             await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
           ).data;

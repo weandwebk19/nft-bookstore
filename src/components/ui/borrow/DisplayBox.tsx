@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
-import { useAllLeasingBooks } from "@hooks/web3";
+import { useAllLendingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
@@ -23,7 +23,7 @@ const DisplayBox: FunctionComponent = () => {
 
   const router = useRouter();
 
-  const { nfts } = useAllLeasingBooks();
+  const { nfts } = useAllLendingBooks();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {

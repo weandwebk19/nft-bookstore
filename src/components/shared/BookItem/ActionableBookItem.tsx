@@ -18,15 +18,15 @@ type ActionableBookItemStatus =
   | "isBorrowed"
   | "isSharing"
   | "isListing"
-  | "isLeasing"
-  | "isBought";
+  | "isLending"
+  | "isPurchased";
 
 interface ActionableBookItemProps {
   bookCover: string;
   title: string;
   fileType: string;
   tokenId: number;
-  author?: string; // !!! 'author' should ALWAYS be display !!!
+  owner?: string; // !!! 'author' should ALWAYS be display !!!  => /// In some cases, we can use seller instead
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
   renter?: string;
@@ -47,7 +47,7 @@ const ActionableBookItem = ({
   title,
   fileType,
   tokenId,
-  author,
+  owner,
   onClick,
   buttons,
   renter,
@@ -65,7 +65,7 @@ const ActionableBookItem = ({
   const account = useAccount();
 
   const theme = useTheme();
-  const [authorName, setAuthorName] = useState("");
+  const [ownerName, setOwnerName] = useState("");
   const [sharerName, setSharerName] = useState("");
   const [renterName, setRenterName] = useState("");
   const [sharedPersonName, setSharedPersonName] = useState("");
@@ -74,18 +74,18 @@ const ActionableBookItem = ({
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (owner) {
+          const userRes = await axios.get(`/api/users/wallet/${owner}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setOwnerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [owner]);
 
   useEffect(() => {
     (async () => {
@@ -197,7 +197,7 @@ const ActionableBookItem = ({
               {title}
             </Typography>
             {status !== "isCreated" && (
-              <Typography variant="body2">{authorName}</Typography>
+              <Typography variant="body2">{ownerName}</Typography>
             )}
             {status === "isBorrowed" && (
               <Stack>
@@ -211,7 +211,7 @@ const ActionableBookItem = ({
                 <Typography variant="label">{sharerName}</Typography>
               </Stack>
             )}
-            {status === "isLeasing" && borrower && (
+            {status === "isLending" && borrower && (
               <Stack>
                 <Typography variant="subtitle2">Borrowed by:</Typography>
                 <Typography variant="label">{borrowerName}</Typography>
@@ -235,7 +235,7 @@ const ActionableBookItem = ({
               >
                 {status !== "isCreated" &&
                   status !== "isOwned" &&
-                  status !== "isBought" && (
+                  status !== "isPurchased" && (
                     <Stack>
                       <Typography variant="subtitle2">Price:</Typography>
                       <Typography variant="label">{price} ETH</Typography>
@@ -243,7 +243,7 @@ const ActionableBookItem = ({
                   )}
                 {status !== "isCreated" &&
                   status !== "isOwned" &&
-                  status === "isBought" && (
+                  status === "isPurchased" && (
                     <Stack>
                       <Typography variant="subtitle2">Amount:</Typography>
                       <Typography variant="label">{amount}</Typography>
@@ -253,7 +253,7 @@ const ActionableBookItem = ({
               {(status === "isBorrowed" ||
                 status === "isShared" ||
                 status === "isSharing" ||
-                (status === "isLeasing" && borrower)) && (
+                (status === "isLending" && borrower)) && (
                 <Stack>
                   <Typography variant="subtitle2">Return in:</Typography>
                   <Typography variant="label">
@@ -269,7 +269,7 @@ const ActionableBookItem = ({
               )}
               {(status === "isOwned" ||
                 status === "isCreated" ||
-                status === "isBought") && (
+                status === "isPurchased") && (
                 <Stack>
                   <Typography variant="subtitle2">Tradeable amount:</Typography>
                   <Typography variant="label">{amountTradeable}</Typography>

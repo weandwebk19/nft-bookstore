@@ -35,7 +35,7 @@ export const hookFactory: CreatedBooksHookFactory =
 
         for (let i = 0; i < createdBooks.length; i++) {
           const item = createdBooks[i];
-          const tokenURI = await contract!.uri(item.tokenId);
+          const tokenURI = await contract!.getUri(item.tokenId);
           const metaRes = await (
             await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
           ).data;

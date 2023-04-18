@@ -30,12 +30,12 @@ const BookShelf = () => {
       )
     },
     {
-      id: `${preUrl}/bought-books`,
+      id: `${preUrl}/purchased-books`,
       component: (
         <Ticket
-          href={`${preUrl}/bought-books`}
-          header={t("boughtBooks") as string}
-          body={t("boughtBooksDesc") as string}
+          href={`${preUrl}/purchased-books`}
+          header={t("purchasedBooks") as string}
+          body={t("purchasedBooksDesc") as string}
           image={images.gradient3}
         />
       )
@@ -91,12 +91,12 @@ const BookShelf = () => {
       )
     },
     {
-      id: `${preUrl}/leasing-books`,
+      id: `${preUrl}/lending-books`,
       component: (
         <Ticket
-          href={`${preUrl}/leasing-books`}
-          header={t("leasingBooks") as string}
-          body={t("leasingBooksDesc") as string}
+          href={`${preUrl}/lending-books`}
+          header={t("lendingBooks") as string}
+          body={t("lendingBooksDesc") as string}
           image={images.gradient8}
         />
       )

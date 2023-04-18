@@ -18,6 +18,7 @@
   "noPages": "Số trang",
   "languages": "Ngôn ngữ",
   "genres": "Thể loại",
+  "keywords": "Từ khóa",
   "editionVersion": "Tái bản",
   "quantity": "Số lượng",
   "owners": "Chủ sở hữu",
@@ -28,6 +29,6 @@
   "lowest": "Thấp nhất",
   "lasted": "Gần đây",
   "listings": "Đang mở bán",
-  "leasings": "Đang mở cho thuê",
+  "lendings": "Đang mở cho thuê",
   "recommended": "Có thể bạn sẽ thích"
 }

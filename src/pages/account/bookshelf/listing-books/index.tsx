@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useAccount, useOwnedListedBooks } from "@/components/hooks/web3";
-import { RecallButton } from "@/components/shared/BookButton";
+import RevokeButton from "@/components/shared/BookButton/RevokeButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BookList } from "@/components/shared/BookList";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
@@ -54,35 +54,35 @@ const ListingBooks = () => {
     })();
   };
 
-  const handleOpenRecallDialogClick = (
+  const handleOpenRevokeDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setAnchorRecallButton(e.currentTarget);
+    setAnchorRevokeButton(e.currentTarget);
   };
 
-  const [anchorRecallButton, setAnchorRecallButton] = useState<Element | null>(
+  const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
     null
   );
 
-  const openRecallDialog = Boolean(anchorRecallButton);
+  const openRevokeDialog = Boolean(anchorRevokeButton);
 
-  const handleRecallClick = (
+  const handleRevokeClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setAnchorRecallButton(null);
+    setAnchorRevokeButton(null);
   };
 
   const handleCancelClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    setAnchorRecallButton(null);
+    setAnchorRevokeButton(null);
   };
 
-  const handleRecallClose = () => {
-    setAnchorRecallButton(null);
+  const handleRevokeClose = () => {
+    setAnchorRevokeButton(null);
   };
 
   useEffect(() => {
@@ -113,14 +113,14 @@ const ListingBooks = () => {
                 <>
                   <StyledButton
                     customVariant="secondary"
-                    onClick={(e) => handleOpenRecallDialogClick(e)}
+                    onClick={(e) => handleOpenRevokeDialogClick(e)}
                   >
-                    Recall All
+                    Revoke All
                   </StyledButton>
                   <Dialog
                     title={t("dialogTitle") as string}
-                    open={openRecallDialog}
-                    onClose={handleRecallClose}
+                    open={openRevokeDialog}
+                    onClose={handleRevokeClose}
                   >
                     <Stack spacing={3}>
                       <Typography>{t("message")}</Typography>
@@ -131,8 +131,8 @@ const ListingBooks = () => {
                         >
                           {t("button_cancel")}
                         </StyledButton>
-                        <StyledButton onClick={(e) => handleRecallClick(e)}>
-                          {t("button_recall")}
+                        <StyledButton onClick={(e) => handleRevokeClick(e)}>
+                          {t("button_revoke")}
                         </StyledButton>
                       </Stack>
                     </Stack>
@@ -181,13 +181,14 @@ const ListingBooks = () => {
                               amount={book?.amount}
                               buttons={
                                 <>
-                                  <RecallButton
+                                  <RevokeButton
                                     buttonName="Unlisting"
                                     tokenId={book?.tokenId}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
                                     renter={book?.renter}
                                     amount={book?.amount}
+                                    handleRevoke={() => {}}
                                   />
                                 </>
                               }

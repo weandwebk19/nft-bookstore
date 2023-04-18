@@ -124,7 +124,7 @@ const WalletBar = ({
   if (isLoading)
     return <StyledButton customVariant="secondary">Loading...</StyledButton>;
 
-  if (data)
+  if (address && account)
     return (
       <Stack direction="row" alignItems="center" sx={{ flexGrow: 0 }}>
         <Stack
@@ -134,7 +134,7 @@ const WalletBar = ({
         >
           {isAuthor ? (
             <StyledChip
-              avatar={<AdjustIcon color="primary" />}
+              icon={<AdjustIcon color="primary" />}
               label={truncate(account ? account : "", 6, -4)}
               background={images.gradient1}
             />

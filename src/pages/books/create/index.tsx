@@ -25,6 +25,8 @@ import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import withAuth from "@/components/HOC/withAuth";
+import withAuthor from "@/components/HOC/withAuthor";
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
 import { useAccount, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -34,7 +36,7 @@ import {
   Step1,
   Step2,
   Step3
-} from "@/components/ui/author/create/steps";
+} from "@/components/ui/books/create/steps";
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
@@ -80,7 +82,7 @@ const defaultValues = {
   genres: [],
   languages: [],
   totalPages: 1,
-  keywords: "",
+  keywords: [""],
 
   // Final step
   termsOfService: false,
@@ -186,7 +188,7 @@ const CreateBook = () => {
         .typeError(t("textError20") as string)
         .min(0, `${t("textError16") as string}`)
         .required(t("textError17") as string),
-      keywords: yup.string()
+      keywords: yup.array().of(yup.string())
     }),
 
     // validate for final step (Accept the terms and conditions)
@@ -727,7 +729,7 @@ const CreateBook = () => {
   );
 };
 
-export default withAuth(CreateBook);
+export default withAuth(withAuthor(CreateBook));
 
 export async function getStaticProps({ locale }: any) {
   return {

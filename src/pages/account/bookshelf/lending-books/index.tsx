@@ -1,7 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -13,24 +15,25 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import {
   useAccount,
-  useOwnedLeasedOutBooks,
-  useOwnedLeasingBooks
+  useOwnedLendingBooks,
+  useOwnedLentOutBooks
 } from "@/components/hooks/web3";
-import { RecallButton } from "@/components/shared/BookButton";
+import { useWeb3 } from "@/components/providers/web3";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
-import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { StyledButton } from "@/styles/components/Button";
-import { BorrowedBook, LeaseBook } from "@/types/nftBook";
+import RevokeAllLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLendingButton";
+import RevokeAllLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLentOutButton";
+import RevokeLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeLendingButton";
+import RevokeLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeLentOutButton";
+import { BorrowedBook, LendBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
-import pluralize from "@/utils/pluralize";
 import { secondsToDhms } from "@/utils/secondsToDhms";
 
-const LeasingBooks = () => {
-  const { t } = useTranslation("leasingBooks");
+const LendingBooks = () => {
+  const { t } = useTranslation("lendingBooks");
 
   const breadCrumbs = [
     {
@@ -38,18 +41,20 @@ const LeasingBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_leasingBooks") as string,
-      href: "/account/bookshelf/leasing-books"
+      content: t("breadcrumbs_lendingBooks") as string,
+      href: "/account/bookshelf/lending-books"
     }
   ];
 
   const router = useRouter();
+  const { account } = useAccount();
+  const { contract } = useWeb3();
 
-  const { nfts: leaseNfts } = useOwnedLeasingBooks();
-  const leasingBooks = leaseNfts.data as LeaseBook[];
+  const { nfts: lendNfts } = useOwnedLendingBooks();
+  const lendingBooks = lendNfts.data as LendBook[];
 
-  const { nfts: leasedOutNfts } = useOwnedLeasedOutBooks();
-  const leasedOutBooks = leasedOutNfts.data as BorrowedBook[];
+  const { nfts: lentOutNfts } = useOwnedLentOutBooks();
+  const lentOutBooks = lentOutNfts.data as BorrowedBook[];
 
   const [nowTime, setNowTime] = useState<number>(0);
 
@@ -57,13 +62,6 @@ const LeasingBooks = () => {
     const seconds = new Date().getTime() / 1000;
     setNowTime(seconds);
   }, []);
-
-  const handleOpenRecallDialogClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(e.currentTarget);
-  };
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -75,36 +73,66 @@ const LeasingBooks = () => {
     })();
   };
 
-  const [anchorRecallButton, setAnchorRecallButton] = useState<Element | null>(
-    null
-  );
+  const handleRevokeLendingClick = async (tokenId: number, renter: string) => {
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
 
-  const openRecallDialog = Boolean(anchorRecallButton);
+      const tx = await contract?.updateBookFromRenting(tokenId, 0, 0, renter);
 
-  const handleRecallClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Revoke Lending NftBook successfully",
+        error: "Oops! There's a problem with lending revoke process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
+
+  const handleRevokeBorrowedBooks = async (
+    tokenId: number,
+    renter: string,
+    borrower: string,
+    startTime: number,
+    endTime: number
   ) => {
-    e.preventDefault();
-    setAnchorRecallButton(null);
-  };
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
 
-  const handleCancelClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(null);
-  };
+      const idBorrowedBook = await contract!.getIdBorrowedBook(
+        tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
 
-  const handleRecallClose = () => {
-    setAnchorRecallButton(null);
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Revoke lent out book successfully",
+        error: "Oops! There's a problem with lent out process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
   };
-
-  // useEffect(() => {
-  //   if (nfts.data?.length !== 0) {
-  //     const res = nfts.data?.filter((nft: any) => nft.author !== account.data);
-  //     if (res) setLeasingBooks(res);
-  //   }
-  // }, [nfts.data, account.data]);
 
   return (
     <>
@@ -124,44 +152,15 @@ const LeasingBooks = () => {
             <Stack spacing={3}>
               {/* Lease books that have not been borrowed by anyone */}
               <ContentPaper
-                title={t("leasingBooksTitle")}
-                button={
-                  <>
-                    <StyledButton
-                      customVariant="secondary"
-                      onClick={(e) => handleOpenRecallDialogClick(e)}
-                    >
-                      Recall All
-                    </StyledButton>
-                    <Dialog
-                      title={t("dialogTitle") as string}
-                      open={openRecallDialog}
-                      onClose={handleRecallClose}
-                    >
-                      <Stack spacing={3}>
-                        <Typography>{t("message")}</Typography>
-                        <Stack direction="row" spacing={3} justifyContent="end">
-                          <StyledButton
-                            customVariant="secondary"
-                            onClick={(e) => handleCancelClick(e)}
-                          >
-                            {t("button_cancel")}
-                          </StyledButton>
-                          <StyledButton onClick={(e) => handleRecallClick(e)}>
-                            {t("button_recall")}
-                          </StyledButton>
-                        </Stack>
-                      </Stack>
-                    </Dialog>
-                  </>
-                }
+                title={t("lendingBooksTitle")}
+                button={<RevokeAllLendingButton />}
               >
                 {(() => {
-                  if (leaseNfts.isLoading) {
+                  if (lendNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (leasingBooks?.length === 0 || leaseNfts.error) {
+                  } else if (lendingBooks?.length === 0 || lendNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>{t("emptyMessage") as string}</Typography>
@@ -175,7 +174,7 @@ const LeasingBooks = () => {
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
                       <>
-                        {leasingBooks!.map((book: LeaseBook) => {
+                        {lendingBooks!.map((book: LendBook) => {
                           return (
                             <Grid
                               item
@@ -186,7 +185,7 @@ const LeasingBooks = () => {
                               lg={8}
                             >
                               <ActionableBookItem
-                                status="isLeasing"
+                                status="isLending"
                                 tokenId={book?.tokenId}
                                 bookCover={book?.meta.bookCover}
                                 title={book?.meta.title}
@@ -197,13 +196,18 @@ const LeasingBooks = () => {
                                 amount={book?.amount}
                                 buttons={
                                   <>
-                                    <RecallButton
-                                      buttonName="Recall leasing"
+                                    <RevokeLendingButton
                                       tokenId={book?.tokenId}
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
+                                      handleRevoke={async () => {
+                                        return handleRevokeLendingClick(
+                                          book?.tokenId,
+                                          book?.renter
+                                        );
+                                      }}
                                     />
                                   </>
                                 }
@@ -214,7 +218,7 @@ const LeasingBooks = () => {
                                 //           book?.endRentalDay,
                                 //           "day"
                                 //         )} left`
-                                //       : "Ended" // End of leasing term
+                                //       : "Ended" // End of lending term
                                 //     : undefined
                                 // }
                               />
@@ -229,51 +233,19 @@ const LeasingBooks = () => {
 
               {/* Lease books that have been borrowed by others */}
               <ContentPaper
-                title={t("leasedOutBooksTitle")}
-                button={
-                  <>
-                    <StyledButton
-                      customVariant="secondary"
-                      onClick={(e) => handleOpenRecallDialogClick(e)}
-                    >
-                      Recall All
-                    </StyledButton>
-                    <Dialog
-                      title={t("dialogTitle") as string}
-                      open={openRecallDialog}
-                      onClose={handleRecallClose}
-                    >
-                      <Stack spacing={3}>
-                        <Typography>{t("message")}</Typography>
-                        <Stack direction="row" spacing={3} justifyContent="end">
-                          <StyledButton
-                            customVariant="secondary"
-                            onClick={(e) => handleCancelClick(e)}
-                          >
-                            {t("button_cancel")}
-                          </StyledButton>
-                          <StyledButton onClick={(e) => handleRecallClick(e)}>
-                            {t("button_recall")}
-                          </StyledButton>
-                        </Stack>
-                      </Stack>
-                    </Dialog>
-                  </>
-                }
+                title={t("lentOutBooksTitle")}
+                button={<RevokeAllLentOutButton />}
               >
                 {(() => {
-                  if (leasedOutNfts.isLoading) {
+                  if (lentOutNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (
-                    leasedOutBooks?.length === 0 ||
-                    leasedOutNfts.error
-                  ) {
+                  } else if (lentOutBooks?.length === 0 || lentOutNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>
-                          {t("emptyMessage__leasedOutBooks") as string}
+                          {t("emptyMessage__lentOutBooks") as string}
                         </Typography>
                       </FallbackNode>
                     );
@@ -285,7 +257,7 @@ const LeasingBooks = () => {
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
                       <>
-                        {leasedOutBooks!.map((book) => {
+                        {lentOutBooks!.map((book) => {
                           return (
                             <Grid
                               item
@@ -296,7 +268,7 @@ const LeasingBooks = () => {
                               lg={12}
                             >
                               <ActionableBookItem
-                                status="isLeasing"
+                                status="isLending"
                                 tokenId={book?.tokenId}
                                 bookCover={book?.meta.bookCover}
                                 title={book?.meta.title}
@@ -311,25 +283,24 @@ const LeasingBooks = () => {
                                 )}
                                 buttons={
                                   <>
-                                    <RecallButton
+                                    <RevokeLentOutButton
                                       tokenId={book?.tokenId}
                                       title={book?.meta.title}
                                       bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
+                                      handleRevoke={async () => {
+                                        return handleRevokeBorrowedBooks(
+                                          book?.tokenId,
+                                          book?.renter,
+                                          book?.borrower,
+                                          book?.startTime,
+                                          book?.endTime
+                                        );
+                                      }}
                                     />
                                   </>
                                 }
-                                // status={
-                                //   book?.endRentalDay !== undefined
-                                //     ? book?.endRentalDay > 0
-                                //       ? `${pluralize(
-                                //           book?.endRentalDay,
-                                //           "day"
-                                //         )} left`
-                                //       : "Ended" // End of leasing term
-                                //     : undefined
-                                // }
                               />
                             </Grid>
                           );
@@ -345,12 +316,13 @@ const LeasingBooks = () => {
             <FilterBar />
           </Grid>
         </Grid>
+        <ToastContainer />
       </Stack>
     </>
   );
 };
 
-export default withAuth(LeasingBooks);
+export default withAuth(LendingBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -358,7 +330,7 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "leasingBooks"
+        "lendingBooks"
       ]))
     }
   };

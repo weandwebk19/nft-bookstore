@@ -11,7 +11,7 @@ import withAuth from "@/components/HOC/withAuth";
 import { useCreatedBooks } from "@/components/hooks/web3";
 import {
   EditButton,
-  LeaseButton,
+  LendButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -99,7 +99,7 @@ const CreatedBooks = () => {
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            author={book?.author}
+                            owner={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
                             amountTradeable={book?.amountTradeable}
@@ -113,7 +113,7 @@ const CreatedBooks = () => {
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  author={book?.author}
+                                  owner={book?.author}
                                   amountTradeable={book?.amountTradeable!}
                                 />
                                 <EditButton tokenId={book?.tokenId} />

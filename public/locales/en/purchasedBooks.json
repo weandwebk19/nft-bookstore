@@ -1,8 +1,8 @@
 {
-  "titlePage": "Bought books - NFT Bookstore",
-  "boughtBooksTitle": "Bought books",
+  "titlePage": "Purchased books - NFT Bookstore",
+  "purchasedBooksTitle": "Purchased books",
   "emptyMessage": "You haven't own any books!",
   "loadingMessage": "Putting books on the shelves...",
   "breadcrumbs_bookshelf": "Bookshelf",
-  "breadcrumbs_boughtBooks": "Bought books"
+  "breadcrumbs_purchasedBooks": "Purchased books"
 }

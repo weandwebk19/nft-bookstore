@@ -10,6 +10,7 @@ import * as yup from "yup";
 
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
+  AutoCompleteController,
   InputController,
   TextAreaController
 } from "@/components/shared/FormController";
@@ -20,7 +21,8 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 const defaultValues = {
   name: "",
   email: "",
-  message: ""
+  message: "",
+  keywords: [""]
 };
 
 export default function Contact() {
@@ -28,13 +30,15 @@ export default function Contact() {
 
   const schema = yup
     .object({
-      name: yup.string().required(t("textError1") as string),
-      email: yup
-        .string()
-        .email(t("textError2") as string)
-        .max(255)
-        .required(t("textError3") as string),
-      message: yup.string().required(t("textError4") as string)
+      name: yup.string(),
+      // .required(t("textError1") as string),
+      email: yup.string(),
+      // .email(t("textError2") as string)
+      // .max(255)
+      // .required(t("textError3") as string),
+      message: yup.string(),
+      // .required(t("textError4") as string),
+      keywords: yup.array().of(yup.string())
     })
     .required();
 
@@ -79,6 +83,9 @@ export default function Contact() {
                   <Grid item xs={12}>
                     <FormGroup label={t("message")} required>
                       <TextAreaController name="message" />
+                    </FormGroup>
+                    <FormGroup label={t("keywords")} required>
+                      <AutoCompleteController name="keywords" />
                     </FormGroup>
                   </Grid>
                   <Grid item xs={12} container justifyContent="flex-end">
