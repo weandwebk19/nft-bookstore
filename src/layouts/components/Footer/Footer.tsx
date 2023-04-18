@@ -30,20 +30,16 @@ const Footer = () => {
       content: t("store") as string,
       subList: [
         {
-          content: t("explore") as string,
-          url: "/"
-        },
-        {
-          content: t("share") as string,
-          url: "/"
+          content: t("publishing") as string,
+          url: "/publishing"
         },
         {
           content: t("borrow") as string,
           url: "/borrow"
         },
         {
-          content: t("publishBook") as string,
-          url: "/"
+          content: t("share") as string,
+          url: "/share"
         }
       ]
     },
@@ -52,15 +48,15 @@ const Footer = () => {
       subList: [
         {
           content: t("profile") as string,
-          url: "/profile"
+          url: "/account/profile"
         },
         {
           content: t("watchlist") as string,
-          url: "/watchlist"
+          url: "/account/watchlist"
         },
         {
           content: t("my_bookshelf") as string,
-          url: "/"
+          url: "/account/bookshelf"
         }
       ]
     },
@@ -98,7 +94,7 @@ const Footer = () => {
         columns={{ xs: 4, md: 24 }}
         sx={{
           marginTop: "24px",
-          padding: "64px 32px 32px"
+          padding: "64px 32px"
         }}
         className={styles.footer__wrapper}
       >
