@@ -516,6 +516,16 @@ const NavBar = () => {
     }
   ];
 
+  useEffect(() => {
+    if (router.locale !== openLanguage.currentState) {
+      setClientLocale(openLanguage.currentState);
+
+      router.push({ pathname, query }, asPath, {
+        locale: openLanguage.currentState
+      });
+    }
+  }, []);
+
   return (
     <motion.div
       initial={{

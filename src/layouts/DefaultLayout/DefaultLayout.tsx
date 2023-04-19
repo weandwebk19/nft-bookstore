@@ -1,5 +1,7 @@
 import { Box, Container } from "@mui/material";
 
+import { useRouter } from "next/router";
+
 import { ScrollButton } from "@/components/shared/ScrollButton";
 
 import { Footer, NavBar } from "../components";
@@ -9,6 +11,9 @@ interface DefaultLayoutProps {
 }
 
 const DefaultLayout = ({ children }: DefaultLayoutProps) => {
+  // const router = useRouter();
+  // console.log("router", router);
+
   return (
     <>
       <NavBar />

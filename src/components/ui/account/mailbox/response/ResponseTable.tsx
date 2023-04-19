@@ -249,27 +249,26 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       >
         <Stack spacing={3}>
           <Typography>{t("message_delete")}</Typography>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={{ xs: 1, sm: 2, md: 4 }}
-          >
-            <Box>
+          <Stack direction={{ xs: "column" }} spacing={{ xs: 1 }}>
+            <Typography variant="body1">
+              <b>Event:</b> {targetItem?.event}
+            </Typography>
+            <Typography variant="body1">
+              <b>Price:</b> {targetItem?.price}
+            </Typography>
+            {targetItem?.from && (
               <Typography variant="body1">
-                Event: {targetItem?.event}
+                <b>From:</b> {targetItem?.from}
               </Typography>
+            )}
+            {targetItem?.to && (
               <Typography variant="body1">
-                Price: {targetItem?.price}
+                <b>To:</b> {targetItem?.to}
               </Typography>
-              {targetItem?.from && (
-                <Typography variant="body1">
-                  From: {targetItem?.from}
-                </Typography>
-              )}
-              {targetItem?.to && (
-                <Typography variant="body1">To: {targetItem?.to}</Typography>
-              )}
-              <Typography variant="body1">Date: {targetItem?.date}</Typography>
-            </Box>
+            )}
+            <Typography variant="body1">
+              <b>Date:</b> {targetItem?.date}
+            </Typography>
           </Stack>
           <Stack direction="row" spacing={3} justifyContent="end">
             <StyledButton
