@@ -1,7 +1,15 @@
+import { useMemo } from "react";
+
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import { GridColDef, DataGrid as MUIDataGrid } from "@mui/x-data-grid";
+import {
+  GridColDef,
+  DataGrid as MUIDataGrid,
+  enUS,
+  viVN
+} from "@mui/x-data-grid";
+import { useRouter } from "next/router";
 
 interface DataGridProps {
   columns: GridColDef[];
@@ -11,6 +19,20 @@ interface DataGridProps {
 
 const DataGrid = ({ columns, rows, getRowId }: DataGridProps) => {
   const theme = useTheme();
+  const { locale } = useRouter();
+
+  const localeText = useMemo(() => {
+    if (locale === "en") {
+      return enUS.components.MuiDataGrid.defaultProps.localeText;
+    } else if (locale === "vi") {
+      return {
+        ...viVN.components.MuiDataGrid.defaultProps.localeText,
+        columnMenuManageColumns: "Quản lí các cột",
+        filterOperatorIsAnyOf: "Một trong số"
+      };
+    }
+  }, [locale]);
+
   return (
     <Box
       sx={{
@@ -51,6 +73,7 @@ const DataGrid = ({ columns, rows, getRowId }: DataGridProps) => {
         checkboxSelection
         disableRowSelectionOnClick
         getRowHeight={() => "auto"}
+        localeText={localeText}
       />
     </Box>
   );

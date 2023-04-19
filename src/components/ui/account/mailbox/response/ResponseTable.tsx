@@ -33,15 +33,15 @@ import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 import { WatchlistRowData } from "@/types/watchlist";
 
-interface MailboxTableProps {
+interface ResponseTableProps {
   data: WatchlistRowData[];
 }
 
-export default function MailboxTable({ data }: MailboxTableProps) {
+export default function ResponseTable({ data }: ResponseTableProps) {
   const matches = useMediaQuery("(min-width:700px)");
 
   const router = useRouter();
-  const { t } = useTranslation("inbox");
+  const { t } = useTranslation("response");
   const { account } = useAccount();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
@@ -93,7 +93,7 @@ export default function MailboxTable({ data }: MailboxTableProps) {
     })();
   };
 
-  const handleCancelClick = (
+  const handleCancelDeleteClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
@@ -106,61 +106,56 @@ export default function MailboxTable({ data }: MailboxTableProps) {
 
   const columns: GridColDef[] = [
     {
-      field: "id",
-      headerName: t("id") as string,
-      flex: 0.1
-    },
-    {
-      field: "bookCover",
-      headerName: t("bookCover") as string,
-      width: 150,
-      renderCell: (params) => (
-        <Box sx={{ p: 1, ml: -1 }}>
-          <Image
-            src={params.value}
-            alt={params.value}
-            sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-            className={styles["book-item__book-cover"]}
-          />
-        </Box>
-      )
-    },
-    {
-      field: "title",
-      headerName: t("title") as string,
+      field: "event",
+      headerName: t("event") as string,
+      renderCell: (params) => {
+        return <Typography>{params.value}</Typography>;
+      },
       flex: 1,
-      renderCell: (params) => (
-        <Typography variant="h6">{params.value}</Typography>
-      ),
-      minWidth: 250
+      minWidth: 200
     },
     {
-      field: "author",
-      headerName: t("author") as string,
+      field: "price",
+      headerName: t("price") as string,
       renderCell: (params) => <Typography>{params.value}</Typography>,
-      width: 110
+      width: 150
     },
     {
-      field: "status",
-      headerName: t("status") as string,
+      field: "from",
+      headerName: t("from") as string,
       width: 200,
-      renderCell: (params) => (
-        // <Chip label={params.value[1]} color={params.value[0]} />
-        <Chip label={params.value} />
-      )
+      renderCell: (params) => <Typography>{params.value}</Typography>
+    },
+    {
+      field: "to",
+      headerName: t("to") as string,
+      width: 200,
+      renderCell: (params) => <Typography>{params.value}</Typography>
+    },
+    {
+      field: "date",
+      headerName: t("date") as string,
+      width: 200,
+      renderCell: (params) => <Typography>{params.value}</Typography>
     },
     {
       field: "action",
       headerName: t("action") as string,
       sortable: false,
       width: 160,
-      renderCell: (params) => (
-        <Tooltip title={t("tooltip_delete")}>
-          <IconButton onClick={(e) => handleOpenDeleteDialogClick(e, params)}>
-            {params.value}
-          </IconButton>
-        </Tooltip>
-      )
+      renderCell: (params) => {
+        return (
+          <Stack direction="row" spacing={1}>
+            <Tooltip title={t("tooltip_delete")}>
+              <IconButton
+                onClick={(e) => handleOpenDeleteDialogClick(e, params)}
+              >
+                {params?.value?.delete}
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        );
+      }
     }
   ];
 
@@ -170,39 +165,116 @@ export default function MailboxTable({ data }: MailboxTableProps) {
     });
   }, [data]);
 
+  const mockData = [
+    {
+      tokenId: 1,
+      event: "Sell listing",
+      price: "0.5 ETH",
+      from: "0xEg25....f2F2",
+      to: "",
+      date: "2 months ago",
+      action: {
+        delete: <DeleteOutlineOutlinedIcon />
+      }
+    },
+    {
+      tokenId: 2,
+      event: "Purchased",
+      price: "0.4 ETH",
+      from: "0xEg25....f2F3",
+      to: "0xEg25....f2F2",
+      date: "3 months ago",
+      action: {
+        delete: <DeleteOutlineOutlinedIcon />
+      }
+    },
+    {
+      tokenId: 3,
+      event: "Sell listing",
+      price: "0.4 ETH",
+      from: "0xEg25....f2F3",
+      to: "",
+      date: "4 months ago",
+      action: {
+        delete: <DeleteOutlineOutlinedIcon />
+      }
+    },
+    {
+      tokenId: 4,
+      event: "Cancel trade",
+      price: "",
+      from: "0xEg25....f2F3",
+      to: "",
+      date: "4 months ago",
+      action: {
+        delete: <DeleteOutlineOutlinedIcon />
+      }
+    },
+    {
+      tokenId: 5,
+      event: "Sell listing",
+      price: "0.4 ETH",
+      from: "0xEg25....f2F4",
+      to: "0xEg25....f2F2",
+      date: "5 months ago",
+      action: {
+        delete: <DeleteOutlineOutlinedIcon />
+      }
+    },
+    {
+      tokenId: 6,
+      event: "Claimed",
+      price: "",
+      from: "0xEg25....f2F4",
+      to: "",
+      date: "6 months ago",
+      action: {
+        delete: <DeleteOutlineOutlinedIcon />
+      }
+    }
+  ];
+
   return (
     <Stack spacing={3}>
       <DataGrid
         getRowId={(row: any) => row.tokenId}
         columns={columns}
-        rows={data}
+        // rows={data}
+        rows={mockData}
       />
       <Dialog
-        title={t("dialogTitle") as string}
+        title={t("dialogTitleDelete") as string}
         open={openDeleteDialog}
         onClose={handleDeleteClose}
       >
         <Stack spacing={3}>
-          <Typography>{t("message")}</Typography>
+          <Typography>{t("message_delete")}</Typography>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={{ xs: 1, sm: 2, md: 4 }}
           >
-            <Image
-              src={targetItem?.bookCover}
-              alt={targetItem?.title}
-              sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-              className={styles["book-item__book-cover"]}
-            />
             <Box>
-              <Typography variant="h5">{targetItem?.title}</Typography>
-              <Typography variant="h4">{targetItem?.author}</Typography>
+              <Typography variant="body1">
+                Event: {targetItem?.event}
+              </Typography>
+              <Typography variant="body1">
+                Price: {targetItem?.price}
+              </Typography>
+              {targetItem?.from && (
+                <Typography variant="body1">
+                  From: {targetItem?.from}
+                </Typography>
+              )}
+              {targetItem?.to && (
+                <Typography variant="body1">To: {targetItem?.to}</Typography>
+              )}
+              <Typography variant="body1">Date: {targetItem?.date}</Typography>
             </Box>
           </Stack>
           <Stack direction="row" spacing={3} justifyContent="end">
             <StyledButton
               customVariant="secondary"
-              onClick={(e) => handleCancelClick(e)}
+              onClick={(e) => handleCancelDeleteClick(e)}
             >
               {t("button_cancel")}
             </StyledButton>
