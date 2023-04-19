@@ -6,40 +6,80 @@ import { Box, Grid, Stack, Typography } from "@mui/material";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
+import { useAccount } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
 interface RevokeSharedOutButtonProps {
-  borrower?: string;
+  sharer: string;
+  sharedPer: string;
   amount: number;
   isEnded?: boolean;
   countDown?: string;
   title: string;
   bookCover: string;
-  renter: string;
+  fromRenter: string;
   tokenId: number;
-  handleRevoke: () => Promise<any>;
+  startTime: number;
+  endTime: number;
   buttonName?: string;
 }
 
 const RevokeSharedOutButton = ({
-  borrower,
+  sharer,
+  sharedPer,
   amount,
   isEnded,
   countDown,
   bookCover,
   title,
-  renter,
+  fromRenter,
+  startTime,
+  endTime,
   tokenId,
-  handleRevoke,
   buttonName = "Revoke"
 }: RevokeSharedOutButtonProps) => {
   const [renterName, setRenterName] = useState();
+  const { account } = useAccount();
+  const { contract } = useWeb3();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
   const openRevokeDiaglog = Boolean(anchorRevokeDiaglog);
+
+  const handleRevokeSharedOut = async () => {
+    try {
+      // handle errors
+      if (fromRenter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const idSharedBook = await contract!.getIdSharedBook(
+        tokenId,
+        sharedPer,
+        sharer,
+        startTime,
+        endTime
+      );
+
+      const tx = await contract?.recallSharedBooks(idSharedBook);
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Revoke share NftBook successfully",
+        error: "Oops! There's a problem with sharing revoke process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
 
   const handleRevokeDiaglogClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -47,7 +87,7 @@ const RevokeSharedOutButton = ({
     setAnchorRevokeDiaglog(e.currentTarget);
     if (isEnded) {
       try {
-        await handleRevoke();
+        await handleRevokeSharedOut();
       } catch (e: any) {
         console.error(e);
         toast.error(`${e.message}.`, {
@@ -63,7 +103,7 @@ const RevokeSharedOutButton = ({
 
   const handleRevokeClick = async () => {
     try {
-      await handleRevoke();
+      await handleRevokeSharedOut();
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {
@@ -75,8 +115,8 @@ const RevokeSharedOutButton = ({
   useEffect(() => {
     (async () => {
       try {
-        if (renter) {
-          const userRes = await axios.get(`/api/users/wallet/${renter}`);
+        if (fromRenter) {
+          const userRes = await axios.get(`/api/users/wallet/${fromRenter}`);
 
           if (userRes.data.success === true) {
             setRenterName(userRes.data.data.fullname);
@@ -86,7 +126,7 @@ const RevokeSharedOutButton = ({
         console.log(err);
       }
     })();
-  }, [renter]);
+  }, [fromRenter]);
 
   return (
     <>
@@ -124,10 +164,10 @@ const RevokeSharedOutButton = ({
                   mb: 5
                 }}
               >
-                {borrower && !isEnded && (
+                {sharer && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} is in a rental term duration. Are you sure you
+                      {sharer} is in a sharing term duration. Are you sure you
                       want to revoke this?
                     </Typography>
                     <Typography>{countDown} left</Typography>

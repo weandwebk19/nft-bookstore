@@ -11,16 +11,16 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useAccount, useOwnedListedBooks } from "@/components/hooks/web3";
-import RevokeButton from "@/components/shared/BookButton/RevokeButton";
+import { useOwnedListedBooks } from "@/components/hooks/web3";
 import { ActionableBookItem } from "@/components/shared/BookItem";
-import { BookList } from "@/components/shared/BookList";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import UnListButton from "@/components/ui/account/bookshelf/listing-books/UnListButton";
 import { StyledButton } from "@/styles/components/Button";
+import { ListedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const ListingBooks = () => {
@@ -38,10 +38,8 @@ const ListingBooks = () => {
   ];
 
   const { nfts } = useOwnedListedBooks();
-  const [ownedBooks, setOwnedBooks] = useState<any[]>([]);
+  const listedBooks = nfts.data;
   const router = useRouter();
-
-  const { account } = useAccount();
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -54,43 +52,36 @@ const ListingBooks = () => {
     })();
   };
 
-  const handleOpenRevokeDialogClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRevokeButton(e.currentTarget);
-  };
+  // const handleOpenRevokeDialogClick = (
+  //   e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  // ) => {
+  //   e.preventDefault();
+  //   setAnchorRevokeButton(e.currentTarget);
+  // };
 
-  const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
-    null
-  );
+  // const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
+  //   null
+  // );
 
-  const openRevokeDialog = Boolean(anchorRevokeButton);
+  // const openRevokeDialog = Boolean(anchorRevokeButton);
 
-  const handleRevokeClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRevokeButton(null);
-  };
+  // const handleRevokeClick = (
+  //   e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  // ) => {
+  //   e.preventDefault();
+  //   setAnchorRevokeButton(null);
+  // };
 
-  const handleCancelClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRevokeButton(null);
-  };
+  // const handleCancelClick = (
+  //   e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  // ) => {
+  //   e.preventDefault();
+  //   setAnchorRevokeButton(null);
+  // };
 
-  const handleRevokeClose = () => {
-    setAnchorRevokeButton(null);
-  };
-
-  useEffect(() => {
-    if (nfts.data?.length !== 0) {
-      const res = nfts.data?.filter((nft: any) => nft.author !== account.data);
-      if (res) setOwnedBooks(res);
-    }
-  }, [nfts.data, account.data]);
+  // const handleRevokeClose = () => {
+  //   setAnchorRevokeButton(null);
+  // };
 
   return (
     <>
@@ -109,43 +100,43 @@ const ListingBooks = () => {
           <Grid item xs={4} sm={8} md={9}>
             <ContentPaper
               title={t("listingBooksTitle")}
-              button={
-                <>
-                  <StyledButton
-                    customVariant="secondary"
-                    onClick={(e) => handleOpenRevokeDialogClick(e)}
-                  >
-                    Revoke All
-                  </StyledButton>
-                  <Dialog
-                    title={t("dialogTitle") as string}
-                    open={openRevokeDialog}
-                    onClose={handleRevokeClose}
-                  >
-                    <Stack spacing={3}>
-                      <Typography>{t("message")}</Typography>
-                      <Stack direction="row" spacing={3} justifyContent="end">
-                        <StyledButton
-                          customVariant="secondary"
-                          onClick={(e) => handleCancelClick(e)}
-                        >
-                          {t("button_cancel")}
-                        </StyledButton>
-                        <StyledButton onClick={(e) => handleRevokeClick(e)}>
-                          {t("button_revoke")}
-                        </StyledButton>
-                      </Stack>
-                    </Stack>
-                  </Dialog>
-                </>
-              }
+              // button={
+              //   <>
+              //     <StyledButton
+              //       customVariant="secondary"
+              //       onClick={(e) => handleOpenRevokeDialogClick(e)}
+              //     >
+              //       Revoke All
+              //     </StyledButton>
+              //     <Dialog
+              //       title={t("dialogTitle") as string}
+              //       open={openRevokeDialog}
+              //       onClose={handleRevokeClose}
+              //     >
+              //       <Stack spacing={3}>
+              //         <Typography>{t("message")}</Typography>
+              //         <Stack direction="row" spacing={3} justifyContent="end">
+              //           <StyledButton
+              //             customVariant="secondary"
+              //             onClick={(e) => handleCancelClick(e)}
+              //           >
+              //             {t("button_cancel")}
+              //           </StyledButton>
+              //           <StyledButton onClick={(e) => handleRevokeClick(e)}>
+              //             {t("button_revoke")}
+              //           </StyledButton>
+              //         </Stack>
+              //       </Stack>
+              //     </Dialog>
+              //   </>
+              // }
             >
               {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (ownedBooks?.length === 0 || nfts.error) {
+                } else if (listedBooks?.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
                       <Typography>{t("emptyMessage") as string}</Typography>
@@ -159,7 +150,7 @@ const ListingBooks = () => {
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
                     <>
-                      {ownedBooks!.map((book) => {
+                      {listedBooks!.map((book: ListedBook) => {
                         return (
                           <Grid
                             item
@@ -175,20 +166,18 @@ const ListingBooks = () => {
                               bookCover={book?.meta.bookCover}
                               title={book?.meta.title}
                               fileType={book?.meta.fileType}
-                              renter={book?.renter}
+                              owner={book?.seller}
                               onClick={handleBookClick}
                               price={book?.price}
                               amount={book?.amount}
                               buttons={
                                 <>
-                                  <RevokeButton
-                                    buttonName="Unlisting"
+                                  <UnListButton
                                     tokenId={book?.tokenId}
+                                    amount={book?.amount}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
-                                    renter={book?.renter}
-                                    amount={book?.amount}
-                                    handleRevoke={() => {}}
+                                    seller={book?.seller}
                                   />
                                 </>
                               }

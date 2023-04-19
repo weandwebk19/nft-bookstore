@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 
 import { AddToWatchlistButton } from "@/components/shared/BookButton";
 import BuyButton from "@/components/shared/BookButton/BuyButton";
+import TakeButton from "@/components/shared/BookButton/TakeButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
@@ -27,7 +28,6 @@ const DisplayBox: FunctionComponent = () => {
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
@@ -79,11 +79,14 @@ const DisplayBox: FunctionComponent = () => {
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <BuyButton
+                                <TakeButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  seller={book?.sharedPer}
+                                  fromRenter={book?.fromRenter}
+                                  sharer={book?.sharer}
+                                  startTime={book?.startTime}
+                                  endTime={book?.endTime}
                                   price={book?.price}
                                   supplyAmount={book?.amount}
                                 />

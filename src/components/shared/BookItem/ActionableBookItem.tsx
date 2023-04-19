@@ -243,7 +243,9 @@ const ActionableBookItem = ({
                   )}
                 {(status === "isPurchased" ||
                   status === "isLending" ||
-                  status === "isBorrowed") && (
+                  status === "isBorrowed" ||
+                  status === "isSharing" ||
+                  status === "isListing") && (
                   <Stack>
                     <Typography variant="subtitle2">Amount:</Typography>
                     <Typography variant="label">{amount}</Typography>

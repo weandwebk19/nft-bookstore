@@ -7,10 +7,10 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { PurchasedBook } from "@/types/nftBook";
+import { BookSelling } from "@/types/nftBook";
 import { toNumber } from "@/utils/nomalizer";
 
-type OwnedPurchasedBooksHookFactory = CryptoHookFactory<PurchasedBook[]>;
+type OwnedPurchasedBooksHookFactory = CryptoHookFactory<BookSelling[]>;
 
 export type UseOwnedPurchasedBooksHook =
   ReturnType<OwnedPurchasedBooksHookFactory>;
@@ -22,14 +22,13 @@ export const hookFactory: OwnedPurchasedBooksHookFactory =
       contract ? "web3/useOwnedPurchasedBooks" : null,
       async () => {
         try {
-          const nfts = [] as PurchasedBook[];
+          const nfts = [] as BookSelling[];
           const coreNfts = await contract!.getOwnedPurchasedBooks();
 
           for (let i = 0; i < coreNfts.length; i++) {
             const item = coreNfts[i];
-            const listedBook = await contract!.getListedBookById(item.listedId);
-            const tokenURI = await contract!.getUri(listedBook.tokenId);
-            if (listedBook.tokenId.toNumber() !== 0) {
+            const tokenURI = await contract!.getUri(item.tokenId);
+            if (item.tokenId.toNumber() !== 0) {
               const metaRes = await (
                 await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
               ).data;
@@ -39,21 +38,17 @@ export const hookFactory: OwnedPurchasedBooksHookFactory =
               }
 
               const amountTradeable = await contract!.getAmountUnUsedBook(
-                listedBook.tokenId
+                item.tokenId
               );
 
               nfts.push({
-                listedBook: toNumber({
-                  tokenId: listedBook.tokenId,
-                  seller: listedBook.seller,
-                  amount: listedBook.amount,
-                  price: parseFloat(ethers.utils.formatEther(listedBook.price))
-                }),
-                listedId: item?.listedId?.toNumber(),
                 buyer: item?.buyer,
                 amount: item?.amount?.toNumber(),
                 amountTradeable: amountTradeable.toNumber(),
-                meta
+                meta,
+                tokenId: item?.tokenId.toNumber(),
+                seller: item?.seller,
+                price: parseFloat(ethers.utils.formatEther(item?.price))
               });
             }
           }

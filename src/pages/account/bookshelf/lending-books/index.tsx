@@ -47,8 +47,6 @@ const LendingBooks = () => {
   ];
 
   const router = useRouter();
-  const { account } = useAccount();
-  const { contract } = useWeb3();
 
   const { nfts: lendNfts } = useOwnedLendingBooks();
   const lendingBooks = lendNfts.data as LendBook[];

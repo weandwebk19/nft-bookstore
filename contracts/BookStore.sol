@@ -85,10 +85,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _bookSellingStorage.isListing(tokenId, seller);
   }
 
-  function isLending(uint tokenId, address renter) public view returns (bool) {
-    return _bookRentingStorage.isLending(tokenId, renter);
-  }
-
   function _beforeTokenTransfer(
     address operator,
     address from,
@@ -203,7 +199,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
 
   function getListedBookById(
     uint idListedBook
-  ) public view returns (BookSellingStorage.BookSelling  memory) {
+  ) public view returns (BookSellingStorage.BookSelling memory) {
     return _bookSellingStorage.getListedBookById(idListedBook);
   }
 
@@ -739,6 +735,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return _bookSharingStorage.getAllOwnedSharedBook(msg.sender);
   }
 
+  function getIdBookOnSharing(
+    uint tokenId,
+    address fromRenter,
+    address sharer,
+    uint startTime,
+    uint endTime
+  ) public view returns (uint) {
+    return
+      _bookSharingStorage.getIdBookOnSharing(
+        tokenId,
+        fromRenter,
+        sharer,
+        startTime,
+        endTime
+      );
+  }
+
   function updateBooksOnSharing(
     uint idBooksOnSharing,
     uint newPrice,
@@ -793,8 +806,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
     );
   }
 
-  function takeBooksOnSharing(uint idBooksOnSharing) 
-    public payable {
+  function removeBooksOnSharing(
+    uint tokenId,
+    address fromRenter,
+    address sharer,
+    uint startTime,
+    uint endTime
+  ) public {
+    _bookSharingStorage.removeBooksOnSharing(
+      tokenId,
+      fromRenter,
+      sharer,
+      startTime,
+      endTime
+    );
+  }
+
+  function takeBooksOnSharing(uint idBooksOnSharing) public payable {
     if (msg.sender == address(0)) {
       revert Error.InvalidAddressError(msg.sender);
     }
@@ -807,6 +835,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
       idBooksOnSharing,
       msg.sender
     );
+    if (msg.value != price) {
+      revert Error.InvalidPriceError(msg.value);
+    }
     if (price != 0 && booksOnSharing.tokenId != 0) {
       _safeTransferFrom(
         booksOnSharing.sharer,
@@ -821,6 +852,23 @@ contract BookStore is ERC1155URIStorage, Ownable {
     } else {
       revert Error.ExecutionError();
     }
+  }
+
+  function getIdSharedBook(
+    uint tokenId,
+    address sharedPer,
+    address sharer,
+    uint startTime,
+    uint endTime
+  ) public view returns (uint) {
+    return
+      _bookSharingStorage.getIdSharedBook(
+        tokenId,
+        sharedPer,
+        sharer,
+        startTime,
+        endTime
+      );
   }
 
   // Return true if success, owthersise return false

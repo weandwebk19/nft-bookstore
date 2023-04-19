@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import { AlertColor, Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
@@ -14,22 +13,16 @@ import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
-import { Snackbar } from "@/components/shared/Snackbar";
 import { StyledButton } from "@/styles/components/Button";
 
-interface RevokeSharingButtonProps {
-  sharedPer?: string;
+interface UnListButtonProps {
+  borrower?: string;
   amount: number;
   isEnded?: boolean;
-  countDown?: string;
   title: string;
   bookCover: string;
-  sharer: string;
+  seller: string;
   tokenId: number;
-  fromRenter: string;
-  startTime: number;
-  endTime: number;
-  buttonName?: string;
 }
 
 // const schema = yup
@@ -50,21 +43,16 @@ interface RevokeSharingButtonProps {
 //   amount: 1
 // };
 
-const RevokeSharingButton = ({
-  sharedPer,
+const UnListButton = ({
+  borrower,
   amount,
   isEnded,
-  countDown,
   bookCover,
   title,
-  sharer,
-  fromRenter,
-  startTime,
-  endTime,
-  tokenId,
-  buttonName = "Cancel Share"
-}: RevokeSharingButtonProps) => {
-  const [sharerName, setSharerName] = useState();
+  seller,
+  tokenId
+}: UnListButtonProps) => {
+  const [sellerName, setSellerName] = useState();
   const { contract } = useWeb3();
   const { account } = useAccount();
 
@@ -72,34 +60,22 @@ const RevokeSharingButton = ({
     useState<Element | null>(null);
   const openRevokeDiaglog = Boolean(anchorRevokeDiaglog);
 
-  const handleCancelSharing = async () => {
+  const handleCancelLending = async () => {
     try {
       // handle errors
-      if (sharer !== account.data) {
-        return toast.error("Sharer address is not valid.", {
+      if (seller !== account.data) {
+        return toast.error("Seller address is not valid.", {
           position: toast.POSITION.TOP_CENTER
         });
       }
 
-      const idBooksOnSharing = await contract!.getIdBookOnSharing(
-        tokenId,
-        fromRenter,
-        sharer,
-        startTime,
-        endTime
-      );
-
-      const tx = await contract?.convertBookOnSharingToBorrowedBook(
-        idBooksOnSharing,
-        amount
-      );
+      const tx = await contract?.updateBookFromSale(tokenId, 0, 0, seller);
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Cancel share NftBook successfully",
-        error: "Oops! There's a problem with sharing cancel process!"
+        success: "Cancel Lend NftBook successfully",
+        error: "Oops! There's a problem with lending cancel process!"
       });
-      console.log(receipt);
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {
@@ -114,9 +90,12 @@ const RevokeSharingButton = ({
     setAnchorRevokeDiaglog(e.currentTarget);
     if (isEnded) {
       try {
-        await handleCancelSharing();
+        await handleCancelLending();
       } catch (e: any) {
         console.error(e);
+        toast.error(`${e.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
       }
     }
   };
@@ -125,29 +104,41 @@ const RevokeSharingButton = ({
     setAnchorRevokeDiaglog(null);
   };
 
+  // const methods = useForm({
+  //   shouldUnregister: false,
+  //   defaultValues,
+  //   resolver: yupResolver(schema),
+  //   mode: "all"
+  // });
+
+  // const { handleSubmit } = methods;
+
   const handleRevokeClick = async () => {
     try {
-      await handleCancelSharing();
+      await handleCancelLending();
     } catch (e: any) {
       console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 
   useEffect(() => {
     (async () => {
       try {
-        if (sharer) {
-          const userRes = await axios.get(`/api/users/wallet/${sharer}`);
+        if (seller) {
+          const userRes = await axios.get(`/api/users/wallet/${seller}`);
 
           if (userRes.data.success === true) {
-            setSharerName(userRes.data.data.fullname);
+            setSellerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [sharer]);
+  }, [seller]);
 
   return (
     <>
@@ -155,15 +146,16 @@ const RevokeSharingButton = ({
         onClick={handleRevokeDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        Cancel Share
+        Unlist
       </StyledButton>
 
       {!isEnded && (
         <Dialog
-          title={buttonName}
+          title="Unlist"
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
+          renter
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
               <Stack>
@@ -174,7 +166,7 @@ const RevokeSharingButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{sharerName}</Typography>
+                <Typography>{sellerName}</Typography>
                 <Typography>Amount: {amount}</Typography>
               </Stack>
             </Grid>
@@ -185,13 +177,12 @@ const RevokeSharingButton = ({
                   mb: 5
                 }}
               >
-                {sharedPer && !isEnded && (
+                {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {sharedPer} is in a rental term duration. Are you sure you
-                      want to revoke this?
+                      {borrower} is in a rental term duration. Are you sure you
+                      want to cacel lending this book?
                     </Typography>
-                    <Typography>{countDown} left</Typography>
                   </>
                 )}
               </Stack>
@@ -215,4 +206,4 @@ const RevokeSharingButton = ({
   );
 };
 
-export default RevokeSharingButton;
+export default UnListButton;

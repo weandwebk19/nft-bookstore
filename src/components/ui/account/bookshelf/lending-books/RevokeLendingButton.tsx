@@ -76,7 +76,7 @@ const RevokeLendingButton = ({
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Cancel Lending NftBook successfully",
+        success: "Cancel Lend NftBook successfully",
         error: "Oops! There's a problem with lending cancel process!"
       });
     } catch (e: any) {
@@ -149,12 +149,12 @@ const RevokeLendingButton = ({
         onClick={handleRevokeDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        Cancel Lending
+        Cancel Lend
       </StyledButton>
 
       {!isEnded && (
         <Dialog
-          title="Cancel Lending"
+          title="Cancel Lend"
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
