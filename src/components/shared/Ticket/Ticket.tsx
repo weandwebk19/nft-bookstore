@@ -26,8 +26,6 @@ const Ticket = ({ header, body, image, footer, href, icon }: TicketProps) => {
     router.push(`${href}`);
   };
 
-  console.log(icon);
-
   return (
     // older UI
     // <Box

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +16,7 @@ import Paper from "@mui/material/Paper";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Alert } from "@mui/lab";
+import getFileExtension from "@utils/getFileExtension";
 import axios from "axios";
 import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
@@ -100,6 +101,7 @@ const CreateBook = () => {
   const [bookFileLink, setBookFileLink] = useState("");
   const [bookCoverLink, setBookCoverLink] = useState("");
   const [bookSampleLink, setBookSampleLink] = useState("");
+  const [currentFile, setCurrentFile] = useState("");
 
   const steps = [
     t("titleStep1") as string,
@@ -117,10 +119,9 @@ const CreateBook = () => {
 
     // validation for step2 (Upload your book)
     yup.object().shape({
-      fileType: yup
-        .string()
-        .required(t("textError3") as string)
-        .oneOf(["epub", "pdf"], t("textError4") as string),
+      fileType: yup.string(),
+      // .required(t("textError3") as string)
+      // .oneOf(["epub", "pdf"], t("textError4") as string),
       bookFile: yup
         .mixed()
         .required(t("textError5") as string)
@@ -450,8 +451,9 @@ const CreateBook = () => {
     }
   };
 
-  const { handleSubmit, trigger, getValues } = methods;
+  const { handleSubmit, trigger, getValues, setValue } = methods;
   const onSubmit = (data: any) => {
+    setCurrentFile(data.bookFile.path);
     try {
       if (activeStep === 1) {
         (async () => {
@@ -525,6 +527,12 @@ const CreateBook = () => {
       handleError(err);
     }
   };
+
+  useEffect(() => {
+    if (currentFile !== "" && currentFile) {
+      setValue("fileType", getFileExtension(currentFile));
+    }
+  }, [currentFile]);
 
   const handleNext = async () => {
     const isStepValid = await trigger();

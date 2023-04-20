@@ -144,7 +144,7 @@ const NavBar = () => {
           fullname: "Anonymous"
         })
         .catch((e) => {
-          console.log(e);
+          console.error(e);
         });
     } catch (error) {
       // window.alert(error);
@@ -174,7 +174,6 @@ const NavBar = () => {
   useEffect(() => {
     if (userInfo?.isAuthor !== undefined) {
       setIsAuthor(userInfo?.isAuthor);
-      console.log(userInfo?.isAuthor);
     } else {
       setIsAuthor(false);
     }
