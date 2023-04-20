@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Box, Stack, Typography } from "@mui/material";
 
 import {
@@ -35,9 +37,9 @@ const Step2 = () => {
           </Typography>
         </Box>
         <Stack alignItems="center" spacing={3}>
-          <FormGroup label={t("chooseFormatBook") as string} required>
+          {/* <FormGroup label={t("chooseFormatBook") as string} required>
             <RadioGroupController items={radioItems} name="fileType" />
-          </FormGroup>
+          </FormGroup> */}
           <FormGroup label={t("bookFile") as string} required>
             <AttachmentController
               name="bookFile"
