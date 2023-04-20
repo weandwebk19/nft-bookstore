@@ -3,8 +3,11 @@ import { toast } from "react-toastify";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
+import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { ethers } from "ethers";
+import * as yup from "yup";
 
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
@@ -12,34 +15,44 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-interface RevokeLentOutButtonProps {
-  borrower: string;
+interface UnListButtonProps {
+  borrower?: string;
   amount: number;
   isEnded?: boolean;
-  countDown?: string;
   title: string;
   bookCover: string;
-  renter: string;
+  seller: string;
   tokenId: number;
-  startTime: number;
-  endTime: number;
-  buttonName?: string;
 }
 
-const RevokeLentOutButton = ({
+// const schema = yup
+//   .object({
+//     price: yup
+//       .number()
+//       .min(0, `The price must be higher than 0.`)
+//       .typeError("Price must be a number"),
+//     amount: yup
+//       .number()
+//       .min(1, `The price must be higher than 0.`)
+//       .typeError("Amount must be a number")
+//   })
+//   .required();
+
+// const defaultValues = {
+//   price: 0,
+//   amount: 1
+// };
+
+const UnListButton = ({
   borrower,
   amount,
   isEnded,
-  countDown,
   bookCover,
   title,
-  renter,
-  tokenId,
-  startTime,
-  endTime,
-  buttonName = "Revoke"
-}: RevokeLentOutButtonProps) => {
-  const [renterName, setRenterName] = useState();
+  seller,
+  tokenId
+}: UnListButtonProps) => {
+  const [sellerName, setSellerName] = useState();
   const { contract } = useWeb3();
   const { account } = useAccount();
 
@@ -47,28 +60,21 @@ const RevokeLentOutButton = ({
     useState<Element | null>(null);
   const openRevokeDiaglog = Boolean(anchorRevokeDiaglog);
 
-  const handleRevokeBorrowedBooks = async () => {
+  const handleCancelLending = async () => {
     try {
       // handle errors
-      if (renter !== account.data) {
-        return toast.error("Renter address is not valid.", {
+      if (seller !== account.data) {
+        return toast.error("Seller address is not valid.", {
           position: toast.POSITION.TOP_CENTER
         });
       }
 
-      const idBorrowedBook = await contract!.getIdBorrowedBook(
-        tokenId,
-        renter,
-        borrower,
-        startTime,
-        endTime
-      );
-      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
+      const tx = await contract?.updateBookFromSale(tokenId, 0, 0, seller);
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Revoke lent out book successfully",
-        error: "Oops! There's a problem with lent out process!"
+        success: "Cancel Lend NftBook successfully",
+        error: "Oops! There's a problem with lending cancel process!"
       });
     } catch (e: any) {
       console.error(e);
@@ -84,7 +90,7 @@ const RevokeLentOutButton = ({
     setAnchorRevokeDiaglog(e.currentTarget);
     if (isEnded) {
       try {
-        await handleRevokeBorrowedBooks();
+        await handleCancelLending();
       } catch (e: any) {
         console.error(e);
         toast.error(`${e.message}.`, {
@@ -98,9 +104,18 @@ const RevokeLentOutButton = ({
     setAnchorRevokeDiaglog(null);
   };
 
+  // const methods = useForm({
+  //   shouldUnregister: false,
+  //   defaultValues,
+  //   resolver: yupResolver(schema),
+  //   mode: "all"
+  // });
+
+  // const { handleSubmit } = methods;
+
   const handleRevokeClick = async () => {
     try {
-      await handleRevokeBorrowedBooks();
+      await handleCancelLending();
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {
@@ -112,18 +127,18 @@ const RevokeLentOutButton = ({
   useEffect(() => {
     (async () => {
       try {
-        if (renter) {
-          const userRes = await axios.get(`/api/users/wallet/${renter}`);
+        if (seller) {
+          const userRes = await axios.get(`/api/users/wallet/${seller}`);
 
           if (userRes.data.success === true) {
-            setRenterName(userRes.data.data.fullname);
+            setSellerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [renter]);
+  }, [seller]);
 
   return (
     <>
@@ -131,15 +146,16 @@ const RevokeLentOutButton = ({
         onClick={handleRevokeDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        {buttonName}
+        Unlist
       </StyledButton>
 
       {!isEnded && (
         <Dialog
-          title={buttonName}
+          title="Unlist"
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
+          renter
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
               <Stack>
@@ -150,7 +166,7 @@ const RevokeLentOutButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{renterName}</Typography>
+                <Typography>{sellerName}</Typography>
                 <Typography>Amount: {amount}</Typography>
               </Stack>
             </Grid>
@@ -165,9 +181,8 @@ const RevokeLentOutButton = ({
                   <>
                     <Typography>
                       {borrower} is in a rental term duration. Are you sure you
-                      want to revoke this?
+                      want to cacel lending this book?
                     </Typography>
-                    <Typography>{countDown} left</Typography>
                   </>
                 )}
               </Stack>
@@ -177,10 +192,10 @@ const RevokeLentOutButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  Cancel
+                  No
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Revoke
+                  Yes
                 </StyledButton>
               </Box>
             </Grid>
@@ -191,4 +206,4 @@ const RevokeLentOutButton = ({
   );
 };
 
-export default RevokeLentOutButton;
+export default UnListButton;

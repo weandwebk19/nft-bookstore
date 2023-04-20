@@ -10,6 +10,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
@@ -24,8 +25,6 @@ interface RevokeLendingButtonProps {
   bookCover: string;
   renter: string;
   tokenId: number;
-  buttonName?: string;
-  handleRevoke: () => Promise<any>;
 }
 
 // const schema = yup
@@ -54,16 +53,39 @@ const RevokeLendingButton = ({
   bookCover,
   title,
   renter,
-  tokenId,
-  buttonName = "Revoke",
-  handleRevoke
+  tokenId
 }: RevokeLendingButtonProps) => {
   const [renterName, setRenterName] = useState();
   const { contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
   const openRevokeDiaglog = Boolean(anchorRevokeDiaglog);
+
+  const handleCancelLending = async () => {
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const tx = await contract?.updateBookFromRenting(tokenId, 0, 0, renter);
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Cancel Lend NftBook successfully",
+        error: "Oops! There's a problem with lending cancel process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
 
   const handleRevokeDiaglogClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -71,7 +93,7 @@ const RevokeLendingButton = ({
     setAnchorRevokeDiaglog(e.currentTarget);
     if (isEnded) {
       try {
-        await handleRevoke();
+        await handleCancelLending();
       } catch (e: any) {
         console.error(e);
         toast.error(`${e.message}.`, {
@@ -96,7 +118,7 @@ const RevokeLendingButton = ({
 
   const handleRevokeClick = async () => {
     try {
-      await handleRevoke();
+      await handleCancelLending();
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {
@@ -127,12 +149,12 @@ const RevokeLendingButton = ({
         onClick={handleRevokeDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        Cancel Lending
+        Cancel Lend
       </StyledButton>
 
       {!isEnded && (
         <Dialog
-          title={buttonName}
+          title="Cancel Lend"
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
@@ -161,7 +183,7 @@ const RevokeLendingButton = ({
                   <>
                     <Typography>
                       {borrower} is in a rental term duration. Are you sure you
-                      want to revoke this?
+                      want to cacel lending this book?
                     </Typography>
                     <Typography>{countDown} left</Typography>
                   </>
@@ -173,10 +195,10 @@ const RevokeLendingButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  Cancel
+                  No
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Revoke
+                  Yes
                 </StyledButton>
               </Box>
             </Grid>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
@@ -11,7 +12,10 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useAccount, useOwnedSharingBooks } from "@/components/hooks/web3";
+import {
+  useOwnedSharedOutBooks,
+  useOwnedSharingBooks
+} from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
@@ -28,8 +32,6 @@ import { secondsToDhms } from "@/utils/secondsToDhms";
 
 const SharingBooks = () => {
   const { t } = useTranslation("sharingBooks");
-  const { account } = useAccount();
-  const { contract } = useWeb3();
 
   const breadCrumbs = [
     {
@@ -42,9 +44,12 @@ const SharingBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedSharingBooks();
   const router = useRouter();
-  const sharingBooks = nfts.data as BookSharing[];
+  const { nfts: sharingNfts } = useOwnedSharingBooks();
+  const sharingBooks = sharingNfts.data as BookSharing[];
+
+  const { nfts: sharedNfts } = useOwnedSharedOutBooks();
+  const sharedBooks = sharedNfts.data as BookSharing[];
 
   const [nowTime, setNowTime] = useState<number>(0);
 
@@ -61,67 +66,6 @@ const SharingBooks = () => {
         router.push(`/books/${bookId}`);
       }
     })();
-  };
-
-  const handleRevokeSharingClick = async (tokenId: number, renter: string) => {
-    try {
-      // handle errors
-      if (renter !== account.data) {
-        return toast.error("Renter address is not valid.", {
-          position: toast.POSITION.TOP_CENTER
-        });
-      }
-
-      const tx = await contract?.updateBookFromRenting(tokenId, 0, 0, renter);
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Pending.",
-        success: "Revoke Sharing NftBook successfully",
-        error: "Oops! There's a problem with sharing revoke process!"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
-  };
-
-  const handleRevokeSharedOutClick = async (
-    tokenId: number,
-    renter: string,
-    borrower: string,
-    startTime: number,
-    endTime: number
-  ) => {
-    try {
-      // handle errors
-      if (renter !== account.data) {
-        return toast.error("Renter address is not valid.", {
-          position: toast.POSITION.TOP_CENTER
-        });
-      }
-
-      const idBorrowedBook = await contract!.getIdBorrowedBook(
-        tokenId,
-        renter,
-        borrower,
-        startTime,
-        endTime
-      );
-      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Pending.",
-        success: "Revoke shared out book successfully",
-        error: "Oops! There's a problem with shared out process!"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
   };
 
   return (
@@ -146,11 +90,11 @@ const SharingBooks = () => {
                 button={<RevokeAllSharingButton />}
               >
                 {(() => {
-                  if (nfts.isLoading) {
+                  if (sharingNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (sharingBooks?.length === 0 || nfts.error) {
+                  } else if (sharingBooks?.length === 0 || sharingNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>{t("emptyMessage") as string}</Typography>
@@ -163,7 +107,7 @@ const SharingBooks = () => {
                       spacing={3}
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
-                      {sharingBooks!.map((book) => {
+                      {sharingBooks!.map((book: BookSharing) => {
                         return (
                           <Grid
                             item
@@ -179,6 +123,7 @@ const SharingBooks = () => {
                               bookCover={book?.meta.bookCover}
                               title={book?.meta.title}
                               fileType={book?.meta.fileType}
+                              amount={book?.amount}
                               onClick={handleBookClick}
                               buttons={
                                 <>
@@ -193,12 +138,9 @@ const SharingBooks = () => {
                                     bookCover={book?.meta.bookCover}
                                     sharer={book?.sharer}
                                     amount={book?.amount}
-                                    handleRevoke={async () => {
-                                      return handleRevokeSharingClick(
-                                        book?.tokenId,
-                                        book?.sharer
-                                      );
-                                    }}
+                                    fromRenter={book?.fromRenter}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
                                   />
                                 </>
                               }
@@ -217,11 +159,11 @@ const SharingBooks = () => {
                 button={<RevokeAllSharedOutButton />}
               >
                 {(() => {
-                  if (nfts.isLoading) {
+                  if (sharedNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (sharingBooks?.length === 0 || nfts.error) {
+                  } else if (sharedBooks?.length === 0 || sharedNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>
@@ -236,7 +178,7 @@ const SharingBooks = () => {
                       spacing={3}
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
-                      {sharingBooks!.map((book) => {
+                      {sharedBooks!.map((book: BookSharing) => {
                         return (
                           <Grid
                             item
@@ -252,6 +194,7 @@ const SharingBooks = () => {
                               bookCover={book?.meta.bookCover}
                               title={book?.meta.title}
                               fileType={book?.meta.fileType}
+                              amount={book?.amount}
                               onClick={handleBookClick}
                               buttons={
                                 <>
@@ -259,17 +202,12 @@ const SharingBooks = () => {
                                     tokenId={book?.tokenId}
                                     title={book?.meta.title}
                                     bookCover={book?.meta.bookCover}
-                                    renter={book?.sharer}
+                                    sharer={book?.sharer}
+                                    sharedPer={book?.sharedPer}
+                                    fromRenter={book?.fromRenter}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
                                     amount={book?.amount}
-                                    handleRevoke={async () => {
-                                      return handleRevokeSharedOutClick(
-                                        book?.tokenId,
-                                        book?.sharer,
-                                        book?.sharedPer,
-                                        book?.startTime,
-                                        book?.endTime
-                                      );
-                                    }}
                                   />
                                 </>
                               }
@@ -289,6 +227,7 @@ const SharingBooks = () => {
             </ContentPaper>
           </Grid>
         </Grid>
+        <ToastContainer />
       </Stack>
     </>
   );
