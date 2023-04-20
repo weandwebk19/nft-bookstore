@@ -1,68 +1,74 @@
 /* eslint-disable prettier/prettier */
 import { Web3Dependencies } from "@_types/hooks";
 
-import { UseAccountHook, hookFactory as createAccountHook } from "./useAccount";
-import {
-  UseAllLendingBooksHook,
-  hookFactory as createAllLendingBooksHook
-} from "./useAllLendingBooks";
-import {
-  UseAllSharingBooksHook,
-  hookFactory as createAllSharingBooksHook
-} from "./useAllSharingBooks";
-import {
-  UseBookDetailHook,
-  hookFactory as createBookDetailHook
-} from "./useBookDetail";
-import {
-  UseCreatedBooksHook,
-  hookFactory as createCreatedBooksHook
-} from "./useCreatedBooks";
-import {
-  UseListedBooksHook,
-  hookFactory as createListedBooksHook
-} from "./useListedBooks";
-import { UseNetworkHook, hookFactory as createNetworkHook } from "./useNetwork";
 import {
   UseOwnedBorrowedBooksHook,
   hookFactory as createOwnedBorrowedBooksHook
-} from "./useOwnedBorrowedBooks";
+} from "./bookShelf/borrow/useOwnedBorrowedBooks";
 import {
   UseOwnedLendingBooksHook,
   hookFactory as createOwnedLendingBooksHook
-} from "./useOwnedLendingBooks";
+} from "./bookShelf/borrow/useOwnedLendingBooks";
 import {
   UseOwnedLentOutBooksHook,
   hookFactory as createOwnedLentOutBooksHook
-} from "./useOwnedLentOutBooks";
+} from "./bookShelf/borrow/useOwnedLentOutBooks";
 import {
   UseOwnedListedBooksHook,
   hookFactory as createOwnedListedBooksHook
-} from "./useOwnedListedBooks";
-import {
-  UseOwnedNftsHook,
-  hookFactory as createOwnedBooksHook
-} from "./useOwnedNfts";
+} from "./bookShelf/sell/useOwnedListedBooks";
 import {
   UseOwnedPurchasedBooksHook,
   hookFactory as createOwnedPurchasedBooksHook
-} from "./useOwnedPurchasedBooks";
+} from "./bookShelf/sell/useOwnedPurchasedBooks";
 import {
   UseOwnedSharedBooksHook,
   hookFactory as createOwnedSharedBooksHook
-} from "./useOwnedSharedBooks";
+} from "./bookShelf/share/useOwnedSharedBooks";
 import {
   UseOwnedSharedOutBooksHook,
   hookFactory as createOwnedSharedOutBooksHook
-} from "./useOwnedSharedOutBooks";
+} from "./bookShelf/share/useOwnedSharedOutBooks";
 import {
   UseOwnedSharingBooksHook,
   hookFactory as createOwnedSharingBooksHook
-} from "./useOwnedSharingBooks";
+} from "./bookShelf/share/useOwnedSharingBooks";
+import {
+  UseCreatedBooksHook,
+  hookFactory as createCreatedBooksHook
+} from "./bookShelf/useCreatedBooks";
+import {
+  UseOwnedNftsHook,
+  hookFactory as createOwnedBooksHook
+} from "./bookShelf/useOwnedNfts";
+import {
+  UseAllLendingBooksHook,
+  hookFactory as createAllLendingBooksHook
+} from "./borrow/useAllLendingBooks";
+import {
+  UseBookDetailHook,
+  hookFactory as createBookDetailHook
+} from "./detailPage/useBookDetail";
 import {
   UseRealOwnerOfTokensHook,
   hookFactory as createRealOwnerOfTokensHook
-} from "./useRealOwnerOfTokens";
+} from "./detailPage/useRealOwnerOfTokens";
+import {
+  UseListedBooksHook,
+  hookFactory as createListedBooksHook
+} from "./publishing/useListedBooks";
+import {
+  UseAllSharingBooksHook,
+  hookFactory as createAllSharingBooksHook
+} from "./share/useAllSharingBooks";
+import {
+  UseAccountHook,
+  hookFactory as createAccountHook
+} from "./utils/useAccount";
+import {
+  UseNetworkHook,
+  hookFactory as createNetworkHook
+} from "./utils/useNetwork";
 
 export type Web3Hooks = {
   useAccount: UseAccountHook;

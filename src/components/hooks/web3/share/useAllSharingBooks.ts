@@ -6,7 +6,7 @@ import { BookSharing } from "@_types/nftBook";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { useAccount } from ".";
+import { useAccount } from "..";
 
 type AllSharingBooksHookFactory = CryptoHookFactory<BookSharing[]>;
 

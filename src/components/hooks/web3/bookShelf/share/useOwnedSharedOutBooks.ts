@@ -1,27 +1,32 @@
+/* eslint-disable prettier/prettier */
+import { useCallback } from "react";
+import { toast } from "react-toastify";
+
 import { CryptoHookFactory } from "@_types/hooks";
 import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { BorrowedBook } from "@/types/nftBook";
+import { BookSharing } from "@/types/nftBook";
 
-import { useAccount } from ".";
+import { useAccount } from "../..";
 
-type OwnedLentOutBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
+type OwnedSharedOutBooksHookFactory = CryptoHookFactory<BookSharing[]>;
 
-export type UseOwnedLentOutBooksHook = ReturnType<OwnedLentOutBooksHookFactory>;
+export type UseOwnedSharedOutBooksHook =
+  ReturnType<OwnedSharedOutBooksHookFactory>;
 
-export const hookFactory: OwnedLentOutBooksHookFactory =
+export const hookFactory: OwnedSharedOutBooksHookFactory =
   ({ contract }) =>
   () => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedLentOutBooks" : null,
+      contract ? "web3/useOwnedSharedOutBooks" : null,
       async () => {
-        const nfts = [] as BorrowedBook[];
-        const allBorrowedBooks = await contract!.getAllBorrowedBooks();
-        const coreNfts = allBorrowedBooks.filter((nft) => {
-          return nft.renter == account.data;
+        const nfts = [] as BookSharing[];
+        const allSharedBooks = await contract!.getAllSharedBook();
+        const coreNfts = allSharedBooks.filter((nft) => {
+          return nft.sharer == account.data;
         });
 
         for (let i = 0; i < coreNfts.length; i++) {
@@ -37,12 +42,14 @@ export const hookFactory: OwnedLentOutBooksHookFactory =
           try {
             nfts.push({
               tokenId: item?.tokenId?.toNumber(),
-              renter: item?.renter,
+              fromRenter: item?.fromRenter,
+              sharer: item?.sharer,
+              sharedPer: item?.sharedPer,
               amount: item?.amount?.toNumber(),
-              price: parseFloat(ethers.utils.formatEther(item?.price)),
-              borrower: item?.borrower,
               startTime: item?.startTime?.toNumber(),
               endTime: item?.endTime?.toNumber(),
+              priceOfBB: parseFloat(ethers.utils.formatEther(item?.priceOfBB)),
+              price: parseFloat(ethers.utils.formatEther(item?.price)),
               meta
             });
           } catch (err) {
