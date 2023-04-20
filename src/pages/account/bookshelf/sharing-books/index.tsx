@@ -13,8 +13,7 @@ import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
 import {
-  useAccount,
-  useOwnedSharedBooks,
+  useOwnedSharedOutBooks,
   useOwnedSharingBooks
 } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
@@ -49,7 +48,7 @@ const SharingBooks = () => {
   const { nfts: sharingNfts } = useOwnedSharingBooks();
   const sharingBooks = sharingNfts.data as BookSharing[];
 
-  const { nfts: sharedNfts } = useOwnedSharedBooks();
+  const { nfts: sharedNfts } = useOwnedSharedOutBooks();
   const sharedBooks = sharedNfts.data as BookSharing[];
 
   const [nowTime, setNowTime] = useState<number>(0);

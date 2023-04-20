@@ -125,7 +125,7 @@ const TakeButton = ({
         return toast.error(`Amount must be less than ${supplyAmount}.`, {
           position: toast.POSITION.TOP_CENTER
         });
-      } else if (account.data == sharer) {
+      } else if (account.data == sharer || account.data == fromRenter) {
         return toast.error(
           "You are not allowed to take the book shared by yourself.",
           {
@@ -142,10 +142,6 @@ const TakeButton = ({
         endTime
       );
 
-      console.log("idBooksOnSharing ", idBooksOnSharing.toNumber());
-
-      console.log("price ", price);
-
       const tx = await contract?.takeBooksOnSharing(
         idBooksOnSharing.toNumber(),
         {
@@ -159,10 +155,10 @@ const TakeButton = ({
         error: "Processing error"
       });
     } catch (error: any) {
-      console.log(error);
-      // toast.error(`${error.message}.`, {
-      //   position: toast.POSITION.TOP_CENTER
-      // });
+      console.error(error);
+      toast.error(`${error.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
     }
   };
 
