@@ -26,6 +26,7 @@ const BookShelf = () => {
           header={t("createdBooks") as string}
           body={t("createdBooksDesc") as string}
           image={images.gradient2}
+          icon={images.createdBooks}
         />
       )
     },
@@ -37,6 +38,7 @@ const BookShelf = () => {
           header={t("purchasedBooks") as string}
           body={t("purchasedBooksDesc") as string}
           image={images.gradient3}
+          icon={images.purchasedBooks}
         />
       )
     },
@@ -48,6 +50,7 @@ const BookShelf = () => {
           header={t("borrowedBooks") as string}
           body={t("borrowedBooksDesc") as string}
           image={images.gradient4}
+          icon={images.borrowedBooks}
         />
       )
     },
@@ -59,6 +62,7 @@ const BookShelf = () => {
           header={t("sharedBooks") as string}
           body={t("sharedBooksDesc") as string}
           image={images.gradient5}
+          icon={images.sharedBooks}
         />
       )
     }
@@ -76,6 +80,7 @@ const BookShelf = () => {
           header={t("sharingBooks") as string}
           body={t("sharingBooksDesc") as string}
           image={images.gradient6}
+          icon={images.sharingBooks}
         />
       )
     },
@@ -87,6 +92,7 @@ const BookShelf = () => {
           header={t("listingBooks") as string}
           body={t("listingBooksDesc") as string}
           image={images.gradient7}
+          icon={images.listingBooks}
         />
       )
     },
@@ -98,6 +104,7 @@ const BookShelf = () => {
           header={t("lendingBooks") as string}
           body={t("lendingBooksDesc") as string}
           image={images.gradient8}
+          icon={images.lendingBooks}
         />
       )
     }
@@ -119,6 +126,7 @@ const BookShelf = () => {
               header={t("ownedBooks") as string}
               body={t("ownedBooksDesc") as string}
               image={images.gradient8}
+              icon={images.ownedBooks}
             />
           </Paper>
           <Wrapper items={topCategories} itemsInARow={4} />

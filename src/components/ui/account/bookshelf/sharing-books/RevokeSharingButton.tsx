@@ -10,6 +10,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
@@ -25,8 +26,10 @@ interface RevokeSharingButtonProps {
   bookCover: string;
   sharer: string;
   tokenId: number;
+  fromRenter: string;
+  startTime: number;
+  endTime: number;
   buttonName?: string;
-  handleRevoke: () => Promise<any>;
 }
 
 // const schema = yup
@@ -55,15 +58,55 @@ const RevokeSharingButton = ({
   bookCover,
   title,
   sharer,
+  fromRenter,
+  startTime,
+  endTime,
   tokenId,
-  buttonName = "Revoke",
-  handleRevoke
+  buttonName = "Cancel Share"
 }: RevokeSharingButtonProps) => {
   const [sharerName, setSharerName] = useState();
+  const { contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
   const openRevokeDiaglog = Boolean(anchorRevokeDiaglog);
+
+  const handleCancelSharing = async () => {
+    try {
+      // handle errors
+      if (sharer !== account.data) {
+        return toast.error("Sharer address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const idBooksOnSharing = await contract!.getIdBookOnSharing(
+        tokenId,
+        fromRenter,
+        sharer,
+        startTime,
+        endTime
+      );
+
+      const tx = await contract?.convertBookOnSharingToBorrowedBook(
+        idBooksOnSharing,
+        amount
+      );
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Cancel share NftBook successfully",
+        error: "Oops! There's a problem with sharing cancel process!"
+      });
+      console.log(receipt);
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
 
   const handleRevokeDiaglogClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -71,12 +114,9 @@ const RevokeSharingButton = ({
     setAnchorRevokeDiaglog(e.currentTarget);
     if (isEnded) {
       try {
-        await handleRevoke();
+        await handleCancelSharing();
       } catch (e: any) {
         console.error(e);
-        toast.error(`${e.message}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
       }
     }
   };
@@ -87,12 +127,9 @@ const RevokeSharingButton = ({
 
   const handleRevokeClick = async () => {
     try {
-      await handleRevoke();
+      await handleCancelSharing();
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
     }
   };
 
@@ -118,7 +155,7 @@ const RevokeSharingButton = ({
         onClick={handleRevokeDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        Cancel Sharing
+        Cancel Share
       </StyledButton>
 
       {!isEnded && (
@@ -164,10 +201,10 @@ const RevokeSharingButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  Cancel
+                  No
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Revoke
+                  Yes
                 </StyledButton>
               </Box>
             </Grid>

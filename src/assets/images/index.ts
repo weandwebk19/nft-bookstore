@@ -20,7 +20,15 @@ const images = {
   gradient8: require("@/assets/images/vv50.jpg").default.src,
   loading: require("@/assets/images/loading.gif").default.src,
   genre2: require("@/assets/images/genre2.svg").default.src,
-  heroImg: require("@/assets/images/hero-img.jpg").default.src
+  heroImg: require("@/assets/images/hero-img.jpg").default.src,
+  ownedBooks: require("@/assets/images/owned.svg").default.src,
+  createdBooks: require("@/assets/images/created.svg").default.src,
+  purchasedBooks: require("@/assets/images/purchased.svg").default.src,
+  borrowedBooks: require("@/assets/images/borrowed.svg").default.src,
+  sharedBooks: require("@/assets/images/shared.svg").default.src,
+  listingBooks: require("@/assets/images/listing.svg").default.src,
+  lendingBooks: require("@/assets/images/lend.svg").default.src,
+  sharingBooks: require("@/assets/images/sharing.svg").default.src
 };
 
 export default images;

@@ -11,5 +11,7 @@
   "dialogTitle": "Revoke all",
   "message": "Are you sure to revoke all the books?",
   "button_cancel": "Cancel",
-  "button_revoke": "Revoke"
+  "button_revoke": "Revoke",
+  "button_yes": "Yes",
+  "button_no": "No",
 }

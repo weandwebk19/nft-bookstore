@@ -5,7 +5,7 @@ import useSWR from "swr";
 
 import { BorrowedBook } from "@/types/nftBook";
 
-import { useAccount } from ".";
+import { useAccount } from "../..";
 
 type OwnedLentOutBooksHookFactory = CryptoHookFactory<BorrowedBook[]>;
 

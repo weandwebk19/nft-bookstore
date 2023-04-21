@@ -241,14 +241,16 @@ const ActionableBookItem = ({
                       <Typography variant="label">{price} ETH</Typography>
                     </Stack>
                   )}
-                {status !== "isCreated" &&
-                  status !== "isOwned" &&
-                  status === "isPurchased" && (
-                    <Stack>
-                      <Typography variant="subtitle2">Amount:</Typography>
-                      <Typography variant="label">{amount}</Typography>
-                    </Stack>
-                  )}
+                {(status === "isPurchased" ||
+                  status === "isLending" ||
+                  status === "isBorrowed" ||
+                  status === "isSharing" ||
+                  status === "isListing") && (
+                  <Stack>
+                    <Typography variant="subtitle2">Amount:</Typography>
+                    <Typography variant="label">{amount}</Typography>
+                  </Stack>
+                )}
               </Stack>
               {(status === "isBorrowed" ||
                 status === "isShared" ||

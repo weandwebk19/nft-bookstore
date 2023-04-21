@@ -6,7 +6,7 @@ import { LendBook } from "@_types/nftBook";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { useAccount } from ".";
+import { useAccount } from "..";
 
 type UseAllLendingBooksResponse = {
   borrowBooks: (
@@ -76,7 +76,7 @@ export const hookFactory: AllLendingBooksHookFactory =
             });
           } else if (account.data == renter) {
             return toast.error(
-              "You are not allowed to borrow the book lendd by yourself.",
+              "You are not allowed to borrow the book lent by yourself.",
               {
                 position: toast.POSITION.TOP_CENTER
               }
