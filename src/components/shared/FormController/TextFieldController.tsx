@@ -12,6 +12,7 @@ interface TextFieldControllerProps {
   ) => void;
   InputProps?: object;
   readOnly?: boolean;
+  endAdornment?: React.ReactNode;
 }
 
 const TextFieldController = ({
@@ -22,6 +23,7 @@ const TextFieldController = ({
   onChange,
   InputProps,
   readOnly = false,
+  endAdornment,
   ...rest
 }: TextFieldControllerProps) => {
   const { control } = useFormContext();
@@ -35,7 +37,7 @@ const TextFieldController = ({
             type={type}
             label={label}
             error={invalid}
-            InputProps={{ readOnly, ...InputProps }}
+            InputProps={{ readOnly, endAdornment }}
             {...field}
             onChange={(e) => {
               if (onChange) {
