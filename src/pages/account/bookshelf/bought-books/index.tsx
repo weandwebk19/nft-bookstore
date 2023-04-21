@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -8,18 +9,22 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useOwnedSharedBooks } from "@/components/hooks/web3";
-import { ReadButton } from "@/components/shared/BookButton";
+import { useOwnedPurchasedBooks } from "@/components/hooks/web3";
+import {
+  LendButton,
+  ReadButton,
+  SellButton
+} from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { BookSharing } from "@/types/nftBook";
+import { PurchasedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
-const SharedBooks = () => {
-  const { t } = useTranslation("sharedBooks");
+const BoughtBooks = () => {
+  const { t } = useTranslation("boughtBooks");
 
   const breadCrumbs = [
     {
@@ -27,18 +32,20 @@ const SharedBooks = () => {
       href: "/account/bookshelf"
     },
     {
-      content: t("breadcrumbs_sharedBooks") as string,
-      href: "/account/bookshelf/shared-books"
+      content: t("breadcrumbs_boughtBooks") as string,
+      href: "/account/bookshelf/owned-books"
     }
   ];
 
-  const { nfts } = useOwnedSharedBooks();
+  const { nfts } = useOwnedPurchasedBooks();
   const router = useRouter();
-  const sharedBooks = nfts.data as BookSharing[];
+  const boughtBooks = nfts.data;
+  // console.log(nfts);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
@@ -61,13 +68,13 @@ const SharedBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9}>
-            <ContentPaper title={t("sharedBooksTitle")}>
+            <ContentPaper title={t("boughtBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
                     <Typography>{t("loadingMessage") as string}</Typography>
                   );
-                } else if (sharedBooks?.length === 0 || nfts.error) {
+                } else if (boughtBooks?.length === 0 || nfts.error) {
                   return (
                     <FallbackNode>
                       <Typography>{t("emptyMessage") as string}</Typography>
@@ -80,27 +87,42 @@ const SharedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {sharedBooks!.map((book: BookSharing) => {
+                    {boughtBooks!.map((book: PurchasedBook) => {
                       return (
                         <Grid
                           item
-                          key={book.tokenId}
+                          key={book.listedId}
                           xs={4}
                           sm={4}
                           md={6}
                           lg={8}
                         >
                           <ActionableBookItem
-                            status="isShared"
-                            tokenId={book?.tokenId}
+                            status="isBought"
+                            tokenId={book?.listedBook.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            sharer={book?.sharer}
+                            owner={book?.listedBook.seller}
                             onClick={handleBookClick}
+                            amount={book?.amount}
+                            amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
-                                <ReadButton bookFile={book?.meta.bookFile} />
+                                <SellButton
+                                  tokenId={book?.listedBook.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  owner={book?.listedBook.seller}
+                                  amountTradeable={book?.amountTradeable!}
+                                />
+                                <LendButton
+                                  tokenId={book?.listedBook.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  owner={book?.listedBook.seller}
+                                  amountTradeable={book?.amountTradeable!}
+                                />
                               </>
                             }
                           />
@@ -121,7 +143,7 @@ const SharedBooks = () => {
   );
 };
 
-export default withAuth(SharedBooks);
+export default withAuth(BoughtBooks);
 
 export async function getStaticProps({ locale }: any) {
   return {
@@ -129,7 +151,7 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "sharedBooks"
+        "boughtBooks"
       ]))
     }
   };

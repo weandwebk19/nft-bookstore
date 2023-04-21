@@ -1,0 +1,20 @@
+{
+  "titlePage": "Request - NFT Bookstore",
+  "containerTitle": "My Request",
+  "button_cancel": "Cancel",
+  "button_delete": "Remove",
+  "button_refuse": "Refuse",
+  "button_accept": "Accept",
+  "tooltip_delete": "Remove this",
+  "tooltip_accept": "Accept this",
+  "dialogTitleDelete": "Remove this from your request",
+  "dialogTitleAccept": "Accept the request",
+  "message_delete": "Are you sure you want to remove this from your request?",
+  "message_accept": "Are you sure you want to accept this request?",
+  "event": "Event",
+  "price": "Price",
+  "from": "From",
+  "to": "To",
+  "date": "Date",
+  "action": "Action"
+}

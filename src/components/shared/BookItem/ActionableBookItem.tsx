@@ -160,19 +160,19 @@ const ActionableBookItem = ({
       }}
     >
       <Stack
-        direction={{ xs: "column", sm: "row" }}
+        direction={{ xs: "column" }}
         sx={{
           height: "100%"
         }}
       >
         <Box
-          sx={{ flexShrink: 0, aspectRatio: "2 / 3", cursor: "pointer" }}
+          sx={{ flexShrink: 0, aspectRatio: "1 / 1", cursor: "pointer" }}
           onClick={() => onClick(tokenId)}
         >
           <Image
             src={bookCover}
             alt={title}
-            sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
+            sx={{ flexShrink: 0, aspectRatio: "1 / 1" }}
             className={styles["book-item__book-cover"]}
           />
         </Box>
@@ -225,7 +225,7 @@ const ActionableBookItem = ({
             )}
           </Stack>
 
-          <Divider sx={{ my: 3 }} />
+          <Divider />
           <Stack spacing={3}>
             <Stack spacing={{ xs: 1, sm: 2, md: 4 }}>
               <Stack

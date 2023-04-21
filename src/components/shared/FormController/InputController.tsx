@@ -12,6 +12,7 @@ interface InputControllerProps {
   ) => void;
   InputProps?: object;
   readOnly?: boolean;
+  endAdornment?: React.ReactNode;
 }
 
 const InputController = ({
@@ -22,6 +23,7 @@ const InputController = ({
   onChange,
   InputProps,
   readOnly = false,
+  endAdornment,
   ...rest
 }: InputControllerProps) => {
   const { control } = useFormContext();
@@ -35,7 +37,7 @@ const InputController = ({
             type={type}
             label={label}
             error={invalid}
-            InputProps={{ readOnly, ...InputProps }}
+            InputProps={{ readOnly, endAdornment }}
             {...field}
             onChange={(e) => {
               if (onChange) {

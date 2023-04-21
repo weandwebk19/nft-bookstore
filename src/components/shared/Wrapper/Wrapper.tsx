@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 
-type WrapperVariants = 3 | 4 | 6;
+type WrapperVariants = 2 | 3 | 4 | 6;
 
 interface WrapperProps {
   itemsInARow?: WrapperVariants;
@@ -49,6 +49,12 @@ const Wrapper = ({
             } else if (itemsInARow === 6) {
               return (
                 <Grid key={i} item xs={xs} sm={sm} md={2}>
+                  {item.component}
+                </Grid>
+              );
+            } else if (itemsInARow === 2) {
+              return (
+                <Grid key={i} item xs={xs} sm={sm} md={6}>
                   {item.component}
                 </Grid>
               );

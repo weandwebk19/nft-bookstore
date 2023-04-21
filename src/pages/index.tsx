@@ -6,6 +6,7 @@ import DisplayBox from "@ui/Home/DisplayBox";
 import Hero from "@ui/Home/Hero";
 import MainProduct from "@ui/Home/MainProduct";
 import { CldImage } from "next-cloudinary";
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -14,6 +15,8 @@ import { StyledButton } from "@/styles/components/Button";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 export default function Home() {
+  const { t } = useTranslation("home");
+
   const router = useRouter();
 
   const imageCloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -98,7 +101,7 @@ export default function Home() {
                   router.push("/author/request");
                 }}
               >
-                Become an author
+                {t("becomeAnAuthor") as string}
               </StyledButton>
             </Box>
           </Box>
