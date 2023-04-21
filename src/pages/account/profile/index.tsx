@@ -34,8 +34,8 @@ import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
-  InputController,
-  TextAreaController
+  TextAreaController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -265,7 +265,7 @@ const Profile = () => {
                       <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                           <FormGroup label={t("username") as string} required>
-                            <InputController
+                            <TextFieldController
                               name="userName"
                               readOnly={isLoading}
                             />
@@ -273,7 +273,7 @@ const Profile = () => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <FormGroup label={t("email") as string} required>
-                            <InputController name="email" />
+                            <TextFieldController name="email" />
                           </FormGroup>
                         </Grid>
                         <Grid item xs={12}>
@@ -292,7 +292,7 @@ const Profile = () => {
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <FormGroup label={t("website") as string}>
-                            <InputController
+                            <TextFieldController
                               name="website"
                               readOnly={isLoading}
                             />
@@ -300,7 +300,7 @@ const Profile = () => {
                         </Grid>
                         <Grid item xs={12}>
                           <FormGroup label={t("walletAddress") as string}>
-                            <InputController
+                            <TextFieldController
                               name="walletAddress"
                               readOnly={true}
                               endAdornment={
@@ -342,7 +342,7 @@ const Profile = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="facebook"
                               readOnly={isLoading}
                             />
@@ -364,7 +364,7 @@ const Profile = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="twitter"
                               readOnly={isLoading}
                             />
@@ -386,7 +386,7 @@ const Profile = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="linkedIn"
                               readOnly={isLoading}
                             />
@@ -408,7 +408,7 @@ const Profile = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="instagram"
                               readOnly={isLoading}
                             />

@@ -37,8 +37,8 @@ import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
   AttachmentController,
-  InputController,
-  TextAreaController
+  TextAreaController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -336,7 +336,7 @@ const AuthorRequest = () => {
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <FormGroup label={t("pseudonym") as string} required>
-                            <InputController
+                            <TextFieldController
                               name="pseudonym"
                               readOnly={isLoading}
                             />
@@ -352,7 +352,7 @@ const AuthorRequest = () => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <FormGroup label={t("email") as string} required>
-                            <InputController name="email" />
+                            <TextFieldController name="email" />
                           </FormGroup>
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -360,7 +360,7 @@ const AuthorRequest = () => {
                             label={t("phoneNumber") as string}
                             required
                           >
-                            <InputController
+                            <TextFieldController
                               name="phoneNumber"
                               onChange={(e) => {
                                 e.target.value = e.target.value.trim();
@@ -401,7 +401,7 @@ const AuthorRequest = () => {
                       <Grid container spacing={2}>
                         <Grid item xs={12}>
                           <FormGroup label={t("website") as string}>
-                            <InputController
+                            <TextFieldController
                               name="website"
                               readOnly={isLoading}
                             />
@@ -409,7 +409,7 @@ const AuthorRequest = () => {
                         </Grid>
                         <Grid item xs={12}>
                           <FormGroup label={t("walletAddress") as string}>
-                            <InputController
+                            <TextFieldController
                               name="walletAddress"
                               readOnly={true}
                               endAdornment={
@@ -451,7 +451,7 @@ const AuthorRequest = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="facebook"
                               readOnly={isLoading}
                             />
@@ -473,7 +473,7 @@ const AuthorRequest = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="twitter"
                               readOnly={isLoading}
                             />
@@ -495,7 +495,7 @@ const AuthorRequest = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="linkedIn"
                               readOnly={isLoading}
                             />
@@ -517,7 +517,7 @@ const AuthorRequest = () => {
                               </Box>
                             }
                           >
-                            <InputController
+                            <TextFieldController
                               name="instagram"
                               readOnly={isLoading}
                             />

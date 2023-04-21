@@ -5,7 +5,7 @@ import styles from "@styles/ContentContainer.module.scss";
 import images from "@/assets/images";
 
 interface ContentContainerProps {
-  titles: string[];
+  titles?: string[];
   children: React.ReactNode;
 }
 

@@ -25,7 +25,7 @@ import * as yup from "yup";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
+import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
@@ -198,10 +198,10 @@ const BuyButton = ({
                 }}
               >
                 <FormGroup label="Listing price" required>
-                  <InputController name="price" type="number" />
+                  <TextFieldController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
-                  <InputController name="amount" type="number" />
+                  <TextFieldController name="amount" type="number" />
                 </FormGroup>
               </Stack>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

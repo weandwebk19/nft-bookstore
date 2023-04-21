@@ -1,6 +1,13 @@
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
-import { FormHelperText, TextField } from "@mui/material";
+import {
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  OutlinedInput,
+  TextField
+} from "@mui/material";
 
 interface InputControllerProps {
   type?: string;
@@ -10,9 +17,12 @@ interface InputControllerProps {
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
+  onSubmit?: (data: any) => void;
+  icon?: JSX.Element;
   InputProps?: object;
   readOnly?: boolean;
-  endAdornment?: React.ReactNode;
+  userHandle?: string;
+  tagName?: string;
 }
 
 const InputController = ({
@@ -20,39 +30,59 @@ const InputController = ({
   label,
   name,
   defaultValue,
+  onSubmit,
+  icon,
   onChange,
   InputProps,
   readOnly = false,
-  endAdornment,
+  userHandle,
+  tagName,
   ...rest
 }: InputControllerProps) => {
-  const { control } = useFormContext();
+  const { control, setValue } = useFormContext();
+
+  useEffect(() => {
+    if (tagName) {
+      setValue(name, `@${tagName}, `);
+    }
+  }, [tagName]);
 
   return (
     <Controller
       {...rest}
-      render={({ field, fieldState: { invalid, error } }) => (
-        <>
-          <TextField
-            type={type}
-            label={label}
-            error={invalid}
-            InputProps={{ readOnly, endAdornment }}
-            {...field}
-            onChange={(e) => {
-              if (onChange) {
-                onChange(e);
+      render={({ field, fieldState: { invalid, error } }) => {
+        return (
+          <>
+            <OutlinedInput
+              id="outlined-adornment-password"
+              type={type}
+              minRows={3}
+              multiline={true}
+              fullWidth
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={onSubmit}
+                    // onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {icon}
+                  </IconButton>
+                </InputAdornment>
               }
-              field.onChange(e);
-            }}
-          />
-          {invalid && (
-            <FormHelperText error sx={{ marginTop: "8px" }}>
-              {error?.message}
-            </FormHelperText>
-          )}
-        </>
-      )}
+              {...field}
+              label={label}
+              sx={{ alignItems: "end", pb: 3 }}
+            />
+            {invalid && (
+              <FormHelperText error sx={{ marginTop: "8px" }}>
+                {error?.message}
+              </FormHelperText>
+            )}
+          </>
+        );
+      }}
       name={name}
       control={control}
       defaultValue={defaultValue}

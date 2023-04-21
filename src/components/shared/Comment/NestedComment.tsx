@@ -1,130 +1,108 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Collapse,
-  Divider,
-  OutlinedInput,
-  Paper,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, Collapse } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 
-import SubdirectoryArrowRightOutlinedIcon from "@mui/icons-material/SubdirectoryArrowRightOutlined";
-import TryOutlinedIcon from "@mui/icons-material/TryOutlined";
+import axios from "axios";
+
+import { useAccount } from "@/components/hooks/web3";
 
 import Comment from "./Comment";
-
-// import { makeStyles } from "@mui/styles";
-
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     display: "flex",
-//     flexDirection: "column",
-//     marginBottom: theme.spacing(2)
-//   },
-//   comment: {
-//     marginBottom: theme.spacing(1)
-//   },
-//   nestedComments: {
-//     marginLeft: theme.spacing(2)
-//   },
-//   button: {
-//     marginTop: theme.spacing(1)
-//   }
-// }));
+import InputComment from "./InputComment";
 
 interface CommentProps {
-  username: string; // this is you
-  avatar: string; // this is your avatar
-  author: string; // this is comment author
-  authorAvatar: string; // this is author avatar
+  id: string | number;
+  author: string;
+  authorAvatar: string;
   content: string;
-  nestedComments?: CommentProps[];
+  rating?: number;
+  replies: CommentProps[];
 }
 
 const NestedComments = ({
-  username,
+  id,
   author,
+  authorAvatar,
   content,
-  nestedComments
+  rating,
+  replies
 }: CommentProps) => {
-  // const classes = useStyles();
+  const theme = useTheme();
+
   const [showNestedComments, setShowNestedComments] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const [userName, setUserName] = useState("");
+  const { account } = useAccount();
+  const [targetReply, setTargetReply] = useState("");
 
-  const handleReplyCommentClick = () => {
+  const handleReplyCommentClick = (replyTo: string) => {
     setShowReplyInput(true);
     setShowNestedComments(true);
+    setTargetReply(replyTo);
   };
 
   const handleNestedCommentsToggle = () => {
     setShowNestedComments(!showNestedComments);
   };
 
+  useEffect(() => {
+    (async () => {
+      try {
+        if (account) {
+          const userRes = await axios.get(`/api/users/wallet/${account.data}`);
+
+          if (userRes.data.success === true) {
+            setUserName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [account]);
+
   return (
     <div>
       <Box sx={{ mb: 3 }}>
-        {/* <Card>
-          <CardContent>
-            <Typography variant="h6">{author}</Typography>
-            <Typography>{content}</Typography>
-            {nestedComments && (
-              <Button
-                size="small"
-                variant="text"
-                startIcon={<TryOutlinedIcon />}
-                onClick={handleNestedCommentsToggle}
-              >
-                {showNestedComments ? "Hide replies" : "View replies"}
-              </Button>
-            )}
-          </CardContent>
-        </Card> */}
         <Box sx={{ width: "100%" }}>
-          <Comment username={author} comment={content} rating={5} />
+          <Comment
+            username={author}
+            avatar={authorAvatar}
+            comment={content}
+            rating={rating}
+            onShowReplyInput={() => handleReplyCommentClick(author)}
+            showNestedComments={showNestedComments}
+            onShowNestedComment={handleNestedCommentsToggle}
+            hasChildren={replies && replies?.length > 0}
+          />
         </Box>
-        {nestedComments && (
-          <Stack direction="row" spacing={3}>
-            <Button
-              size="small"
-              variant="text"
-              startIcon={<TryOutlinedIcon />}
-              onClick={handleReplyCommentClick}
-            >
-              Reply
-            </Button>
-            <Button
-              size="small"
-              variant="text"
-              startIcon={<SubdirectoryArrowRightOutlinedIcon />}
-              onClick={handleNestedCommentsToggle}
-            >
-              {showNestedComments ? "Hide replies" : "View replies"}
-            </Button>
-          </Stack>
-        )}
-        {nestedComments && (
+        {replies && (
           <Box sx={{ ml: 2 }}>
-            <Collapse
-              in={showNestedComments}
-              timeout="auto"
-              unmountOnExit
-              sx={{ borderLeft: "1px solid black" }}
-            >
-              <div>
-                {nestedComments.map((comment) => (
-                  <>
-                    <NestedComments key={comment.content} {...comment} />
-                    <Divider />
-                  </>
+            <Collapse in={showNestedComments} timeout="auto" unmountOnExit>
+              <Box>
+                {replies.map((comment) => (
+                  <Box
+                    key={comment.id}
+                    sx={{
+                      borderLeft: `1px solid ${theme.palette.background.default}`,
+                      borderBottom: `1px solid ${theme.palette.background.default}`,
+                      borderBottomLeftRadius: "1em"
+                    }}
+                  >
+                    <Comment
+                      username={comment.author}
+                      comment={comment.content}
+                      rating={comment.rating}
+                      onShowReplyInput={() =>
+                        handleReplyCommentClick(comment.author)
+                      }
+                      onShowNestedComment={handleNestedCommentsToggle}
+                    />
+                  </Box>
                 ))}
-              </div>
+              </Box>
               {showReplyInput && (
-                <Comment username={username} canComment={showReplyInput} />
+                <InputComment username={userName} replyTo={targetReply} />
               )}
             </Collapse>
           </Box>

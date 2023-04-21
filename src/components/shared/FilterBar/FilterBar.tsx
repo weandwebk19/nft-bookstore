@@ -21,10 +21,10 @@ import { Language } from "@/types/languages";
 
 import { ContentPaper } from "../ContentPaper";
 import {
-  InputController,
   RangeSliderController,
   RatingController,
   SelectController,
+  TextFieldController,
   TreeViewController
 } from "../FormController";
 
@@ -145,7 +145,7 @@ const FilterBar = () => {
             <TreeViewController name="genre" items={genres.data} />
           </FormGroup>
           <FormGroup label={t("searchBook") as string}>
-            <InputController name="title" />
+            <TextFieldController name="title" />
           </FormGroup>
           <FormGroup label={t("rating") as string}>
             <RatingController
@@ -163,7 +163,7 @@ const FilterBar = () => {
             />
           </FormGroup>
           <FormGroup label={t("searchByAuthor") as string}>
-            <InputController name="author" />
+            <TextFieldController name="author" />
           </FormGroup>
           <FormGroup label={t("languagesSupport") as string}>
             <SelectController
