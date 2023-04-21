@@ -31,8 +31,8 @@ import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
-  InputController,
-  TextAreaController
+  TextAreaController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -227,14 +227,14 @@ const Profile = () => {
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="userName" />
+                          <TextFieldController name="userName" />
                         </FormGroup>
                         <FormGroup
                           label={t("email") as string}
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="email" />
+                          <TextFieldController name="email" />
                         </FormGroup>
                       </Stack>
                       <FormGroup label={t("bio") as string}>
@@ -245,10 +245,10 @@ const Profile = () => {
                   <ContentGroup title={t("titleSocial") as string}>
                     <Stack direction="column" spacing={3}>
                       <FormGroup label={t("website") as string}>
-                        <InputController name="website" />
+                        <TextFieldController name="website" />
                       </FormGroup>
                       <FormGroup label={t("walletAddress") as string}>
-                        <InputController
+                        <TextFieldController
                           name="walletAddress"
                           InputProps={{
                             readOnly: true,
@@ -290,7 +290,7 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="facebook" />
+                          <TextFieldController name="facebook" />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -308,7 +308,7 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="twitter" />
+                          <TextFieldController name="twitter" />
                         </FormGroup>
                       </Stack>
                       <Stack
@@ -331,7 +331,7 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="linkedIn" />
+                          <TextFieldController name="linkedIn" />
                         </FormGroup>
                         <FormGroup
                           label={
@@ -349,7 +349,7 @@ const Profile = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="instagram" />
+                          <TextFieldController name="instagram" />
                         </FormGroup>
                       </Stack>
                     </Stack>

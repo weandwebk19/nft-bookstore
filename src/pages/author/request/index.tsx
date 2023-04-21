@@ -40,8 +40,8 @@ import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
   AttachmentController,
-  InputController,
-  TextAreaController
+  TextAreaController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import FileController from "@/components/shared/FormController/FileController";
 import { FormGroup } from "@/components/shared/FormGroup";
@@ -330,7 +330,7 @@ const AuthorRequest = () => {
                   <ContentGroup title={t("titleInfo") as string}>
                     <Stack direction="column" spacing={3}>
                       <FormGroup label={t("pseudonym") as string} required>
-                        <InputController
+                        <TextFieldController
                           name="pseudonym"
                           readOnly={isLoading}
                         />
@@ -347,14 +347,17 @@ const AuthorRequest = () => {
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController name="email" readOnly={isLoading} />
+                          <TextFieldController
+                            name="email"
+                            readOnly={isLoading}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={t("phoneNumber") as string}
                           required
                           className={styles["form__group-half"]}
                         >
-                          <InputController
+                          <TextFieldController
                             name="phoneNumber"
                             onChange={(e) => {
                               e.target.value = e.target.value.trim();
@@ -390,10 +393,13 @@ const AuthorRequest = () => {
                   <ContentGroup title={t("titleSocial") as string}>
                     <Stack direction="column" spacing={3}>
                       <FormGroup label={t("website") as string}>
-                        <InputController name="website" readOnly={isLoading} />
+                        <TextFieldController
+                          name="website"
+                          readOnly={isLoading}
+                        />
                       </FormGroup>
                       <FormGroup label={t("walletAddress") as string}>
-                        <InputController
+                        <TextFieldController
                           name="walletAddress"
                           InputProps={{
                             readOnly: true,
@@ -435,7 +441,7 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController
+                          <TextFieldController
                             name="facebook"
                             readOnly={isLoading}
                           />
@@ -456,7 +462,7 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController
+                          <TextFieldController
                             name="twitter"
                             readOnly={isLoading}
                           />
@@ -482,7 +488,7 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController
+                          <TextFieldController
                             name="linkedIn"
                             readOnly={isLoading}
                           />
@@ -503,7 +509,7 @@ const AuthorRequest = () => {
                           }
                           className={styles["form__group-half"]}
                         >
-                          <InputController
+                          <TextFieldController
                             name="instagram"
                             readOnly={isLoading}
                           />

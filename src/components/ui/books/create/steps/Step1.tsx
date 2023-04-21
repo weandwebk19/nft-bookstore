@@ -1,6 +1,9 @@
 import { Box, Stack, Typography } from "@mui/material";
 
-import { InputController, TextAreaController } from "@shared/FormController";
+import {
+  TextAreaController,
+  TextFieldController
+} from "@shared/FormController";
 import { useTranslation } from "next-i18next";
 
 import { ContentGroup } from "@/components/shared/ContentGroup";
@@ -18,7 +21,7 @@ const Step1 = () => {
       </Box>
       <Stack direction="column" spacing={3}>
         <FormGroup label={t("bookTitle") as string} required>
-          <InputController name="title" />
+          <TextFieldController name="title" />
         </FormGroup>
         <FormGroup label={t("bookDesc") as string} required>
           <TextAreaController name="description" />

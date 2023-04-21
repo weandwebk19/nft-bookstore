@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import * as yup from "yup";
 
 import { useWeb3 } from "@/components/providers/web3";
+import { ContentGroup } from "@/components/shared/ContentGroup";
 import { Dialog } from "@/components/shared/Dialog";
 import {
   RatingController,
@@ -19,10 +20,8 @@ import {
   TextFieldController
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
-
-import { ContentGroup } from "../ContentGroup";
-import { Image } from "../Image";
 
 interface RatingButtonProps {
   title: string;
@@ -124,65 +123,61 @@ const RatingButton = ({
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Rating</StyledButton>
-
-      <Dialog title="Rating" open={openBookCard} onClose={handleBookCardClose}>
-        <FormProvider {...methods}>
-          <Stack spacing={3} sx={{ overflowX: "hidden" }}>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1, sm: 2, md: 4 }}
-            >
-              <Image
-                src={bookCover}
-                alt={title}
-                sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-                className={styles["book-item__book-cover"]}
-              />
-              <Box>
-                <Typography variant="h5">{title}</Typography>
-                <Typography>{authorName}</Typography>
-                {/* <Typography variant="h4">{price} ETH</Typography> */}
-              </Box>
-            </Stack>
-            <Divider />
-            <Stack flexGrow={1}>
-              <ContentGroup title="Leave your rating here">
-                {/* Waiting for your signing... */}
-                <Stack spacing={3}>
-                  <Box
-                    sx={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      scale: "2"
-                    }}
-                  >
-                    <RatingController name="rating" />
-                  </Box>
-                  <FormGroup label="Review">
-                    <TextAreaController name="review" maxCharacters={8000} />
-                  </FormGroup>
-                </Stack>
-              </ContentGroup>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-                <StyledButton
-                  customVariant="secondary"
-                  sx={{ mr: 2 }}
-                  onClick={handleBookCardClose}
-                >
-                  Cancel
-                </StyledButton>
-                <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Send review
-                </StyledButton>
-              </Box>
-            </Stack>
+      <FormProvider {...methods}>
+        <Stack spacing={3} sx={{ overflowX: "hidden" }}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={{ xs: 1, sm: 2, md: 4 }}
+          >
+            <Image
+              src={bookCover}
+              alt={title}
+              sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
+              className={styles["book-item__book-cover"]}
+            />
+            <Box>
+              <Typography variant="h5">{title}</Typography>
+              <Typography>{authorName}</Typography>
+              {/* <Typography variant="h4">{price} ETH</Typography> */}
+            </Box>
           </Stack>
-        </FormProvider>
-        <ToastContainer />
-      </Dialog>
+          <Divider />
+          <Stack flexGrow={1}>
+            <ContentGroup title="Leave your rating here">
+              {/* Waiting for your signing... */}
+              <Stack spacing={3}>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    scale: "2"
+                  }}
+                >
+                  <RatingController name="rating" />
+                </Box>
+                <FormGroup label="Review">
+                  <TextAreaController name="review" maxCharacters={8000} />
+                </FormGroup>
+              </Stack>
+            </ContentGroup>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+              <StyledButton
+                customVariant="secondary"
+                sx={{ mr: 2 }}
+                onClick={handleBookCardClose}
+              >
+                Cancel
+              </StyledButton>
+              <StyledButton onClick={handleSubmit(onSubmit)}>
+                Send review
+              </StyledButton>
+            </Box>
+          </Stack>
+        </Stack>
+      </FormProvider>
+      <ToastContainer />
     </>
   );
 };
