@@ -25,27 +25,6 @@ const DisplayBox: FunctionComponent = () => {
   const query = router.query;
 
   const { listedBooks } = useListedBooks(query as FilterField);
-  // console.log(listedBooks);
-  // let data: ListedBook[] = listedBooks.data!;
-
-  // useEffect(() => {
-  //   setData(listedBooks.data);
-  // }, [listedBooks.isLoading]);
-
-  // useEffect(() => {
-  //   console.log(query);
-  //   console.log(Object.keys(query).length > 0);
-  //   if (Object.keys(query).length > 0) {
-  //     const newData = listedBooks.data?.filter((item) => {
-  //       console.log("item.meta.title", item.meta.title);
-  //       console.log("query.title", query.title?.toString());
-  //       console.log("is", item.meta.title.includes(query.title?.toString()!));
-  //       return item.meta.title.includes(query.title?.toString()!);
-  //     });
-  //     // setData(newData);
-  //     listedBooks.mutate(newData);
-  //   }
-  // }, [query, listedBooks.isLoading]);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {

@@ -137,18 +137,18 @@ export const useRealOwnerOfTokens = (tokenId: number) => {
   };
 };
 
-export const useAllLendingBooks = () => {
+export const useAllLendingBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useAllLendingBooks();
+  const swrRes = hooks.useAllLendingBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useAllSharingBooks = () => {
+export const useAllSharingBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useAllSharingBooks();
+  const swrRes = hooks.useAllSharingBooks(queryString);
 
   return {
     nfts: swrRes
