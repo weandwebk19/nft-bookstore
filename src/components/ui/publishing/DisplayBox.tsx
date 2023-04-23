@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
@@ -15,13 +15,37 @@ import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { book } from "@/mocks";
+import { FilterField } from "@/types/filter";
+import { ListedBookCore } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const { t } = useTranslation("publishingBooks");
 
   const router = useRouter();
+  const query = router.query;
 
-  const { listedBooks } = useListedBooks();
+  const { listedBooks } = useListedBooks(query as FilterField);
+  // console.log(listedBooks);
+  // let data: ListedBook[] = listedBooks.data!;
+
+  // useEffect(() => {
+  //   setData(listedBooks.data);
+  // }, [listedBooks.isLoading]);
+
+  // useEffect(() => {
+  //   console.log(query);
+  //   console.log(Object.keys(query).length > 0);
+  //   if (Object.keys(query).length > 0) {
+  //     const newData = listedBooks.data?.filter((item) => {
+  //       console.log("item.meta.title", item.meta.title);
+  //       console.log("query.title", query.title?.toString());
+  //       console.log("is", item.meta.title.includes(query.title?.toString()!));
+  //       return item.meta.title.includes(query.title?.toString()!);
+  //     });
+  //     // setData(newData);
+  //     listedBooks.mutate(newData);
+  //   }
+  // }, [query, listedBooks.isLoading]);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -45,10 +69,7 @@ const DisplayBox: FunctionComponent = () => {
             {firstBook && (
               <BookBanner
                 tokenId={firstBook?.tokenId}
-                title={firstBook?.meta.title}
                 author={firstBook?.seller}
-                bookCover={firstBook?.meta.bookCover}
-                fileType={firstBook?.meta.fileType}
                 //  description={firstBook?.info.description}
                 //  price={firstBook?.price}
                 //  genres={}
@@ -59,7 +80,11 @@ const DisplayBox: FunctionComponent = () => {
               />
             )}
 
-            <ContentPaper isPaginate={true} title={t("publishingBooksTitle")}>
+            <ContentPaper
+              isPaginate={true}
+              totalPages={Math.ceil(listedBooks.data.length / 30)}
+              title={t("publishingBooksTitle")}
+            >
               {(() => {
                 if (listedBooks.isLoading) {
                   return (
@@ -77,11 +102,11 @@ const DisplayBox: FunctionComponent = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {listedBooks?.data?.map((book) => {
+                    {listedBooks.data?.map((book: ListedBookCore) => {
                       return (
                         <Grid
                           item
-                          key={book.tokenId}
+                          key={`${book.tokenId}+${book.seller}+${book.price}`}
                           xs={4}
                           sm={8}
                           md={6}
@@ -90,17 +115,12 @@ const DisplayBox: FunctionComponent = () => {
                           <OwnableBookItem
                             price={book?.price}
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             author={book?.seller}
                             onClick={handleBookClick}
                             buttons={
                               <>
                                 <BuyButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   seller={book?.seller}
                                   price={book?.price}
                                   supplyAmount={book?.amount}

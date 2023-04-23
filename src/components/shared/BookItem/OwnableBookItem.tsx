@@ -7,13 +7,15 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import useSWR from "swr";
+
+import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useWeb3 } from "@/components/providers/web3";
+import { NftBookMeta } from "@/types/nftBook";
 
 import { Image } from "../Image";
 
 interface OwnableBookItemProps {
-  bookCover: string;
-  title: string;
-  fileType: string;
   tokenId: number;
   author: string;
   onClick: (tokenId: number) => void;
@@ -22,9 +24,6 @@ interface OwnableBookItemProps {
 }
 
 const OwnableBookItem = ({
-  bookCover,
-  title,
-  fileType,
   tokenId,
   author,
   onClick,
@@ -33,6 +32,7 @@ const OwnableBookItem = ({
 }: OwnableBookItemProps) => {
   const theme = useTheme();
   const [authorName, setAuthorName] = useState();
+  const metadata = useMetadata(tokenId);
 
   useEffect(() => {
     (async () => {
@@ -70,7 +70,7 @@ const OwnableBookItem = ({
             position: "absolute",
             borderRadius: "16px",
             backgroundSize: "cover",
-            backgroundImage: `url(${bookCover})`,
+            backgroundImage: `url(${metadata?.data?.bookCover})`,
             backgroundRepeat: "no-repeat"
           }
         }
@@ -83,8 +83,8 @@ const OwnableBookItem = ({
         }}
       >
         <Image
-          src={bookCover}
-          alt={title}
+          src={metadata?.data?.bookCover}
+          alt={metadata?.data?.title}
           sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
           className={styles["book-item__book-cover"]}
         />
@@ -105,7 +105,9 @@ const OwnableBookItem = ({
           >
             <Stack direction="row">
               <InsertDriveFileIcon fontSize="small" color="disabled" />
-              <Typography variant="caption">{fileType}</Typography>
+              <Typography variant="caption">
+                {metadata?.data?.fileType}
+              </Typography>
             </Stack>
 
             {/* {meta.attributes?.map((stat, i) => {
@@ -134,7 +136,7 @@ const OwnableBookItem = ({
               variant="h6"
               sx={{ flex: 1 }}
             >
-              {title}
+              {metadata?.data?.title}
             </Typography>
             <Typography
               className="text-limit text-limit--1"
