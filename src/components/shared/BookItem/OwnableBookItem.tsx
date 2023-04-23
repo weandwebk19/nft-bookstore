@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Box, ButtonGroup, Stack, Typography } from "@mui/material";
+import { Box, ButtonGroup, Skeleton, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
@@ -82,12 +82,16 @@ const OwnableBookItem = ({
           onClick(tokenId);
         }}
       >
-        <Image
-          src={metadata?.data?.bookCover}
-          alt={metadata?.data?.title}
-          sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
-          className={styles["book-item__book-cover"]}
-        />
+        {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
+          <Skeleton variant="rectangular" width="100%" height={350} />
+        ) : (
+          <Image
+            src={metadata?.data?.bookCover}
+            alt={metadata?.data?.title}
+            sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
+            className={styles["book-item__book-cover"]}
+          />
+        )}
         <Box
           sx={{
             mt: 2,
@@ -103,12 +107,16 @@ const OwnableBookItem = ({
             className="book-item__chips"
             sx={{ flexShrink: 0, marginBottom: "auto" }}
           >
-            <Stack direction="row">
-              <InsertDriveFileIcon fontSize="small" color="disabled" />
-              <Typography variant="caption">
-                {metadata?.data?.fileType}
-              </Typography>
-            </Stack>
+            {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
+              <Skeleton variant="text" width="20%" />
+            ) : (
+              <Stack direction="row">
+                <InsertDriveFileIcon fontSize="small" color="disabled" />
+                <Typography variant="caption">
+                  {metadata?.data?.fileType}
+                </Typography>
+              </Stack>
+            )}
 
             {/* {meta.attributes?.map((stat, i) => {
             switch (stat.statType) {
@@ -131,29 +139,46 @@ const OwnableBookItem = ({
               flexDirection: "column"
             }}
           >
-            <Typography
-              className="text-limit text-limit--2"
-              variant="h6"
-              sx={{ flex: 1 }}
-            >
-              {metadata?.data?.title}
-            </Typography>
-            <Typography
-              className="text-limit text-limit--1"
-              variant="body2"
-              sx={{ flexShrink: 0, marginTop: "auto" }}
-              gutterBottom
-            >
-              {authorName}
-            </Typography>
-            <Typography variant="h6" color={`${theme.palette.success.main}`}>
-              {price} ETH
-            </Typography>
+            {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
+              <Skeleton variant="text" width="100%" />
+            ) : (
+              <Typography
+                className="text-limit text-limit--2"
+                variant="h6"
+                sx={{ flex: 1 }}
+              >
+                {metadata?.data?.title}
+              </Typography>
+            )}
+            {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
+              <Skeleton variant="text" width="40%" />
+            ) : (
+              <Typography
+                className="text-limit text-limit--1"
+                variant="body2"
+                sx={{ flexShrink: 0, marginTop: "auto" }}
+                gutterBottom
+              >
+                {authorName}
+              </Typography>
+            )}
+
+            {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
+              <Skeleton variant="text" width="30%" />
+            ) : (
+              <Typography variant="h6" color={`${theme.palette.success.main}`}>
+                {price} ETH
+              </Typography>
+            )}
           </Box>
         </Box>
       </Stack>
       <Stack sx={{ width: "100%" }}>
-        <ButtonGroup>{buttons}</ButtonGroup>
+        {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
+          <Skeleton variant="rectangular" width="100%" height={36.5} />
+        ) : (
+          <ButtonGroup>{buttons}</ButtonGroup>
+        )}
       </Stack>
     </Stack>
   );

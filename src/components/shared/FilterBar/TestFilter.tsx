@@ -1,29 +1,34 @@
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import {
-  Box,
-  CircularProgress,
   Divider,
   IconButton,
+  InputAdornment,
+  OutlinedInput,
   Stack,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import SelectAllOutlinedIcon from "@mui/icons-material/SelectAllOutlined";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { faBorderAll, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
+import nestify from "@utils/nestify";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import querystring from "querystring";
 import * as yup from "yup";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
 import { FormGroup } from "@/components/shared/FormGroup";
-import { UsersSelectController } from "@/components/ui/common/FormController";
 import { StyledButton } from "@/styles/components/Button";
 import { Language } from "@/types/languages";
 
@@ -35,6 +40,8 @@ import {
   TextFieldController,
   TreeViewController
 } from "../FormController";
+import TreeView from "../TreeView/TreeView";
+import RecursiveTreeView from "./TestFilter";
 
 config.autoAddCss = false;
 
@@ -70,9 +77,15 @@ const defaultValues = {
   priceRange: [MIN_PRICE, MAX_PRICE]
 };
 
-const FilterBar = () => {
+interface FilterBarProps {
+  data?: any[];
+  pathname: string;
+}
+
+const FilterBar = ({ data, pathname }: FilterBarProps) => {
   const { t } = useTranslation("filter");
   const router = useRouter();
+  const [query, setQuery] = useState("");
 
   const genres = useGenres();
   const languages = useLanguages();
@@ -87,14 +100,12 @@ const FilterBar = () => {
   const { handleSubmit, setValue } = methods;
 
   const onSubmit = (data: any) => {
-    const newQueryString = { ...router.query, ...data };
-    const queryString = querystring.stringify(newQueryString);
-    const url = `?${queryString}`;
-    router.push(url);
+    console.log("data:", data);
   };
 
   const handleResetGenres = () => {
     setValue("genre", [], { shouldValidate: true });
+    query.genre = "";
   };
   const handleSelectAllGenres = () => {
     const data: any[] = genres?.data || [];
@@ -115,6 +126,45 @@ const FilterBar = () => {
     return `${value} Star${value !== 1 ? "s" : ""}, ${labels[value]}`;
   }
 
+  const [nestedItems, setNestedItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (genres.data !== null) {
+      setNestedItems(nestify(genres.data));
+    }
+  }, [genres.data]);
+
+  const { genre = "all", title = "all", rating = "all" } = router.query;
+
+  const filterSearch = ({
+    genre,
+    title,
+    rating
+  }: {
+    genre?: string;
+    title?: string;
+  }) => {
+    const { query } = router;
+    if (genre) query.genre = genre;
+    if (title) query.title = title;
+    if (rating) query.rating = rating;
+
+    router.push({
+      pathname: router.pathname,
+      query: query
+    });
+  };
+
+  const genreHandler = (nodeId: string) => {
+    filterSearch({ genre: nodeId });
+  };
+
+  const titleHandler = (e) => {
+    e.preventDefault();
+    // router.push(`${router.pathname}?title=${query}`);
+    filterSearch({ title: query });
+  };
+
   return (
     <ContentPaper title={t("filter") as string}>
       <FormProvider {...methods}>
@@ -125,6 +175,35 @@ const FilterBar = () => {
           sx={{ marginTop: 4 }}
           className={styles["filter-bar"]}
         >
+          <Stack>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Typography variant="body2">
+                {data?.length === 0 ? "No" : data?.length} Results
+              </Typography>
+              {(query !== "all" &&
+                query !== "" &&
+                Object.keys(query).length === 0) ||
+              genre !== "all" ||
+              title !== "all" ? (
+                <Tooltip title="Clear all filters">
+                  <IconButton
+                    onClick={() => {
+                      router.push(pathname);
+                      console.log(router.query);
+                    }}
+                  >
+                    <CancelOutlinedIcon fontSize="small" color="primary" />
+                  </IconButton>
+                </Tooltip>
+              ) : null}
+            </Stack>
+            {genre !== "all" && genre !== "" && " | " + genre}
+          </Stack>
+
           <FormGroup
             label={
               <Stack
@@ -151,23 +230,24 @@ const FilterBar = () => {
               </Stack>
             }
           >
-            {genres.isLoading && (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <CircularProgress />
-              </Box>
-            )}
+            {genres.isLoading && "Loading..."}
             {genres.error &&
               "Oops! There was a problem loading genres \n Try refresh the page."}
-            <TreeViewController name="genre" items={genres.data} />
+            <TreeView items={nestedItems} name="genre" onClick={genreHandler} />
           </FormGroup>
           <FormGroup label={t("searchBook") as string}>
-            <TextFieldController name="title" />
+            <OutlinedInput
+              id="outlined-adornment-title-search"
+              fullWidth
+              onBlur={(e) => setQuery(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={titleHandler} edge="end">
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
           </FormGroup>
           <FormGroup label={t("rating") as string}>
             <RatingController
@@ -185,18 +265,13 @@ const FilterBar = () => {
             />
           </FormGroup>
           <FormGroup label={t("searchByAuthor") as string}>
-            {/* <TextFieldController name="author" /> */}
-            <UsersSelectController
-              name="author"
-              itemValue="fullname"
-              itemName="fullname"
-            />
+            <TextFieldController name="author" />
           </FormGroup>
           <FormGroup label={t("languagesSupport") as string}>
             <SelectController
               name="language"
               items={languages.data}
-              itemValue="name"
+              itemValue="_id"
             />
           </FormGroup>
           <StyledButton
@@ -211,5 +286,13 @@ const FilterBar = () => {
     </ContentPaper>
   );
 };
+
+export async function getServerSideProps({ query }) {
+  const genre = query.genre || "";
+  const title = query.title || "";
+
+  const genreFilter = genre && genre !== "all";
+  const titleFilter = title && title !== "all";
+}
 
 export default FilterBar;

@@ -780,3 +780,42 @@ export const comments = [
     replies: []
   }
 ];
+
+export const users = [
+  {
+    _id: "6444db557a806468ac55aa25",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166c",
+    fullname: "Tô Hoài",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa26",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166d",
+    fullname: "Nguyễn Nhật Ánh",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa27",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166e",
+    fullname: "Xuân Quỳnh",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa28",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166f",
+    fullname: "Hồ Xuân Hương",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa29",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d1660",
+    fullname: "Nguyễn Ngọc Tư",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa30",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d1661",
+    fullname: "Kim Lân",
+    isAuthor: true
+  }
+];
