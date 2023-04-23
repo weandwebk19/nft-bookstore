@@ -188,7 +188,7 @@ const FilterBar = () => {
             {/* <TextFieldController name="author" /> */}
             <UsersSelectController
               name="author"
-              itemValue="fullname"
+              itemValue="walletAddress"
               itemName="fullname"
             />
           </FormGroup>
