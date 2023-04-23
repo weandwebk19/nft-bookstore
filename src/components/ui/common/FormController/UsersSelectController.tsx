@@ -29,7 +29,8 @@ const UsersSelectController = ({
     (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: any) => {
       event.preventDefault();
       setSelectedItem(item);
-      setInputValue(item?.[itemValue]);
+      setInputValue(item?.[itemName]);
+      setValue(rest.name, item?.[itemValue]);
     },
     [inputValue]
   );
@@ -50,9 +51,9 @@ const UsersSelectController = ({
     setValue(rest.name, "");
   };
 
-  useEffect(() => {
-    setValue(rest.name, inputValue);
-  }, [inputValue]);
+  // useEffect(() => {
+  //   setValue(rest.name, inputValue);
+  // }, [inputValue]);
 
   useEffect(() => {
     if (!debounced.trim()) {
@@ -80,8 +81,8 @@ const UsersSelectController = ({
           onSelectClick={handleListItemClick}
           onInputChange={handleInputChange}
           onResetClick={handleResetClick}
-          itemValue="fullname"
-          itemName="fullname"
+          itemValue={itemValue}
+          itemName={itemName}
           itemSubname="walletAddress"
         />
       )}
