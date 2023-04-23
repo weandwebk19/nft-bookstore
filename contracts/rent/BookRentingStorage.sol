@@ -479,38 +479,38 @@ contract BookRentingStorage is ExtendTime {
     uint256 value
   ) public payable returns (uint256) {
     uint idLendBook = getIdLendBook(tokenId, renter);
-    if (idLendBook != 0) {
-      uint totalPrice = (amount * price * (endTime - startTime)) / 604800;
-
-      if (value != totalPrice) {
-        revert Error.InvalidValueError(value);
-      }
-
-      LendBook memory lendBook = getLendBook(tokenId, renter);
-
-      if (amount > lendBook.amount || amount <= 0) {
-        revert Error.InvalidAmountError(amount);
-      }
-
-      createBorrowedBook(
-        tokenId,
-        renter,
-        price,
-        amount,
-        startTime,
-        endTime,
-        borrower
-      );
-      updateLendBookFromRenting(
-        tokenId,
-        lendBook.price,
-        lendBook.amount - amount,
-        renter
-      );
-
-      return totalPrice;
+    if (idLendBook == 0) {
+      revert Error.InvalidIdError(idLendBook);
     }
-    return 0;
+    uint totalPrice = (amount * price * (endTime - startTime)) / 604800;
+
+    if (value != totalPrice) {
+      revert Error.InvalidValueError(value);
+    }
+
+    LendBook memory lendBook = getLendBook(tokenId, renter);
+
+    if (amount > lendBook.amount || amount <= 0) {
+      revert Error.InvalidAmountError(amount);
+    }
+
+    createBorrowedBook(
+      tokenId,
+      renter,
+      price,
+      amount,
+      startTime,
+      endTime,
+      borrower
+    );
+    updateLendBookFromRenting(
+      tokenId,
+      lendBook.price,
+      lendBook.amount - amount,
+      renter
+    );
+
+    return totalPrice;
   }
 
   function requestExtendTimeOfBorrowedBooks(

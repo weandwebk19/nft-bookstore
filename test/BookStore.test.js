@@ -227,7 +227,6 @@ contract("BookStore", (accounts) => {
       const ownedPurchasedBooks = await _contract.getOwnedPurchasedBooks({
         from: accounts[1]
       });
-      console.log('ownedPurchasedBooks: ', ownedPurchasedBooks);
       assert.equal(
         ownedPurchasedBooks.length,
         1,

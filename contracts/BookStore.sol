@@ -807,7 +807,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
       idBooksOnSharing,
       msg.sender
     );
-    if (price != 0 && booksOnSharing.tokenId != 0) {
+    if (booksOnSharing.tokenId != 0) {
       _safeTransferFrom(
         booksOnSharing.sharer,
         msg.sender,
