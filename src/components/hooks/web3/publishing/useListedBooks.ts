@@ -5,7 +5,6 @@ import { CryptoHookFactory } from "@_types/hooks";
 import { BookInfo, ListedBookCore } from "@_types/nftBook";
 import axios from "axios";
 import { ethers } from "ethers";
-import { ParsedUrlQuery } from "querystring";
 import useSWR from "swr";
 
 import { FilterField } from "@/types/filter";

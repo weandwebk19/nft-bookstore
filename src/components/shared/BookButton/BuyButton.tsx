@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -110,37 +110,50 @@ const BuyButton = ({
 
   const { handleSubmit, setValue } = methods;
 
-  const onSubmit = async (data: any) => {
-    try {
-      // Handle errors
-      if (data.amount > supplyAmount) {
-        return toast.error(`Amount must be less than ${supplyAmount}.`, {
+  const buyBooks = useCallback(
+    async (
+      tokenId: number,
+      seller: string,
+      price: number,
+      amount: number,
+      supplyAmount: number
+    ) => {
+      try {
+        // Handle errors
+        if (amount > supplyAmount) {
+          return toast.error(`Amount must be less than ${supplyAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (account.data == seller) {
+          return toast.error(
+            "You are not allowed to buy the book published by yourself.",
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
+        }
+
+        const tx = await contract?.buyBooks(tokenId, seller, amount, {
+          value: ethers.utils.parseEther((price * amount).toString())
+        });
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Processing transaction",
+          success: "Nft Book is yours! Go to Profile page",
+          error: "Processing error"
+        });
+      } catch (e: any) {
+        console.error(e);
+        toast.error(`${e.message}.`, {
           position: toast.POSITION.TOP_CENTER
         });
-      } else if (account.data == seller) {
-        return toast.error(
-          "You are not allowed to buy the book published by yourself.",
-          {
-            position: toast.POSITION.TOP_CENTER
-          }
-        );
       }
+    },
+    [contract, account.data]
+  );
 
-      const tx = await contract?.buyBooks(tokenId, seller, data.amount, {
-        value: ethers.utils.parseEther((price * data.amount).toString())
-      });
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Processing transaction",
-        success: "Nft Book is yours! Go to Profile page",
-        error: "Processing error"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
+  const onSubmit = async (data: any) => {
+    await buyBooks(tokenId, seller, price, data.amount, supplyAmount);
   };
 
   useEffect(() => {
