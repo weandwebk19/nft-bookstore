@@ -20,7 +20,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { PurchasedBook } from "@/types/nftBook";
+import { BookSelling } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const PurchasedBooks = () => {
@@ -40,7 +40,7 @@ const PurchasedBooks = () => {
   const { nfts } = useOwnedPurchasedBooks();
   const router = useRouter();
   const purchasedBooks = nfts.data;
-  // console.log(nfts);
+  console.log(nfts);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -87,11 +87,11 @@ const PurchasedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {purchasedBooks!.map((book: PurchasedBook) => {
+                    {purchasedBooks!.map((book: BookSelling) => {
                       return (
                         <Grid
                           item
-                          key={book.listedId}
+                          key={`${book.tokenId} ${book.seller}`}
                           xs={4}
                           sm={8}
                           md={6}
@@ -99,28 +99,28 @@ const PurchasedBooks = () => {
                         >
                           <ActionableBookItem
                             status="isPurchased"
-                            tokenId={book?.listedBook.tokenId}
+                            tokenId={book?.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
                             fileType={book?.meta.fileType}
-                            owner={book?.listedBook.seller}
+                            owner={book?.seller}
                             onClick={handleBookClick}
                             amount={book?.amount}
                             amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
                                 <SellButton
-                                  tokenId={book?.listedBook.tokenId}
+                                  tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  owner={book?.listedBook.seller}
+                                  owner={book?.seller}
                                   amountTradeable={book?.amountTradeable!}
                                 />
                                 <LendButton
-                                  tokenId={book?.listedBook.tokenId}
+                                  tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
-                                  owner={book?.listedBook.seller}
+                                  owner={book?.seller}
                                   amountTradeable={book?.amountTradeable!}
                                 />
                               </>

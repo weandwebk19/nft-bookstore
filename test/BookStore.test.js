@@ -947,7 +947,7 @@ contract("BookStore", (accounts) => {
   });
 
   describe("Take books on sharing", () => {
-    let value = ethers.utils.parseEther("0.11").toString();
+    let value = ethers.utils.parseEther("0.011").toString();
 
     before(async () => {
       await _contract.takeBooksOnSharing(1, {

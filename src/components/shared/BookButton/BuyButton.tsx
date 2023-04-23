@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,21 +22,21 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
+import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
+import { NftBookMeta } from "@/types/nftBook";
 
 import Step1 from "../../ui/publishing/steps/Step1";
 import Step2 from "../../ui/publishing/steps/Step2";
 
 interface BuyButtonProps {
   tokenId: number;
-  title: string;
-  bookCover: string;
   seller: string;
   price: number;
   supplyAmount: number;
@@ -57,16 +57,15 @@ const defaultValues = {
 
 const BuyButton = ({
   tokenId,
-  bookCover,
-  title,
   seller,
   price,
   supplyAmount
 }: BuyButtonProps) => {
   const router = useRouter();
-  const [sellerName, setSellerName] = useState();
   const { ethereum, contract } = useWeb3();
   const { account } = useAccount();
+  const [sellerName, setSellerName] = useState();
+  const metadata = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -111,37 +110,50 @@ const BuyButton = ({
 
   const { handleSubmit, setValue } = methods;
 
-  const onSubmit = async (data: any) => {
-    try {
-      // Handle errors
-      if (data.amount > supplyAmount) {
-        return toast.error(`Amount must be less than ${supplyAmount}.`, {
+  const buyBooks = useCallback(
+    async (
+      tokenId: number,
+      seller: string,
+      price: number,
+      amount: number,
+      supplyAmount: number
+    ) => {
+      try {
+        // Handle errors
+        if (amount > supplyAmount) {
+          return toast.error(`Amount must be less than ${supplyAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (account.data == seller) {
+          return toast.error(
+            "You are not allowed to buy the book published by yourself.",
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
+        }
+
+        const tx = await contract?.buyBooks(tokenId, seller, amount, {
+          value: ethers.utils.parseEther((price * amount).toString())
+        });
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Processing transaction",
+          success: "Nft Book is yours! Go to Profile page",
+          error: "Processing error"
+        });
+      } catch (e: any) {
+        console.error(e);
+        toast.error(`${e.message}.`, {
           position: toast.POSITION.TOP_CENTER
         });
-      } else if (account.data == seller) {
-        return toast.error(
-          "You are not allowed to buy the book published by yourself.",
-          {
-            position: toast.POSITION.TOP_CENTER
-          }
-        );
       }
+    },
+    [contract, account.data]
+  );
 
-      const tx = await contract?.buyBooks(tokenId, seller, data.amount, {
-        value: ethers.utils.parseEther((price * data.amount).toString())
-      });
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Processing transaction",
-        success: "Nft Book is yours! Go to Profile page",
-        error: "Processing error"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
+  const onSubmit = async (data: any) => {
+    await buyBooks(tokenId, seller, price, data.amount, supplyAmount);
   };
 
   useEffect(() => {
@@ -198,10 +210,10 @@ const BuyButton = ({
                 }}
               >
                 <FormGroup label="Listing price" required>
-                  <InputController name="price" type="number" />
+                  <TextFieldController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
-                  <InputController name="amount" type="number" />
+                  <TextFieldController name="amount" type="number" />
                 </FormGroup>
               </Stack>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -224,13 +236,13 @@ const BuyButton = ({
               spacing={{ xs: 1, sm: 2, md: 4 }}
             >
               <Image
-                src={bookCover}
-                alt={title}
+                src={metadata?.data?.bookCover}
+                alt={metadata?.data?.title}
                 sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                 className={styles["book-item__book-cover"]}
               />
               <Box>
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata?.data?.title}</Typography>
                 <Typography>{sellerName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
               </Box>

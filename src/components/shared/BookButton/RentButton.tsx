@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,9 +22,11 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
+import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
@@ -35,19 +37,9 @@ import Step2 from "../../ui/borrow/steps/Step2";
 
 interface RentButtonProps {
   tokenId: number;
-  title: string;
-  bookCover: string;
   renter: string;
   price: number;
   supplyAmount: number;
-  borrowBooks: (
-    tokenId: number,
-    renter: string,
-    price: number,
-    amount: number,
-    rentalDuration: number,
-    supplyAmount: number
-  ) => Promise<void>;
 }
 
 const schema = yup
@@ -70,16 +62,15 @@ const defaultValues = {
 
 const RentButton = ({
   tokenId,
-  bookCover,
-  title,
   renter,
   price,
-  supplyAmount,
-  borrowBooks
+  supplyAmount
 }: RentButtonProps) => {
   const router = useRouter();
   const [renterName, setAuthorName] = useState();
-  const { ethereum, contract } = useWeb3();
+  const { contract } = useWeb3();
+  const { account } = useAccount();
+  const metadata = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -123,6 +114,61 @@ const RentButton = ({
   });
 
   const { handleSubmit, setValue } = methods;
+
+  const borrowBooks = useCallback(
+    async (
+      tokenId: number,
+      renter: string,
+      price: number,
+      amount: number,
+      rentalDuration: number,
+      supplyAmount: number
+    ) => {
+      try {
+        // Handle errors
+        if (rentalDuration < 604800) {
+          return toast.error("Minimum borrow book period is 7 days", {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (amount > supplyAmount) {
+          return toast.error(`Amount must be less than ${supplyAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (account.data == renter) {
+          return toast.error(
+            "You are not allowed to borrow the book lent by yourself.",
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
+        }
+
+        const value = (price * amount * rentalDuration) / 604800;
+        const result = await contract!.borrowBooks(
+          tokenId,
+          renter,
+          ethers.utils.parseEther(price.toString()),
+          amount,
+          rentalDuration,
+          {
+            value: ethers.utils.parseEther(value.toString())
+          }
+        );
+
+        await toast.promise(result!.wait(), {
+          pending: "Processing transaction",
+          success: "Nft is yours! Go to Profile page",
+          error: "Processing error"
+        });
+      } catch (e: any) {
+        console.error(e.message);
+        toast.error(`${e.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [account.data, contract]
+  );
 
   const onSubmit = async (data: any) => {
     try {
@@ -178,13 +224,13 @@ const RentButton = ({
               spacing={{ xs: 1, sm: 2, md: 4 }}
             >
               <Image
-                src={bookCover}
-                alt={title}
+                src={metadata.data?.bookCover}
+                alt={metadata.data?.title}
                 sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                 className={styles["book-item__book-cover"]}
               />
               <Box>
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
               </Box>

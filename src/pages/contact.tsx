@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Box, Grid, TextField } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "next-i18next";
@@ -10,9 +10,8 @@ import * as yup from "yup";
 
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
-  AutoCompleteController,
-  InputController,
-  TextAreaController
+  TextAreaController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
@@ -21,8 +20,7 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 const defaultValues = {
   name: "",
   email: "",
-  message: "",
-  keywords: [""]
+  message: ""
 };
 
 export default function Contact() {
@@ -30,15 +28,13 @@ export default function Contact() {
 
   const schema = yup
     .object({
-      name: yup.string(),
-      // .required(t("textError1") as string),
-      email: yup.string(),
-      // .email(t("textError2") as string)
-      // .max(255)
-      // .required(t("textError3") as string),
-      message: yup.string(),
-      // .required(t("textError4") as string),
-      keywords: yup.array().of(yup.string())
+      name: yup.string().required(t("textError1") as string),
+      email: yup
+        .string()
+        .email(t("textError2") as string)
+        .max(255)
+        .required(t("textError3") as string),
+      message: yup.string().required(t("textError4") as string)
     })
     .required();
 
@@ -72,20 +68,17 @@ export default function Contact() {
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <FormGroup label={t("name")} required>
-                      <InputController name="name" />
+                      <TextFieldController name="name" />
                     </FormGroup>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormGroup label={t("email")} required>
-                      <InputController name="email" />
+                      <TextFieldController name="email" />
                     </FormGroup>
                   </Grid>
                   <Grid item xs={12}>
                     <FormGroup label={t("message")} required>
                       <TextAreaController name="message" />
-                    </FormGroup>
-                    <FormGroup label={t("keywords")} required>
-                      <AutoCompleteController name="keywords" />
                     </FormGroup>
                   </Grid>
                   <Grid item xs={12} container justifyContent="flex-end">

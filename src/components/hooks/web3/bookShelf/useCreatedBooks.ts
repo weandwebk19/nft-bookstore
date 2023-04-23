@@ -9,7 +9,7 @@ import useSWR from "swr";
 
 import { NftBook } from "@/types/nftBook";
 
-import { useAccount } from ".";
+import { useAccount } from "..";
 
 type UseCreatedBooksResponse = {
   // listNft: (tokenId: number, price: number) => Promise<void>;

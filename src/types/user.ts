@@ -1,6 +1,6 @@
 export type UserInfo = {
   id: string;
-  fullName?: string;
+  fullname?: string;
   walletAddress: string;
   bio?: string;
   avatar?: string;

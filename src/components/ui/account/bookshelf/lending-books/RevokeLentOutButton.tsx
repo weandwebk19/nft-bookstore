@@ -6,12 +6,14 @@ import { Box, Grid, Stack, Typography } from "@mui/material";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
+import { useAccount } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
 interface RevokeLentOutButtonProps {
-  borrower?: string;
+  borrower: string;
   amount: number;
   isEnded?: boolean;
   countDown?: string;
@@ -19,7 +21,8 @@ interface RevokeLentOutButtonProps {
   bookCover: string;
   renter: string;
   tokenId: number;
-  handleRevoke: () => Promise<any>;
+  startTime: number;
+  endTime: number;
   buttonName?: string;
 }
 
@@ -32,14 +35,48 @@ const RevokeLentOutButton = ({
   title,
   renter,
   tokenId,
-  handleRevoke,
+  startTime,
+  endTime,
   buttonName = "Revoke"
 }: RevokeLentOutButtonProps) => {
   const [renterName, setRenterName] = useState();
+  const { contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
   const openRevokeDiaglog = Boolean(anchorRevokeDiaglog);
+
+  const handleRevokeBorrowedBooks = async () => {
+    try {
+      // handle errors
+      if (renter !== account.data) {
+        return toast.error("Renter address is not valid.", {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+
+      const idBorrowedBook = await contract!.getIdBorrowedBook(
+        tokenId,
+        renter,
+        borrower,
+        startTime,
+        endTime
+      );
+      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
+
+      const receipt: any = await toast.promise(tx!.wait(), {
+        pending: "Pending.",
+        success: "Revoke lent out book successfully",
+        error: "Oops! There's a problem with lent out process!"
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`${e.message}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
 
   const handleRevokeDiaglogClick = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -47,7 +84,7 @@ const RevokeLentOutButton = ({
     setAnchorRevokeDiaglog(e.currentTarget);
     if (isEnded) {
       try {
-        await handleRevoke();
+        await handleRevokeBorrowedBooks();
       } catch (e: any) {
         console.error(e);
         toast.error(`${e.message}.`, {
@@ -63,7 +100,7 @@ const RevokeLentOutButton = ({
 
   const handleRevokeClick = async () => {
     try {
-      await handleRevoke();
+      await handleRevokeBorrowedBooks();
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {

@@ -731,3 +731,91 @@ export const bookComments = [
     comment: `I found a lot of this book incredibly tedious. I tend to avoid the winners of the Man / Booker – they make me a little depressed. The only Carey I haven’t liked won the Booker (Oscar and Lucinda), I really didn’t like the little bit of Vernon God Little I read and I never finished The Sea despite really liking Banville’s writing. So, being told a book is a winner of the Booker tends to be a mark against it from the start, unfortunately.`
   }
 ];
+
+export const comments = [
+  {
+    id: 1,
+    content: "This is the first comment!",
+    author: "John Doe",
+    authorAvatar: "JD",
+    rating: 5,
+    date: "2022-03-01",
+    replies: [
+      {
+        id: 2,
+        content: "I totally agree with you!",
+        author: "Jane Smith",
+        authorAvatar: "JM",
+        rating: 4,
+        date: "2022-03-02",
+        replies: []
+      },
+      {
+        id: 3,
+        content: "Thanks for the support!",
+        author: "John Doe",
+        authorAvatar: "JD",
+        rating: 5,
+        date: "2022-03-03",
+        replies: []
+      },
+      {
+        id: 4,
+        content: "I have a different opinion...",
+        author: "Bob Johnson",
+        authorAvatar: "BJ",
+        rating: 5,
+        date: "2022-03-04",
+        replies: []
+      }
+    ]
+  },
+  {
+    id: 5,
+    content: "This is the second comment!",
+    author: "Alice Lee",
+    authorAvatar: "AL",
+    rating: 3,
+    date: "2022-03-05",
+    replies: []
+  }
+];
+
+export const users = [
+  {
+    _id: "6444db557a806468ac55aa25",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166c",
+    fullname: "Tô Hoài",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa26",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166d",
+    fullname: "Nguyễn Nhật Ánh",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa27",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166e",
+    fullname: "Xuân Quỳnh",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa28",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d166f",
+    fullname: "Hồ Xuân Hương",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa29",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d1660",
+    fullname: "Nguyễn Ngọc Tư",
+    isAuthor: true
+  },
+  {
+    _id: "6444db557a806468ac55aa30",
+    walletAddress: "0xe7faf0b613c54c9bf3c1a0df9c1af2ce733d1661",
+    fullname: "Kim Lân",
+    isAuthor: true
+  }
+];

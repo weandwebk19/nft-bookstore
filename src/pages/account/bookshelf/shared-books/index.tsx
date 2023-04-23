@@ -86,9 +86,9 @@ const SharedBooks = () => {
                           item
                           key={book.tokenId}
                           xs={4}
-                          sm={8}
+                          sm={4}
                           md={6}
-                          lg={12}
+                          lg={8}
                         >
                           <ActionableBookItem
                             status="isShared"
@@ -113,9 +113,7 @@ const SharedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar />
           </Grid>
         </Grid>
       </Stack>

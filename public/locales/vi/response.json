@@ -1,0 +1,20 @@
+{
+  "titlePage": "Danh sách phản hồi - NFT Bookstore",
+  "containerTitle": "Danh sách phản hồi",
+  "button_cancel": "Hủy",
+  "button_delete": "Xóa",
+  "button_refuse": "Từ chối",
+  "button_accept": "Chấp nhận",
+  "tooltip_delete": "Xóa",
+  "tooltip_accept": "Chấp nhận",
+  "dialogTitleDelete": "Xóa khỏi Danh sách",
+  "dialogTitleAccept": "Chấp nhận yêu cầu",
+  "message_delete": "Bạn có chắc rằng muốn xóa yêu cầu này khỏi Danh sách?",
+  "message_accept": "Bạn có chắc rằng muốn chấp nhận yêu cầu này?",
+  "event": "Sự kiện",
+  "price": "Giá",
+  "from": "Từ",
+  "to": "Đến",
+  "date": "Thời gian",
+  "action": "Hành động"
+}

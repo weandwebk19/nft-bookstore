@@ -2,8 +2,8 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import {
   AutoCompleteController,
-  InputController,
-  MultipleSelectController
+  MultipleSelectController,
+  TextFieldController
 } from "@shared/FormController";
 import styles from "@styles/Form.module.scss";
 import { useTranslation } from "next-i18next";
@@ -31,7 +31,7 @@ const Step3 = () => {
             label={t("externalLink") as string}
             desc={t("descExternalLink") as string}
           >
-            <InputController name="externalLink" />
+            <TextFieldController name="externalLink" />
           </FormGroup>
           <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 2 }}>
             <FormGroup
@@ -39,14 +39,14 @@ const Step3 = () => {
               required
               className={styles["form__formGroup-half"]}
             >
-              <InputController name="version" />
+              <TextFieldController name="version" />
             </FormGroup>
             <FormGroup
               label={t("quantity") as string}
               required
               className={styles["form__formGroup-half"]}
             >
-              <InputController name="quantity" />
+              <TextFieldController name="quantity" />
             </FormGroup>
           </Stack>
           <FormGroup label={t("genres") as string} required>
@@ -61,7 +61,7 @@ const Step3 = () => {
               required
               className={styles["form__formGroup-half"]}
             >
-              <InputController name="totalPages" />
+              <TextFieldController name="totalPages" />
             </FormGroup>
             <FormGroup
               label={t("keywords") as string}

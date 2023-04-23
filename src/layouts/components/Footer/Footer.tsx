@@ -30,20 +30,16 @@ const Footer = () => {
       content: t("store") as string,
       subList: [
         {
-          content: t("explore") as string,
-          url: "/"
-        },
-        {
-          content: t("share") as string,
-          url: "/"
+          content: t("publishing") as string,
+          url: "/publishing"
         },
         {
           content: t("borrow") as string,
           url: "/borrow"
         },
         {
-          content: t("publishBook") as string,
-          url: "/"
+          content: t("share") as string,
+          url: "/share"
         }
       ]
     },
@@ -52,15 +48,15 @@ const Footer = () => {
       subList: [
         {
           content: t("profile") as string,
-          url: "/profile"
+          url: "/account/profile"
         },
         {
           content: t("watchlist") as string,
-          url: "/watchlist"
+          url: "/account/watchlist"
         },
         {
           content: t("my_bookshelf") as string,
-          url: "/"
+          url: "/account/bookshelf"
         }
       ]
     },
@@ -98,7 +94,7 @@ const Footer = () => {
         columns={{ xs: 4, md: 24 }}
         sx={{
           marginTop: "24px",
-          padding: "64px 32px 32px"
+          padding: "64px 32px"
         }}
         className={styles.footer__wrapper}
       >
@@ -106,8 +102,7 @@ const Footer = () => {
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              padding: "24px"
+              flexDirection: "column"
             }}
           >
             <Link href="/">
@@ -123,7 +118,7 @@ const Footer = () => {
           <Grid
             container
             spacing={{ xs: 2, md: 3, lg: 4 }}
-            columns={{ xs: 4, sm: 8, md: 12 }}
+            columns={{ xs: 4, sm: 8, md: 12, lg: 20 }}
             className={styles.footer__list}
           >
             {footerItems.length > 0 &&
@@ -132,7 +127,8 @@ const Footer = () => {
                   item
                   xs={4}
                   sm={4}
-                  md={2}
+                  md={3}
+                  lg={4}
                   key={item.content}
                   className="footer__item"
                 >

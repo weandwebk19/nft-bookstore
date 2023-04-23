@@ -81,17 +81,17 @@ const CreatedBooks = () => {
                   <Grid
                     container
                     spacing={3}
-                    columns={{ xs: 4, sm: 8, md: 12, lg: 12 }}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
                     {createdBooks!.map((book) => {
                       return (
                         <Grid
                           item
                           key={book.tokenId}
-                          xs={2}
-                          sm={8}
-                          md={12}
-                          lg={6}
+                          xs={4}
+                          sm={4}
+                          md={6}
+                          lg={8}
                         >
                           <ActionableBookItem
                             status="isCreated"
@@ -129,9 +129,7 @@ const CreatedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3} lg={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar />
           </Grid>
         </Grid>
       </Stack>

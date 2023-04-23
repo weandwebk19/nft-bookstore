@@ -5,13 +5,20 @@ import { Stack, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
+import { LendBook } from "@/types/nftBook";
 
-const RevokeAllLendingButton = () => {
+interface CancelAllLendingButtonProps {
+  allBooks: LendBook[];
+}
+
+const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
   const { t } = useTranslation("lendingBooks");
   const { contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
     null
@@ -23,20 +30,37 @@ const RevokeAllLendingButton = () => {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    // try {
-    //   const tx = await contract?.revokeAllLendingBooks();
+    await Promise.all(
+      allBooks.map(async (book) => {
+        try {
+          // handle errors
+          if (book.renter !== account.data) {
+            return toast.error("Renter address is not valid.", {
+              position: toast.POSITION.TOP_CENTER
+            });
+          }
 
-    //   const receipt: any = await toast.promise(tx!.wait(), {
-    //     pending: "Pending.",
-    //     success: "Revoke lending books successfully",
-    //     error: "Oops! There's a problem with lending process!"
-    //   });
-    // } catch (e: any) {
-    //   console.error(e);
-    //   toast.error(`${e.message}.`, {
-    //     position: toast.POSITION.TOP_CENTER
-    //   });
-    // }
+          const tx = await contract?.updateBookFromRenting(
+            book.tokenId,
+            0,
+            0,
+            book.renter
+          );
+
+          const receipt: any = await toast.promise(tx!.wait(), {
+            pending: "Pending.",
+            success: "Cancel Lending NftBook successfully",
+            error: "Oops! There's a problem with lending cancel process!"
+          });
+          return receipt;
+        } catch (e: any) {
+          console.error(e);
+          return toast.error(`${e.message}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+      })
+    );
     setAnchorRevokeButton(null);
   };
 
@@ -64,7 +88,7 @@ const RevokeAllLendingButton = () => {
         customVariant="secondary"
         onClick={(e) => handleOpenRevokeDialogClick(e)}
       >
-        Revoke All
+        Cancel All
       </StyledButton>
       <Dialog
         title={t("dialogTitle") as string}
@@ -78,10 +102,10 @@ const RevokeAllLendingButton = () => {
               customVariant="secondary"
               onClick={(e) => handleCancelClick(e)}
             >
-              {t("button_cancel")}
+              {t("button_no")}
             </StyledButton>
             <StyledButton onClick={(e) => handleRevokeClick(e)}>
-              {t("button_revoke")}
+              {t("button_yes")}
             </StyledButton>
           </Stack>
         </Stack>

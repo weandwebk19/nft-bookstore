@@ -20,6 +20,7 @@ import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlin
 import CollectionsBookmarkOutlinedIcon from "@mui/icons-material/CollectionsBookmarkOutlined";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
 import SwitchAccountOutlinedIcon from "@mui/icons-material/SwitchAccountOutlined";
@@ -93,6 +94,13 @@ const AccountMenu = ({
       content: t("navbar:switchAccount") as string,
       onClick: () => {
         switchAccount();
+      }
+    },
+    {
+      icon: <MailOutlineIcon color="primary" fontSize="small" />,
+      content: t("navbar:mailBox") as string,
+      onClick: () => {
+        router.push("/account/mailbox");
       }
     },
     {

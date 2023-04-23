@@ -14,9 +14,9 @@ import * as yup from "yup";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import {
-  InputController,
   RatingController,
-  TextAreaController
+  TextAreaController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";

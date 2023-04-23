@@ -8,5 +8,8 @@
   "breadcrumbs_ownedBooks": "Owned books",
   "breadcrumbs_rentalBooks": "Borrowed books",
   "breadcrumbs_lendingBooks": "Lending books",
-  "scrollToTop": "Scroll to top"
+  "scrollToTop": "Scroll to top",
+  "dropFileHere": "Drop the files here ...",
+  "dragAndDrop1": "Drag 'n' drop a file here",
+  "dragAndDrop2": " or click to select file"
 }
