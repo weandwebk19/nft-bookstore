@@ -210,8 +210,6 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
               {isOpenForSale && (
                 <BuyButton
                   tokenId={bookDetail?.nftCore.tokenId!}
-                  title={bookDetail?.meta.title!}
-                  bookCover={bookDetail?.meta.bookCover!}
                   seller={bookDetail?.listedCore?.seller!}
                   price={bookDetail?.listedCore?.price!}
                   supplyAmount={bookDetail?.listedCore?.amount!}

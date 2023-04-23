@@ -12,6 +12,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import querystring from "querystring";
 import * as yup from "yup";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
@@ -63,6 +65,7 @@ const defaultValues = {
 
 const FilterBar = () => {
   const { t } = useTranslation("filter");
+  const router = useRouter();
 
   const genres = useGenres();
   const languages = useLanguages();
@@ -77,7 +80,10 @@ const FilterBar = () => {
   const { handleSubmit, setValue } = methods;
 
   const onSubmit = (data: any) => {
-    console.log("data:", data);
+    const newQueryString = { ...router.query, ...data };
+    const queryString = querystring.stringify(newQueryString);
+    const url = `?${queryString}`;
+    router.push(url);
   };
 
   const handleResetGenres = () => {
@@ -167,7 +173,7 @@ const FilterBar = () => {
           <SelectController
             name="language"
             items={languages.data}
-            itemValue="_id"
+            itemValue="name"
           />
         </FormGroup>
         <StyledButton

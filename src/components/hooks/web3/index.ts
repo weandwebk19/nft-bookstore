@@ -1,5 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { useHooks } from "@providers/web3";
+import { ParsedUrlQuery } from "querystring";
+
+import { FilterField } from "@/types/filter";
 
 export const useAccount = () => {
   const hooks = useHooks();
@@ -19,9 +22,9 @@ export const useNetwork = () => {
   };
 };
 
-export const useListedBooks = () => {
+export const useListedBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useListedBooks();
+  const swrRes = hooks.useListedBooks(queryString);
 
   return {
     listedBooks: swrRes

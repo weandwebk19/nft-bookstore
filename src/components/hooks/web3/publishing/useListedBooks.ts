@@ -2,88 +2,77 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
-import { ListedBook } from "@_types/nftBook";
+import { BookInfo, ListedBookCore } from "@_types/nftBook";
 import axios from "axios";
 import { ethers } from "ethers";
+import { ParsedUrlQuery } from "querystring";
 import useSWR from "swr";
 
-type UseListedBooksResponse = {
-  buyBooks: (
-    tokenId: number,
-    seller: string,
-    value: number,
-    amount: number
-  ) => Promise<void>;
-};
-type ListedBooksHookFactory = CryptoHookFactory<
-  ListedBook[],
-  UseListedBooksResponse
->;
+import { FilterField } from "@/types/filter";
+
+import { checkFilterBooks } from "../utils/checkFilterBooks";
+
+type ListedBooksHookFactory = CryptoHookFactory<ListedBookCore[]>;
 
 export type UseListedBooksHook = ReturnType<ListedBooksHookFactory>;
 
 export const hookFactory: ListedBooksHookFactory =
   ({ contract }) =>
-  () => {
+  (queryString: FilterField) => {
     const { data, ...swr } = useSWR(
-      contract ? "web3/useListedBooks" : null,
+      [contract ? "web3/useListedBooks" : null, queryString],
       async () => {
-        const listedBooks = [] as ListedBook[];
+        const listedBooks = [] as ListedBookCore[];
         const coreListedBooks = await contract!.getAllBooksOnSale();
+        const limitItem = 30;
+        const page = queryString.page
+          ? parseInt(queryString.page as string)
+          : 1;
 
-        for (let i = 0; i < coreListedBooks.length; i++) {
+        for (
+          let i = (page - 1) * limitItem;
+          i < limitItem * page && i < coreListedBooks.length;
+          i++
+        ) {
           const listedBook = coreListedBooks[i];
-          // const nftBook = await contract!.getNftBook(listedBook.tokenId);
-          const tokenURI = await contract!.getUri(listedBook.tokenId);
-          const metaRes = await (
-            await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
-          ).data;
-          let meta = null;
-          if (metaRes.success === true) {
-            meta = metaRes.data;
-          }
 
-          listedBooks.push({
-            tokenId: listedBook.tokenId.toNumber(),
-            seller: listedBook.seller,
-            price: parseFloat(ethers.utils.formatEther(listedBook.price)),
-            amount: listedBook.amount.toNumber(),
-            meta
-          });
+          // Filter
+          if (
+            !Object.keys(queryString).length ||
+            (Object.keys(queryString).length == 1 &&
+              Object.keys(queryString).includes("page"))
+          ) {
+            listedBooks.push({
+              tokenId: listedBook.tokenId.toNumber(),
+              seller: listedBook.seller,
+              price: parseFloat(ethers.utils.formatEther(listedBook.price)),
+              amount: listedBook.amount.toNumber()
+            });
+          } else {
+            if (
+              (await checkFilterBooks(
+                listedBook.tokenId,
+                listedBook.price,
+                contract!,
+                queryString
+              )) === true
+            ) {
+              listedBooks.push({
+                tokenId: listedBook.tokenId.toNumber(),
+                seller: listedBook.seller,
+                price: parseFloat(ethers.utils.formatEther(listedBook.price)),
+                amount: listedBook.amount.toNumber()
+              });
+            }
+          }
         }
 
         return listedBooks;
       }
     );
 
-    const _contract = contract;
-    const buyBooks = useCallback(
-      async (
-        tokenId: number,
-        seller: string,
-        value: number,
-        amount: number
-      ) => {
-        try {
-          const result = await _contract!.buyBooks(tokenId, seller, amount, {
-            value: ethers.utils.parseEther(value.toString())
-          });
-
-          await toast.promise(result!.wait(), {
-            pending: "Processing transaction",
-            success: "Nft is yours! Go to Profile page",
-            error: "Processing error"
-          });
-        } catch (e: any) {
-          console.error(e.message);
-        }
-      },
-      [_contract]
-    );
-
     return {
       ...swr,
-      buyBooks,
       data: data || []
     };
   };

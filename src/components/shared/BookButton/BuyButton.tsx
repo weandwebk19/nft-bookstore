@@ -22,6 +22,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
@@ -29,14 +30,13 @@ import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
+import { NftBookMeta } from "@/types/nftBook";
 
 import Step1 from "../../ui/publishing/steps/Step1";
 import Step2 from "../../ui/publishing/steps/Step2";
 
 interface BuyButtonProps {
   tokenId: number;
-  title: string;
-  bookCover: string;
   seller: string;
   price: number;
   supplyAmount: number;
@@ -57,16 +57,15 @@ const defaultValues = {
 
 const BuyButton = ({
   tokenId,
-  bookCover,
-  title,
   seller,
   price,
   supplyAmount
 }: BuyButtonProps) => {
   const router = useRouter();
-  const [sellerName, setSellerName] = useState();
   const { ethereum, contract } = useWeb3();
   const { account } = useAccount();
+  const [sellerName, setSellerName] = useState();
+  const metadata = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -224,13 +223,13 @@ const BuyButton = ({
               spacing={{ xs: 1, sm: 2, md: 4 }}
             >
               <Image
-                src={bookCover}
-                alt={title}
+                src={metadata?.data?.bookCover}
+                alt={metadata?.data?.title}
                 sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                 className={styles["book-item__book-cover"]}
               />
               <Box>
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata?.data?.title}</Typography>
                 <Typography>{sellerName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
               </Box>

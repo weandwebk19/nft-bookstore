@@ -61,14 +61,8 @@ import {
   UseAllSharingBooksHook,
   hookFactory as createAllSharingBooksHook
 } from "./share/useAllSharingBooks";
-import {
-  UseAccountHook,
-  hookFactory as createAccountHook
-} from "./utils/useAccount";
-import {
-  UseNetworkHook,
-  hookFactory as createNetworkHook
-} from "./utils/useNetwork";
+import { UseAccountHook, hookFactory as createAccountHook } from "./useAccount";
+import { UseNetworkHook, hookFactory as createNetworkHook } from "./useNetwork";
 
 export type Web3Hooks = {
   useAccount: UseAccountHook;

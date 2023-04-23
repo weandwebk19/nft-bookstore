@@ -73,9 +73,6 @@ const DisplayBox: FunctionComponent = () => {
                           <OwnableBookItem
                             price={book?.price}
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             author={book?.meta.author}
                             onClick={handleBookClick}
                             buttons={
