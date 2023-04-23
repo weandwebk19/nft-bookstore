@@ -17,6 +17,7 @@
   "bookCover": "Book cover",
   "title": "Title",
   "price": "Price (ETH)",
+  "author": "Author",
   "status": "Status",
   "action": "Action"
 }

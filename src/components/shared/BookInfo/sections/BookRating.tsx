@@ -1,12 +1,16 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import StarIcon from "@mui/icons-material/Star";
 
-import { bookComments } from "@/mocks";
+import { useRouter } from "next/router";
+
+import { bookComments, comments } from "@/mocks";
+import { StyledButton } from "@/styles/components/Button";
 import { StyledLinearProgress } from "@/styles/components/LinearProgress";
 
-import { Comment } from "../../Comment";
+import { Comment, NestedComment } from "../../Comment";
+import { FallbackNode } from "../../FallbackNode";
 import { StaticRating } from "../../Rating";
 
 interface BookRatingProp {
@@ -16,6 +20,7 @@ const BookRating = ({ bookId }: BookRatingProp) => {
   // search book by its id to get its comments and ratings
 
   const theme = useTheme();
+  const router = useRouter();
 
   return (
     <Box component="section">
@@ -81,17 +86,38 @@ const BookRating = ({ bookId }: BookRatingProp) => {
             <Typography variant="h2">4.9</Typography>
           </Box>
         </Stack>
-        {bookComments.map((comment) => (
-          <Box key={comment.id}>
-            <Comment
-              avatar={comment.avatar}
-              username={comment.username}
-              date={comment.date}
-              rating={comment.rating}
-              comment={comment.comment}
-            />
-          </Box>
-        ))}
+        <Stack alignItems="center" spacing={2}>
+          <Typography variant="h5">What do you think?</Typography>
+          <StyledButton
+            onClick={() => {
+              router.push(`/books/${bookId}/review`);
+            }}
+          >
+            Write a review
+          </StyledButton>
+        </Stack>
+        <Divider />
+        <Typography variant="h6">Community Reviews</Typography>
+
+        <Paper>
+          {comments ? (
+            comments.map((comment) => {
+              return (
+                <NestedComment
+                  key={comment.id}
+                  id={comment.id}
+                  author={comment.author}
+                  authorAvatar={comment?.authorAvatar}
+                  rating={comment?.rating}
+                  content={comment.content}
+                  replies={comment.replies}
+                />
+              );
+            })
+          ) : (
+            <FallbackNode>No reviews yet</FallbackNode>
+          )}
+        </Paper>
       </Stack>
     </Box>
   );

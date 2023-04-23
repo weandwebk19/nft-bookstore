@@ -9,5 +9,8 @@
   "breadcrumbs_rentalBooks": "Sách đang thuê",
   "breadcrumbs_listingBooks": "Sách đang bán",
   "breadcrumbs_lendingBooks": "Sách cho thuê",
-  "scrollToTop": "Cuộn lên đầu trang"
+  "scrollToTop": "Cuộn lên đầu trang",
+  "dropFileHere": "Thả file ở đây ...",
+  "dragAndDrop1": "Kéo & thả file ở đây",
+  "dragAndDrop2": " hoặc click để chọn file"
 }

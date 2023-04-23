@@ -13,7 +13,7 @@ import * as yup from "yup";
 
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
+import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 
@@ -151,10 +151,10 @@ const SellButton = ({
                 }}
               >
                 <FormGroup label="Listing price" required>
-                  <InputController name="price" type="number" />
+                  <TextFieldController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
-                  <InputController name="amount" type="number" />
+                  <TextFieldController name="amount" type="number" />
                 </FormGroup>
               </Stack>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

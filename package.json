@@ -21,6 +21,7 @@
     "@metamask/providers": "^10.2.1",
     "@mui/base": "^5.0.0-alpha.124",
     "@mui/icons-material": "^5.11.0",
+    "@mui/joy": "^5.0.0-alpha.76",
     "@mui/lab": "^5.0.0-alpha.120",
     "@mui/material": "^5.11.9",
     "@mui/types": "^7.2.3",

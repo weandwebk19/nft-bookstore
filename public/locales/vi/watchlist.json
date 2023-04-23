@@ -17,6 +17,7 @@
   "bookCover": "Bìa sách",
   "title": "Tựa sách",
   "price": "Giá (ETH)",
+  "author": "Tác giả",
   "status": "Trạng thái",
   "action": "Hành động"
 }

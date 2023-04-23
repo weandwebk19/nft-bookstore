@@ -143,9 +143,7 @@ const DisplayBox: FunctionComponent = () => {
         </Grid>
         <Grid item xs={4} sm={3} md={3}>
           <Stack spacing={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar />
           </Stack>
         </Grid>
       </Grid>

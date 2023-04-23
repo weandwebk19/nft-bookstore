@@ -1,7 +1,10 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import { InputController, TextAreaController } from "@shared/FormController";
+import {
+  TextAreaController,
+  TextFieldController
+} from "@shared/FormController";
 import { useTranslation } from "next-i18next";
 
 import { ContentGroup } from "@/components/shared/ContentGroup";

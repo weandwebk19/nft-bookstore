@@ -14,6 +14,8 @@ import { useTheme } from "@mui/material/styles";
 import CloudUpload from "@mui/icons-material/CloudUpload";
 import InsertDriveFile from "@mui/icons-material/InsertDriveFile";
 
+import { useTranslation } from "next-i18next";
+
 import formatBytes from "@/utils/formatBytes";
 
 interface UploadFieldProps {
@@ -38,6 +40,7 @@ const UploadField = ({
   desc,
   disabled = false
 }: UploadFieldProps) => {
+  const { t } = useTranslation("common");
   const theme = useTheme();
 
   return (
@@ -82,11 +85,11 @@ const UploadField = ({
             <CloudUpload />
             <input {...getInputProps()} onBlur={onBlur} />
             {isDragActive ? (
-              <p>Drop the files here ...</p>
+              <p>{t("dropFileHere") as string}</p>
             ) : (
               <Stack>
-                <p>Drag &apos;n&apos; drop a file here</p>
-                <p> or click to select file</p>
+                <p>{t("dragAndDrop1") as string}</p>
+                <p>{t("dragAndDrop2") as string}</p>
               </Stack>
             )}
           </Stack>
