@@ -11,8 +11,8 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedNfts } from "@/components/hooks/web3";
 import {
-  RatingButton,
   ReadButton,
+  ReviewButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -108,7 +108,7 @@ const OwnedBooks = () => {
                             amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
-                                <RatingButton
+                                <ReviewButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
@@ -128,7 +128,7 @@ const OwnedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar data={ownedBooks} pathname="/owned-books" />
+            <FilterBar data={ownedBooks} pathname="/bookshelf/owned-books" />
           </Grid>
         </Grid>
       </Stack>

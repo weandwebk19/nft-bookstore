@@ -65,17 +65,6 @@ const CreatedBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9} lg={9}>
-            <Box sx={{ width: "100%", display: "flex", justifyContent: "end" }}>
-              <Button
-                variant="outlined"
-                sx={{ mb: 3 }}
-                onClick={() => {
-                  router.push("/review-management");
-                }}
-              >
-                Reviews Management
-              </Button>
-            </Box>
             <ContentPaper title="Created books">
               {(() => {
                 if (nfts.isLoading) {
@@ -141,7 +130,10 @@ const CreatedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3} lg={3}>
-            <FilterBar data={createdBooks} pathname="/created-books" />
+            <FilterBar
+              data={createdBooks}
+              pathname="/bookshelf/created-books"
+            />
           </Grid>
         </Grid>
       </Stack>

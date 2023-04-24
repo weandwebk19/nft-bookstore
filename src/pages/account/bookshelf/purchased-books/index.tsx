@@ -13,6 +13,7 @@ import { useOwnedPurchasedBooks } from "@/components/hooks/web3";
 import {
   LendButton,
   ReadButton,
+  ReviewButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -109,6 +110,12 @@ const PurchasedBooks = () => {
                             amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
+                                <ReviewButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.seller}
+                                />
                                 <SellButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
@@ -136,7 +143,10 @@ const PurchasedBooks = () => {
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
             <ContentPaper title="Filter">
-              <FilterBar data={purchasedBooks} pathname="/purchased-books" />
+              <FilterBar
+                data={purchasedBooks}
+                pathname="/bookshelf/purchased-books"
+              />
             </ContentPaper>
           </Grid>
         </Grid>

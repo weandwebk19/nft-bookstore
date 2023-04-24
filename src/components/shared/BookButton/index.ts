@@ -5,4 +5,4 @@ export { default as LendButton } from "./LendButton";
 export { default as BookmarkButton } from "./BookmarkButton";
 export { default as AddToWatchlistButton } from "./AddToWatchlistButton";
 export { default as RevokeButton } from "./RevokeButton";
-export { default as RatingButton } from "./RatingButton";
+export { default as ReviewButton } from "./ReviewButton";

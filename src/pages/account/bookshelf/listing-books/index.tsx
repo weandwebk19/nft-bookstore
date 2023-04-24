@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -92,8 +92,23 @@ const ListingBooks = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Stack sx={{ pt: 3 }}>
-        <Box sx={{ mb: 3 }}>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 3
+          }}
+        >
           <BreadCrumbs breadCrumbs={breadCrumbs} />
+          <Button
+            variant="outlined"
+            onClick={() => {
+              router.push("/review-management");
+            }}
+          >
+            Reviews Management
+          </Button>
         </Box>
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
@@ -202,7 +217,7 @@ const ListingBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar data={listedBooks} pathname="/listing-books" />
+            <FilterBar data={listedBooks} pathname="/bookshelf/listing-books" />
           </Grid>
         </Grid>
       </Stack>

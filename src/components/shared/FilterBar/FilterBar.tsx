@@ -217,7 +217,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
             <UsersSelectController
               name="author"
               itemValue="walletAddress"
-              itemName="fullname"
+              itemName="pseudonym"
             />
           </FormGroup>
           <FormGroup label={t("languagesSupport") as string}>

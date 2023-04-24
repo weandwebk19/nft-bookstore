@@ -58,7 +58,7 @@ const schema = yup
       .number()
       .min(1, `The price must be higher than 0.`)
       .typeError("Amount must be a number"),
-    rentalDays: yup
+    extendDays: yup
       .number()
       .min(1, `The day must be higher than 0.`)
       .typeError("Rental days must be a number")
@@ -67,7 +67,7 @@ const schema = yup
 
 const defaultValues = {
   amount: 1,
-  rentalDays: 7
+  extendDays: 7
 };
 
 const ExtendRequestButton = ({
@@ -128,7 +128,7 @@ const ExtendRequestButton = ({
 
   const onSubmit = async (data: any) => {
     try {
-      const rentalDuration = daysToSeconds(data.rentalDays);
+      const rentalDuration = daysToSeconds(data.extendDays);
       await borrowBooks(tokenId, renter, price, data.amount, rentalDuration);
     } catch (e: any) {
       console.error(e.message);
@@ -188,11 +188,11 @@ const ExtendRequestButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Listing price" required>
-                  <TextFieldController name="price" type="number" />
-                </FormGroup>
                 <FormGroup label="Amount" required>
                   <TextFieldController name="amount" type="number" />
+                </FormGroup>
+                <FormGroup label="Extend for (day)" required>
+                  <NumericStepperController name="extendDays" />
                 </FormGroup>
               </Stack>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

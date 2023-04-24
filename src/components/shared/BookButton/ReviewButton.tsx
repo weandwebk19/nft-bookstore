@@ -24,12 +24,11 @@ import { StyledButton } from "@/styles/components/Button";
 import { ContentGroup } from "../ContentGroup";
 import { Image } from "../Image";
 
-interface RatingButtonProps {
+interface ReviewButtonProps {
   title: string;
   bookCover: string;
   author: string;
   tokenId: number;
-  amountTradeable: number;
 }
 
 const schema = yup
@@ -44,13 +43,12 @@ const defaultValues = {
   review: ""
 };
 
-const RatingButton = ({
+const ReviewButton = ({
   bookCover,
   title,
   author,
-  tokenId,
-  amountTradeable
-}: RatingButtonProps) => {
+  tokenId
+}: ReviewButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
 
@@ -76,13 +74,6 @@ const RatingButton = ({
 
   const onSubmit = async (data: any) => {
     try {
-      // handle errors
-      if (data.amount > amountTradeable) {
-        return toast.error(`Amount must be less than ${amountTradeable}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
-      }
-
       const listingPrice = await contract!.listingPrice();
       const tx = await contract?.sellBooks(
         tokenId,
@@ -124,9 +115,9 @@ const RatingButton = ({
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Rating</StyledButton>
+      <StyledButton onClick={handleBookCardClick}>Review</StyledButton>
 
-      <Dialog title="Rating" open={openBookCard} onClose={handleBookCardClose}>
+      <Dialog title="Review" open={openBookCard} onClose={handleBookCardClose}>
         <FormProvider {...methods}>
           <Stack spacing={3} sx={{ overflowX: "hidden" }}>
             <Stack
@@ -187,4 +178,4 @@ const RatingButton = ({
   );
 };
 
-export default RatingButton;
+export default ReviewButton;

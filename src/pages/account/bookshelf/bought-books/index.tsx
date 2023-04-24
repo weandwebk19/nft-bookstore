@@ -135,7 +135,10 @@ const BoughtBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar data={boughtBooks?.data} pathname="/bought-books" />
+            <FilterBar
+              data={boughtBooks?.data}
+              pathname="/bookshelf/bought-books"
+            />
           </Grid>
         </Grid>
       </Stack>
