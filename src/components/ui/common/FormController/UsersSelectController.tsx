@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { useDebounce } from "@hooks/common";
+import axios from "axios";
 
 import UsersSelect from "@/components/ui/common/UsersSelect";
 import { users } from "@/mocks";
@@ -60,13 +61,13 @@ const UsersSelectController = ({
       setInputValue("");
       return;
     }
+    (async () => {
+      const authorsRes = await axios.get(`/api/authors?pseudonym=${debounced}`);
 
-    // fetching API here (replace 'inputValue' to 'debounced')
-    console.log("API CALLED!!!");
-
-    const authors = users;
-
-    setListItems(authors);
+      if (authorsRes.data.success === true) {
+        setListItems(authorsRes.data.data);
+      }
+    })();
   }, [debounced]);
 
   return (

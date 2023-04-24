@@ -16,14 +16,16 @@ import TakeButton from "@/components/shared/BookButton/TakeButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { BookSharing } from "@/types/nftBook";
+import { FilterField } from "@/types/filter";
+import { BookSharingCore } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const { t } = useTranslation("shareBooks");
 
   const router = useRouter();
+  const query = router.query;
 
-  const { nfts } = useAllSharingBooks();
+  const { nfts } = useAllSharingBooks(query as FilterField);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -59,7 +61,7 @@ const DisplayBox: FunctionComponent = () => {
                   `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
                   title, bookCover, author,... */}
 
-                    {nfts?.data?.map((book: BookSharing) => {
+                    {nfts?.data?.map((book: BookSharingCore) => {
                       return (
                         <Grid
                           item
@@ -78,8 +80,6 @@ const DisplayBox: FunctionComponent = () => {
                               <>
                                 <TakeButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   fromRenter={book?.fromRenter}
                                   sharer={book?.sharer}
                                   startTime={book?.startTime}

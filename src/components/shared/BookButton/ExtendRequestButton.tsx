@@ -80,7 +80,7 @@ const ExtendRequestButton = ({
   borrowBooks
 }: ExtendRequestButtonProps) => {
   const router = useRouter();
-  const [renterName, setAuthorName] = useState();
+  const [renterName, setRenterName] = useState();
   const { ethereum, contract } = useWeb3();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
@@ -142,7 +142,7 @@ const ExtendRequestButton = ({
           const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setRenterName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
@@ -158,10 +158,14 @@ const ExtendRequestButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Rent now
+        Extend now
       </Button>
 
-      <Dialog title="Sell" open={openBookCard} onClose={handleBookCardClose}>
+      <Dialog
+        title="Request Extend"
+        open={openBookCard}
+        onClose={handleBookCardClose}
+      >
         <FormProvider {...methods}>
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
@@ -173,7 +177,7 @@ const ExtendRequestButton = ({
                   className={styles["book-item__book-cover"]}
                 />
                 <Typography variant="h5">{title}</Typography>
-                <Typography>{renter}</Typography>
+                <Typography>{renterName}</Typography>
                 <Typography>{supplyAmount} left</Typography>
               </Stack>
             </Grid>
@@ -200,7 +204,7 @@ const ExtendRequestButton = ({
                   Cancel
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start selling
+                  Request extend
                 </StyledButton>
               </Box>
             </Grid>

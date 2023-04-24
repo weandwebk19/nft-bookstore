@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,6 +22,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
@@ -35,8 +36,6 @@ import Step2 from "../../ui/publishing/steps/Step2";
 
 interface TakeButtonProps {
   tokenId: number;
-  title: string;
-  bookCover: string;
   fromRenter: string;
   sharer: string;
   price: number;
@@ -60,8 +59,6 @@ const defaultValues = {
 
 const TakeButton = ({
   tokenId,
-  bookCover,
-  title,
   fromRenter,
   sharer,
   startTime,
@@ -71,9 +68,9 @@ const TakeButton = ({
 }: TakeButtonProps) => {
   const router = useRouter();
   const [sharerName, setSharerName] = useState();
-  const { provider, contract } = useWeb3();
+  const { contract } = useWeb3();
   const { account } = useAccount();
-  // const logger = new ethers.utils.Logger("provider");
+  const metadata = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -118,48 +115,72 @@ const TakeButton = ({
 
   const { handleSubmit, setValue } = methods;
 
-  const onSubmit = async (data: any) => {
-    try {
-      // Handle errors
-      if (data.amount > supplyAmount) {
-        return toast.error(`Amount must be less than ${supplyAmount}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
-      } else if (account.data == sharer || account.data == fromRenter) {
-        return toast.error(
-          "You are not allowed to take the book shared by yourself.",
-          {
+  const takeBooks = useCallback(
+    async (
+      tokenId: number,
+      fromRenter: string,
+      sharer: string,
+      startTime: number,
+      endTime: number,
+      amount: number,
+      supplyAmount: number
+    ) => {
+      try {
+        // Handle errors
+        if (amount > supplyAmount) {
+          return toast.error(`Amount must be less than ${supplyAmount}.`, {
             position: toast.POSITION.TOP_CENTER
+          });
+        }
+        if (account.data == sharer || account.data == fromRenter) {
+          return toast.error(
+            "You are not allowed to take the book shared or lent by yourself.",
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
+        }
+
+        const idBooksOnSharing = await contract!.getIdBookOnSharing(
+          tokenId,
+          fromRenter,
+          sharer,
+          startTime,
+          endTime
+        );
+
+        const tx = await contract?.takeBooksOnSharing(
+          idBooksOnSharing.toNumber(),
+          {
+            value: ethers.utils.parseEther(price.toString())
           }
         );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Processing transaction",
+          success: "Nft Book is yours! Go to Profile page",
+          error: "Processing error"
+        });
+      } catch (error: any) {
+        console.error(error);
+        toast.error(`${error.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
       }
+    },
+    [contract, account.data]
+  );
 
-      const idBooksOnSharing = await contract!.getIdBookOnSharing(
-        tokenId,
-        fromRenter,
-        sharer,
-        startTime,
-        endTime
-      );
-
-      const tx = await contract?.takeBooksOnSharing(
-        idBooksOnSharing.toNumber(),
-        {
-          value: ethers.utils.parseEther(price.toString())
-        }
-      );
-
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Processing transaction",
-        success: "Nft Book is yours! Go to Profile page",
-        error: "Processing error"
-      });
-    } catch (error: any) {
-      console.error(error);
-      toast.error(`${error.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
+  const onSubmit = async (data: any) => {
+    await takeBooks(
+      tokenId,
+      fromRenter,
+      sharer,
+      startTime,
+      endTime,
+      data.amount,
+      supplyAmount
+    );
   };
 
   useEffect(() => {
@@ -242,13 +263,13 @@ const TakeButton = ({
               spacing={{ xs: 1, sm: 2, md: 4 }}
             >
               <Image
-                src={bookCover}
-                alt={title}
+                src={metadata?.data?.bookCover}
+                alt={metadata?.data?.title}
                 sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                 className={styles["book-item__book-cover"]}
               />
               <Box>
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata?.data?.title}</Typography>
                 <Typography>{sharerName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
               </Box>
