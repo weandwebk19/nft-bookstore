@@ -131,9 +131,10 @@ const TakeButton = ({
           return toast.error(`Amount must be less than ${supplyAmount}.`, {
             position: toast.POSITION.TOP_CENTER
           });
-        } else if (account.data == sharer || account.data == fromRenter) {
+        }
+        if (account.data == sharer || account.data == fromRenter) {
           return toast.error(
-            "You are not allowed to take the book shared by yourself.",
+            "You are not allowed to take the book shared or lent by yourself.",
             {
               position: toast.POSITION.TOP_CENTER
             }
@@ -167,7 +168,7 @@ const TakeButton = ({
         });
       }
     },
-    [contract]
+    [contract, account.data]
   );
 
   const onSubmit = async (data: any) => {

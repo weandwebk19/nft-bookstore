@@ -484,8 +484,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
       msg.sender,
       msg.value
     );
-    _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
-    payable(renter).transfer(totalPrice);
+    if (totalPrice != 0) {
+      _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
+      payable(renter).transfer(totalPrice);
+    } else {
+      revert Error.ExecutionError();
+    }
   }
 
   function getAllBorrowedBooks()
@@ -497,7 +501,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   //Make a request to extend the rental period and wait for their owner to approve your request
-  function requestExtendTimeOfBorrowedBooks(
+  function(
     uint256 tokenId,
     address renter,
     uint startTime,
@@ -834,7 +838,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     if (msg.value != price) {
       revert Error.InvalidPriceError(msg.value);
     }
-    if (booksOnSharing.tokenId != 0) {
+    if (price != 0 && booksOnSharing.tokenId != 0) {
       _safeTransferFrom(
         booksOnSharing.sharer,
         msg.sender,
