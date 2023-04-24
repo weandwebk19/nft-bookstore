@@ -185,6 +185,10 @@ export type RequestExtendCore = {
 
 export type RequestExtend = {} & RequestExtendCore;
 
+export type RequestExtendRowData = {
+  action?: JSX.Element;
+} & RequestExtendCore;
+
 export type ResponseExtendCore = {
   id: number;
   time: number;
@@ -193,6 +197,10 @@ export type ResponseExtendCore = {
 };
 
 export type ResponseExtend = {} & ResponseExtendCore;
+
+export type ResponseExtendRowData = {
+  action?: JSX.Element;
+} & RequestExtendCore;
 
 export enum BookGenres {
   "Art & photography",
