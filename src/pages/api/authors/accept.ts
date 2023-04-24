@@ -6,6 +6,8 @@ import AuthorRegistrationSuccess from "@shared/Emails/AuthorRegistrationSuccess"
 import { verify } from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { toSnake } from "@/utils/nomalizer";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -30,7 +32,7 @@ export default async function handler(
       await db
         .collection("authors")
         .createIndex({ wallet_address: 1 }, { unique: true });
-      await db.collection("authors").insertOne(authorInfo);
+      await db.collection("authors").insertOne(toSnake(authorInfo));
 
       // Send email notification to author
       await sendEmail({
