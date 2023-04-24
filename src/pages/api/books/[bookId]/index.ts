@@ -49,7 +49,11 @@ export default async function handler(
       return res.json({
         success: true,
         message: "Get bookDetail successfully.",
-        data: { ...toCamel(bookDetail), languages, genres }
+        data: {
+          ...toCamel({ ...bookDetail, _id: bookDetail._id }),
+          languages,
+          genres
+        }
       });
     } else {
       return res.json({
