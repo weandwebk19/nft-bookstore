@@ -154,3 +154,21 @@ export const useAllSharingBooks = (queryString: FilterField) => {
     nfts: swrRes
   };
 };
+
+export const useOwnedRequestsOnExtending = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedRequestsOnExtending();
+
+  return {
+    swr: swrRes
+  };
+};
+
+export const useOwnedResponsesOnExtending = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedResponsesOnExtending();
+
+  return {
+    swr: swrRes
+  };
+};

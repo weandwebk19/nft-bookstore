@@ -54,6 +54,14 @@ import {
   hookFactory as createRealOwnerOfTokensHook
 } from "./detailPage/useRealOwnerOfTokens";
 import {
+  UseOwnedRequestsOnExtendingHook,
+  hookFactory as createOwnedRequestsOnExtendingHook
+} from "./mailbox/useOwnedRequestsOnExtending";
+import {
+  UseOwnedResponsesOnExtendingHook,
+  hookFactory as createOwnedResponsesOnExtendingHook
+} from "./mailbox/useOwnedResponsesOnExtending";
+import {
   UseListedBooksHook,
   hookFactory as createListedBooksHook
 } from "./publishing/useListedBooks";
@@ -82,6 +90,8 @@ export type Web3Hooks = {
   useOwnedSharedOutBooks: UseOwnedSharedOutBooksHook;
   useBookDetail: UseBookDetailHook;
   useRealOwnerOfTokens: UseRealOwnerOfTokensHook;
+  useOwnedRequestsOnExtending: UseOwnedRequestsOnExtendingHook;
+  useOwnedResponsesOnExtending: UseOwnedResponsesOnExtendingHook;
 };
 
 export type SetupHooks = {
@@ -106,6 +116,8 @@ export const setupHooks: SetupHooks = (deps) => {
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
     useOwnedSharedOutBooks: createOwnedSharedOutBooksHook(deps),
     useBookDetail: createBookDetailHook(deps),
-    useRealOwnerOfTokens: createRealOwnerOfTokensHook(deps)
+    useRealOwnerOfTokens: createRealOwnerOfTokensHook(deps),
+    useOwnedRequestsOnExtending: createOwnedRequestsOnExtendingHook(deps),
+    useOwnedResponsesOnExtending: createOwnedResponsesOnExtendingHook(deps)
   };
 };
