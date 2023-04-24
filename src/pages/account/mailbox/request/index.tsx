@@ -10,10 +10,14 @@ import Head from "next/head";
 
 import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
-import { useAccount } from "@/components/hooks/web3";
+import {
+  useAccount,
+  useOwnedRequestsOnExtending
+} from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import RequestTable from "@/components/ui/account/mailbox/request/RequestTable";
+import { RequestExtendCore } from "@/types/nftBook";
 import { WatchlistRowData, WatchlistStatus } from "@/types/watchlist";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
@@ -22,6 +26,9 @@ const Request = () => {
   const { account } = useAccount();
   const { ethereum, contract } = useWeb3();
   const [rows, setRows] = useState<WatchlistRowData[]>([]);
+  const { swr } = useOwnedRequestsOnExtending(); // check isLoading if necessary
+  const data = swr.data as RequestExtendCore[]; // replace data with rows
+  console.log("swr", swr);
 
   useEffect(() => {
     (async () => {

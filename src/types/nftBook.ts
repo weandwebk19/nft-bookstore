@@ -175,6 +175,25 @@ export type FileReq = {
   fileName: string;
 };
 
+export type RequestExtendCore = {
+  id: number; // id of Borrowed Books
+  time: number; // Extended time
+  amount: number;
+  sender: string; // Borrower
+  isAccept: boolean;
+};
+
+export type RequestExtend = {} & RequestExtendCore;
+
+export type ResponseExtendCore = {
+  id: number;
+  time: number;
+  amount: number;
+  sender: string; // Renter
+};
+
+export type ResponseExtend = {} & ResponseExtendCore;
+
 export enum BookGenres {
   "Art & photography",
   "Architecture",
