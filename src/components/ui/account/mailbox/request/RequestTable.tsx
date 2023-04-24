@@ -2,16 +2,7 @@ import * as React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Chip,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography
-} from "@mui/material";
+import { Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
@@ -22,22 +13,17 @@ import {
   GridRenderCellParams,
   GridTreeNodeWithRender
 } from "@mui/x-data-grid";
-import styles from "@styles/BookItem.module.scss";
-import axios from "axios";
-import { ParamType } from "ethers/lib/utils.js";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import { useLocalStorage } from "@/components/hooks/common";
 import { useAccount } from "@/components/hooks/web3";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
-import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
-import { WatchlistRowData } from "@/types/watchlist";
+import { RequestExtendRowData } from "@/types/nftBook";
 
 interface RequestTableProps {
-  data: WatchlistRowData[];
+  data: RequestExtendRowData[];
 }
 
 export default function RequestTable({ data }: RequestTableProps) {
@@ -77,36 +63,12 @@ export default function RequestTable({ data }: RequestTableProps) {
 
   const handleDeleteClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    item: WatchlistRowData
+    item: RequestExtendRowData
   ) => {
     e.preventDefault();
     setAnchorDeleteButton(null);
 
-    console.log(item.tokenId);
-    console.log(account.data);
-    (async () => {
-      try {
-        if (account.data) {
-          const res = await axios.delete(
-            `/api/watchlists/${account.data}/${item.tokenId}/delete`
-          );
-          console.log("Res:", res);
-          if (res.data.success) {
-            toast.success("Delete this request successfully!", {
-              position: toast.POSITION.TOP_RIGHT
-            });
-          } else {
-            toast.error("Delete this request failed!", {
-              position: toast.POSITION.TOP_RIGHT
-            });
-          }
-        }
-      } catch (err: any) {
-        toast.error(err.message, {
-          position: toast.POSITION.TOP_RIGHT
-        });
-      }
-    })();
+    console.log(item.id);
   };
 
   const handleCancelDeleteClick = (
@@ -118,32 +80,21 @@ export default function RequestTable({ data }: RequestTableProps) {
 
   const handleAcceptClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    item: WatchlistRowData
+    item: RequestExtendRowData
   ) => {
     e.preventDefault();
     setAnchorAcceptButton(null);
 
-    console.log(item.tokenId);
-    // console.log(account.data);
-    (async () => {
-      try {
-        if (account.data) {
-        }
-      } catch (err: any) {
-        toast.error(err.message, {
-          position: toast.POSITION.TOP_RIGHT
-        });
-      }
-    })();
+    console.log(item.id);
   };
 
   const handleRefuseAcceptClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    item: WatchlistRowData
+    item: RequestExtendRowData
   ) => {
     e.preventDefault();
     setAnchorAcceptButton(null);
-    console.log("Refusing to accept:", item.tokenId);
+    console.log("Refusing to accept:", item.id);
   };
 
   const handleDeleteClose = () => {
@@ -156,37 +107,38 @@ export default function RequestTable({ data }: RequestTableProps) {
 
   const columns: GridColDef[] = [
     {
-      field: "event",
-      headerName: t("event") as string,
+      field: "id",
+      headerName: t("id") as string,
+      width: 100
+    },
+    {
+      field: "time",
+      headerName: t("time") as string,
+      width: 200,
       renderCell: (params) => {
-        return <Typography>{params.value}</Typography>;
-      },
+        return <Typography>{params.value} days</Typography>;
+      }
+    },
+    {
+      field: "amount",
+      headerName: t("amount") as string,
+      width: 150,
+      renderCell: (params) => <Typography>{params.value}</Typography>
+    },
+    {
+      field: "sender",
+      headerName: t("sender") as string,
       flex: 1,
-      minWidth: 200
-    },
-    {
-      field: "price",
-      headerName: t("price") as string,
-      renderCell: (params) => <Typography>{params.value}</Typography>,
-      width: 150
-    },
-    {
-      field: "from",
-      headerName: t("from") as string,
-      width: 200,
+      minWidth: 250,
       renderCell: (params) => <Typography>{params.value}</Typography>
     },
     {
-      field: "to",
-      headerName: t("to") as string,
-      width: 200,
-      renderCell: (params) => <Typography>{params.value}</Typography>
-    },
-    {
-      field: "date",
-      headerName: t("date") as string,
-      width: 200,
-      renderCell: (params) => <Typography>{params.value}</Typography>
+      field: "isAccept",
+      headerName: t("status") as string,
+      width: 250,
+      renderCell: (params) => (
+        <Typography>{params.value ? "Accept" : "Processing"}</Typography>
+      )
     },
     {
       field: "action",
@@ -196,100 +148,79 @@ export default function RequestTable({ data }: RequestTableProps) {
       renderCell: (params) => {
         return (
           <Stack direction="row" spacing={1}>
-            <Tooltip title={t("tooltip_delete")}>
+            {/* <Tooltip title={t("tooltip_delete")}>
               <IconButton
                 onClick={(e) => handleOpenDeleteDialogClick(e, params)}
               >
                 {params?.value?.delete}
               </IconButton>
-            </Tooltip>
-            <Tooltip title={t("tooltip_accept")}>
-              <IconButton
-                onClick={(e) => handleOpenAcceptDialogClick(e, params)}
-              >
-                {params?.value?.accept}
-              </IconButton>
-            </Tooltip>
+            </Tooltip> */}
+            {params.row.isAccept === false && (
+              <Tooltip title={t("tooltip_accept")}>
+                <IconButton
+                  onClick={(e) => handleOpenAcceptDialogClick(e, params)}
+                >
+                  {params?.value?.accept}
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
         );
       }
     }
   ];
 
-  React.useEffect(() => {
-    data.forEach((object) => {
-      object.action = <DeleteOutlineOutlinedIcon />;
-    });
-  }, [data]);
-
   const mockData = [
     {
-      tokenId: 1,
-      event: "Sell listing",
-      price: "0.5 ETH",
-      from: "0xEg25....f2F2",
-      to: "",
-      date: "2 months ago",
+      id: 1,
+      amount: 1,
+      sender: "0xEg25....f2F2",
+      time: 7,
+      isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
         accept: <CheckOutlinedIcon />
       }
     },
     {
-      tokenId: 2,
-      event: "Purchased",
-      price: "0.4 ETH",
-      from: "0xEg25....f2F3",
-      to: "0xEg25....f2F2",
-      date: "3 months ago",
+      id: 2,
+      amount: 1,
+      sender: "0xEg25....f2F3",
+      time: 7,
+      isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
         accept: <CheckOutlinedIcon />
       }
     },
     {
-      tokenId: 3,
-      event: "Sell listing",
-      price: "0.4 ETH",
-      from: "0xEg25....f2F3",
-      to: "",
-      date: "4 months ago",
+      id: 3,
+      amount: 2,
+      sender: "0xEg25....f2F3",
+      time: 2,
+      isAccept: true,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
         accept: <CheckOutlinedIcon />
       }
     },
     {
-      tokenId: 4,
-      event: "Cancel trade",
-      price: "",
-      from: "0xEg25....f2F3",
-      to: "",
-      date: "4 months ago",
+      id: 4,
+      amount: 4,
+      sender: "0xEg25....f2F3",
+      time: 4,
+      isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
         accept: <CheckOutlinedIcon />
       }
     },
     {
-      tokenId: 5,
-      event: "Sell listing",
-      price: "0.4 ETH",
-      from: "0xEg25....f2F4",
-      to: "0xEg25....f2F2",
-      date: "5 months ago",
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />
-      }
-    },
-    {
-      tokenId: 6,
-      event: "Claimed",
-      price: "",
-      from: "0xEg25....f2F4",
-      to: "",
-      date: "6 months ago",
+      id: 5,
+      amount: 1,
+      sender: "0xEg25....f2F4",
+      time: 5,
+      isAccept: true,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
         accept: <CheckOutlinedIcon />
@@ -300,12 +231,12 @@ export default function RequestTable({ data }: RequestTableProps) {
   return (
     <Stack spacing={3}>
       <DataGrid
-        getRowId={(row: any) => row.tokenId}
+        getRowId={(row: any) => row.id}
         columns={columns}
-        // rows={data}
-        rows={mockData}
+        rows={data}
+        // rows={mockData}
       />
-      <Dialog
+      {/* <Dialog
         title={t("dialogTitleDelete") as string}
         open={openDeleteDialog}
         onClose={handleDeleteClose}
@@ -386,7 +317,7 @@ export default function RequestTable({ data }: RequestTableProps) {
             </StyledButton>
           </Stack>
         </Stack>
-      </Dialog>
+      </Dialog> */}
       <ToastContainer />
     </Stack>
   );

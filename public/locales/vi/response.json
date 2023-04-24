@@ -11,10 +11,9 @@
   "dialogTitleAccept": "Chấp nhận yêu cầu",
   "message_delete": "Bạn có chắc rằng muốn xóa yêu cầu này khỏi Danh sách?",
   "message_accept": "Bạn có chắc rằng muốn chấp nhận yêu cầu này?",
-  "event": "Sự kiện",
-  "price": "Giá",
-  "from": "Từ",
-  "to": "Đến",
-  "date": "Thời gian",
+  "id": "ID",
+  "time": "Thời gian gia hạn",
+  "amount": "Số lượng",
+  "sender": "Người gửi",
   "action": "Hành động"
 }

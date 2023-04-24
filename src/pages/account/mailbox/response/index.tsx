@@ -1,14 +1,10 @@
-import { useEffect, useState } from "react";
+import { Box, CircularProgress, Grid, Paper } from "@mui/material";
 
-import { Grid, Paper, Stack, Typography } from "@mui/material";
-
-import axios from "axios";
 import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
-import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
 import {
   useAccount,
@@ -18,27 +14,15 @@ import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import ResponseTable from "@/components/ui/account/mailbox/response/ResponseTable";
 import { ResponseExtendCore } from "@/types/nftBook";
-import { WatchlistRowData, WatchlistStatus } from "@/types/watchlist";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const Response = () => {
   const { t } = useTranslation("response");
   const { account } = useAccount();
   const { ethereum, contract } = useWeb3();
-  const [rows, setRows] = useState<WatchlistRowData[]>([]);
   const { swr } = useOwnedResponsesOnExtending(); // check isLoading if necessary
   const data = swr.data as ResponseExtendCore[]; // replace data with rows
   console.log("swr", swr);
-
-  useEffect(() => {
-    (async () => {
-      const rows = [] as WatchlistRowData[];
-
-      // handle logic
-
-      setRows(rows);
-    })();
-  }, [account.data]);
 
   return (
     <>
@@ -51,7 +35,23 @@ const Response = () => {
       <ContentContainer titles={[`${t("containerTitle")}`]}>
         <Grid container columns={{ xs: 4, sm: 8, md: 12, lg: 12 }}>
           <Paper sx={{ p: 3, width: "100%" }}>
-            <ResponseTable data={rows!} />
+            {(() => {
+              if (swr.isLoading) {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      minHeight: "200px"
+                    }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                );
+              }
+              return <ResponseTable data={data!} />;
+            })()}
           </Paper>
         </Grid>
       </ContentContainer>
