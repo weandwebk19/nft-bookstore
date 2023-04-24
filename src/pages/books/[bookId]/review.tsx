@@ -23,7 +23,7 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-interface RatingButtonProps {
+interface ReviewButtonProps {
   title: string;
   bookCover: string;
   author: string;
@@ -43,13 +43,13 @@ const defaultValues = {
   review: ""
 };
 
-const RatingButton = ({
+const ReviewButton = ({
   bookCover,
   title,
   author,
   tokenId,
   amountTradeable
-}: RatingButtonProps) => {
+}: ReviewButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const { ethereum, contract } = useWeb3();
 
@@ -182,4 +182,4 @@ const RatingButton = ({
   );
 };
 
-export default RatingButton;
+export default ReviewButton;

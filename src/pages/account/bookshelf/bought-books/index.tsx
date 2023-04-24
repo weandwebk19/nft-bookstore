@@ -20,7 +20,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { PurchasedBook } from "@/types/nftBook";
+// import { PurchasedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const BoughtBooks = () => {
@@ -87,7 +87,7 @@ const BoughtBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {boughtBooks!.map((book: PurchasedBook) => {
+                    {boughtBooks!.map((book: any) => {
                       return (
                         <Grid
                           item
@@ -98,7 +98,7 @@ const BoughtBooks = () => {
                           lg={8}
                         >
                           <ActionableBookItem
-                            status="isBought"
+                            status="isPurchased"
                             tokenId={book?.listedBook.tokenId}
                             bookCover={book?.meta.bookCover}
                             title={book?.meta.title}
@@ -135,7 +135,10 @@ const BoughtBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar />
+            <FilterBar
+              data={boughtBooks?.data}
+              pathname="/bookshelf/bought-books"
+            />
           </Grid>
         </Grid>
       </Stack>

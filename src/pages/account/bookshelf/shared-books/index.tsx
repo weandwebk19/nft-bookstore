@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedSharedBooks } from "@/components/hooks/web3";
-import { ReadButton } from "@/components/shared/BookButton";
+import { ReadButton, ReviewButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
@@ -100,6 +100,12 @@ const SharedBooks = () => {
                             onClick={handleBookClick}
                             buttons={
                               <>
+                                <ReviewButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.seller}
+                                />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>
                             }
@@ -113,7 +119,7 @@ const SharedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar />
+            <FilterBar data={sharedBooks} pathname="/bookshelf/shared-books" />
           </Grid>
         </Grid>
       </Stack>

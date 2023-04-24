@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -19,6 +19,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { StyledButton } from "@/styles/components/Button";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const CreatedBooks = () => {
@@ -129,7 +130,10 @@ const CreatedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3} lg={3}>
-            <FilterBar />
+            <FilterBar
+              data={createdBooks}
+              pathname="/bookshelf/created-books"
+            />
           </Grid>
         </Grid>
       </Stack>

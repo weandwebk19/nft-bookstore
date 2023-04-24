@@ -15,6 +15,7 @@ import { useOwnedBorrowedBooks } from "@/components/hooks/web3";
 import {
   LendButton,
   ReadButton,
+  ReviewButton,
   SellButton
 } from "@/components/shared/BookButton";
 import ExtendRequestButton from "@/components/shared/BookButton/ExtendRequestButton";
@@ -130,6 +131,12 @@ const BorrowedBooks = () => {
                                   endTime={book?.endTime}
                                   borrowedAmount={book?.amount}
                                 />
+                                <ReviewButton
+                                  tokenId={book?.tokenId}
+                                  title={book?.meta.title}
+                                  bookCover={book?.meta.bookCover}
+                                  author={book?.seller}
+                                />
                                 <ExtendRequestButton
                                   tokenId={book?.tokenId}
                                   title={book?.meta.title}
@@ -152,7 +159,10 @@ const BorrowedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar />
+            <FilterBar
+              data={rentedBooks}
+              pathname="/bookshelf/borrowed-books"
+            />
           </Grid>
         </Grid>
       </Stack>

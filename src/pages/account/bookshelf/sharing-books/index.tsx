@@ -222,7 +222,10 @@ const SharingBooks = () => {
             </Stack>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar />
+            <FilterBar
+              data={sharingBooks}
+              pathname="/bookshelf/sharing-books"
+            />
           </Grid>
         </Grid>
         <ToastContainer />
