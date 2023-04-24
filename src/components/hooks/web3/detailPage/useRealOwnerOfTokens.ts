@@ -18,7 +18,7 @@ export const hookFactory: RealOwnerOfTokensHookFactory =
   ({ contract }) =>
   (tokenId: number) => {
     const { data, ...swr } = useSWR(
-      contract ? "web3/useRealOwnerOfTokens" : null,
+      [contract ? "web3/useRealOwnerOfTokens" : null, tokenId],
       async () => {
         try {
           if (tokenId) {

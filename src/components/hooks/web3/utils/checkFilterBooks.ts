@@ -28,9 +28,17 @@ export const checkFilterBooks = async (
 
   // genre check
   if (queryString.genre && queryString.genre.length > 0) {
-    if (bookInfoRes?.success === true) {
-      const bookInfo = bookInfoRes.data as BookInfo;
-      if (!bookInfo.genres.some((item) => queryString.genre?.includes(item))) {
+    const bookGenresRes = await (
+      await axios.get(`/api/books/token/${tokenId}/genres`)
+    ).data;
+
+    if (bookGenresRes?.success === true) {
+      const bookGenres = bookGenresRes.data;
+      if (
+        !bookGenres.some((item: any) =>
+          queryString.genre.includes(item.genre_id)
+        )
+      ) {
         isGenrePass = false;
       }
     }
@@ -66,6 +74,12 @@ export const checkFilterBooks = async (
   }
 
   // TODO: author check
+  if (queryString.author !== "") {
+    const author = queryString.author.toLocaleLowerCase();
+    if (!metaRes?.data.author.includes(author)) {
+      isAuthorPass = false;
+    }
+  }
 
   if (
     isGenrePass &&

@@ -142,9 +142,9 @@ const BorrowedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   renter={book?.renter}
-                                  price={book?.price}
                                   supplyAmount={book?.amount}
-                                  borrowBooks={nfts?.borrowBooks}
+                                  startTime={book?.startTime}
+                                  endTime={book?.endTime}
                                 />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>

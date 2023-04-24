@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,6 +22,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import {
@@ -41,15 +42,9 @@ interface ExtendRequestButtonProps {
   title: string;
   bookCover: string;
   renter: string;
-  price: number;
+  startTime: number;
+  endTime: number;
   supplyAmount: number;
-  borrowBooks: (
-    tokenId: number,
-    renter: string,
-    price: number,
-    amount: number,
-    rentalDuration: number
-  ) => Promise<void>;
 }
 
 const schema = yup
@@ -75,13 +70,13 @@ const ExtendRequestButton = ({
   bookCover,
   title,
   renter,
-  price,
-  supplyAmount,
-  borrowBooks
+  startTime,
+  endTime,
+  supplyAmount
 }: ExtendRequestButtonProps) => {
-  const router = useRouter();
   const [renterName, setRenterName] = useState();
-  const { ethereum, contract } = useWeb3();
+  const { contract } = useWeb3();
+  const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -126,10 +121,71 @@ const ExtendRequestButton = ({
 
   const { handleSubmit, setValue } = methods;
 
+  const requestExtendTime = useCallback(
+    async (
+      tokenId: number,
+      renter: string,
+      startTime: number,
+      endTime: number,
+      extendedAmount: number,
+      extendedTime: number
+    ) => {
+      try {
+        // Handle errors
+        if (extendedTime < 604800) {
+          return toast.error(`Extend time must be greater than 7 days.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+        if (extendedAmount > supplyAmount) {
+          return toast.error(`Amount must be less than ${supplyAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+        if (account.data == renter) {
+          return toast.error(
+            "You are not allowed to extend the book borrowed by yourself.",
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
+        }
+
+        const tx = await contract?.requestExtendTimeOfBorrowedBooks(
+          tokenId,
+          renter,
+          startTime,
+          endTime,
+          extendedAmount,
+          extendedTime
+        );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Processing transaction",
+          success: "Request extend successfully.",
+          error: "Processing error"
+        });
+      } catch (error: any) {
+        console.error(error);
+        toast.error(`${error.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [contract, account.data]
+  );
+
   const onSubmit = async (data: any) => {
     try {
-      const rentalDuration = daysToSeconds(data.extendDays);
-      await borrowBooks(tokenId, renter, price, data.amount, rentalDuration);
+      const extendedTime = daysToSeconds(data.extendDays);
+      await requestExtendTime(
+        tokenId,
+        renter,
+        startTime,
+        endTime,
+        data.amount,
+        extendedTime
+      );
     } catch (e: any) {
       console.error(e.message);
     }
