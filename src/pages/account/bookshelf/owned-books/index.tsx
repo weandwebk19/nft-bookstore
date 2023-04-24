@@ -128,7 +128,7 @@ const OwnedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar />
+            <FilterBar data={ownedBooks} pathname="/owned-books" />
           </Grid>
         </Grid>
       </Stack>

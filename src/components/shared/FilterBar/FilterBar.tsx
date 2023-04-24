@@ -6,9 +6,11 @@ import {
   Divider,
   IconButton,
   Stack,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import SelectAllOutlinedIcon from "@mui/icons-material/SelectAllOutlined";
 
@@ -16,6 +18,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
+import pluralize from "@utils/pluralize";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import querystring from "querystring";
@@ -70,7 +73,12 @@ const defaultValues = {
   priceRange: [MIN_PRICE, MAX_PRICE]
 };
 
-const FilterBar = () => {
+interface FilterBarProps {
+  data?: any[];
+  pathname: string;
+}
+
+const FilterBar = ({ data, pathname }: FilterBarProps) => {
   const { t } = useTranslation("filter");
   const router = useRouter();
 
@@ -125,6 +133,26 @@ const FilterBar = () => {
           sx={{ marginTop: 4 }}
           className={styles["filter-bar"]}
         >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography>{pluralize(data.length, t("result"))}</Typography>
+            </Box>
+            {!(Object.keys(router.query).length === 0) && (
+              <Tooltip title={t("clearAllFilter")}>
+                <IconButton
+                  onClick={() => {
+                    router.push(pathname);
+                  }}
+                >
+                  <CancelOutlinedIcon fontSize="small" color="inherit" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
           <FormGroup
             label={
               <Stack

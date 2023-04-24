@@ -105,7 +105,7 @@ const DisplayBox: FunctionComponent = () => {
         </Grid>
         <Grid item xs={4} sm={3} md={3}>
           <Stack spacing={3}>
-            <FilterBar />
+            <FilterBar data={nfts?.data} pathname="/share" />
           </Stack>
         </Grid>
       </Grid>

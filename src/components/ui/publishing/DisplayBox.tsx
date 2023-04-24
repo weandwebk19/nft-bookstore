@@ -143,7 +143,7 @@ const DisplayBox: FunctionComponent = () => {
         </Grid>
         <Grid item xs={4} sm={3} md={3}>
           <Stack spacing={3}>
-            <FilterBar />
+            <FilterBar data={listedBooks?.data} pathname="/publishing" />
           </Stack>
         </Grid>
       </Grid>

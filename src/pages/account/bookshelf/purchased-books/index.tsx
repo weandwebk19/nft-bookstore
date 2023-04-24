@@ -136,7 +136,7 @@ const PurchasedBooks = () => {
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
             <ContentPaper title="Filter">
-              <FilterBar />
+              <FilterBar data={purchasedBooks} pathname="/purchased-books" />
             </ContentPaper>
           </Grid>
         </Grid>

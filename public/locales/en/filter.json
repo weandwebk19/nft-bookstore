@@ -3,10 +3,10 @@
   "genres": "Genres",
   "tooltip_reset": "Reset",
   "tooltip_selectAll": "Select All",
-  "searchBook": "Search Book",
+  "searchBook": "Search by title",
   "rating": "Rating",
   "rating0Star": "all ratings",
-  "rating1Star": "from 1 stars",
+  "rating1Star": "from 1 star",
   "rating2Star": "from 2 stars",
   "rating3Star": "from 3 stars",
   "rating4Star": "from 4 stars",
@@ -14,5 +14,7 @@
   "price": "Price",
   "searchByAuthor": "Search by author",
   "languagesSupport": "Languages support",
-  "apply": "Apply"
+  "apply": "Apply",
+  "result": "Result",
+  "clearAllFilter": "Clear all Filters"
 }

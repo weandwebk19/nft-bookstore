@@ -238,7 +238,7 @@ const LendingBooks = () => {
             </Stack>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar />
+            <FilterBar data={lendingBooks} pathname="/lending-books" />
           </Grid>
         </Grid>
         <ToastContainer />

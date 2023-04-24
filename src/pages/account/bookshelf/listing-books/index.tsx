@@ -202,7 +202,7 @@ const ListingBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <FilterBar />
+            <FilterBar data={listedBooks} pathname="/listing-books" />
           </Grid>
         </Grid>
       </Stack>

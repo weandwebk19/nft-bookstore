@@ -81,14 +81,14 @@ const Comment = ({
                 1 hour ago
                 {/* {date} */}
               </Typography>
-              <Button
+              {/* <Button
                 size="small"
                 variant="text"
                 startIcon={<TryOutlinedIcon />}
                 onClick={onShowReplyInput}
               >
                 Reply
-              </Button>
+              </Button> */}
               {hasChildren && (
                 <Button
                   size="small"
