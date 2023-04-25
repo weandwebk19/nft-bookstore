@@ -9,6 +9,8 @@ import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useAccount } from "wagmi";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
+
 import { Image } from "../Image";
 
 type ActionableBookItemStatus =
@@ -22,9 +24,6 @@ type ActionableBookItemStatus =
   | "isPurchased";
 
 interface ActionableBookItemProps {
-  bookCover: string;
-  title: string;
-  fileType: string;
   tokenId: number;
   owner?: string; // !!! 'author' should ALWAYS be display !!!  => /// In some cases, we can use seller instead
   onClick: (tokenId: number) => void;
@@ -43,9 +42,6 @@ interface ActionableBookItemProps {
 }
 
 const ActionableBookItem = ({
-  bookCover,
-  title,
-  fileType,
   tokenId,
   owner,
   onClick,
@@ -70,6 +66,8 @@ const ActionableBookItem = ({
   const [renterName, setRenterName] = useState("");
   const [sharedPersonName, setSharedPersonName] = useState("");
   const [borrowerName, setBorrowerName] = useState("");
+
+  const metadata = useMetadata(tokenId);
 
   useEffect(() => {
     (async () => {
@@ -170,8 +168,8 @@ const ActionableBookItem = ({
           onClick={() => onClick(tokenId)}
         >
           <Image
-            src={bookCover}
-            alt={title}
+            src={metadata.data?.bookCover}
+            alt={metadata.data?.title}
             sx={{ flexShrink: 0, aspectRatio: "1 / 1" }}
             className={styles["book-item__book-cover"]}
           />
@@ -187,14 +185,16 @@ const ActionableBookItem = ({
           <Stack>
             <Stack direction="row" spacing={0.5}>
               <InsertDriveFileIcon fontSize="small" color="action" />
-              <Typography variant="caption">{fileType}</Typography>
+              <Typography variant="caption">
+                {metadata.data?.fileType}
+              </Typography>
             </Stack>
             <Typography
               variant="h6"
               className="text-limit text-limit--2"
               sx={{ minHeight: "64px" }}
             >
-              {title}
+              {metadata.data?.title}
             </Typography>
             {status !== "isCreated" && (
               <Typography variant="body2">{ownerName}</Typography>

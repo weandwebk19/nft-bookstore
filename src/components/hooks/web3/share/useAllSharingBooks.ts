@@ -8,6 +8,7 @@ import useSWR from "swr";
 
 import { FilterField } from "@/types/filter";
 
+import { useAccount } from "..";
 import { checkFilterBooks } from "../utils/checkFilterBooks";
 
 type AllSharingBooksHookFactory = CryptoHookFactory<BookSharingCore[]>;
@@ -17,8 +18,9 @@ export type UseAllSharingBooksHook = ReturnType<AllSharingBooksHookFactory>;
 export const hookFactory: AllSharingBooksHookFactory =
   ({ contract }) =>
   (queryString: FilterField) => {
+    const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useAllSharingBooks" : null, queryString],
+      [contract ? "web3/useAllSharingBooks" : null, queryString, account.data],
       async () => {
         const allSharingBooks = [] as BookSharingCore[];
         const coreBookSharings = await contract!.getAllBooksOnSharing();
@@ -35,32 +37,13 @@ export const hookFactory: AllSharingBooksHookFactory =
           const sharingBook = coreBookSharings[i];
 
           if (
-            !Object.keys(queryString).length ||
-            (Object.keys(queryString).length == 1 &&
-              Object.keys(queryString).includes("page"))
+            sharingBook.sharer !== account.data &&
+            sharingBook.fromRenter !== account.data
           ) {
-            allSharingBooks.push({
-              tokenId: sharingBook.tokenId.toNumber(),
-              sharer: sharingBook.sharer,
-              price: parseFloat(ethers.utils.formatEther(sharingBook.price)),
-              amount: sharingBook.amount.toNumber(),
-              fromRenter: sharingBook.fromRenter,
-              sharedPer: sharingBook.sharedPer,
-              priceOfBB: parseFloat(
-                ethers.utils.formatEther(sharingBook.priceOfBB)
-              ),
-              startTime: sharingBook.startTime.toNumber(),
-              endTime: sharingBook.endTime.toNumber()
-            });
-          } else {
-            // Filter
             if (
-              (await checkFilterBooks(
-                sharingBook.tokenId,
-                sharingBook.price,
-                contract!,
-                queryString
-              )) === true
+              !Object.keys(queryString).length ||
+              (Object.keys(queryString).length == 1 &&
+                Object.keys(queryString).includes("page"))
             ) {
               allSharingBooks.push({
                 tokenId: sharingBook.tokenId.toNumber(),
@@ -75,6 +58,32 @@ export const hookFactory: AllSharingBooksHookFactory =
                 startTime: sharingBook.startTime.toNumber(),
                 endTime: sharingBook.endTime.toNumber()
               });
+            } else {
+              // Filter
+              if (
+                (await checkFilterBooks(
+                  sharingBook.tokenId,
+                  sharingBook.price,
+                  contract!,
+                  queryString
+                )) === true
+              ) {
+                allSharingBooks.push({
+                  tokenId: sharingBook.tokenId.toNumber(),
+                  sharer: sharingBook.sharer,
+                  price: parseFloat(
+                    ethers.utils.formatEther(sharingBook.price)
+                  ),
+                  amount: sharingBook.amount.toNumber(),
+                  fromRenter: sharingBook.fromRenter,
+                  sharedPer: sharingBook.sharedPer,
+                  priceOfBB: parseFloat(
+                    ethers.utils.formatEther(sharingBook.priceOfBB)
+                  ),
+                  startTime: sharingBook.startTime.toNumber(),
+                  endTime: sharingBook.endTime.toNumber()
+                });
+              }
             }
           }
         }

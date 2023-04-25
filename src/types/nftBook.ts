@@ -73,7 +73,7 @@ export type NftBookCore = {
 export type NftBook = {
   amountOwned?: number;
   amountTradeable?: number;
-  meta: NftBookMeta;
+  // meta: NftBookMeta;
 } & NftBookCore;
 
 export type ListedBookCore = {
@@ -132,30 +132,21 @@ export type SharedBookCore = {
   endTime: number;
 };
 
-export type ListedBook = {
-  meta: NftBookMeta;
-} & ListedBookCore;
+export type ListedBook = {} & ListedBookCore;
 
 export type BookSelling = {
   amountTradeable: number;
-  meta: NftBookMeta;
 } & BookSellingCore;
 
-export type LendBook = {
-  meta: NftBookMeta;
-} & LendBookCore;
+export type LendBook = {} & LendBookCore;
 
-export type BorrowedBook = {
-  meta: NftBookMeta;
-} & BorrowedBookCore;
+export type BorrowedBook = {} & BorrowedBookCore;
 
 export type SharedBook = {
   meta: NftBookMeta;
 } & SharedBookCore;
 
-export type BookSharing = {
-  meta: NftBookMeta;
-} & BookSharingCore;
+export type BookSharing = {} & BookSharingCore;
 
 export type NftListedBook = {
   meta: NftBookMeta;

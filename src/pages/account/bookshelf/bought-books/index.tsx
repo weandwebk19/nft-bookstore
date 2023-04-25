@@ -100,9 +100,6 @@ const BoughtBooks = () => {
                           <ActionableBookItem
                             status="isPurchased"
                             tokenId={book?.listedBook.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             owner={book?.listedBook.seller}
                             onClick={handleBookClick}
                             amount={book?.amount}
@@ -111,8 +108,6 @@ const BoughtBooks = () => {
                               <>
                                 <SellButton
                                   tokenId={book?.listedBook.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   owner={book?.listedBook.seller}
                                   amountTradeable={book?.amountTradeable!}
                                 />

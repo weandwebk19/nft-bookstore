@@ -20,6 +20,8 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { FilterField } from "@/types/filter";
+import { NftBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const OwnedBooks = () => {
@@ -36,8 +38,8 @@ const OwnedBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedNfts();
   const router = useRouter();
+  const { nfts } = useOwnedNfts(router.query as FilterField);
   const ownedBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
@@ -85,7 +87,7 @@ const OwnedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {ownedBooks!.map((book) => {
+                    {ownedBooks!.map((book: NftBook) => {
                       return (
                         <Grid
                           item
@@ -98,9 +100,6 @@ const OwnedBooks = () => {
                           <ActionableBookItem
                             status="isOwned"
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             owner={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
@@ -110,12 +109,9 @@ const OwnedBooks = () => {
                               <>
                                 <ReviewButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   author={book?.author}
-                                  amountTradeable={book?.amountTradeable!}
                                 />
-                                <ReadButton bookFile={book?.meta.bookFile} />
+                                <ReadButton tokenId={book?.tokenId} />
                               </>
                             }
                           />

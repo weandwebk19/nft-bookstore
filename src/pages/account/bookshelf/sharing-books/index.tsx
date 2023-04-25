@@ -26,6 +26,7 @@ import RevokeAllSharedOutButton from "@/components/ui/account/bookshelf/sharing-
 import RevokeAllSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeAllSharingButton";
 import RevokeSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharedOutButton";
 import RevokeSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharingButton";
+import { FilterField } from "@/types/filter";
 import { BookSharing } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import { secondsToDhms } from "@/utils/secondsToDhms";
@@ -45,10 +46,14 @@ const SharingBooks = () => {
   ];
 
   const router = useRouter();
-  const { nfts: sharingNfts } = useOwnedSharingBooks();
+  const { nfts: sharingNfts } = useOwnedSharingBooks(
+    router.query as FilterField
+  );
   const sharingBooks = sharingNfts.data as BookSharing[];
 
-  const { nfts: sharedNfts } = useOwnedSharedOutBooks();
+  const { nfts: sharedNfts } = useOwnedSharedOutBooks(
+    router.query as FilterField
+  );
   const sharedBooks = sharedNfts.data as BookSharing[];
 
   const [nowTime, setNowTime] = useState<number>(0);
@@ -120,9 +125,6 @@ const SharingBooks = () => {
                             <ActionableBookItem
                               status="isSharing"
                               tokenId={book?.tokenId}
-                              bookCover={book?.meta.bookCover}
-                              title={book?.meta.title}
-                              fileType={book?.meta.fileType}
                               amount={book?.amount}
                               onClick={handleBookClick}
                               buttons={
@@ -134,8 +136,6 @@ const SharingBooks = () => {
                                       book?.endTime - nowTime
                                     )}
                                     tokenId={book?.tokenId}
-                                    title={book?.meta.title}
-                                    bookCover={book?.meta.bookCover}
                                     sharer={book?.sharer}
                                     amount={book?.amount}
                                     fromRenter={book?.fromRenter}
@@ -191,9 +191,6 @@ const SharingBooks = () => {
                             <ActionableBookItem
                               status="isSharing"
                               tokenId={book?.tokenId}
-                              bookCover={book?.meta.bookCover}
-                              title={book?.meta.title}
-                              fileType={book?.meta.fileType}
                               amount={book?.amount}
                               onClick={handleBookClick}
                               buttons={

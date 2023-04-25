@@ -7,7 +7,7 @@ import { BookInfo } from "@/types/nftBook";
 
 export const checkFilterBooks = async (
   tokenId: BigNumber,
-  price: BigNumber,
+  price: BigNumber | undefined,
   contract: BookStoreContract,
   queryString: FilterField
 ) => {
@@ -53,14 +53,16 @@ export const checkFilterBooks = async (
   // TODO: rating check
 
   // price check
-  const priceCheck = parseFloat(ethers.utils.formatEther(price));
-  if (
-    priceCheck <
-      parseFloat(queryString.priceRange ? queryString.priceRange[0] : "") ||
-    priceCheck >
-      parseFloat(queryString.priceRange ? queryString.priceRange[1] : "")
-  ) {
-    isPricePass = false;
+  if (price) {
+    const priceCheck = parseFloat(ethers.utils.formatEther(price));
+    if (
+      priceCheck <
+        parseFloat(queryString.priceRange ? queryString.priceRange[0] : "") ||
+      priceCheck >
+        parseFloat(queryString.priceRange ? queryString.priceRange[1] : "")
+    ) {
+      isPricePass = false;
+    }
   }
 
   // language check
@@ -75,7 +77,7 @@ export const checkFilterBooks = async (
 
   // TODO: author check
   if (queryString.author !== "") {
-    const author = queryString.author.toLocaleLowerCase();
+    const author = queryString.author.toLowerCase();
     if (!metaRes?.data.author.includes(author)) {
       isAuthorPass = false;
     }

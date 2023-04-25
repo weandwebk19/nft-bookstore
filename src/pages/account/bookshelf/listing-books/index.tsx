@@ -20,6 +20,7 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import UnListButton from "@/components/ui/account/bookshelf/listing-books/UnListButton";
 import { StyledButton } from "@/styles/components/Button";
+import { FilterField } from "@/types/filter";
 import { ListedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
@@ -37,9 +38,9 @@ const ListingBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedListedBooks();
-  const listedBooks = nfts.data;
   const router = useRouter();
+  const { nfts } = useOwnedListedBooks(router.query as FilterField);
+  const listedBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -178,9 +179,6 @@ const ListingBooks = () => {
                             <ActionableBookItem
                               status="isListing"
                               tokenId={book?.tokenId}
-                              bookCover={book?.meta.bookCover}
-                              title={book?.meta.title}
-                              fileType={book?.meta.fileType}
                               owner={book?.seller}
                               onClick={handleBookClick}
                               price={book?.price}
@@ -190,8 +188,6 @@ const ListingBooks = () => {
                                   <UnListButton
                                     tokenId={book?.tokenId}
                                     amount={book?.amount}
-                                    title={book?.meta.title}
-                                    bookCover={book?.meta.bookCover}
                                     seller={book?.seller}
                                   />
                                 </>

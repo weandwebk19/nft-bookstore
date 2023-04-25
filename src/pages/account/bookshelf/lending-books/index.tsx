@@ -28,6 +28,7 @@ import RevokeAllLendingButton from "@/components/ui/account/bookshelf/lending-bo
 import RevokeAllLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLentOutButton";
 import RevokeLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeLendingButton";
 import RevokeLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeLentOutButton";
+import { FilterField } from "@/types/filter";
 import { BorrowedBook, LendBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import { secondsToDhms } from "@/utils/secondsToDhms";
@@ -48,10 +49,12 @@ const LendingBooks = () => {
 
   const router = useRouter();
 
-  const { nfts: lendNfts } = useOwnedLendingBooks();
+  const { nfts: lendNfts } = useOwnedLendingBooks(router.query as FilterField);
   const lendingBooks = lendNfts.data as LendBook[];
 
-  const { nfts: lentOutNfts } = useOwnedLentOutBooks();
+  const { nfts: lentOutNfts } = useOwnedLentOutBooks(
+    router.query as FilterField
+  );
   const lentOutBooks = lentOutNfts.data as BorrowedBook[];
 
   const [nowTime, setNowTime] = useState<number>(0);
@@ -124,9 +127,6 @@ const LendingBooks = () => {
                               <ActionableBookItem
                                 status="isLending"
                                 tokenId={book?.tokenId}
-                                bookCover={book?.meta.bookCover}
-                                title={book?.meta.title}
-                                fileType={book?.meta.fileType}
                                 renter={book?.renter}
                                 onClick={handleBookClick}
                                 price={book?.price}
@@ -135,8 +135,6 @@ const LendingBooks = () => {
                                   <>
                                     <RevokeLendingButton
                                       tokenId={book?.tokenId}
-                                      title={book?.meta.title}
-                                      bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       amount={book?.amount}
                                     />
@@ -201,9 +199,6 @@ const LendingBooks = () => {
                               <ActionableBookItem
                                 status="isLending"
                                 tokenId={book?.tokenId}
-                                bookCover={book?.meta.bookCover}
-                                title={book?.meta.title}
-                                fileType={book?.meta.fileType}
                                 renter={book?.renter}
                                 onClick={handleBookClick}
                                 price={book?.price}
@@ -216,8 +211,6 @@ const LendingBooks = () => {
                                   <>
                                     <RevokeLentOutButton
                                       tokenId={book?.tokenId}
-                                      title={book?.meta.title}
-                                      bookCover={book?.meta.bookCover}
                                       renter={book?.renter}
                                       borrower={book?.borrower}
                                       amount={book?.amount}
