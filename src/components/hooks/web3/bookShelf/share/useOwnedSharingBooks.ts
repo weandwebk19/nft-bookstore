@@ -3,7 +3,11 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
+import { FilterField } from "@/types/filter";
 import { BookSharing } from "@/types/nftBook";
+
+import { useAccount } from "../..";
+import { checkFilterBooks } from "../../utils/checkFilterBooks";
 
 type OwnedSharingBooksHookFactory = CryptoHookFactory<BookSharing[]>;
 
@@ -11,38 +15,67 @@ export type UseOwnedSharingBooksHook = ReturnType<OwnedSharingBooksHookFactory>;
 
 export const hookFactory: OwnedSharingBooksHookFactory =
   ({ contract }) =>
-  () => {
+  (queryString: FilterField) => {
+    const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedSharingBooks" : null,
+      [
+        contract ? "web3/useOwnedSharingBooks" : null,
+        queryString,
+        account.data
+      ],
       async () => {
         const nfts = [] as BookSharing[];
         const coreNfts = await contract!.getAllOwnedBooksOnSharing();
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
-          const tokenURI = await contract!.getUri(item.tokenId);
-          const metaRes = await (
-            await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
-          ).data;
-          let meta = null;
-          if (metaRes.success === true) {
-            meta = metaRes.data;
-          }
-          try {
-            nfts.push({
-              tokenId: item?.tokenId?.toNumber(),
-              fromRenter: item?.fromRenter,
-              amount: item?.amount?.toNumber(),
-              price: parseFloat(ethers.utils.formatEther(item?.price)),
-              sharer: item?.sharer,
-              sharedPer: item?.sharedPer,
-              priceOfBB: parseFloat(ethers.utils.formatEther(item?.priceOfBB)),
-              startTime: item?.startTime?.toNumber(),
-              endTime: item?.endTime?.toNumber(),
-              meta
-            });
-          } catch (err) {
-            console.log(err);
+
+          if (!Object.keys(queryString).length) {
+            try {
+              nfts.push({
+                tokenId: item?.tokenId?.toNumber(),
+                fromRenter: item?.fromRenter,
+                amount: item?.amount?.toNumber(),
+                price: parseFloat(ethers.utils.formatEther(item?.price)),
+                sharer: item?.sharer,
+                sharedPer: item?.sharedPer,
+                priceOfBB: parseFloat(
+                  ethers.utils.formatEther(item?.priceOfBB)
+                ),
+                startTime: item?.startTime?.toNumber(),
+                endTime: item?.endTime?.toNumber()
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          } else {
+            // Filter
+            if (
+              (await checkFilterBooks(
+                item.tokenId,
+                item.price,
+                contract!,
+                queryString
+              )) === true
+            ) {
+              try {
+                nfts.push({
+                  tokenId: item?.tokenId?.toNumber(),
+                  fromRenter: item?.fromRenter,
+                  amount: item?.amount?.toNumber(),
+                  price: parseFloat(ethers.utils.formatEther(item?.price)),
+                  sharer: item?.sharer,
+                  sharedPer: item?.sharedPer,
+                  priceOfBB: parseFloat(
+                    ethers.utils.formatEther(item?.priceOfBB)
+                  ),
+                  startTime: item?.startTime?.toNumber(),
+                  endTime: item?.endTime?.toNumber()
+                });
+              } catch (err) {
+                console.log(err);
+              }
+            }
           }
         }
         return nfts;

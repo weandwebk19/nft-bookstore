@@ -10,6 +10,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
@@ -22,8 +23,6 @@ interface RevokeSharingButtonProps {
   amount: number;
   isEnded?: boolean;
   countDown?: string;
-  title: string;
-  bookCover: string;
   sharer: string;
   tokenId: number;
   fromRenter: string;
@@ -55,8 +54,6 @@ const RevokeSharingButton = ({
   amount,
   isEnded,
   countDown,
-  bookCover,
-  title,
   sharer,
   fromRenter,
   startTime,
@@ -67,6 +64,7 @@ const RevokeSharingButton = ({
   const [sharerName, setSharerName] = useState();
   const { contract } = useWeb3();
   const { account } = useAccount();
+  const metadata = useMetadata(tokenId);
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
@@ -168,12 +166,12 @@ const RevokeSharingButton = ({
             <Grid item md={4}>
               <Stack>
                 <Image
-                  src={bookCover}
-                  alt={title}
+                  src={metadata.data?.bookCover}
+                  alt={metadata.data?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{sharerName}</Typography>
                 <Typography>Amount: {amount}</Typography>
               </Stack>

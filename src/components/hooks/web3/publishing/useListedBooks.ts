@@ -9,6 +9,7 @@ import useSWR from "swr";
 
 import { FilterField } from "@/types/filter";
 
+import { useAccount } from "..";
 import { checkFilterBooks } from "../utils/checkFilterBooks";
 
 type ListedBooksHookFactory = CryptoHookFactory<ListedBookCore[]>;
@@ -18,8 +19,9 @@ export type UseListedBooksHook = ReturnType<ListedBooksHookFactory>;
 export const hookFactory: ListedBooksHookFactory =
   ({ contract }) =>
   (queryString: FilterField) => {
+    const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useListedBooks" : null, queryString],
+      [contract ? "web3/useListedBooks" : null, queryString, account.data],
       async () => {
         const listedBooks = [] as ListedBookCore[];
         const coreListedBooks = await contract!.getAllBooksOnSale();
@@ -35,26 +37,11 @@ export const hookFactory: ListedBooksHookFactory =
         ) {
           const listedBook = coreListedBooks[i];
 
-          // Filter
-          if (
-            !Object.keys(queryString).length ||
-            (Object.keys(queryString).length == 1 &&
-              Object.keys(queryString).includes("page"))
-          ) {
-            listedBooks.push({
-              tokenId: listedBook.tokenId.toNumber(),
-              seller: listedBook.seller,
-              price: parseFloat(ethers.utils.formatEther(listedBook.price)),
-              amount: listedBook.amount.toNumber()
-            });
-          } else {
+          if (listedBook.seller !== account.data) {
             if (
-              (await checkFilterBooks(
-                listedBook.tokenId,
-                listedBook.price,
-                contract!,
-                queryString
-              )) === true
+              !Object.keys(queryString).length ||
+              (Object.keys(queryString).length == 1 &&
+                Object.keys(queryString).includes("page"))
             ) {
               listedBooks.push({
                 tokenId: listedBook.tokenId.toNumber(),
@@ -62,6 +49,23 @@ export const hookFactory: ListedBooksHookFactory =
                 price: parseFloat(ethers.utils.formatEther(listedBook.price)),
                 amount: listedBook.amount.toNumber()
               });
+            } else {
+              // Filter
+              if (
+                (await checkFilterBooks(
+                  listedBook.tokenId,
+                  listedBook.price,
+                  contract!,
+                  queryString
+                )) === true
+              ) {
+                listedBooks.push({
+                  tokenId: listedBook.tokenId.toNumber(),
+                  seller: listedBook.seller,
+                  price: parseFloat(ethers.utils.formatEther(listedBook.price)),
+                  amount: listedBook.amount.toNumber()
+                });
+              }
             }
           }
         }

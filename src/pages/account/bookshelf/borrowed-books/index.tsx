@@ -25,6 +25,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { FilterField } from "@/types/filter";
 import { BorrowedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import { secondsToDhms } from "@/utils/secondsToDhms";
@@ -43,8 +44,8 @@ const BorrowedBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedBorrowedBooks();
   const router = useRouter();
+  const { nfts } = useOwnedBorrowedBooks(router.query as FilterField);
   const rentedBooks = nfts.data as BorrowedBook[];
   const [nowTime, setNowTime] = useState<number>(0);
 
@@ -111,9 +112,6 @@ const BorrowedBooks = () => {
                           <ActionableBookItem
                             status="isBorrowed"
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             renter={book?.renter}
                             onClick={handleBookClick}
                             price={book?.price}
@@ -123,8 +121,6 @@ const BorrowedBooks = () => {
                               <>
                                 <ShareButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   renter={book?.renter}
                                   borrower={book?.borrower}
                                   startTime={book?.startTime}
@@ -133,20 +129,16 @@ const BorrowedBooks = () => {
                                 />
                                 <ReviewButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.seller}
+                                  author={book?.renter}
                                 />
                                 <ExtendRequestButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   renter={book?.renter}
                                   supplyAmount={book?.amount}
                                   startTime={book?.startTime}
                                   endTime={book?.endTime}
                                 />
-                                <ReadButton bookFile={book?.meta.bookFile} />
+                                <ReadButton tokenId={book?.tokenId} />
                               </>
                             }
                           />

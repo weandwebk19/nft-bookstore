@@ -6,6 +6,7 @@ import { Box, Grid, Stack, Typography } from "@mui/material";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
@@ -17,8 +18,6 @@ interface RevokeLentOutButtonProps {
   amount: number;
   isEnded?: boolean;
   countDown?: string;
-  title: string;
-  bookCover: string;
   renter: string;
   tokenId: number;
   startTime: number;
@@ -31,8 +30,6 @@ const RevokeLentOutButton = ({
   amount,
   isEnded,
   countDown,
-  bookCover,
-  title,
   renter,
   tokenId,
   startTime,
@@ -42,6 +39,7 @@ const RevokeLentOutButton = ({
   const [renterName, setRenterName] = useState();
   const { contract } = useWeb3();
   const { account } = useAccount();
+  const metadata = useMetadata(tokenId);
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
@@ -144,12 +142,12 @@ const RevokeLentOutButton = ({
             <Grid item md={4}>
               <Stack>
                 <Image
-                  src={bookCover}
-                  alt={title}
+                  src={metadata.data?.bookCover}
+                  alt={metadata.data?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
                 <Typography>Amount: {amount}</Typography>
               </Stack>

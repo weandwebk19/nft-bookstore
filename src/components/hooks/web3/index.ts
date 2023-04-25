@@ -31,90 +31,90 @@ export const useListedBooks = (queryString: FilterField) => {
   };
 };
 
-export const useOwnedNfts = () => {
+export const useOwnedNfts = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedNfts();
+  const swrRes = hooks.useOwnedNfts(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useCreatedBooks = () => {
+export const useCreatedBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useCreatedBooks();
+  const swrRes = hooks.useCreatedBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedListedBooks = () => {
+export const useOwnedListedBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedListedBooks();
+  const swrRes = hooks.useOwnedListedBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedPurchasedBooks = () => {
+export const useOwnedPurchasedBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedPurchasedBooks();
+  const swrRes = hooks.useOwnedPurchasedBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedBorrowedBooks = () => {
+export const useOwnedBorrowedBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedBorrowedBooks();
+  const swrRes = hooks.useOwnedBorrowedBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedLendingBooks = () => {
+export const useOwnedLendingBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedLendingBooks();
+  const swrRes = hooks.useOwnedLendingBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedLentOutBooks = () => {
+export const useOwnedLentOutBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedLentOutBooks();
+  const swrRes = hooks.useOwnedLentOutBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedSharingBooks = () => {
+export const useOwnedSharingBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedSharingBooks();
+  const swrRes = hooks.useOwnedSharingBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedSharedBooks = () => {
+export const useOwnedSharedBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedSharedBooks();
+  const swrRes = hooks.useOwnedSharedBooks(queryString);
 
   return {
     nfts: swrRes
   };
 };
 
-export const useOwnedSharedOutBooks = () => {
+export const useOwnedSharedOutBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedSharedOutBooks();
+  const swrRes = hooks.useOwnedSharedOutBooks(queryString);
 
   return {
     nfts: swrRes

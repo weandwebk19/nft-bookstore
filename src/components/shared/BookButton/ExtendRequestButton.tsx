@@ -22,6 +22,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
@@ -39,8 +40,6 @@ import Step2 from "../../ui/borrow/steps/Step2";
 
 interface ExtendRequestButtonProps {
   tokenId: number;
-  title: string;
-  bookCover: string;
   renter: string;
   startTime: number;
   endTime: number;
@@ -67,8 +66,6 @@ const defaultValues = {
 
 const ExtendRequestButton = ({
   tokenId,
-  bookCover,
-  title,
   renter,
   startTime,
   endTime,
@@ -77,6 +74,7 @@ const ExtendRequestButton = ({
   const [renterName, setRenterName] = useState();
   const { contract } = useWeb3();
   const { account } = useAccount();
+  const metadata = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -227,12 +225,12 @@ const ExtendRequestButton = ({
             <Grid item md={4}>
               <Stack>
                 <Image
-                  src={bookCover}
-                  alt={title}
+                  src={metadata.data?.bookCover}
+                  alt={metadata.data?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
                 <Typography>{supplyAmount} left</Typography>
               </Stack>

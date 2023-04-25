@@ -11,6 +11,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
@@ -20,8 +21,6 @@ import { StyledButton } from "@/styles/components/Button";
 import { Image } from "../Image";
 
 interface SellButtonProps {
-  title: string;
-  bookCover: string;
   owner: string;
   tokenId: number;
   amountTradeable: number;
@@ -45,15 +44,10 @@ const defaultValues = {
   amount: 1
 };
 
-const SellButton = ({
-  bookCover,
-  title,
-  owner,
-  tokenId,
-  amountTradeable
-}: SellButtonProps) => {
+const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
   const [ownerName, setOwnerName] = useState();
   const { ethereum, contract } = useWeb3();
+  const metadata = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -133,12 +127,12 @@ const SellButton = ({
             <Grid item md={4}>
               <Stack>
                 <Image
-                  src={bookCover}
-                  alt={title}
+                  src={metadata.data?.bookCover}
+                  alt={metadata.data?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{ownerName}</Typography>
                 <Typography>{amountTradeable} left</Typography>
               </Stack>

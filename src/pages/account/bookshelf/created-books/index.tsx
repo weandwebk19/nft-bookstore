@@ -20,6 +20,7 @@ import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { StyledButton } from "@/styles/components/Button";
+import { FilterField } from "@/types/filter";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const CreatedBooks = () => {
@@ -36,8 +37,8 @@ const CreatedBooks = () => {
     }
   ];
 
-  const { nfts } = useCreatedBooks();
   const router = useRouter();
+  const { nfts } = useCreatedBooks(router.query as FilterField);
   const createdBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
@@ -97,9 +98,6 @@ const CreatedBooks = () => {
                           <ActionableBookItem
                             status="isCreated"
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             owner={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
@@ -112,8 +110,6 @@ const CreatedBooks = () => {
                               >
                                 <SellButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   owner={book?.author}
                                   amountTradeable={book?.amountTradeable!}
                                 />

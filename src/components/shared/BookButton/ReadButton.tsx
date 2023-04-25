@@ -1,14 +1,17 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { StyledButton } from "@/styles/components/Button";
 
 interface ReadButtonProps {
-  bookFile: string | number;
+  tokenId: number;
 }
 
-const ReadButton = ({ bookFile }: ReadButtonProps) => {
+const ReadButton = ({ tokenId }: ReadButtonProps) => {
   const router = useRouter();
+  const metadata = useMetadata(tokenId);
+  const bookFile = metadata.data?.bookFile;
   const urlFile = bookFile ? (bookFile as string) : "/#";
 
   const handleReadBookClick = () => {
