@@ -7,10 +7,10 @@ import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { BookInfo, NftBook, NftBookDetails } from "@/types/nftBook";
+import { BookInfo, NftBook, NftBookDetail } from "@/types/nftBook";
 import { toNumber } from "@/utils/nomalizer";
 
-type BookDetailHookFactory = CryptoHookFactory<NftBookDetails>;
+type BookDetailHookFactory = CryptoHookFactory<NftBookDetail>;
 
 export type UseBookDetailHook = ReturnType<BookDetailHookFactory>;
 

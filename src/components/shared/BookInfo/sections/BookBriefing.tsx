@@ -27,7 +27,7 @@ import * as yup from "yup";
 import { NumericStepperController } from "@/components/shared/FormController";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
-import { ListedBookCore, NftBookDetails } from "@/types/nftBook";
+import { NftBookDetail } from "@/types/nftBook";
 
 import { AddToWatchlistButton } from "../../BookButton";
 import BuyButton from "../../BookButton/BuyButton";
@@ -43,7 +43,7 @@ interface BookBriefingProps {
   // isOpenForSale?: boolean;
   // isOpenForTradeIn?: boolean;
   // isOpenForBorrow?: boolean;
-  bookDetail?: NftBookDetails;
+  bookDetail?: NftBookDetail;
 }
 
 const BookBriefing = ({ bookDetail }: BookBriefingProps) => {

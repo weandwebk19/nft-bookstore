@@ -33,6 +33,8 @@ interface WalletBarProps {
   isInstalled: boolean;
   isLoading: boolean;
   account?: string;
+  userName?: string;
+  avatar?: string;
   connect(...args: unknown[]): unknown;
   handleLogin: () => Promise<void>;
   switchAccount(...args: unknown[]): unknown;
@@ -46,6 +48,8 @@ const WalletBar = ({
   isLoading,
   connect,
   account,
+  userName,
+  avatar,
   handleLogin,
   switchAccount,
   disconnect,
@@ -153,6 +157,8 @@ const WalletBar = ({
         </Stack>
         <AccountMenu
           account={account}
+          userName={userName}
+          avatar={avatar}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
           switchAccount={() => {

@@ -11,7 +11,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useOwnedListedBooks } from "@/components/hooks/web3";
+import { useOwnedSellingBooks } from "@/components/hooks/web3";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
@@ -21,7 +21,7 @@ import { FilterBar } from "@/components/shared/FilterBar";
 import UnListButton from "@/components/ui/account/bookshelf/listing-books/UnListButton";
 import { StyledButton } from "@/styles/components/Button";
 import { FilterField } from "@/types/filter";
-import { ListedBook } from "@/types/nftBook";
+import { BookSelling } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const ListingBooks = () => {
@@ -39,7 +39,7 @@ const ListingBooks = () => {
   ];
 
   const router = useRouter();
-  const { nfts } = useOwnedListedBooks(router.query as FilterField);
+  const { nfts } = useOwnedSellingBooks(router.query as FilterField);
   const listedBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
@@ -166,7 +166,7 @@ const ListingBooks = () => {
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
                     <>
-                      {listedBooks!.map((book: ListedBook) => {
+                      {listedBooks!.map((book: BookSelling) => {
                         return (
                           <Grid
                             item

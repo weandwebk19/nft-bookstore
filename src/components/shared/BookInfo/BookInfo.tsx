@@ -16,14 +16,14 @@ import BookPricingHistory from "@/components/shared/BookInfo/sections/BookPricin
 import { BookList } from "@/components/shared/BookList";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { bookList } from "@/mocks";
-import { NftBookDetails } from "@/types/nftBook";
+import { NftBookDetail } from "@/types/nftBook";
 
 import { FallbackNode } from "../FallbackNode";
 import BookListActionable from "./sections/BookListActionable";
 
 type BookInfoProps = {
   onClick?: () => void;
-  bookDetail?: NftBookDetails;
+  bookDetail?: NftBookDetail;
 };
 
 const BookInfo = ({ bookDetail }: BookInfoProps) => {

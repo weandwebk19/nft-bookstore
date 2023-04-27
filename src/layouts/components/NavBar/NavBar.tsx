@@ -638,6 +638,8 @@ const NavBar = () => {
                   connect={wagmiConnect}
                   // account={account.data}
                   account={wagmiAddress}
+                  userName={userInfo?.fullname}
+                  avatar={userInfo?.avatar}
                   switchAccount={account.switchAccount}
                   disconnect={disconnect}
                   handleLogin={handleLogin}
@@ -646,6 +648,8 @@ const NavBar = () => {
                 />
                 <AccountMenu
                   account={wagmiAddress}
+                  userName={userInfo?.fullname}
+                  avatar={userInfo?.avatar}
                   open={openAccountMenu}
                   onClose={handleAccountMenuClose}
                   switchAccount={account.switchAccount}

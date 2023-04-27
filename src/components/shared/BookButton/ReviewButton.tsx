@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import * as yup from "yup";
 
 import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import {
@@ -44,8 +45,9 @@ const defaultValues = {
 
 const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
   const [authorName, setAuthorName] = useState();
-  const { contract } = useWeb3();
+  const [reviews, setReviews] = useState();
   const metadata = useMetadata(tokenId);
+  const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -69,22 +71,20 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
 
   const onSubmit = async (data: any) => {
     try {
-      // const listingPrice = await contract!.listingPrice();
-      // const tx = await contract?.sellBooks(
-      //   tokenId,
-      //   ethers.utils.parseEther(data.price.toString()),
-      //   data.amount,
-      //   {
-      //     value: listingPrice
-      //   }
-      // );
-      // const receipt: any = await toast.promise(tx!.wait(), {
-      //   pending: "Sending your review",
-      //   success: "Your review has been posted",
-      //   error: "Oops! There's a problem with review process!"
-      // });
+      const reviewRes = await axios.post(`/api/reviews/create`, {
+        walletAddress: account.data,
+        tokenId,
+        review: data.review,
+        rating: data.rating
+      });
+      if (reviewRes.data.success === true) {
+        toast.success("Review book successfully.");
+      } else {
+        toast.error(`${reviewRes.data.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
     } catch (e: any) {
-      console.error(e);
       toast.error(`${e.message}.`, {
         position: toast.POSITION.TOP_CENTER
       });
@@ -106,6 +106,33 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
       }
     })();
   }, [author]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (tokenId && account.data) {
+          const userRes = await axios.get(
+            `/api/users/wallet/${account.data?.toLowerCase()}`
+          );
+
+          const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
+
+          if (userRes.data.success === true && bookRes.data.success === true) {
+            const reviewRes = await axios.get(
+              `/api/reviews/${bookRes.data.data}/${userRes.data.data.id}`
+            );
+            if (reviewRes.data.success == true) {
+              setReviews(reviewRes.data.data);
+            }
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [tokenId, account.data]);
+
+  console.log("reviews", reviews);
 
   return (
     <>

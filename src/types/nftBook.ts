@@ -44,10 +44,10 @@ export type BookInfo = {
   publishingTime?: Date;
 };
 
-export type NftBookDetails = {
+export type NftBookDetail = {
   bookId: string;
   nftCore: NftBookCore; // Data from smartcontract
-  listedCore?: ListedBookCore; // Data from smartcontract
+  listedCore?: BookSellingCore; // Data from smartcontract
   meta: NftBookMeta; // Data from metadata
   info: BookInfo; // Data from database
 };
@@ -75,13 +75,6 @@ export type NftBook = {
   amountTradeable?: number;
   // meta: NftBookMeta;
 } & NftBookCore;
-
-export type ListedBookCore = {
-  tokenId: number;
-  seller: string;
-  price: number;
-  amount: number;
-};
 
 export type BookSellingCore = {
   tokenId: number;
@@ -132,8 +125,6 @@ export type SharedBookCore = {
   endTime: number;
 };
 
-export type ListedBook = {} & ListedBookCore;
-
 export type BookSelling = {
   amountTradeable: number;
 } & BookSellingCore;
@@ -150,7 +141,7 @@ export type BookSharing = {} & BookSharingCore;
 
 export type NftListedBook = {
   meta: NftBookMeta;
-} & ListedBookCore &
+} & BookSellingCore &
   NftBookCore;
 
 export type PinataRes = {

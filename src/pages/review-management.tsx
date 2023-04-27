@@ -10,12 +10,13 @@ import Head from "next/head";
 
 import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
+import { useSoldBooksReviews } from "@/components/hooks/api/useSoldBooksReviews";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import CustomerReviewTable from "@/components/ui/review-management/CustomerReviewTable";
 import { bookReviews } from "@/mocks";
-import { ReviewRowData, ReviewStatus } from "@/types/review-management";
+import { ReviewRowData, ReviewStatus } from "@/types/reviews";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const ReviewManagement = () => {
@@ -23,6 +24,8 @@ const ReviewManagement = () => {
   const { account } = useAccount();
   const { ethereum, contract } = useWeb3();
   const [rows, setRows] = useState<ReviewRowData[]>([]);
+  const reviews = useSoldBooksReviews();
+  // console.log("reviews", reviews);
 
   useEffect(() => {
     (async () => {

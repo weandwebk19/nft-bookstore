@@ -40,6 +40,8 @@ import { truncate } from "@/utils/truncate";
 
 interface AccountMenuProps {
   account?: string;
+  userName?: string;
+  avatar?: string;
   open: boolean;
   onClose(...args: unknown[]): unknown;
   switchAccount(...args: unknown[]): unknown;
@@ -49,6 +51,8 @@ interface AccountMenuProps {
 
 const AccountMenu = ({
   account,
+  userName,
+  avatar,
   open,
   onClose,
   switchAccount,
@@ -163,7 +167,7 @@ const AccountMenu = ({
                 }}
               >
                 <Avatar
-                  alt="Tho Le"
+                  alt="{userName}"
                   src=""
                   sx={{
                     width: 56,
@@ -177,7 +181,7 @@ const AccountMenu = ({
                   }}
                 >
                   <Typography variant="subtitle2">User name</Typography>
-                  <Typography>Tho Le</Typography>
+                  <Typography>{userName}</Typography>
                 </Stack>
               </Stack>
               <Divider orientation="vertical" variant="middle" flexItem />
@@ -189,8 +193,8 @@ const AccountMenu = ({
                   }}
                 >
                   <Avatar
-                    alt="Tho Le"
-                    src=""
+                    alt={userName}
+                    src={avatar}
                     sx={{
                       width: 56,
                       height: 56,

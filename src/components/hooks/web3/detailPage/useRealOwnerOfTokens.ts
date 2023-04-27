@@ -8,9 +8,9 @@ import { Address } from "ethereumjs-util";
 import { ethers } from "ethers";
 import useSWR from "swr";
 
-import { ListedBookCore } from "@/types/nftBook";
+import { BookSellingCore } from "@/types/nftBook";
 
-type RealOwnerOfTokensHookFactory = CryptoHookFactory<ListedBookCore[]>;
+type RealOwnerOfTokensHookFactory = CryptoHookFactory<BookSellingCore[]>;
 
 export type UseRealOwnerOfTokensHook = ReturnType<RealOwnerOfTokensHookFactory>;
 
@@ -22,7 +22,7 @@ export const hookFactory: RealOwnerOfTokensHookFactory =
       async () => {
         try {
           if (tokenId) {
-            const nfts = [] as ListedBookCore[];
+            const nfts = [] as BookSellingCore[];
             const coreNfts = await contract!.getAllRealOwnerOfTokenId(tokenId);
 
             for (let i = 0; i < coreNfts.length; i++) {
@@ -37,6 +37,7 @@ export const hookFactory: RealOwnerOfTokensHookFactory =
                 nfts.push({
                   tokenId: listedBook.tokenId.toNumber(),
                   seller: listedBook.seller,
+                  buyer: listedBook.buyer,
                   price: parseFloat(ethers.utils.formatEther(listedBook.price)),
                   amount: listedBook.amount.toNumber()
                 });

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 
 import { CryptoHookFactory } from "@_types/hooks";
-import { BookInfo, ListedBookCore } from "@_types/nftBook";
+import { BookInfo, BookSellingCore } from "@_types/nftBook";
 import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
@@ -12,18 +12,18 @@ import { FilterField } from "@/types/filter";
 import { useAccount } from "..";
 import { checkFilterBooks } from "../utils/checkFilterBooks";
 
-type ListedBooksHookFactory = CryptoHookFactory<ListedBookCore[]>;
+type PublishingBooksHookFactory = CryptoHookFactory<BookSellingCore[]>;
 
-export type UseListedBooksHook = ReturnType<ListedBooksHookFactory>;
+export type UsePublishingBooksHook = ReturnType<PublishingBooksHookFactory>;
 
-export const hookFactory: ListedBooksHookFactory =
+export const hookFactory: PublishingBooksHookFactory =
   ({ contract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useListedBooks" : null, queryString, account.data],
+      [contract ? "web3/usePublishingBooks" : null, queryString, account.data],
       async () => {
-        const listedBooks = [] as ListedBookCore[];
+        const listedBooks = [] as BookSellingCore[];
         const coreListedBooks = await contract!.getAllBooksOnSale();
         const limitItem = 30;
         const page = queryString.page
@@ -46,6 +46,7 @@ export const hookFactory: ListedBooksHookFactory =
               listedBooks.push({
                 tokenId: listedBook.tokenId.toNumber(),
                 seller: listedBook.seller,
+                buyer: listedBook.buyer,
                 price: parseFloat(ethers.utils.formatEther(listedBook.price)),
                 amount: listedBook.amount.toNumber()
               });

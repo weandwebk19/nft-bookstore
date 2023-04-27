@@ -8,23 +8,27 @@ import { ethers } from "ethers";
 import useSWR from "swr";
 
 import { FilterField } from "@/types/filter";
-import { ListedBook } from "@/types/nftBook";
+import { BookSellingCore } from "@/types/nftBook";
 
 import { useAccount } from "../..";
 import { checkFilterBooks } from "../../utils/checkFilterBooks";
 
-type OwnedListedBooksHookFactory = CryptoHookFactory<ListedBook[]>;
+type OwnedSellingBooksHookFactory = CryptoHookFactory<BookSellingCore[]>;
 
-export type UseOwnedListedBooksHook = ReturnType<OwnedListedBooksHookFactory>;
+export type UseOwnedSellingBooksHook = ReturnType<OwnedSellingBooksHookFactory>;
 
-export const hookFactory: OwnedListedBooksHookFactory =
+export const hookFactory: OwnedSellingBooksHookFactory =
   ({ contract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useOwnedListedBooks" : null, queryString, account.data],
+      [
+        contract ? "web3/useOwnedSellingBooks" : null,
+        queryString,
+        account.data
+      ],
       async () => {
-        const nfts = [] as ListedBook[];
+        const nfts = [] as BookSellingCore[];
         const coreNfts = await contract!.getOwnedListedBooks();
 
         for (let i = 0; i < coreNfts.length; i++) {
@@ -34,6 +38,7 @@ export const hookFactory: OwnedListedBooksHookFactory =
               nfts.push({
                 tokenId: item?.tokenId?.toNumber(),
                 seller: item?.seller,
+                buyer: item?.buyer,
                 amount: item?.amount?.toNumber(),
                 price: parseFloat(ethers.utils.formatEther(item?.price))
               });
@@ -54,6 +59,7 @@ export const hookFactory: OwnedListedBooksHookFactory =
                 nfts.push({
                   tokenId: item?.tokenId?.toNumber(),
                   seller: item?.seller,
+                  buyer: item?.buyer,
                   amount: item?.amount?.toNumber(),
                   price: parseFloat(ethers.utils.formatEther(item?.price))
                 });
