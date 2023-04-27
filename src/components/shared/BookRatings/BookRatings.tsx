@@ -28,7 +28,7 @@ import {
   NftBook,
   NftBookAttribute,
   NftBookCore,
-  NftBookDetails,
+  NftBookDetail,
   NftBookMeta
 } from "@/types/nftBook";
 

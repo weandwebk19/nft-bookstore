@@ -26,7 +26,7 @@ import * as yup from "yup";
 import { useGenres, useLanguages } from "@/components/hooks/api";
 import { useCountdown } from "@/components/hooks/common";
 import { StyledButton } from "@/styles/components/Button";
-import { ListedBook, NftBook, NftBookDetails } from "@/types/nftBook";
+import { NftBook, NftBookDetail } from "@/types/nftBook";
 
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
@@ -34,7 +34,7 @@ import { Timer } from "../Timer";
 
 type BookDetailsProps = {
   onClick: () => void;
-  bookDetail: NftBookDetails;
+  bookDetail: NftBookDetail;
 };
 
 const schema = yup

@@ -2,7 +2,7 @@ import { FunctionComponent, useEffect, useState } from "react";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
-import { useListedBooks } from "@hooks/web3";
+import { usePublishingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
@@ -16,7 +16,7 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { book } from "@/mocks";
 import { FilterField } from "@/types/filter";
-import { ListedBookCore } from "@/types/nftBook";
+import { BookSellingCore } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const { t } = useTranslation("publishingBooks");
@@ -24,7 +24,7 @@ const DisplayBox: FunctionComponent = () => {
   const router = useRouter();
   const query = router.query;
 
-  const { listedBooks } = useListedBooks(query as FilterField);
+  const { listedBooks } = usePublishingBooks(query as FilterField);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -81,7 +81,7 @@ const DisplayBox: FunctionComponent = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {listedBooks.data?.map((book: ListedBookCore) => {
+                    {listedBooks.data?.map((book: BookSellingCore) => {
                       return (
                         <Grid
                           item

@@ -18,7 +18,7 @@ import { useRouter } from "next/router";
 import images from "@/assets/images";
 import { BookList } from "@/components/shared/BookList";
 import { book, bookList } from "@/mocks";
-import { BookGenres, NftBookAttribute, NftBookDetails } from "@/types/nftBook";
+import { BookGenres, NftBookAttribute, NftBookDetail } from "@/types/nftBook";
 
 config.autoAddCss = false;
 

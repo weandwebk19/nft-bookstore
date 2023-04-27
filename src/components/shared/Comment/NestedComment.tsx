@@ -16,7 +16,7 @@ interface CommentProps {
   authorAvatar: string;
   content: string;
   rating?: number;
-  replies: CommentProps[];
+  // replies: CommentProps[];
 }
 
 const NestedComments = ({
@@ -24,9 +24,9 @@ const NestedComments = ({
   author,
   authorAvatar,
   content,
-  rating,
-  replies
-}: CommentProps) => {
+  rating
+}: // replies
+CommentProps) => {
   const theme = useTheme();
 
   const [showNestedComments, setShowNestedComments] = useState(false);
@@ -73,10 +73,10 @@ const NestedComments = ({
             onShowReplyInput={() => handleReplyCommentClick(author)}
             showNestedComments={showNestedComments}
             onShowNestedComment={handleNestedCommentsToggle}
-            hasChildren={replies && replies?.length > 0}
+            // hasChildren={replies && replies?.length > 0}
           />
         </Box>
-        {replies && (
+        {/* {replies && (
           <Box sx={{ ml: 2 }}>
             <Collapse in={showNestedComments} timeout="auto" unmountOnExit>
               <Box>
@@ -106,7 +106,7 @@ const NestedComments = ({
               )}
             </Collapse>
           </Box>
-        )}
+        )} */}
       </Box>
     </div>
   );

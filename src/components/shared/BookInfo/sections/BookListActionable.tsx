@@ -2,14 +2,14 @@ import { Box, Grid, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 
-import { ListedBookCore } from "@/types/nftBook";
+import { BookSellingCore } from "@/types/nftBook";
 
 import BookCardActionable from "./BookCardActionable";
 
 interface BookListActionableProps {
   isOpenForPurchase: boolean;
   isOpenForBorrow: boolean;
-  bookListActionable: ListedBookCore[];
+  bookListActionable: BookSellingCore[];
 }
 
 const BookListActionable = ({

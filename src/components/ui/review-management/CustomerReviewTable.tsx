@@ -41,7 +41,7 @@ import { Image } from "@/components/shared/Image";
 import { StaticRating } from "@/components/shared/Rating";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
-import { ReviewRowData } from "@/types/review-management";
+import { ReviewRowData } from "@/types/reviews";
 
 interface CustomerReviewTableProps {
   data: ReviewRowData[];

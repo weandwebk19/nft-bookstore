@@ -1,13 +1,17 @@
+import { useEffect, useState } from "react";
+
 import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import StarIcon from "@mui/icons-material/Star";
 
+import axios from "axios";
 import { useRouter } from "next/router";
 
 import { bookComments, comments } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledLinearProgress } from "@/styles/components/LinearProgress";
+import { ReviewInfo } from "@/types/reviews";
 
 import { Comment, NestedComment } from "../../Comment";
 import { FallbackNode } from "../../FallbackNode";
@@ -21,6 +25,20 @@ const BookRating = ({ bookId }: BookRatingProp) => {
 
   const theme = useTheme();
   const router = useRouter();
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      if (bookId) {
+        const reviewsRes = await axios.get(`/api/reviews/${bookId}`);
+        if (reviewsRes.data.success === true) {
+          setReviews(reviewsRes.data.data);
+        }
+      }
+    })();
+  }, [bookId]);
+
+  console.log("reviews", reviews);
 
   return (
     <Box component="section">
@@ -100,17 +118,18 @@ const BookRating = ({ bookId }: BookRatingProp) => {
         <Typography variant="h6">Community Reviews</Typography>
 
         <Paper>
-          {comments ? (
-            comments.map((comment) => {
+          {reviews ? (
+            reviews.map((review: ReviewInfo) => {
               return (
                 <NestedComment
-                  key={comment.id}
-                  id={comment.id}
-                  author={comment.author}
-                  authorAvatar={comment?.authorAvatar}
-                  rating={comment?.rating}
-                  content={comment.content}
-                  replies={comment.replies}
+                  key={review.id}
+                  id={review.id}
+                  author={review.userId}
+                  // authorAvatar={review?.authorAvatar}
+                  rating={review?.rating}
+                  content={review.review}
+                  authorAvatar={""}
+                  // replies={[]}
                 />
               );
             })

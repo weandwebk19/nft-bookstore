@@ -1,12 +1,12 @@
 import images from "@/assets/images";
 import {
   BookGenres,
-  ListedBook,
+  BookSelling,
   NftBook,
   NftBookAttribute,
   NftBookDetail
 } from "@/types/nftBook";
-import { ReviewRowData } from "@/types/review-management";
+import { ReviewRowData } from "@/types/reviews";
 
 export const book = {
   tokenId: "0",
@@ -39,7 +39,7 @@ export const book = {
       BookGenres[BookGenres["Action & Adventure"]],
       BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
       BookGenres[BookGenres["Mystery - Horror"]]
-    ] as NftBookDetails["genres"],
+    ] as NftBookDetail["genres"],
     editionVersion: 1,
     maxSupply: 100,
     registered: 25,
@@ -84,7 +84,7 @@ export const bookList: NftBook[] = [
         BookGenres[BookGenres["Action & Adventure"]],
         BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
         BookGenres[BookGenres["Mystery - Horror"]]
-      ] as NftBookDetails["genres"],
+      ] as NftBookDetail["genres"],
       editionVersion: 1,
       maxSupply: 100,
       registered: 25,
@@ -126,7 +126,7 @@ export const bookList: NftBook[] = [
         BookGenres[BookGenres["Action & Adventure"]],
         BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
         BookGenres[BookGenres["Mystery - Horror"]]
-      ] as NftBookDetails["genres"],
+      ] as NftBookDetail["genres"],
       editionVersion: 1,
       maxSupply: 100,
       registered: 25,
@@ -166,7 +166,7 @@ export const bookList: NftBook[] = [
         BookGenres[BookGenres["Action & Adventure"]],
         BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
         BookGenres[BookGenres["Mystery - Horror"]]
-      ] as NftBookDetails["genres"],
+      ] as NftBookDetail["genres"],
       editionVersion: 1,
       maxSupply: 100,
       registered: 25,
@@ -206,7 +206,7 @@ export const bookList: NftBook[] = [
         BookGenres[BookGenres["Action & Adventure"]],
         BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
         BookGenres[BookGenres["Mystery - Horror"]]
-      ] as NftBookDetails["genres"],
+      ] as NftBookDetail["genres"],
       editionVersion: 1,
       maxSupply: 100,
       registered: 25,
@@ -246,7 +246,7 @@ export const bookList: NftBook[] = [
         BookGenres[BookGenres["Action & Adventure"]],
         BookGenres[BookGenres["Agriculture - Forestry - Fisheries"]],
         BookGenres[BookGenres["Mystery - Horror"]]
-      ] as NftBookDetails["genres"],
+      ] as NftBookDetail["genres"],
       editionVersion: 1,
       maxSupply: 100,
       registered: 25,
@@ -262,7 +262,7 @@ type BookDetailsProps = {
   isPublished?: boolean;
   isSelled?: boolean;
   setIsSelled?: (flag: boolean) => void;
-} & ListedBook &
+} & BookSelling &
   NftBook;
 
 export const book3: BookDetailsProps = {

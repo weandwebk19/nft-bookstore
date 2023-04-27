@@ -22,9 +22,9 @@ export const useNetwork = () => {
   };
 };
 
-export const useListedBooks = (queryString: FilterField) => {
+export const usePublishingBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useListedBooks(queryString);
+  const swrRes = hooks.usePublishingBooks(queryString);
 
   return {
     listedBooks: swrRes
@@ -49,9 +49,18 @@ export const useCreatedBooks = (queryString: FilterField) => {
   };
 };
 
-export const useOwnedListedBooks = (queryString: FilterField) => {
+export const useOwnedSellingBooks = (queryString: FilterField) => {
   const hooks = useHooks();
-  const swrRes = hooks.useOwnedListedBooks(queryString);
+  const swrRes = hooks.useOwnedSellingBooks(queryString);
+
+  return {
+    nfts: swrRes
+  };
+};
+
+export const useOwnedSoldBooks = (queryString: FilterField) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useOwnedSoldBooks(queryString);
 
   return {
     nfts: swrRes
