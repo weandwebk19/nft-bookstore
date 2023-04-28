@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   Box,
   Snackbar,
+  Stack,
   Step,
   StepLabel,
   Stepper,
@@ -607,13 +608,22 @@ const CreateBook = () => {
                         <Typography sx={{ mt: 2, mb: 3 }}>
                           {t("messageFinish1") as string}
                         </Typography>
-                        <StyledButton
-                          onClick={() => {
-                            router.push("/account/bookshelf/created-books");
-                          }}
-                        >
-                          {t("messageFinish2") as string}
-                        </StyledButton>
+                        <Stack direction="row" spacing={3}>
+                          <StyledButton
+                            onClick={() => {
+                              router.push("/account/bookshelf/created-books");
+                            }}
+                          >
+                            {t("messageFinish2") as string}
+                          </StyledButton>
+                          <StyledButton
+                            onClick={() => {
+                              router.push("/books/create");
+                            }}
+                          >
+                            {t("messageFinish3") as string}
+                          </StyledButton>
+                        </Stack>
                       </Box>
                     );
                   } else {

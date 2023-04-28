@@ -107,7 +107,7 @@ const BorrowedBooks = () => {
                           xs={4}
                           sm={4}
                           md={6}
-                          lg={8}
+                          lg={6}
                         >
                           <ActionableBookItem
                             status="isBorrowed"
@@ -118,28 +118,36 @@ const BorrowedBooks = () => {
                             amount={book?.amount}
                             countDown={secondsToDhms(book?.endTime - nowTime)}
                             buttons={
-                              <>
-                                <ShareButton
-                                  tokenId={book?.tokenId}
-                                  renter={book?.renter}
-                                  borrower={book?.borrower}
-                                  startTime={book?.startTime}
-                                  endTime={book?.endTime}
-                                  borrowedAmount={book?.amount}
-                                />
-                                <ReviewButton
-                                  tokenId={book?.tokenId}
-                                  author={book?.renter}
-                                />
-                                <ExtendRequestButton
-                                  tokenId={book?.tokenId}
-                                  renter={book?.renter}
-                                  supplyAmount={book?.amount}
-                                  startTime={book?.startTime}
-                                  endTime={book?.endTime}
-                                />
-                                <ReadButton tokenId={book?.tokenId} />
-                              </>
+                              <Grid container columns={{ xs: 2, sm: 2 }}>
+                                <Grid item xs={1} sm={1}>
+                                  <ShareButton
+                                    tokenId={book?.tokenId}
+                                    renter={book?.renter}
+                                    borrower={book?.borrower}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
+                                    borrowedAmount={book?.amount}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ExtendRequestButton
+                                    tokenId={book?.tokenId}
+                                    renter={book?.renter}
+                                    supplyAmount={book?.amount}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReviewButton
+                                    tokenId={book?.tokenId}
+                                    author={book?.renter}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReadButton tokenId={book?.tokenId} />
+                                </Grid>
+                              </Grid>
                             }
                           />
                         </Grid>

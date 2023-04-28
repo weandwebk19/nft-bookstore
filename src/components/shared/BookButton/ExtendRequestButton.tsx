@@ -208,15 +208,16 @@ const ExtendRequestButton = ({
   return (
     <>
       <Button
-        variant="contained"
-        sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
+        variant="outlined"
+        size="small"
+        sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        Extend now
+        Extend
       </Button>
 
       <Dialog
-        title="Request Extend"
+        title="Make an Extension Request"
         open={openBookCard}
         onClose={handleBookCardClose}
       >

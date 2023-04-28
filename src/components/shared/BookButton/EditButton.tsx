@@ -1,3 +1,5 @@
+import { Button } from "@mui/material";
+
 import axios from "axios";
 import { useRouter } from "next/router";
 
@@ -21,12 +23,14 @@ const EditButton = ({ tokenId }: EditButtonProps) => {
   };
 
   return (
-    <StyledButton
-      customVariant="secondary"
+    <Button
+      variant="outlined"
+      size="small"
+      sx={{ width: "100%" }}
       onClick={() => handleEditBookClick(tokenId)}
     >
       Edit
-    </StyledButton>
+    </Button>
   );
 };
 

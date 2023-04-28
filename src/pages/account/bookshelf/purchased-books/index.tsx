@@ -95,7 +95,7 @@ const PurchasedBooks = () => {
                           xs={4}
                           sm={8}
                           md={6}
-                          lg={12}
+                          lg={6}
                         >
                           <ActionableBookItem
                             status="isPurchased"
@@ -105,22 +105,31 @@ const PurchasedBooks = () => {
                             amount={book?.amount}
                             amountTradeable={book?.amountTradeable}
                             buttons={
-                              <>
-                                <ReviewButton
-                                  tokenId={book?.tokenId}
-                                  author={book?.seller}
-                                />
-                                <SellButton
-                                  tokenId={book?.tokenId}
-                                  owner={book?.seller}
-                                  amountTradeable={book?.amountTradeable!}
-                                />
-                                <LendButton
-                                  tokenId={book?.tokenId}
-                                  owner={book?.seller}
-                                  amountTradeable={book?.amountTradeable!}
-                                />
-                              </>
+                              <Grid container columns={{ xs: 2, sm: 2 }}>
+                                <Grid item xs={1} sm={1}>
+                                  <SellButton
+                                    tokenId={book?.tokenId}
+                                    owner={book?.seller}
+                                    amountTradeable={book?.amountTradeable!}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <LendButton
+                                    tokenId={book?.tokenId}
+                                    owner={book?.seller}
+                                    amountTradeable={book?.amountTradeable!}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReviewButton
+                                    tokenId={book?.tokenId}
+                                    author={book?.seller}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReadButton tokenId={book?.tokenId} />
+                                </Grid>
+                              </Grid>
                             }
                           />
                         </Grid>
@@ -132,12 +141,10 @@ const PurchasedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <ContentPaper title="Filter">
-              <FilterBar
-                data={purchasedBooks}
-                pathname="/bookshelf/purchased-books"
-              />
-            </ContentPaper>
+            <FilterBar
+              data={purchasedBooks}
+              pathname="/bookshelf/purchased-books"
+            />
           </Grid>
         </Grid>
       </Stack>

@@ -174,7 +174,7 @@ const ListingBooks = () => {
                             xs={4}
                             sm={4}
                             md={6}
-                            lg={8}
+                            lg={6}
                           >
                             <ActionableBookItem
                               status="isListing"

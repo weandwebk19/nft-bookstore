@@ -3,7 +3,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
@@ -136,7 +136,14 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Review</StyledButton>
+      <Button
+        variant="contained"
+        size="small"
+        sx={{ width: "100%" }}
+        onClick={handleBookCardClick}
+      >
+        Review
+      </Button>
 
       <Dialog title="Review" open={openBookCard} onClose={handleBookCardClose}>
         <FormProvider {...methods}>

@@ -3,7 +3,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
@@ -118,7 +118,14 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Lend</StyledButton>
+      <Button
+        variant="outlined"
+        size="small"
+        sx={{ width: "100%" }}
+        onClick={handleBookCardClick}
+      >
+        Lend
+      </Button>
 
       <Dialog
         title="Open for lend"

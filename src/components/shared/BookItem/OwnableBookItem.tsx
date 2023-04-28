@@ -132,20 +132,14 @@ const OwnableBookItem = ({
             }
           })} */}
           </Stack>
-          <Box
-            sx={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column"
-            }}
-          >
+          <Stack>
             {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
               <Skeleton variant="text" width="100%" />
             ) : (
               <Typography
                 className="text-limit text-limit--2"
                 variant="h6"
-                sx={{ flex: 1 }}
+                sx={{ minHeight: "64px" }}
               >
                 {metadata?.data?.title}
               </Typography>
@@ -170,7 +164,7 @@ const OwnableBookItem = ({
                 {price} ETH
               </Typography>
             )}
-          </Box>
+          </Stack>
         </Box>
       </Stack>
       <Stack sx={{ width: "100%" }}>

@@ -122,7 +122,7 @@ const LendingBooks = () => {
                               xs={4}
                               sm={4}
                               md={6}
-                              lg={8}
+                              lg={6}
                             >
                               <ActionableBookItem
                                 status="isLending"
@@ -194,7 +194,7 @@ const LendingBooks = () => {
                               xs={4}
                               sm={8}
                               md={6}
-                              lg={12}
+                              lg={6}
                             >
                               <ActionableBookItem
                                 status="isLending"

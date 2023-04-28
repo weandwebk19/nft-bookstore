@@ -94,17 +94,17 @@ const AccountMenu = ({
       }
     },
     {
-      icon: <SwitchAccountOutlinedIcon color="primary" fontSize="small" />,
-      content: t("navbar:switchAccount") as string,
-      onClick: () => {
-        switchAccount();
-      }
-    },
-    {
       icon: <MailOutlineIcon color="primary" fontSize="small" />,
       content: t("navbar:mailBox") as string,
       onClick: () => {
         router.push("/account/mailbox");
+      }
+    },
+    {
+      icon: <SwitchAccountOutlinedIcon color="primary" fontSize="small" />,
+      content: t("navbar:switchAccount") as string,
+      onClick: () => {
+        switchAccount();
       }
     },
     {
