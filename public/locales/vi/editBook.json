@@ -1,0 +1,14 @@
+{
+  "titlePage": "Sửa thông tin sách - NFT Bookstore",
+  "titleContent1": "Sửa thông ",
+  "titleContent2": "tin sách",
+  "titleContentPaper": "Điều chỉnh thông tin sách",
+  "required": "Trường bắt buộc",
+  "bookDesc": "Mô tả",
+  "externalLink": "Liên kết bên ngoài",
+  "descExternalLink": "NFT Bookstore sẽ hiển thị một liên kết tới URL này trên trang chi tiết của sách này để người dùng có thể nhấp vào. Nó có thể chứa các file bổ sung cho người mua.",
+  "numberOfPages": "Số trang",
+  "keywords": "Từ khóa",
+  "reset": "Hoàn tác",
+  "saveChanges": "Lưu nhưng thay đổi"
+}
