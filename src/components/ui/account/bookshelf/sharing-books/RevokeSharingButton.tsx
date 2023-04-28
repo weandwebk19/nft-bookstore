@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import { AlertColor, Box, Grid, Stack, Typography } from "@mui/material";
+import {
+  AlertColor,
+  Box,
+  Button,
+  Grid,
+  Stack,
+  Typography
+} from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
@@ -151,12 +158,14 @@ const RevokeSharingButton = ({
 
   return (
     <>
-      <StyledButton
+      <Button
+        variant="outlined"
+        size="small"
+        sx={{ width: "100%" }}
         onClick={handleRevokeDiaglogClick}
-        customVariant={isEnded ? "primary" : "secondary"}
       >
         Cancel Share
-      </StyledButton>
+      </Button>
 
       {!isEnded && (
         <Dialog

@@ -93,7 +93,7 @@ const OwnedBooks = () => {
                           xs={4}
                           sm={4}
                           md={6}
-                          lg={8}
+                          lg={6}
                         >
                           <ActionableBookItem
                             status="isOwned"
@@ -113,7 +113,7 @@ const OwnedBooks = () => {
                                   title={book?.meta.title}
                                   bookCover={book?.meta.bookCover}
                                   author={book?.author}
-                                  amountTradeable={book?.amountTradeable!}
+                                  // amountTradeable={book?.amountTradeable!}
                                 />
                                 <ReadButton bookFile={book?.meta.bookFile} />
                               </>

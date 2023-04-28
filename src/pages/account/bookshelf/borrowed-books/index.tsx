@@ -106,7 +106,7 @@ const BorrowedBooks = () => {
                           xs={4}
                           sm={4}
                           md={6}
-                          lg={8}
+                          lg={6}
                         >
                           <ActionableBookItem
                             status="isBorrowed"
@@ -120,34 +120,42 @@ const BorrowedBooks = () => {
                             amount={book?.amount}
                             countDown={secondsToDhms(book?.endTime - nowTime)}
                             buttons={
-                              <>
-                                <ShareButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  renter={book?.renter}
-                                  borrower={book?.borrower}
-                                  startTime={book?.startTime}
-                                  endTime={book?.endTime}
-                                  borrowedAmount={book?.amount}
-                                />
-                                <ReviewButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  author={book?.seller}
-                                />
-                                <ExtendRequestButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  renter={book?.renter}
-                                  price={book?.price}
-                                  supplyAmount={book?.amount}
-                                  borrowBooks={nfts?.borrowBooks}
-                                />
-                                <ReadButton bookFile={book?.meta.bookFile} />
-                              </>
+                              <Grid container columns={{ xs: 2, sm: 2 }}>
+                                <Grid item xs={1} sm={1}>
+                                  <ShareButton
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    renter={book?.renter}
+                                    borrower={book?.borrower}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
+                                    borrowedAmount={book?.amount}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ExtendRequestButton
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    renter={book?.renter}
+                                    price={book?.price}
+                                    supplyAmount={book?.amount}
+                                    borrowBooks={nfts?.borrowBooks}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReviewButton
+                                    tokenId={book?.tokenId}
+                                    title={book?.meta.title}
+                                    bookCover={book?.meta.bookCover}
+                                    author={book?.seller}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReadButton bookFile={book?.meta.bookFile} />
+                                </Grid>
+                              </Grid>
                             }
                           />
                         </Grid>

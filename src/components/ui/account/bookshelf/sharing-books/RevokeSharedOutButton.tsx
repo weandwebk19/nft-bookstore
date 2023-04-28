@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
@@ -130,12 +130,14 @@ const RevokeSharedOutButton = ({
 
   return (
     <>
-      <StyledButton
+      <Button
+        variant={isEnded ? "contained" : "outlined"}
+        size="small"
+        sx={{ width: "100%" }}
         onClick={handleRevokeDiaglogClick}
-        customVariant={isEnded ? "primary" : "secondary"}
       >
         {buttonName}
-      </StyledButton>
+      </Button>
 
       {!isEnded && (
         <Dialog

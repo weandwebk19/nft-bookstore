@@ -1,3 +1,5 @@
+import { Button } from "@mui/material";
+
 import axios from "axios";
 import { useRouter } from "next/router";
 
@@ -16,12 +18,14 @@ const ReadButton = ({ bookFile }: ReadButtonProps) => {
   };
 
   return (
-    <StyledButton
-      customVariant="secondary"
+    <Button
+      size="small"
+      variant="contained"
+      sx={{ width: "100%" }}
       onClick={(e) => handleReadBookClick()}
     >
       Read
-    </StyledButton>
+    </Button>
   );
 };
 

@@ -3,7 +3,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
@@ -125,7 +125,14 @@ const SellButton = ({
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Sell</StyledButton>
+      <Button
+        variant="outlined"
+        size="small"
+        sx={{ width: "100%" }}
+        onClick={handleBookCardClick}
+      >
+        Sell
+      </Button>
 
       <Dialog title="Sell" open={openBookCard} onClose={handleBookCardClose}>
         <FormProvider {...methods}>

@@ -115,7 +115,7 @@ const SharingBooks = () => {
                             xs={4}
                             sm={8}
                             md={6}
-                            lg={12}
+                            lg={6}
                           >
                             <ActionableBookItem
                               status="isSharing"
@@ -124,6 +124,8 @@ const SharingBooks = () => {
                               title={book?.meta.title}
                               fileType={book?.meta.fileType}
                               amount={book?.amount}
+                              price={book?.price}
+                              countDown={secondsToDhms(book?.endTime - nowTime)}
                               onClick={handleBookClick}
                               buttons={
                                 <>
@@ -186,7 +188,7 @@ const SharingBooks = () => {
                             xs={4}
                             sm={4}
                             md={6}
-                            lg={8}
+                            lg={6}
                           >
                             <ActionableBookItem
                               status="isSharing"
