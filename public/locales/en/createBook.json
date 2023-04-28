@@ -33,6 +33,7 @@
   "privacyPolicy2": "Privacy Policy",
   "messageFinish1": "All steps completed - you're finished.",
   "messageFinish2": "my created book",
+  "messageFinish3": "create another",
   "messageSuccessCreated": "Your book is successfully created!",
   "pendingUploadBookFile": "Uploading Book File",
   "successUploadBookFile": "Book file uploaded",
