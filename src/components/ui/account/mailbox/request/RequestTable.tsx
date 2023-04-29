@@ -21,6 +21,8 @@ import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
 import { RequestExtendRowData } from "@/types/nftBook";
+import { secondsToDhms } from "@/utils/secondsToDays";
+import { truncate } from "@/utils/truncate";
 
 interface RequestTableProps {
   data: RequestExtendRowData[];
@@ -116,7 +118,7 @@ export default function RequestTable({ data }: RequestTableProps) {
       headerName: t("time") as string,
       width: 200,
       renderCell: (params) => {
-        return <Typography>{params.value} days</Typography>;
+        return <Typography>{secondsToDhms(params.value)} days</Typography>;
       }
     },
     {
@@ -130,7 +132,9 @@ export default function RequestTable({ data }: RequestTableProps) {
       headerName: t("sender") as string,
       flex: 1,
       minWidth: 250,
-      renderCell: (params) => <Typography>{params.value}</Typography>
+      renderCell: (params) => (
+        <Typography>{truncate(params.value, 12, -4)}</Typography>
+      )
     },
     {
       field: "isAccept",
@@ -174,8 +178,8 @@ export default function RequestTable({ data }: RequestTableProps) {
     {
       id: 1,
       amount: 1,
-      sender: "0xEg25....f2F2",
-      time: 7,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BB",
+      time: 7 * 24 * 60 * 60,
       isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
@@ -185,8 +189,8 @@ export default function RequestTable({ data }: RequestTableProps) {
     {
       id: 2,
       amount: 1,
-      sender: "0xEg25....f2F3",
-      time: 7,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
+      time: 7 * 24 * 60 * 60,
       isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
@@ -196,8 +200,8 @@ export default function RequestTable({ data }: RequestTableProps) {
     {
       id: 3,
       amount: 2,
-      sender: "0xEg25....f2F3",
-      time: 2,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
+      time: 2 * 24 * 60 * 60,
       isAccept: true,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
@@ -207,8 +211,8 @@ export default function RequestTable({ data }: RequestTableProps) {
     {
       id: 4,
       amount: 4,
-      sender: "0xEg25....f2F3",
-      time: 4,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
+      time: 4 * 24 * 60 * 60,
       isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
@@ -218,8 +222,8 @@ export default function RequestTable({ data }: RequestTableProps) {
     {
       id: 5,
       amount: 1,
-      sender: "0xEg25....f2F4",
-      time: 5,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BD",
+      time: 5 * 24 * 60 * 60,
       isAccept: true,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
