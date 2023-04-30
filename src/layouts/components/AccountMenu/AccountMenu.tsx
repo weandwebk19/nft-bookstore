@@ -70,13 +70,13 @@ const AccountMenu = ({
         router.push("/account/profile");
       }
     },
-    {
-      icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
-      content: t("My Profile 2") as string,
-      onClick: () => {
-        router.push("/account/profile2");
-      }
-    },
+    // {
+    //   icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
+    //   content: t("My Profile 2") as string,
+    //   onClick: () => {
+    //     router.push("/account/profile2");
+    //   }
+    // },
     // {
     //   icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
     //   content: t("navbar:favorites") as string,
