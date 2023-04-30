@@ -9,6 +9,10 @@
   "descExternalLink": "NFT Bookstore sẽ hiển thị một liên kết tới URL này trên trang chi tiết của sách này để người dùng có thể nhấp vào. Nó có thể chứa các file bổ sung cho người mua.",
   "numberOfPages": "Số trang",
   "keywords": "Từ khóa",
+  "genres": "Thể loại",
+  "languages": "Ngôn ngữ",
   "reset": "Hoàn tác",
-  "saveChanges": "Lưu nhưng thay đổi"
+  "saveChanges": "Lưu nhưng thay đổi",
+  "textError1": "Vui lòng chọn thể loại sách",
+  "textError2": "Vui lòng chọn ngôn ngữ sách"
 }

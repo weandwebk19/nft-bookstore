@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { FormHelperText, TextField } from "@mui/material";
@@ -26,7 +27,13 @@ const TextFieldController = ({
   endAdornment,
   ...rest
 }: TextFieldControllerProps) => {
-  const { control } = useFormContext();
+  const { control, setValue } = useFormContext();
+
+  useEffect(() => {
+    if (defaultValue) {
+      setValue(name, defaultValue);
+    }
+  }, [defaultValue]);
 
   return (
     <Controller
@@ -45,6 +52,7 @@ const TextFieldController = ({
               }
               field.onChange(e);
             }}
+            defaultValue={defaultValue}
           />
           {invalid && (
             <FormHelperText error sx={{ marginTop: "8px" }}>

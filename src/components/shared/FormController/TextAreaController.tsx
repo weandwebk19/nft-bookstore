@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { FormHelperText } from "@mui/material";
@@ -21,8 +21,14 @@ const TextAreaController = ({
   readOnly = false,
   ...rest
 }: TextAreaControllerProps) => {
-  const { control } = useFormContext();
+  const { control, setValue } = useFormContext();
   const [numberOfCharacters, setNumberOfCharacters] = useState<Number>(0);
+
+  useEffect(() => {
+    if (defaultValue) {
+      setValue(name, defaultValue);
+    }
+  }, [defaultValue]);
 
   return (
     <Controller

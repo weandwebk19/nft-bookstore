@@ -13,64 +13,84 @@ import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import withAuth from "@/components/HOC/withAuth";
 import withAuthor from "@/components/HOC/withAuthor";
+import { useGenres, useLanguages } from "@/components/hooks/api";
 import { useUserInfo } from "@/components/hooks/api/useUserInfo";
-import { useAccount, useNetwork } from "@/components/hooks/web3";
+import { useAccount, useBookDetail, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
   AutoCompleteController,
+  MultipleSelectController,
   TextAreaController,
   TextFieldController
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
-const defaultValues = {
-  description: "",
-  externalLink: "",
-  totalPages: 1,
-  keywords: [""],
-
-  termsOfService: false,
-  privacyPolicy: false
-};
-
 const EditBook = () => {
+  const router = useRouter();
+
+  const { bookId } = router.query;
+  const { bookDetail: book } = useBookDetail(bookId as string);
+  const bookDetail = book?.data;
+
+  const genres = useGenres();
+  const languages = useLanguages();
+
   const { t } = useTranslation("editBook");
+
+  const defaultValues = {
+    description: "",
+    externalLink: "",
+    totalPages: 1,
+    keywords: [""],
+    genres: [],
+    languages: [],
+    termsOfService: false,
+    privacyPolicy: false
+  };
 
   const { ethereum, contract } = useWeb3();
   const [isLoading, setIsLoading] = useState(false);
 
-  const validationSchema = [
-    yup.object({
-      description: yup.string().required(t("textError2") as string),
-      externalLink: yup.string(),
-      totalPages: yup
-        .number()
-        .typeError(t("textError20") as string)
-        .min(0, `${t("textError16") as string}`)
-        .required(t("textError17") as string),
-      keywords: yup.array().of(yup.string())
-    }),
-
-    // validate for final step (Accept the terms and conditions)
-    yup.object().shape({
-      termsOfService: yup.boolean().oneOf([true], t("textError18") as string),
-      privacyPolicy: yup.boolean().oneOf([true], t("textError19") as string)
-    })
-  ];
+  const schema = yup.object({
+    description: yup.string().required(t("textError2") as string),
+    externalLink: yup.string(),
+    totalPages: yup
+      .number()
+      .typeError(t("textError20") as string)
+      .min(0, `${t("textError16") as string}`)
+      .required(t("textError17") as string),
+    keywords: yup.array().of(yup.string()),
+    genres: yup
+      .array()
+      .of(yup.string())
+      .test("required", t("textError1") as string, (arr) => {
+        if (arr && (arr as any).length !== 0) return true;
+        return false;
+      }),
+    languages: yup
+      .array()
+      .of(yup.string())
+      .test("required", t("textError2") as string, (arr) => {
+        if (arr && (arr as any).length !== 0) return true;
+        return false;
+      })
+  });
 
   const methods = useForm({
     shouldUnregister: false,
     defaultValues,
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(schema),
     mode: "all"
   });
 
@@ -80,24 +100,24 @@ const EditBook = () => {
     }));
   }, []);
 
-  const getSignedData = async () => {
-    const messageToSign = await axios.get("/api/pinata/verify");
-    const accounts = (await ethereum?.request({
-      method: "eth_requestAccounts"
-    })) as string[];
-    const account = accounts[0];
+  // const getSignedData = async () => {
+  //   const messageToSign = await axios.get("/api/pinata/verify");
+  //   const accounts = (await ethereum?.request({
+  //     method: "eth_requestAccounts"
+  //   })) as string[];
+  //   const account = accounts[0];
 
-    const signedData = await ethereum?.request({
-      method: "personal_sign",
-      params: [
-        JSON.stringify(messageToSign.data),
-        account,
-        messageToSign.data.id
-      ]
-    });
+  //   const signedData = await ethereum?.request({
+  //     method: "personal_sign",
+  //     params: [
+  //       JSON.stringify(messageToSign.data),
+  //       account,
+  //       messageToSign.data.id
+  //     ]
+  //   });
 
-    return { signedData, account };
-  };
+  //   return { signedData, account };
+  // };
 
   const handleError = async (err: any) => {
     toast.error(err.message, {
@@ -108,19 +128,19 @@ const EditBook = () => {
     }, 3000);
   };
 
-  const uploadBookDetails = async (bookInfo: BookInfo) => {
-    try {
-      // const promise = axios.post("/api/books/create", { bookInfo });
-      // const res = await toast.promise(promise, {
-      //   pending: t("pendingUploadBookDetails") as string,
-      //   success: t("successUploadBookDetails") as string,
-      //   error: t("errorUploadBookDetails") as string
-      // });
-      // return res;
-    } catch (e: any) {
-      handleError(e);
-    }
-  };
+  // const uploadBookDetails = async (bookInfo: BookInfo) => {
+  //   try {
+  //     // const promise = axios.post("/api/books/create", { bookInfo });
+  //     // const res = await toast.promise(promise, {
+  //     //   pending: t("pendingUploadBookDetails") as string,
+  //     //   success: t("successUploadBookDetails") as string,
+  //     //   error: t("errorUploadBookDetails") as string
+  //     // });
+  //     // return res;
+  //   } catch (e: any) {
+  //     handleError(e);
+  //   }
+  // };
 
   const { handleSubmit, trigger, getValues, setValue, reset } = methods;
   const onSubmit = (data: any) => {
@@ -132,6 +152,22 @@ const EditBook = () => {
       handleError(err);
     }
   };
+
+  useEffect(() => {
+    if (bookDetail?.info?.genres) {
+      (async () => {
+        console.log(bookDetail.info.genres);
+        try {
+          const res = await axios.get(
+            `api/genres/${bookDetail?.info?.genres[0]}`
+          );
+          console.log("res", res);
+        } catch (err) {
+          console.error(err);
+        }
+      })();
+    }
+  }, [bookDetail?.info?.genres]);
 
   return (
     <>
@@ -145,6 +181,16 @@ const EditBook = () => {
         <ContentContainer titles={[t("titleContent1"), t("titleContent2")]}>
           <Box component="section" sx={{ width: "100%", maxWidth: "720px" }}>
             <Paper elevation={1} sx={{ mx: "auto", mt: 4, p: 3 }}>
+              <Stack justifyContent="center" alignItems="center">
+                <Image
+                  src={bookDetail?.meta?.bookCover}
+                  alt={bookDetail?.meta?.title}
+                  sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
+                  className={styles["book-item__book-cover"]}
+                />
+                <Typography variant="h6">{bookDetail?.meta?.title}</Typography>
+              </Stack>
+
               <FormProvider {...methods}>
                 <ContentGroup title={t("titleContentPaper") as string}>
                   <Box sx={{ my: 2 }}>
@@ -158,15 +204,32 @@ const EditBook = () => {
                   <Stack direction="column" spacing={3}>
                     <Stack direction="column" spacing={3}>
                       <FormGroup label={t("bookDesc") as string}>
-                        <TextAreaController name="description" />
+                        <TextAreaController
+                          name="description"
+                          defaultValue={bookDetail?.info?.description}
+                        />
                       </FormGroup>
                       <FormGroup
                         label={t("externalLink") as string}
                         desc={t("descExternalLink") as string}
                       >
-                        <TextFieldController name="externalLink" />
+                        <TextFieldController
+                          name="externalLink"
+                          defaultValue={bookDetail?.info?.externalLink}
+                        />
                       </FormGroup>
-
+                      <FormGroup label={t("genres") as string} required>
+                        <MultipleSelectController
+                          items={genres.data}
+                          name="genres"
+                        />
+                      </FormGroup>
+                      <FormGroup label={t("languages") as string} required>
+                        <MultipleSelectController
+                          items={languages.data}
+                          name="languages"
+                        />
+                      </FormGroup>
                       <Stack
                         direction={{ xs: "column", md: "row" }}
                         spacing={{ xs: 2 }}
@@ -175,13 +238,19 @@ const EditBook = () => {
                           label={t("numberOfPages") as string}
                           className={styles["form__formGroup-half"]}
                         >
-                          <TextFieldController name="totalPages" />
+                          <TextFieldController
+                            name="totalPages"
+                            defaultValue={bookDetail?.info?.totalPages}
+                          />
                         </FormGroup>
                         <FormGroup
                           label={t("keywords") as string}
                           className={styles["form__formGroup-half"]}
                         >
-                          <AutoCompleteController name="keywords" />
+                          <AutoCompleteController
+                            name="keywords"
+                            defaultValue={bookDetail?.info?.keywords}
+                          />
                         </FormGroup>
                       </Stack>
                     </Stack>

@@ -10,6 +10,7 @@ import {
   IconButton,
   InputAdornment,
   Stack,
+  Tooltip,
   Typography
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -71,6 +72,7 @@ const Profile = () => {
   const { account } = useAccount();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isAddressCopied, setIsAddressCopied] = useState(false);
 
   const schema = yup
     .object({
@@ -305,16 +307,25 @@ const Profile = () => {
                               readOnly={true}
                               endAdornment={
                                 <InputAdornment position="end">
-                                  <IconButton
-                                    edge="end"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(
-                                        `${getValues("walletAddress")}`
-                                      );
-                                    }}
+                                  <Tooltip
+                                    title={
+                                      isAddressCopied
+                                        ? "Copied"
+                                        : "Copy address"
+                                    }
                                   >
-                                    <ContentCopyIcon />
-                                  </IconButton>
+                                    <IconButton
+                                      edge="end"
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(
+                                          `${getValues("walletAddress")}`
+                                        );
+                                        setIsAddressCopied(true);
+                                      }}
+                                    >
+                                      <ContentCopyIcon />
+                                    </IconButton>
+                                  </Tooltip>
                                 </InputAdornment>
                               }
                             />
