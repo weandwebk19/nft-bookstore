@@ -21,7 +21,7 @@ interface Step1Props {
 }
 
 const Step1 = ({ isLoading }: Step1Props) => {
-  const { t } = useTranslation("authorRequest");
+  const { t } = useTranslation("profile");
   const {
     formState: { errors },
     setValue,

@@ -20,6 +20,8 @@ import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
 import { ResponseExtendRowData } from "@/types/nftBook";
+import { secondsToDhms } from "@/utils/secondsToDays";
+import { truncate } from "@/utils/truncate";
 
 interface ResponseTableProps {
   data: ResponseExtendRowData[];
@@ -80,7 +82,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       headerName: t("time") as string,
       width: 200,
       renderCell: (params) => {
-        return <Typography>{params.value} days</Typography>;
+        return <Typography>{secondsToDhms(params.value)} days</Typography>;
       }
     },
     {
@@ -94,7 +96,9 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       headerName: t("sender") as string,
       flex: 1,
       minWidth: 250,
-      renderCell: (params) => <Typography>{params.value}</Typography>
+      renderCell: (params) => (
+        <Typography>{truncate(params.value, 12, -4)}</Typography>
+      )
     },
     {
       field: "action",
@@ -121,8 +125,8 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     {
       id: 1,
       amount: 1,
-      sender: "0xEg25....f2F2",
-      time: 7,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BB",
+      time: 3 * 24 * 60 * 60,
       action: {
         delete: <DeleteOutlineOutlinedIcon />
       }
@@ -130,8 +134,8 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     {
       id: 2,
       amount: 1,
-      sender: "0xEg25....f2F3",
-      time: 7,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
+      time: 9 * 24 * 60 * 60,
       action: {
         delete: <DeleteOutlineOutlinedIcon />
       }
@@ -139,8 +143,8 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     {
       id: 3,
       amount: 2,
-      sender: "0xEg25....f2F3",
-      time: 2,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
+      time: 2 * 24 * 60 * 60,
       action: {
         delete: <DeleteOutlineOutlinedIcon />
       }
@@ -148,8 +152,8 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     {
       id: 4,
       amount: 4,
-      sender: "0xEg25....f2F3",
-      time: 4,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
+      time: 4 * 24 * 60 * 60,
       action: {
         delete: <DeleteOutlineOutlinedIcon />
       }
@@ -157,8 +161,8 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     {
       id: 5,
       amount: 1,
-      sender: "0xEg25....f2F4",
-      time: 5,
+      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BD",
+      time: 5 * 24 * 60 * 60,
       action: {
         delete: <DeleteOutlineOutlinedIcon />
       }
