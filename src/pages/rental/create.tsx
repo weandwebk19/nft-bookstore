@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -22,7 +22,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useBookDetail, useNetwork } from "@/components/hooks/web3";
+import { useAccount, useBookDetail, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
@@ -39,8 +39,9 @@ import { deleteFile } from "../api/pinata/utils";
 
 const Book = () => {
   const formRef = useRef<any>();
-  const { ethereum, contract } = useWeb3();
+  const { provider, ethereum, contract } = useWeb3();
   const { network } = useNetwork();
+  const { account } = useAccount();
 
   const getSignedData = async () => {
     const messageToSign = await axios.get("/api/metadata/verify");
@@ -61,26 +62,96 @@ const Book = () => {
     return { signedData, account };
   };
 
+  useEffect(() => {
+    const getTransactionHistory = async () => {
+      try {
+        // Get latest block number
+        // const latestBlockNumber = (await provider?.getBlockNumber()) as number;
+        // const transactions: any[] = [];
+        // for (let i = 0; i <= latestBlockNumber; i++) {
+        //   const block = await provider?.getBlock(i);
+        //   console.log("block", block);
+        //   if (block && block.transactions.length > 0) {
+        //     block.transactions.forEach((tx) => {
+        //       // if (tx.from === account.data || tx.to === account.data) {
+        //       //   transactions.push(tx);
+        //       // }
+        //       // console.log("tx", tx);
+        //       transactions.push(tx);
+        //     });
+        //   }
+        // }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getTransactionHistory();
+  }, [account.data, provider]);
+
   const handleSubmit = () => {
     (async () => {
       try {
-        const res = await deleteFile(
-          "QmUZHW5U4a5a5qyGvB6fXLpzK3ADYQh7MpGmV99njPaNT7"
-        );
-        console.log("bookCoverLink res", res);
+        interface Transaction {
+          blockNumber: string;
+          timeStamp: string;
+          hash: string;
+          from: string;
+          to: string;
+          value: string;
+          gas: string;
+          gasPrice: string;
+          isError: string;
+          txreceipt_status: string;
+          input: string;
+          contractAddress: string;
+          cumulativeGasUsed: string;
+          gasUsed: string;
+          confirmations: string;
+        }
+        interface TransactionsResponse {
+          status: string;
+          message: string;
+          result: Transaction[];
+        }
+        let address = account.data as string;
+        const apiKey = "4UE64A86DY6EBTGQMJ28R7HZPJJ83UJJ25";
+        const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=${apiKey}`;
+        const response = await axios.get<TransactionsResponse>(url);
 
+        if (response.data.status === "1") {
+          console.log("transactions", response.data.result);
+          // return response.data.result;
+        } else {
+          throw new Error(
+            `Failed to fetch transactions: ${response.data.message}`
+          );
+        }
+        // let etherscanProvider = new ethers.providers.EtherscanProvider();
+
+        // etherscanProvider.getHistory(address).then((history) => {
+        //   history.forEach((tx) => {
+        //     console.log(tx);
+        //   });
+        // });
+
+        // Set the history state
+        // console.log("transactions", transactions);
+
+        // console.log("ethereum", ethereum);
+        // const res = await deleteFile(
+        //   "QmUZHW5U4a5a5qyGvB6fXLpzK3ADYQh7MpGmV99njPaNT7"
+        // );
+        // console.log("bookCoverLink res", res);
         // const { signedData, account } = await getSignedData();
-
         // const promise = axios.get(
         //   "/api/pinata/metadata/QmUZHW5U4a5a5qyGvB6fXLpzK3ADYQh7MpGmV99njPaNT7/delete"
         // );
-
         // const res = await toast.promise(promise, {
         //   pending: "Uploading metadata",
         //   success: "Metadata uploaded",
         //   error: "Metadata upload error"
         // });
-
         // const data = res.data as PinataRes;
         // const link = `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`;
         // console.log("data", data);

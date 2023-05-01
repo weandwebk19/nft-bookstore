@@ -33,15 +33,15 @@ import {
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
-import { BookInfo } from "@/types/nftBook";
+import { BookInfoForUpdate } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const EditBook = () => {
   const router = useRouter();
 
   const { bookId } = router.query;
-  const { bookDetail: book } = useBookDetail(bookId as string);
-  const bookDetail = book?.data;
+  const { bookDetail } = useBookDetail(bookId as string);
+  // console.log(bookDetail);
 
   const genres = useGenres();
   const languages = useLanguages();
@@ -49,9 +49,9 @@ const EditBook = () => {
   const { t } = useTranslation("editBook");
 
   const defaultValues = {
-    description: "",
-    externalLink: "",
-    totalPages: 1,
+    description: bookDetail.data?.info.description,
+    externalLink: bookDetail.data?.info.externalLink,
+    totalPages: bookDetail.data?.info.totalPages,
     keywords: [""],
     genres: [],
     languages: [],
@@ -100,25 +100,6 @@ const EditBook = () => {
     }));
   }, []);
 
-  // const getSignedData = async () => {
-  //   const messageToSign = await axios.get("/api/pinata/verify");
-  //   const accounts = (await ethereum?.request({
-  //     method: "eth_requestAccounts"
-  //   })) as string[];
-  //   const account = accounts[0];
-
-  //   const signedData = await ethereum?.request({
-  //     method: "personal_sign",
-  //     params: [
-  //       JSON.stringify(messageToSign.data),
-  //       account,
-  //       messageToSign.data.id
-  //     ]
-  //   });
-
-  //   return { signedData, account };
-  // };
-
   const handleError = async (err: any) => {
     toast.error(err.message, {
       position: toast.POSITION.TOP_CENTER
@@ -128,30 +109,50 @@ const EditBook = () => {
     }, 3000);
   };
 
-  // const uploadBookDetails = async (bookInfo: BookInfo) => {
-  //   try {
-  //     // const promise = axios.post("/api/books/create", { bookInfo });
-  //     // const res = await toast.promise(promise, {
-  //     //   pending: t("pendingUploadBookDetails") as string,
-  //     //   success: t("successUploadBookDetails") as string,
-  //     //   error: t("errorUploadBookDetails") as string
-  //     // });
-  //     // return res;
-  //   } catch (e: any) {
-  //     handleError(e);
-  //   }
-  // };
+  const uploadBookInfo = async (bookInfo: BookInfoForUpdate) => {
+    try {
+      const promise = axios.put("/api/books/update", { bookInfo });
+      const res = await toast.promise(promise, {
+        pending: t("pendingUploadBookDetails") as string,
+        success: t("successUploadBookDetails") as string,
+        error: t("errorUploadBookDetails") as string
+      });
+      return res;
+    } catch (e: any) {
+      handleError(e);
+    }
+  };
 
   const { handleSubmit, trigger, getValues, setValue, reset } = methods;
   const onSubmit = (data: any) => {
     try {
       setIsLoading(true);
-
-      console.log(data);
+      uploadBookInfo({
+        id: bookId as string,
+        description: data.description,
+        externalLink: data.externalLink,
+        genres: data.genres,
+        languages: data.languages,
+        totalPages: data.totalPages,
+        keywords: data.keywords,
+        tokenId: data.tokenId,
+        oldLanguages: data.oldLanguages,
+        oldGenres: data.oldGenres
+      });
     } catch (err: any) {
       handleError(err);
     }
   };
+
+  useEffect(() => {
+    setValue("description", bookDetail.data?.info.description);
+    setValue("externalLink", bookDetail.data?.info.externalLink);
+    setValue("totalPages", bookDetail.data?.info.totalPages);
+    setValue("keywords", bookDetail.data?.info.keywords);
+    // setValue("tokenId", bookDetail.data?.nftBook.tokenId);
+    // setValue("oldLanguages", bookDetail.data?.nftBook.languages);
+    // setValue("oldGenres", bookDetail.data?.nftBook.genres);
+  }, []);
 
   useEffect(() => {
     if (bookDetail?.info?.genres) {
