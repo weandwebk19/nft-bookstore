@@ -105,7 +105,11 @@ const PurchasedBooks = () => {
                             amount={book?.amount}
                             amountTradeable={book?.amountTradeable}
                             buttons={
-                              <Grid container columns={{ xs: 2, sm: 2 }}>
+                              <Grid
+                                container
+                                columns={{ xs: 2, sm: 2 }}
+                                spacing={1}
+                              >
                                 <Grid item xs={1} sm={1}>
                                   <SellButton
                                     tokenId={book?.tokenId}

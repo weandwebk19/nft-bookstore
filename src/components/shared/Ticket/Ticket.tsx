@@ -151,7 +151,7 @@ const Ticket = ({ header, body, image, footer, href, icon }: TicketProps) => {
         position: "relative",
         p: 1,
         transition: "all 0.3s ease",
-        minHeight: "337px",
+        minHeight: "400px",
         ":hover": {
           p: 0,
           "> .ticket-text": {
@@ -168,7 +168,7 @@ const Ticket = ({ header, body, image, footer, href, icon }: TicketProps) => {
           },
           "> .ticket-image": {
             backgroundImage: `linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.2)), url(${image})`,
-            height: "21em"
+            height: "24em"
           },
           "> .ticket-image .ticket-icon": {
             display: "none"

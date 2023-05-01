@@ -45,7 +45,7 @@ const defaultValues = {
 
 const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
   const [authorName, setAuthorName] = useState();
-  const [reviews, setReviews] = useState();
+  const [reviews, setReviews] = useState<any>();
   const metadata = useMetadata(tokenId);
   const { account } = useAccount();
 
@@ -132,17 +132,18 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
     })();
   }, [tokenId, account.data]);
 
-  console.log("reviews", reviews);
+  // console.log("reviews", reviews);
 
   return (
     <>
       <Button
-        variant="contained"
+        variant={reviews ? "outlined" : "contained"}
+        color="secondary"
         size="small"
         sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        Review
+        {reviews ? "reviewed" : "review"}
       </Button>
 
       <Dialog title="Review" open={openBookCard} onClose={handleBookCardClose}>
@@ -166,7 +167,13 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
             </Stack>
             <Divider />
             <Stack flexGrow={1}>
-              <ContentGroup title="Leave your rating here">
+              <ContentGroup
+                title={
+                  reviews
+                    ? "You can edit your review"
+                    : "Leave your rating here"
+                }
+              >
                 {/* Waiting for your signing... */}
                 <Stack spacing={3}>
                   <Box
@@ -178,10 +185,17 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
                       scale: "2"
                     }}
                   >
-                    <RatingController name="rating" />
+                    <RatingController
+                      name="rating"
+                      defaultValue={reviews?.rating}
+                    />
                   </Box>
                   <FormGroup label="Review">
-                    <TextAreaController name="review" maxCharacters={8000} />
+                    <TextAreaController
+                      name="review"
+                      maxCharacters={8000}
+                      defaultValue={reviews?.review}
+                    />
                   </FormGroup>
                 </Stack>
               </ContentGroup>
