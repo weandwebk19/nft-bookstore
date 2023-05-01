@@ -26,7 +26,13 @@ export const hookFactory: BookDetailHookFactory =
           ).data?.data;
           const coreNftBook = await contract!.getNftBook(bookInfo?.tokenId);
           const tokenURI = await contract!.getUri(bookInfo?.tokenId);
-          const meta = await (await fetch(tokenURI)).json();
+          const metaRes = await (
+            await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
+          ).data;
+          let meta = null;
+          if (metaRes.success === true) {
+            meta = metaRes.data;
+          }
 
           const sellerDefault = seller ? seller : coreNftBook?.author;
           const isListing = await contract!.isListing(

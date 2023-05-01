@@ -44,6 +44,12 @@ export type BookInfo = {
   publishingTime?: Date;
 };
 
+export type BookInfoForUpdate = {
+  id: string;
+  oldLanguages?: string[];
+  oldGenres?: string[];
+} & BookInfo;
+
 export type NftBookDetail = {
   bookId: string;
   nftCore: NftBookCore; // Data from smartcontract
