@@ -3,17 +3,15 @@
   "containerTitle": "My Response",
   "button_cancel": "Cancel",
   "button_delete": "Remove",
-  "button_refuse": "Refuse",
-  "button_accept": "Accept",
-  "tooltip_delete": "Remove this",
-  "tooltip_accept": "Accept this",
+  "tooltip_delete": "Remove this request",
   "dialogTitleDelete": "Remove this from your request",
   "dialogTitleAccept": "Accept the request",
   "message_delete": "Are you sure you want to remove this from your request?",
-  "message_accept": "Are you sure you want to accept this request?",
   "id": "ID",
   "time": "Extend Time",
   "amount": "Amount",
   "sender": "Sender",
-  "action": "Action"
+  "action": "Action",
+  "days": "days",
+  "day": "day"
 }

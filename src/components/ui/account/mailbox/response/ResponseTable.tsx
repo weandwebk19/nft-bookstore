@@ -55,9 +55,11 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     item: ResponseExtendRowData
   ) => {
     e.preventDefault();
-    setAnchorDeleteButton(null);
+    // setAnchorDeleteButton(null);
 
-    console.log(item.id);
+    console.log("Delete:", item.id);
+
+    // handle logic here ...
   };
 
   const handleCancelDeleteClick = (
@@ -82,7 +84,12 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       headerName: t("time") as string,
       width: 200,
       renderCell: (params) => {
-        return <Typography>{secondsToDhms(params.value)} days</Typography>;
+        return (
+          <Typography>
+            {secondsToDhms(params.value)}{" "}
+            {secondsToDhms(params.value) > 1 ? t("days") : t("day")}
+          </Typography>
+        );
       }
     },
     {
@@ -108,13 +115,13 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       renderCell: (params) => {
         return (
           <Stack direction="row" spacing={1}>
-            {/* <Tooltip title={t("tooltip_delete")}>
+            <Tooltip title={t("tooltip_delete")}>
               <IconButton
                 onClick={(e) => handleOpenDeleteDialogClick(e, params)}
               >
                 {params?.value?.delete}
               </IconButton>
-            </Tooltip> */}
+            </Tooltip>
           </Stack>
         );
       }
@@ -169,6 +176,14 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     }
   ];
 
+  React.useEffect(() => {
+    data.forEach((object) => {
+      object.action = {
+        delete: <DeleteOutlineOutlinedIcon />
+      };
+    });
+  }, [data]);
+
   return (
     <Stack spacing={3}>
       <DataGrid
@@ -177,7 +192,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         rows={data}
         // rows={mockData}
       />
-      {/* <Dialog
+      <Dialog
         title={t("dialogTitleDelete") as string}
         open={openDeleteDialog}
         onClose={handleDeleteClose}
@@ -186,23 +201,20 @@ export default function ResponseTable({ data }: ResponseTableProps) {
           <Typography>{t("message_delete")}</Typography>
           <Stack direction={{ xs: "column" }} spacing={{ xs: 1 }}>
             <Typography variant="body1">
-              <b>Event:</b> {targetItem?.event}
+              <b>{t("id")}:</b> {targetItem?.id}
             </Typography>
             <Typography variant="body1">
-              <b>Price:</b> {targetItem?.price}
+              <b>{t("sender")}:</b>{" "}
+              {targetItem?.sender ? truncate(targetItem?.sender, 12, -4) : ""}
             </Typography>
-            {targetItem?.from && (
-              <Typography variant="body1">
-                <b>From:</b> {targetItem?.from}
-              </Typography>
-            )}
-            {targetItem?.to && (
-              <Typography variant="body1">
-                <b>To:</b> {targetItem?.to}
-              </Typography>
-            )}
             <Typography variant="body1">
-              <b>Date:</b> {targetItem?.date}
+              <b>{t("amount")}:</b> {targetItem?.amount}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("time")}:</b> {secondsToDhms(targetItem?.time)}{" "}
+              {targetItem.time && secondsToDhms(targetItem.time) > 1
+                ? t("days")
+                : t("day")}
             </Typography>
           </Stack>
           <Stack direction="row" spacing={3} justifyContent="end">
@@ -217,7 +229,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
             </StyledButton>
           </Stack>
         </Stack>
-      </Dialog> */}
+      </Dialog>
       <ToastContainer />
     </Stack>
   );
