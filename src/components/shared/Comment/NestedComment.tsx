@@ -12,8 +12,8 @@ import InputComment from "./InputComment";
 
 interface CommentProps {
   id: string | number;
-  author: string;
-  authorAvatar: string;
+  user: string;
+  avatar: string;
   content: string;
   rating?: number;
   // replies: CommentProps[];
@@ -21,8 +21,8 @@ interface CommentProps {
 
 const NestedComments = ({
   id,
-  author,
-  authorAvatar,
+  user,
+  avatar,
   content,
   rating
 }: // replies
@@ -66,11 +66,11 @@ CommentProps) => {
       <Box sx={{ mb: 3 }}>
         <Box sx={{ width: "100%" }}>
           <Comment
-            username={author}
-            avatar={authorAvatar}
+            username={userName}
+            avatar={avatar}
             comment={content}
             rating={rating}
-            onShowReplyInput={() => handleReplyCommentClick(author)}
+            onShowReplyInput={() => handleReplyCommentClick(user)}
             showNestedComments={showNestedComments}
             onShowNestedComment={handleNestedCommentsToggle}
             // hasChildren={replies && replies?.length > 0}

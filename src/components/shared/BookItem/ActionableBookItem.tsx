@@ -344,7 +344,8 @@ const ActionableBookItem = ({
               if (
                 status !== "isCreated" &&
                 status !== "isOwned" &&
-                status !== "isPurchased"
+                status !== "isPurchased" &&
+                status !== "isListing"
               ) {
                 if (
                   metadata.isLoading ||
@@ -364,32 +365,7 @@ const ActionableBookItem = ({
                   );
               }
             })()}
-            {(() => {
-              if (
-                status !== "isCreated" &&
-                status !== "isOwned" &&
-                status !== "isPurchased"
-              ) {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return (
-                    <>
-                      <Skeleton variant="text" width="20%" />
-                      <Skeleton variant="text" width="80%" />
-                    </>
-                  );
-                else
-                  return (
-                    <Stack>
-                      <Typography variant="subtitle2">Price:</Typography>
-                      <Typography variant="label">{price} ETH</Typography>
-                    </Stack>
-                  );
-              }
-            })()}
+
             {(() => {
               if (status === "isCreated" || status === "isOwned") {
                 if (
@@ -478,6 +454,37 @@ const ActionableBookItem = ({
                       label="Inventory:"
                       amount={amountOwned}
                     />
+                  );
+              }
+            })()}
+            {(() => {
+              if (
+                status !== "isCreated" &&
+                status !== "isOwned" &&
+                status !== "isPurchased"
+              ) {
+                if (
+                  metadata.isLoading ||
+                  !metadata ||
+                  !metadata.data?.bookCover
+                )
+                  return (
+                    <>
+                      <Skeleton variant="text" width="20%" />
+                      <Skeleton variant="text" width="80%" />
+                    </>
+                  );
+                else
+                  return (
+                    <Stack>
+                      <Typography variant="subtitle2">Price:</Typography>
+                      <Typography
+                        variant="label"
+                        color={`${theme.palette.success.main}`}
+                      >
+                        {price} ETH
+                      </Typography>
+                    </Stack>
                   );
               }
             })()}

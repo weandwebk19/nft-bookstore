@@ -124,11 +124,11 @@ const BookRating = ({ bookId }: BookRatingProp) => {
                 <NestedComment
                   key={review.id}
                   id={review.id}
-                  author={review.userId}
+                  user={review.userId}
                   // authorAvatar={review?.authorAvatar}
                   rating={review?.rating}
                   content={review.review}
-                  authorAvatar={""}
+                  avatar={""}
                   // replies={[]}
                 />
               );

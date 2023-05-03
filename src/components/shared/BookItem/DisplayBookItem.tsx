@@ -8,60 +8,54 @@ import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useRouter } from "next/router";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
+
 import { Image } from "../Image";
 
 interface DisplayBookItemProps {
-  bookCover: string;
-  title: string;
-  fileType: string;
   tokenId: number;
-  author: string;
-  onClick: (tokenId: number) => void;
+  seller: string;
 }
 
-const DisplayBookItem = ({
-  bookCover,
-  title,
-  fileType,
-  tokenId,
-  author,
-  onClick
-}: DisplayBookItemProps) => {
-  const [authorName, setAuthorName] = useState();
+const DisplayBookItem = ({ tokenId, seller }: DisplayBookItemProps) => {
+  const [sellerName, setSellerName] = useState();
   const router = useRouter();
+  const metadata = useMetadata(tokenId);
 
-  const handleBookClick = useCallback((tokenId: string) => {
-    (async () => {
-      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
-      if (res.data.success === true) {
-        const bookId = res.data.data;
-        router.push(`/books/${bookId}`);
-      }
-    })();
-  }, []);
+  const handleBookClick = useCallback(
+    (tokenId: number) => {
+      (async () => {
+        const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+        if (res.data.success === true) {
+          const bookId = res.data.data;
+          router.push(`/books/${bookId}/${seller}`);
+        }
+      })();
+    },
+    [tokenId]
+  );
 
   useEffect(() => {
     (async () => {
       try {
-        if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+        if (seller) {
+          const userRes = await axios.get(`/api/users/wallet/${seller}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setSellerName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [author]);
+  }, [seller]);
 
   return (
     <Stack
       className={styles["book-item"]}
       onClick={() => {
-        onClick(tokenId);
+        handleBookClick(tokenId);
       }}
       spacing={1}
       sx={{
@@ -78,15 +72,15 @@ const DisplayBookItem = ({
             position: "absolute",
             borderRadius: "16px",
             backgroundSize: "cover",
-            backgroundImage: `url(${bookCover})`,
+            backgroundImage: `url(${metadata.data?.bookCover})`,
             backgroundRepeat: "no-repeat"
           }
         }
       }}
     >
       <Image
-        src={bookCover}
-        alt={title}
+        src={metadata.data?.bookCover}
+        alt={metadata.data?.title}
         sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
         className={styles["book-item__book-cover"]}
       />
@@ -106,7 +100,7 @@ const DisplayBookItem = ({
         >
           <Stack direction="row">
             <InsertDriveFileIcon fontSize="small" color="disabled" />
-            <Typography variant="caption">{fileType}</Typography>
+            <Typography variant="caption">{metadata.data?.fileType}</Typography>
           </Stack>
 
           {/* {meta.attributes?.map((stat, i) => {
@@ -135,14 +129,14 @@ const DisplayBookItem = ({
             variant="h6"
             sx={{ flex: 1 }}
           >
-            {title}
+            {metadata.data?.title}
           </Typography>
           <Typography
             className="text-limit text-limit--1"
             variant="body2"
             sx={{ flexShrink: 0, marginTop: "auto" }}
           >
-            {authorName}
+            {sellerName}
           </Typography>
 
           {/* <Typography
