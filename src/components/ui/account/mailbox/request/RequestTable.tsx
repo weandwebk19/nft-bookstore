@@ -289,8 +289,6 @@ export default function RequestTable({ data }: RequestTableProps) {
     }
   ];
 
-  console.log("data:", data);
-
   React.useEffect(() => {
     data.forEach((object) => {
       object.action = {
