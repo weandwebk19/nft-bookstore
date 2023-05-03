@@ -3,17 +3,15 @@
   "containerTitle": "Danh sách phản hồi",
   "button_cancel": "Hủy",
   "button_delete": "Xóa",
-  "button_refuse": "Từ chối",
-  "button_accept": "Chấp nhận",
   "tooltip_delete": "Xóa",
-  "tooltip_accept": "Chấp nhận",
   "dialogTitleDelete": "Xóa khỏi Danh sách",
   "dialogTitleAccept": "Chấp nhận yêu cầu",
-  "message_delete": "Bạn có chắc rằng muốn xóa yêu cầu này khỏi Danh sách?",
-  "message_accept": "Bạn có chắc rằng muốn chấp nhận yêu cầu này?",
+  "message_delete": "Bạn có chắc chắn rằng muốn xóa yêu cầu này khỏi Danh sách?",
   "id": "ID",
   "time": "Thời gian gia hạn",
   "amount": "Số lượng",
   "sender": "Người gửi",
-  "action": "Hành động"
+  "action": "Hành động",
+  "days": "ngày",
+  "day": "ngày"
 }

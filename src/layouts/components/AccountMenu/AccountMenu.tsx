@@ -67,7 +67,7 @@ const AccountMenu = ({
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
       content: t("navbar:my_profile") as string,
       onClick: () => {
-        router.push("/account/profile");
+        router.push("/account/profile2");
       }
     },
     // {

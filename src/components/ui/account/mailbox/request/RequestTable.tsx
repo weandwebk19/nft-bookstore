@@ -6,6 +6,7 @@ import { Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 import {
@@ -41,9 +42,12 @@ export default function RequestTable({ data }: RequestTableProps) {
     React.useState<Element | null>(null);
   const [anchorAcceptButton, setAnchorAcceptButton] =
     React.useState<Element | null>(null);
+  const [anchorRefuseButton, setAnchorRefuseButton] =
+    React.useState<Element | null>(null);
 
   const openDeleteDialog = Boolean(anchorDeleteButton);
   const openAcceptDialog = Boolean(anchorAcceptButton);
+  const openRefuseDialog = Boolean(anchorRefuseButton);
 
   const handleOpenDeleteDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -63,14 +67,25 @@ export default function RequestTable({ data }: RequestTableProps) {
     setTargetItem(params.row);
   };
 
+  const handleOpenRefuseDialogClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>
+  ) => {
+    e.preventDefault();
+    setAnchorRefuseButton(e.currentTarget);
+    setTargetItem(params.row);
+  };
+
   const handleDeleteClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     item: RequestExtendRowData
   ) => {
     e.preventDefault();
-    setAnchorDeleteButton(null);
+    // setAnchorDeleteButton(null);
 
-    console.log(item.id);
+    console.log("Delete:", item.id);
+
+    // handle logic here ...
   };
 
   const handleCancelDeleteClick = (
@@ -85,18 +100,37 @@ export default function RequestTable({ data }: RequestTableProps) {
     item: RequestExtendRowData
   ) => {
     e.preventDefault();
-    setAnchorAcceptButton(null);
+    // setAnchorAcceptButton(null);
 
-    console.log(item.id);
+    console.log("Accept:", item.id);
+
+    // handle logic here ...
   };
 
-  const handleRefuseAcceptClick = (
+  const handleCancelAcceptClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorAcceptButton(null);
+  };
+
+  const handleRefuseClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     item: RequestExtendRowData
   ) => {
     e.preventDefault();
-    setAnchorAcceptButton(null);
-    console.log("Refusing to accept:", item.id);
+    // setAnchorRefuseButton(null);
+
+    console.log("Refuse:", item.id);
+
+    // handle logic here ...
+  };
+
+  const handleCancelRefuseClick = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    setAnchorRefuseButton(null);
   };
 
   const handleDeleteClose = () => {
@@ -105,6 +139,10 @@ export default function RequestTable({ data }: RequestTableProps) {
 
   const handleAcceptClose = () => {
     setAnchorAcceptButton(null);
+  };
+
+  const handleRefuseClose = () => {
+    setAnchorRefuseButton(null);
   };
 
   const columns: GridColDef[] = [
@@ -118,7 +156,12 @@ export default function RequestTable({ data }: RequestTableProps) {
       headerName: t("time") as string,
       width: 200,
       renderCell: (params) => {
-        return <Typography>{secondsToDhms(params.value)} days</Typography>;
+        return (
+          <Typography>
+            {secondsToDhms(params.value)}{" "}
+            {secondsToDhms(params.value) > 1 ? t("days") : t("day")}
+          </Typography>
+        );
       }
     },
     {
@@ -141,30 +184,39 @@ export default function RequestTable({ data }: RequestTableProps) {
       headerName: t("status") as string,
       width: 250,
       renderCell: (params) => (
-        <Typography>{params.value ? "Accept" : "Processing"}</Typography>
+        <Typography>{params.value ? t("accept") : t("processing")}</Typography>
       )
     },
     {
       field: "action",
       headerName: t("action") as string,
       sortable: false,
-      width: 160,
+      width: 200,
       renderCell: (params) => {
         return (
           <Stack direction="row" spacing={1}>
-            {/* <Tooltip title={t("tooltip_delete")}>
+            <Tooltip title={t("tooltip_delete")}>
               <IconButton
                 onClick={(e) => handleOpenDeleteDialogClick(e, params)}
               >
                 {params?.value?.delete}
               </IconButton>
-            </Tooltip> */}
+            </Tooltip>
             {params.row.isAccept === false && (
               <Tooltip title={t("tooltip_accept")}>
                 <IconButton
                   onClick={(e) => handleOpenAcceptDialogClick(e, params)}
                 >
                   {params?.value?.accept}
+                </IconButton>
+              </Tooltip>
+            )}
+            {params.row.isAccept === false && (
+              <Tooltip title={t("tooltip_refuse")}>
+                <IconButton
+                  onClick={(e) => handleOpenRefuseDialogClick(e, params)}
+                >
+                  {params?.value?.refuse}
                 </IconButton>
               </Tooltip>
             )}
@@ -183,18 +235,20 @@ export default function RequestTable({ data }: RequestTableProps) {
       isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />
+        accept: <CheckOutlinedIcon />,
+        refuse: <CloseOutlinedIcon />
       }
     },
     {
       id: 2,
       amount: 1,
       sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
-      time: 7 * 24 * 60 * 60,
+      time: 1 * 24 * 60 * 60,
       isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />
+        accept: <CheckOutlinedIcon />,
+        refuse: <CloseOutlinedIcon />
       }
     },
     {
@@ -205,7 +259,8 @@ export default function RequestTable({ data }: RequestTableProps) {
       isAccept: true,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />
+        accept: <CheckOutlinedIcon />,
+        refuse: <CloseOutlinedIcon />
       }
     },
     {
@@ -216,7 +271,8 @@ export default function RequestTable({ data }: RequestTableProps) {
       isAccept: false,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />
+        accept: <CheckOutlinedIcon />,
+        refuse: <CloseOutlinedIcon />
       }
     },
     {
@@ -227,10 +283,21 @@ export default function RequestTable({ data }: RequestTableProps) {
       isAccept: true,
       action: {
         delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />
+        accept: <CheckOutlinedIcon />,
+        refuse: <CloseOutlinedIcon />
       }
     }
   ];
+
+  React.useEffect(() => {
+    data.forEach((object) => {
+      object.action = {
+        delete: <DeleteOutlineOutlinedIcon />,
+        accept: <CheckOutlinedIcon />,
+        refuse: <CloseOutlinedIcon />
+      };
+    });
+  }, [data]);
 
   return (
     <Stack spacing={3}>
@@ -240,7 +307,7 @@ export default function RequestTable({ data }: RequestTableProps) {
         rows={data}
         // rows={mockData}
       />
-      {/* <Dialog
+      <Dialog
         title={t("dialogTitleDelete") as string}
         open={openDeleteDialog}
         onClose={handleDeleteClose}
@@ -249,23 +316,24 @@ export default function RequestTable({ data }: RequestTableProps) {
           <Typography>{t("message_delete")}</Typography>
           <Stack direction={{ xs: "column" }} spacing={{ xs: 1 }}>
             <Typography variant="body1">
-              <b>Event:</b> {targetItem?.event}
+              <b>{t("id")}:</b> {targetItem?.id}
             </Typography>
             <Typography variant="body1">
-              <b>Price:</b> {targetItem?.price}
+              <b>{t("sender")}:</b>{" "}
+              {targetItem?.sender ? truncate(targetItem?.sender, 12, -4) : ""}
             </Typography>
-            {targetItem?.from && (
-              <Typography variant="body1">
-                <b>From:</b> {targetItem?.from}
-              </Typography>
-            )}
-            {targetItem?.to && (
-              <Typography variant="body1">
-                <b>To:</b> {targetItem?.to}
-              </Typography>
-            )}
             <Typography variant="body1">
-              <b>Date:</b> {targetItem?.date}
+              <b>{t("amount")}:</b> {targetItem?.amount}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("time")}:</b> {secondsToDhms(targetItem?.time)}{" "}
+              {targetItem.time && secondsToDhms(targetItem.time) > 1
+                ? t("days")
+                : t("day")}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("status")}:</b>{" "}
+              {targetItem?.isAccept ? t("accept") : t("processing")}
             </Typography>
           </Stack>
           <Stack direction="row" spacing={3} justifyContent="end">
@@ -290,38 +358,81 @@ export default function RequestTable({ data }: RequestTableProps) {
           <Typography>{t("message_accept")}</Typography>
           <Stack direction={{ xs: "column" }} spacing={{ xs: 1 }}>
             <Typography variant="body1">
-              <b>Event:</b> {targetItem?.event}
+              <b>{t("id")}:</b> {targetItem?.id}
             </Typography>
             <Typography variant="body1">
-              <b>Price:</b> {targetItem?.price}
+              <b>{t("sender")}:</b>{" "}
+              {targetItem?.sender ? truncate(targetItem?.sender, 12, -4) : ""}
             </Typography>
-            {targetItem?.from && (
-              <Typography variant="body1">
-                <b>From:</b> {targetItem?.from}
-              </Typography>
-            )}
-            {targetItem?.to && (
-              <Typography variant="body1">
-                <b>To:</b> {targetItem?.to}
-              </Typography>
-            )}
             <Typography variant="body1">
-              <b>Date:</b> {targetItem?.date}
+              <b>{t("amount")}:</b> {targetItem?.amount}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("time")}:</b> {secondsToDhms(targetItem?.time)}{" "}
+              {targetItem.time && secondsToDhms(targetItem.time) > 1
+                ? t("days")
+                : t("day")}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("status")}:</b>{" "}
+              {targetItem?.isAccept ? t("accept") : t("processing")}
             </Typography>
           </Stack>
           <Stack direction="row" spacing={3} justifyContent="end">
             <StyledButton
               customVariant="secondary"
-              onClick={(e) => handleRefuseAcceptClick(e, targetItem)}
+              onClick={(e) => handleCancelAcceptClick(e)}
             >
-              {t("button_refuse")}
+              {t("button_cancel")}
             </StyledButton>
             <StyledButton onClick={(e) => handleAcceptClick(e, targetItem)}>
               {t("button_accept")}
             </StyledButton>
           </Stack>
         </Stack>
-      </Dialog> */}
+      </Dialog>
+      <Dialog
+        title={t("dialogTitleRefuse") as string}
+        open={openRefuseDialog}
+        onClose={handleRefuseClose}
+      >
+        <Stack spacing={3}>
+          <Typography>{t("message_refuse")}</Typography>
+          <Stack direction={{ xs: "column" }} spacing={{ xs: 1 }}>
+            <Typography variant="body1">
+              <b>{t("id")}:</b> {targetItem?.id}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("sender")}:</b>{" "}
+              {targetItem?.sender ? truncate(targetItem?.sender, 12, -4) : ""}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("amount")}:</b> {targetItem?.amount}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("time")}:</b> {secondsToDhms(targetItem?.time)}{" "}
+              {targetItem.time && secondsToDhms(targetItem.time) > 1
+                ? t("days")
+                : t("day")}
+            </Typography>
+            <Typography variant="body1">
+              <b>{t("status")}:</b>{" "}
+              {targetItem?.isAccept ? t("accept") : t("processing")}
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={3} justifyContent="end">
+            <StyledButton
+              customVariant="secondary"
+              onClick={(e) => handleCancelRefuseClick(e)}
+            >
+              {t("button_cancel")}
+            </StyledButton>
+            <StyledButton onClick={(e) => handleRefuseClick(e, targetItem)}>
+              {t("button_refuse")}
+            </StyledButton>
+          </Stack>
+        </Stack>
+      </Dialog>
       <ToastContainer />
     </Stack>
   );

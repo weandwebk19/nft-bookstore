@@ -174,7 +174,7 @@ export type RequestExtendCore = {
 export type RequestExtend = {} & RequestExtendCore;
 
 export type RequestExtendRowData = {
-  action?: JSX.Element;
+  action?: any;
 } & RequestExtendCore;
 
 export type ResponseExtendCore = {
@@ -187,7 +187,7 @@ export type ResponseExtendCore = {
 export type ResponseExtend = {} & ResponseExtendCore;
 
 export type ResponseExtendRowData = {
-  action?: JSX.Element;
+  action?: any;
 } & RequestExtendCore;
 
 export enum BookGenres {
