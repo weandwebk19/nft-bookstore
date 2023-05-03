@@ -138,6 +138,14 @@ export const useBookDetail = (bookId: string, seller?: string) => {
   };
 };
 
+export const useRandomBooks = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useRandomBooks();
+  return {
+    nfts: swrRes
+  };
+};
+
 export const useRealOwnerOfTokens = (tokenId: number) => {
   const hooks = useHooks();
   const swrRes = hooks.useRealOwnerOfTokens(tokenId);
