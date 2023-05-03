@@ -230,7 +230,7 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
             <Typography variant="h5" gutterBottom>
               {t("recommended")}
             </Typography>
-            <BookList bookList={bookList} />
+            <BookList />
           </Box>
         </Grid>
       </Grid>

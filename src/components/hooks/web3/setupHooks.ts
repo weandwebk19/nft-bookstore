@@ -54,6 +54,10 @@ import {
   hookFactory as createBookDetailHook
 } from "./detailPage/useBookDetail";
 import {
+  UseRandomBooksHook,
+  hookFactory as createRandomBooksHook
+} from "./detailPage/useRandomBooks";
+import {
   UseRealOwnerOfTokensHook,
   hookFactory as createRealOwnerOfTokensHook
 } from "./detailPage/useRealOwnerOfTokens";
@@ -94,6 +98,7 @@ export type Web3Hooks = {
   useOwnedSharedBooks: UseOwnedSharedBooksHook;
   useOwnedSharedOutBooks: UseOwnedSharedOutBooksHook;
   useBookDetail: UseBookDetailHook;
+  useRandomBooks: UseRandomBooksHook;
   useRealOwnerOfTokens: UseRealOwnerOfTokensHook;
   useOwnedRequestsOnExtending: UseOwnedRequestsOnExtendingHook;
   useOwnedResponsesOnExtending: UseOwnedResponsesOnExtendingHook;
@@ -122,6 +127,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
     useOwnedSharedOutBooks: createOwnedSharedOutBooksHook(deps),
     useBookDetail: createBookDetailHook(deps),
+    useRandomBooks: createRandomBooksHook(deps),
     useRealOwnerOfTokens: createRealOwnerOfTokensHook(deps),
     useOwnedRequestsOnExtending: createOwnedRequestsOnExtendingHook(deps),
     useOwnedResponsesOnExtending: createOwnedResponsesOnExtendingHook(deps)
