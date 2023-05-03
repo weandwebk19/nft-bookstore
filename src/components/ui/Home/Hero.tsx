@@ -18,6 +18,7 @@ import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutl
 import Spline from "@splinetool/react-spline";
 import styles from "@styles/Hero.module.scss";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import images from "@/assets/images";
 import { useTranslate } from "@/components/hooks/common";
@@ -28,6 +29,7 @@ import cssFilter from "@/utils/cssFilter";
 const Hero = () => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <Box className={styles.hero}>
@@ -58,11 +60,14 @@ const Hero = () => {
               whitepaper
             </StyledButton>
             <StyledButton
-              component={Link}
               customVariant="secondary"
               customColor="light"
-              href="https://github.com/weandwebk19/nft-bookstore"
-              target="_blank"
+              onClick={() => {
+                router.push(
+                  "https://github.com/weandwebk19/nft-bookstore",
+                  "_blank"
+                );
+              }}
             >
               <CodeOutlinedIcon sx={{ mr: 1 }} />
               github
