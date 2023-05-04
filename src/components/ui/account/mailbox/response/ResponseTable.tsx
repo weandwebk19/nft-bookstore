@@ -287,8 +287,8 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       <DataGrid
         getRowId={(row: any) => row.id}
         columns={columns}
-        // rows={data}
-        rows={mockData}
+        rows={data}
+        // rows={mockData}
       />
       <Dialog
         title={t("dialogTitleDelete") as string}
