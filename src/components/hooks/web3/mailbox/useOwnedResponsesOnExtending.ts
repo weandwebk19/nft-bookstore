@@ -9,6 +9,8 @@ import useSWR from "swr";
 
 import { ResponseExtendCore } from "@/types/nftBook";
 
+import { useAccount } from "..";
+
 type OwnedResponsesOnExtendingHookFactory = CryptoHookFactory<
   ResponseExtendCore[]
 >;
@@ -19,8 +21,9 @@ export type UseOwnedResponsesOnExtendingHook =
 export const hookFactory: OwnedResponsesOnExtendingHookFactory =
   ({ contract }) =>
   () => {
+    const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      contract ? "web3/useOwnedResponsesOnExtending" : null,
+      [contract ? "web3/useOwnedResponsesOnExtending" : null, account.data],
       async () => {
         try {
           const responses = [] as ResponseExtendCore[];

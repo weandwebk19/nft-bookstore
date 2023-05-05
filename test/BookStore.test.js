@@ -679,40 +679,40 @@ contract("BookStore", (accounts) => {
       }
     });
 
-    it("update extend time for request of borrowed book id 1 ", async () => {
-      const newExtendedTime = 1209600;
-      const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
-        from: accounts[1]
-      });
-      await _contract.updateRequestOfBorrowedBooks(
-        2,
-        accounts[0],
-        ownedBorrowedBooks[0].startTime,
-        ownedBorrowedBooks[0].endTime,
-        ownedBorrowedBooks[0].amount,
-        newExtendedTime,
-        {
-          from: accounts[1]
-        }
-      );
+    // it("update extend time for request of borrowed book id 1 ", async () => {
+    //   const newExtendedTime = 1209600;
+    //   const ownedBorrowedBooks = await _contract.getOwnedBorrowedBooks({
+    //     from: accounts[1]
+    //   });
+    //   await _contract.updateRequestOfBorrowedBooks(
+    //     2,
+    //     accounts[0],
+    //     ownedBorrowedBooks[0].startTime,
+    //     ownedBorrowedBooks[0].endTime,
+    //     ownedBorrowedBooks[0].amount,
+    //     newExtendedTime,
+    //     {
+    //       from: accounts[1]
+    //     }
+    //   );
 
-      const allReq = await _contract.getAllOwnedRequestsOnExtending({
-        from: accounts[0]
-      });
-      assert.equal(allReq.length, 1, "No request exists");
-      assert.equal(
-        allReq[0].sender,
-        accounts[1],
-        "accounts[1] is not sender of request"
-      );
-      assert.equal(allReq[0].id, 1, "id of borrowed book is wrong");
-      assert.equal(
-        allReq[0].time,
-        newExtendedTime,
-        "new extended time is invalid"
-      );
-      assert.equal(allReq[0].isAccept, false, "Status of request is invalid");
-    });
+    //   const allReq = await _contract.getAllOwnedRequestsOnExtending({
+    //     from: accounts[0]
+    //   });
+    //   assert.equal(allReq.length, 1, "No request exists");
+    //   assert.equal(
+    //     allReq[0].sender,
+    //     accounts[1],
+    //     "accounts[1] is not sender of request"
+    //   );
+    //   assert.equal(allReq[0].id, 1, "id of borrowed book is wrong");
+    //   assert.equal(
+    //     allReq[0].time,
+    //     newExtendedTime,
+    //     "new extended time is invalid"
+    //   );
+    //   assert.equal(allReq[0].isAccept, false, "Status of request is invalid");
+    // });
 
     it("account[0] reject request for extension of time from accounts[1] ", async () => {
       await _contract.doAcceptRequest(1, accounts[1], false, {

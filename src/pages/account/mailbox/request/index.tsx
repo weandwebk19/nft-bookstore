@@ -20,9 +20,8 @@ const Request = () => {
   const { t } = useTranslation("request");
   const { account } = useAccount();
   const { ethereum, contract } = useWeb3();
-  const { swr } = useOwnedRequestsOnExtending(); // check isLoading if necessary
-  const data = swr.data as RequestExtendCore[]; // replace data with rows
-  console.log("swr", swr);
+  const { swr } = useOwnedRequestsOnExtending();
+  const data = swr.data as RequestExtendCore[];
 
   return (
     <>

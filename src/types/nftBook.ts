@@ -188,7 +188,7 @@ export type ResponseExtend = {} & ResponseExtendCore;
 
 export type ResponseExtendRowData = {
   action?: any;
-} & RequestExtendCore;
+} & ResponseExtendCore;
 
 export enum BookGenres {
   "Art & photography",

@@ -124,6 +124,7 @@ export type BookStoreContractMethodNames =
   | "recallBorrowedBooks"
   | "recallAllBorrowedBooks"
   | "getIdBorrowedBook"
+  | "getBorrowedBookFromId"
   | "shareBooks"
   | "getAllBooksOnSharing"
   | "getAllOwnedBooksOnSharing"
@@ -914,6 +915,17 @@ export interface BookStoreContract {
     endTime: BigNumberish,
     overrides?: ContractCallOverrides
   ): Promise<BigNumber>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param idBorrowedBook Type: uint256, Indexed: false
+   */
+  getBorrowedBookFromId(
+    idBorrowedBook: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<BorrowedbookResponse>;
   /**
    * Payable: true
    * Constant: false
