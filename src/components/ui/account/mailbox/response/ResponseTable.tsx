@@ -42,25 +42,13 @@ export default function ResponseTable({ data }: ResponseTableProps) {
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
-  const [anchorDeleteButton, setAnchorDeleteButton] =
-    React.useState<Element | null>(null);
   const [anchorAcceptButton, setAnchorAcceptButton] =
     React.useState<Element | null>(null);
   const [anchorRefuseButton, setAnchorRefuseButton] =
     React.useState<Element | null>(null);
 
-  const openDeleteDialog = Boolean(anchorDeleteButton);
   const openAcceptDialog = Boolean(anchorAcceptButton);
   const openRefuseDialog = Boolean(anchorRefuseButton);
-
-  const handleOpenDeleteDialogClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>
-  ) => {
-    e.preventDefault();
-    setAnchorDeleteButton(e.currentTarget);
-    setTargetItem(params.row);
-  };
 
   const handleOpenAcceptDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -78,25 +66,6 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     e.preventDefault();
     setAnchorRefuseButton(e.currentTarget);
     setTargetItem(params.row);
-  };
-
-  const handleDeleteClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    item: ResponseExtendRowData
-  ) => {
-    e.preventDefault();
-    // setAnchorDeleteButton(null);
-
-    console.log("Delete:", item.id);
-
-    // handle logic here ...
-  };
-
-  const handleCancelDeleteClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorDeleteButton(null);
   };
 
   const acceptResponse = useCallback(
@@ -212,10 +181,6 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     setAnchorRefuseButton(null);
   };
 
-  const handleDeleteClose = () => {
-    setAnchorDeleteButton(null);
-  };
-
   const handleAcceptClose = () => {
     setAnchorAcceptButton(null);
   };
@@ -233,7 +198,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     {
       field: "time",
       headerName: t("time") as string,
-      width: 200,
+      width: 150,
       renderCell: (params) => {
         return (
           <Typography>
@@ -266,13 +231,6 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       renderCell: (params) => {
         return (
           <Stack direction="row" spacing={1}>
-            <Tooltip title={t("tooltip_delete")}>
-              <IconButton
-                onClick={(e) => handleOpenDeleteDialogClick(e, params)}
-              >
-                {params?.value?.delete}
-              </IconButton>
-            </Tooltip>
             <Tooltip title={t("tooltip_accept")}>
               <IconButton
                 onClick={(e) => handleOpenAcceptDialogClick(e, params)}
@@ -369,44 +327,6 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         rows={data}
         // rows={mockData}
       />
-      <Dialog
-        title={t("dialogTitleDelete") as string}
-        open={openDeleteDialog}
-        onClose={handleDeleteClose}
-      >
-        <Stack spacing={3}>
-          <Typography>{t("message_delete")}</Typography>
-          <Stack direction={{ xs: "column" }} spacing={{ xs: 1 }}>
-            <Typography variant="body1">
-              <b>{t("id")}:</b> {targetItem?.id}
-            </Typography>
-            <Typography variant="body1">
-              <b>{t("sender")}:</b>{" "}
-              {targetItem?.sender ? truncate(targetItem?.sender, 12, -4) : ""}
-            </Typography>
-            <Typography variant="body1">
-              <b>{t("amount")}:</b> {targetItem?.amount}
-            </Typography>
-            <Typography variant="body1">
-              <b>{t("time")}:</b> {secondsToDhms(targetItem?.time)}{" "}
-              {targetItem.time && secondsToDhms(targetItem.time) > 1
-                ? t("days")
-                : t("day")}
-            </Typography>
-          </Stack>
-          <Stack direction="row" spacing={3} justifyContent="end">
-            <StyledButton
-              customVariant="secondary"
-              onClick={(e) => handleCancelDeleteClick(e)}
-            >
-              {t("button_cancel")}
-            </StyledButton>
-            <StyledButton onClick={(e) => handleDeleteClick(e, targetItem)}>
-              {t("button_delete")}
-            </StyledButton>
-          </Stack>
-        </Stack>
-      </Dialog>
       <Dialog
         title={t("dialogTitleAccept") as string}
         open={openAcceptDialog}
