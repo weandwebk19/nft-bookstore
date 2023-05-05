@@ -523,34 +523,34 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   // If borrowed book exist, only update extended time. Owthersise, do nothing
-  function updateRequestOfBorrowedBooks(
-    uint256 tokenId,
-    address renter,
-    uint startTime,
-    uint endTime,
-    uint newExtendedAmount,
-    uint newExtendedTime
-  ) public {
-    if (renter == address(0) || msg.sender == address(0)) {
-      revert Error.InvalidAddressError(address(0));
-    }
-    if (renter == msg.sender) {
-      revert Error.InvalidAddressError(msg.sender);
-    }
-    if (newExtendedTime < MIN_TIME) {
-      revert Error.InvalidTimeError(newExtendedTime);
-    }
+  // function updateRequestOfBorrowedBooks(
+  //   uint256 tokenId,
+  //   address renter,
+  //   uint startTime,
+  //   uint endTime,
+  //   uint newExtendedAmount,
+  //   uint newExtendedTime
+  // ) public {
+  //   if (renter == address(0) || msg.sender == address(0)) {
+  //     revert Error.InvalidAddressError(address(0));
+  //   }
+  //   if (renter == msg.sender) {
+  //     revert Error.InvalidAddressError(msg.sender);
+  //   }
+  //   if (newExtendedTime < MIN_TIME) {
+  //     revert Error.InvalidTimeError(newExtendedTime);
+  //   }
 
-    _bookRentingStorage.updateRequestOfBorrowedBooks(
-      tokenId,
-      renter,
-      msg.sender,
-      startTime,
-      endTime,
-      newExtendedAmount,
-      newExtendedTime
-    );
-  }
+  //   _bookRentingStorage.updateRequestOfBorrowedBooks(
+  //     tokenId,
+  //     renter,
+  //     msg.sender,
+  //     startTime,
+  //     endTime,
+  //     newExtendedAmount,
+  //     newExtendedTime
+  //   );
+  // }
 
   function doAcceptRequest(
     uint idBorrowedBook,
@@ -660,6 +660,12 @@ contract BookStore is ERC1155URIStorage, Ownable {
         startTime,
         endTime
       );
+  }
+
+  function getBorrowedBookFromId(
+    uint idBorrowedBook
+  ) public view returns (BookRentingStorage.BorrowedBook memory) {
+    return _bookRentingStorage.getBorrowedBookFromId(idBorrowedBook);
   }
 
   function shareBooks(

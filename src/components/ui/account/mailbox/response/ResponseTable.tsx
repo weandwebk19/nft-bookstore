@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,10 +15,12 @@ import {
   GridRenderCellParams,
   GridTreeNodeWithRender
 } from "@mui/x-data-grid";
+import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import { useAccount } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
@@ -35,6 +38,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
   const router = useRouter();
   const { t } = useTranslation("response");
   const { account } = useAccount();
+  const { contract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -64,16 +68,93 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     setTargetItem(params.row);
   };
 
+  const acceptResponse = useCallback(
+    async (
+      idBorrowedBook: number,
+      renter: string,
+      amount: number,
+      time: number
+    ) => {
+      try {
+        const borrowedBook = await contract?.getBorrowedBookFromId(
+          idBorrowedBook
+        );
+        const totalPrice =
+          (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
+            amount *
+            time) /
+          604800;
+
+        const tx = await contract?.transferForSendedRequest(
+          idBorrowedBook,
+          renter,
+          true,
+          {
+            value: ethers.utils.parseEther(totalPrice.toString())
+          }
+        );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Pending.",
+          success: "Accept response successfully",
+          error: "Oops! There's a problem with accept process!"
+        });
+      } catch (err: any) {
+        toast.error(`${err.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [contract]
+  );
+
+  const refuseResponse = useCallback(
+    async (
+      idBorrowedBook: number,
+      renter: string,
+      amount: number,
+      time: number
+    ) => {
+      try {
+        const borrowedBook = await contract?.getBorrowedBookFromId(
+          idBorrowedBook
+        );
+        const totalPrice =
+          (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
+            amount *
+            time) /
+          604800;
+
+        const tx = await contract?.transferForSendedRequest(
+          idBorrowedBook,
+          renter,
+          false,
+          {
+            value: ethers.utils.parseEther(totalPrice.toString())
+          }
+        );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Pending.",
+          success: "Refuse response successfully",
+          error: "Oops! There's a problem with refuse process!"
+        });
+      } catch (err: any) {
+        toast.error(`${err.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [contract]
+  );
+
   const handleAcceptClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     item: ResponseExtendRowData
   ) => {
     e.preventDefault();
     // setAnchorAcceptButton(null);
-
-    console.log("Accept:", item.id);
-
-    // handle logic here ...
+    acceptResponse(item.id, item.sender, item.amount, item.time);
   };
 
   const handleCancelAcceptClick = (
@@ -90,9 +171,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     e.preventDefault();
     // setAnchorRefuseButton(null);
 
-    console.log("Refuse:", item.id);
-
-    // handle logic here ...
+    refuseResponse(item.id, item.sender, item.amount, item.time);
   };
 
   const handleCancelRefuseClick = (

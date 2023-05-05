@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -18,6 +19,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import { useAccount } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
@@ -35,6 +37,7 @@ export default function RequestTable({ data }: RequestTableProps) {
   const router = useRouter();
   const { t } = useTranslation("request");
   const { account } = useAccount();
+  const { contract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -64,16 +67,59 @@ export default function RequestTable({ data }: RequestTableProps) {
     setTargetItem(params.row);
   };
 
+  const acceptRequest = useCallback(
+    async (idBorrowedBook: number, borrower: string) => {
+      try {
+        const tx = await contract?.doAcceptRequest(
+          idBorrowedBook,
+          borrower,
+          true
+        );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Pending.",
+          success: "Accept request successfully",
+          error: "Oops! There's a problem with accept process!"
+        });
+      } catch (err: any) {
+        toast.error(`${err.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [contract]
+  );
+
+  const refuseRequest = useCallback(
+    async (idBorrowedBook: number, borrower: string) => {
+      try {
+        const tx = await contract?.doAcceptRequest(
+          idBorrowedBook,
+          borrower,
+          false
+        );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Pending.",
+          success: "Refuse request successfully",
+          error: "Oops! There's a problem with refuse process!"
+        });
+      } catch (err: any) {
+        toast.error(`${err.message}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [contract]
+  );
+
   const handleAcceptClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     item: RequestExtendRowData
   ) => {
     e.preventDefault();
     // setAnchorAcceptButton(null);
-
-    console.log("Accept:", item.id);
-
-    // handle logic here ...
+    acceptRequest(item.id, item.sender);
   };
 
   const handleCancelAcceptClick = (
@@ -89,10 +135,7 @@ export default function RequestTable({ data }: RequestTableProps) {
   ) => {
     e.preventDefault();
     // setAnchorRefuseButton(null);
-
-    console.log("Refuse:", item.id);
-
-    // handle logic here ...
+    refuseRequest(item.id, item.sender);
   };
 
   const handleCancelRefuseClick = (
@@ -180,69 +223,6 @@ export default function RequestTable({ data }: RequestTableProps) {
             )}
           </Stack>
         );
-      }
-    }
-  ];
-
-  const mockData = [
-    {
-      id: 1,
-      amount: 1,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BB",
-      time: 7 * 24 * 60 * 60,
-      isAccept: false,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 2,
-      amount: 1,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
-      time: 1 * 24 * 60 * 60,
-      isAccept: false,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 3,
-      amount: 2,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
-      time: 2 * 24 * 60 * 60,
-      isAccept: true,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 4,
-      amount: 4,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
-      time: 4 * 24 * 60 * 60,
-      isAccept: false,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 5,
-      amount: 1,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BD",
-      time: 5 * 24 * 60 * 60,
-      isAccept: true,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
       }
     }
   ];
