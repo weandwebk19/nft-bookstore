@@ -15,23 +15,23 @@ import { ZenLayout } from "@/layouts/ZenLayout";
 import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
 import { StyledButton } from "@/styles/components/Button";
 
-const LOCAL_EPUB = "files/nene.epub";
 const LINK_EPUB =
   "https://altmshfkgudtjr.github.io/react-epub-viewer/files/Alices%20Adventures%20in%20Wonderland.epub";
-const LOCAL_PDF = "files/BAITAP1.pdf";
+const LINK_PDF =
+  "https://cors-anywhere.herokuapp.com/http://www.pdf995.com/samples/pdf.pdf";
 
 const ReadBook = () => {
   const [page, setPage] = useState("");
   const [location, setLocation] = useState<string | number | undefined>(0);
   const [firstRenderDone, setFirstRenderDone] = useState(false);
 
+  const [numPages, setNumPages] = useState(2);
+  const [pageNumber, setPageNumber] = useState(1);
+
   const renditionRef = useRef<Rendition | null>(null);
   const tocRef = useRef<IToc | null>(null);
 
-  const fileType = "pdf";
-  const url =
-    "https://cors-anywhere.herokuapp.com/http://www.pdf995.com/samples/pdf.pdf";
-  useEffect(() => {}, []);
+  const fileType = "epub";
 
   const locationChanged = (epubcifi: string) => {
     if (!firstRenderDone) {
@@ -55,8 +55,6 @@ const ReadBook = () => {
   };
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-  const [numPages, setNumPages] = useState(2);
-  const [pageNumber, setPageNumber] = useState(1);
 
   /*To Prevent right click on screen*/
   // useEffect(() => {
@@ -169,7 +167,7 @@ const ReadBook = () => {
             }
           }}
         >
-          <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
+          <Document file={LINK_PDF} onLoadSuccess={onDocumentLoadSuccess}>
             <Page pageNumber={pageNumber} renderAnnotationLayer={false} />
           </Document>
           <Stack
