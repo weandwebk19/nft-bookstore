@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { Button } from "@mui/material";
 
 import axios from "axios";
@@ -15,10 +17,25 @@ const ReadButton = ({ tokenId }: ReadButtonProps) => {
   const metadata = useMetadata(tokenId);
   const bookFile = metadata.data?.bookFile;
   const urlFile = bookFile ? (bookFile as string) : "/#";
+  const [bookId, setBookId] = useState();
 
   const handleReadBookClick = () => {
-    router.push(urlFile, "_blank");
+    if (bookId) {
+      router.push(`/books/${bookId}/read`);
+    }
   };
+
+  useEffect(() => {
+    (async () => {
+      // get bookId
+      try {
+        const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
+        if (bookRes.data.success === true) {
+          setBookId(bookRes.data.data);
+        }
+      } catch (err) {}
+    })();
+  }, [tokenId]);
 
   return (
     <Button
