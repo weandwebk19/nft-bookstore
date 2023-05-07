@@ -47,7 +47,4 @@ next-env.d.ts
 public/contracts/
 
 .vscode/
-.env.development
-.env.development
-
 yarn.lock

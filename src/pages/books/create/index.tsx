@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
@@ -42,6 +43,8 @@ import {
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
+import { Crypto } from "@/utils/crypto";
+import { convertArrayToHexString, convertHexStringToUint8Array} from "@utils/convert";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAX_BOOKFILE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKFILE_SIZE;
@@ -325,6 +328,18 @@ const CreateBook = () => {
     if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
+      const encKey = await Crypto.generateKey("abc");  
+      const iv = Crypto.generateIVValue();
+      // const hashOriginal = await Crypto.sha256(convertArrayToHexString(Array.from(bytes!)));
+      // console.log("hashOriginal: ", hashOriginal);
+      const cipherText = await Crypto.encryption(bytes, encKey!, iv!);
+      // const hashCipherText = await Crypto.sha256(convertArrayToHexString(Array.from(cipherText!)));
+      // const arrayCipherText = Array.from(cipherText!);
+      // const hexString = convertArrayToHexString(arrayCipherText!);
+      // const arr = convertHexStringToUint8Array(hexString!);
+      // const plainText = await Crypto.decryption(arr, encKey!, iv!);
+      // const hashPlainText = await Crypto.sha256(convertArrayToHexString(Array.from(plainText!)));
+      // console.log("hashPlainText: ", hashPlainText);
 
       try {
         const { signedData, account } = await getSignedData();
@@ -332,7 +347,7 @@ const CreateBook = () => {
         const promise = axios.post("/api/pinata/verify-file", {
           address: account,
           signature: signedData,
-          bytes,
+          bytes: cipherText,
           contentType: file.type,
           fileName: file.name.replace(/\.[^/.]+$/, "")
         });
@@ -349,12 +364,13 @@ const CreateBook = () => {
         setBookFileLink(link);
         return link;
       } catch (e: any) {
-        await handleError(e);
+        console.log("error: ", e);
+        // await handleError(e);
       }
     }
     return "";
   };
-
+  
   const uploadBookCover = async (file: File) => {
     if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
@@ -433,6 +449,7 @@ const CreateBook = () => {
         return tokenId;
       }
     } catch (e: any) {
+      console.log("error: ", e);
       await handleError(e);
     }
   };
@@ -459,9 +476,15 @@ const CreateBook = () => {
       if (activeStep === 1) {
         (async () => {
           setIsSigning(true);
-          const bookCoverRes = await uploadBookCover(data.bookCover);
-          const bookFileRes = await uploadBookFile(data.bookFile);
-          const bookSampleRes = await uploadBookSample(data.bookSample);
+          let bookCoverRes, bookFileRes, bookSampleRes;
+          bookCoverRes = await uploadBookCover(data.bookCover);
+          if (bookCoverRes) {
+            bookFileRes = await uploadBookFile(data.bookFile);
+          }
+          if (bookFileRes) {
+            bookSampleRes = await uploadBookSample(data.bookSample);
+          }
+
           if (
             bookCoverRes &&
             bookFileRes &&
@@ -499,7 +522,7 @@ const CreateBook = () => {
             setIsSigning(true);
             // Mint book
             const tokenId = await createNFTBook(nftURI, data.quantity);
-            console.log("Creating book", tokenId);
+            console.log("Book is created with tokenId: " + tokenId);
 
             // Upload data to database
             if (tokenId) {

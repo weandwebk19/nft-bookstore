@@ -257,8 +257,9 @@ contract BookSharingStorage {
         return books;
     }
 
-    function getAllOwnedBooksOnSharing(address owner) public view returns (BookSharing[] memory) {
-        uint total = _totalOwnedBookOnSharing[owner];
+    function getAllOwnedBooksOnSharing() 
+        public view returns (BookSharing[] memory) {
+        uint total = _totalOwnedBookOnSharing[msg.sender];
         BookSharing[] memory books;
 
         if (total > 0) {
@@ -267,7 +268,7 @@ contract BookSharingStorage {
 
             for (uint i = 1; i <= _booksOnSharing.current(); i++) {
                 BookSharing memory book = _idToBookOnSharing[i];
-                if (book.sharer == owner && book.sharedPer == address(0)) {
+                if (book.sharer == msg.sender && book.sharedPer == address(0)) {
                     books[currentIndex] = book;
                     currentIndex += 1;
                 }
@@ -291,8 +292,8 @@ contract BookSharingStorage {
         return books;
     }
 
-    function getAllOwnedSharedBook(address owner) public view returns (BookSharing[] memory) {
-        uint total = _totalOwnedSharedBook[owner];
+    function getAllOwnedSharedBook() public view returns (BookSharing[] memory) {
+        uint total = _totalOwnedSharedBook[msg.sender];
         BookSharing[] memory books;
 
         if (total > 0) {
@@ -301,13 +302,32 @@ contract BookSharingStorage {
 
             for (uint i = 1; i <= _sharedBooks.current(); i++) {
                 BookSharing memory book = _idToSharedBook[i];
-                if (book.sharedPer == owner) {
+                if (book.sharedPer == msg.sender) {
                     books[currentIndex] = book;
                     currentIndex += 1;
                 }
             }
         }
         return books;
+    }
+
+    function isSharedBookReadable(uint tokenId, address owner) 
+        public view returns (bool) {
+        uint total = _totalOwnedSharedBook[owner];
+
+        if (total > 0) {
+
+            for (uint i = 1; i <= _sharedBooks.current(); i++) {
+                BookSharing memory book = _idToSharedBook[i];
+                if (book.sharedPer == owner &&
+                    book.tokenId == tokenId &&
+                    book.endTime > block.timestamp) {
+                    return true;
+                }
+            }
+            
+        }
+        return false;
     }
 
     function _updateSharedBooksInternal(uint idSharedBook,
