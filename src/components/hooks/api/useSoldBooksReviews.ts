@@ -34,8 +34,6 @@ export const useSoldBooksReviews = () => {
             const bookRes = await axios.get(
               `/api/books/token/${tokenId}/bookId`
             );
-
-            console.log("bookRes", bookRes);
             if (bookRes.data.success === true) {
               const reviewRes = await axios.get(
                 `/api/reviews/${bookRes.data.data}`

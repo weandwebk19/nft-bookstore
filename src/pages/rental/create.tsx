@@ -22,6 +22,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useTransactionsHistory } from "@/components/hooks/api";
 import { useAccount, useBookDetail, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -42,6 +43,8 @@ const Book = () => {
   const { provider, ethereum, contract } = useWeb3();
   const { network } = useNetwork();
   const { account } = useAccount();
+  const transactions = useTransactionsHistory();
+  console.log(transactions);
 
   const getSignedData = async () => {
     const messageToSign = await axios.get("/api/metadata/verify");
@@ -116,7 +119,7 @@ const Book = () => {
         }
         let address = account.data as string;
         const apiKey = "4UE64A86DY6EBTGQMJ28R7HZPJJ83UJJ25";
-        const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=${apiKey}`;
+        const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${"0xDAFEA492D9c6733ae3d56b7Ed1ADB60692c98Bc5"}&sort=desc&apikey=${apiKey}`;
         const response = await axios.get<TransactionsResponse>(url);
 
         if (response.data.status === "1") {
