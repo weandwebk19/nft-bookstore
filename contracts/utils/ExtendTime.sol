@@ -239,15 +239,15 @@ contract ExtendTime {
         }                          
     }
 
-    function getAllOwnedRequest(address receiver) public view returns(Request[] memory) {
-        uint length = _totalOwnedRequest[receiver];
+    function getAllOwnedRequest() public view returns(Request[] memory) {
+        uint length = _totalOwnedRequest[msg.sender];
         Request[] memory requests;
         if (length > 0) {
             requests = new Request[](length);
             Request memory request;
 
             for (uint i = 0; i < length; i++) {
-                request = _requests[receiver][i];
+                request = _requests[msg.sender][i];
 
                 requests[i] = request;
             }
@@ -255,8 +255,8 @@ contract ExtendTime {
         return requests;
     }
 
-    function getAllOwnedResponse(address receiver) public view returns(Response[] memory) {
-        uint length = _totalOwnedResponse[receiver];
+    function getAllOwnedResponse() public view returns(Response[] memory) {
+        uint length = _totalOwnedResponse[msg.sender];
         Response[] memory responses;
 
         if (length > 0) {
@@ -264,7 +264,7 @@ contract ExtendTime {
             Response memory response;
 
             for (uint i = 0; i < length; i++) {
-                response = _responses[receiver][i];
+                response = _responses[msg.sender][i];
 
                 responses[i] = response;
             }

@@ -8,6 +8,7 @@ const Error = artifacts.require("Error");
 const BookSharingStorage = artifacts.require("BookSharingStorage");
 const BookRentingStorage = artifacts.require("BookRentingStorage");
 const ListRealOwners = artifacts.require("ListRealOwners");
+const SecretKeyStorage = artifacts.require("SecretKeyStorage");
 module.exports = function (deployer) {
   deployer
     .deploy(BookSellingStorage)
@@ -45,11 +46,13 @@ module.exports = function (deployer) {
     })
     .then(async function ([bookSellingStorage, bookTemporary]) {
       await deployer.deploy(ListRealOwners);
+      await deployer.deploy(SecretKeyStorage);
       return deployer.deploy(
         BookStore,
         bookSellingStorage.address,
         bookTemporary.address,
-        ListRealOwners.address
+        ListRealOwners.address,
+        SecretKeyStorage.address
       );
     });
 };

@@ -227,16 +227,15 @@ contract BookSellingStorage {
     return _totalOwnedPurchasedBook[buyer];
   }
 
-  function getOwnedPurchasedBooks(
-    address owner
-  ) public view returns (BookSelling[] memory) {
-    uint ownedPurchasedBookCount = getTotalOwnedPurchasedBook(owner);
+  function getOwnedPurchasedBooks() 
+    public view returns (BookSelling[] memory) {
+    uint ownedPurchasedBookCount = getTotalOwnedPurchasedBook(msg.sender);
     BookSelling[] memory books = new BookSelling[](ownedPurchasedBookCount);
 
     uint currentIndex = 0;
     for (uint i = 1; i <= ownedPurchasedBookCount; i++) {
-      BookSelling memory book = _ownedPurchasedBooks[owner][i];
-      if (book.tokenId != 0 && book.buyer == owner) {
+      BookSelling memory book = _ownedPurchasedBooks[msg.sender][i];
+      if (book.tokenId != 0 && book.buyer == msg.sender) {
         books[currentIndex] = book;
         currentIndex++;
       }

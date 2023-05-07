@@ -403,13 +403,22 @@ contract BookRentingStorage is ExtendTime {
     }
   }
 
-  function _updateAmountBorrowedBookFromBorrowing(
+  function _updateAmountBorrowedBookFromBorrowingWithHashId(
     bytes32 hashId,
+    uint oldAmount,
     uint newAmount
   ) private {
     uint idBorrowedBook = _allBorrowedBook[hashId];
     if (idBorrowedBook != 0) {
       _idToBorrowedBook[idBorrowedBook].amount = newAmount;
+      uint tokenId = _idToBorrowedBook[idBorrowedBook].tokenId;
+      address borrower = _idToBorrowedBook[idBorrowedBook].borrower;
+      if (oldAmount > newAmount) {
+        _amountOwnedBorrowedBooks[borrower][tokenId] -= (oldAmount - newAmount);
+      }
+      if (oldAmount < newAmount) {
+        _amountOwnedBorrowedBooks[borrower][tokenId] += (newAmount - oldAmount);
+      }
     }
   }
 
@@ -450,16 +459,15 @@ contract BookRentingStorage is ExtendTime {
     return _amountOwnedBorrowedBooks[owner][tokenId];
   }
 
-  function getOwnedBorrowedBooks(
-    address borrower
-  ) public view returns (BorrowedBook[] memory) {
-    uint totalBorrowedBook = _totalOwnedBorrowedBook[borrower];
+  function getOwnedBorrowedBooks() 
+    public view returns (BorrowedBook[] memory) {
+    uint totalBorrowedBook = _totalOwnedBorrowedBook[msg.sender];
     BorrowedBook[] memory borrowedBooks = new BorrowedBook[](totalBorrowedBook);
 
     uint currentIndex = 0;
     for (uint i = 1; i <= _borrowedBooks.current(); i++) {
       BorrowedBook memory book = _idToBorrowedBook[i];
-      if (book.borrower == borrower) {
+      if (book.borrower == msg.sender) {
         borrowedBooks[currentIndex] = book;
         currentIndex++;
       }
@@ -467,6 +475,21 @@ contract BookRentingStorage is ExtendTime {
 
     return borrowedBooks;
   }
+
+  function isBorrowedBookReadable(uint tokenId, address owner)
+    public view returns (bool) {
+    for (uint i = 1; i <= _borrowedBooks.current(); i++) {
+      BorrowedBook memory book = _idToBorrowedBook[i];
+      if (book.borrower == owner &&
+        book.tokenId == tokenId &&
+        book.endTime > block.timestamp) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 
   function borrowBooks(
     uint256 tokenId,
@@ -657,8 +680,9 @@ contract BookRentingStorage is ExtendTime {
             endTime,
             borrower
           );
-          _updateAmountBorrowedBookFromBorrowing(
+          _updateAmountBorrowedBookFromBorrowingWithHashId(
             oldHashId,
+            borrowedBook.amount,
             borrowedBook.amount - response.amount
           );
         }

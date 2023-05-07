@@ -22,4 +22,6 @@ contract Error {
     error AlreadyQueuedError(bytes32);
     error TimestampNotInRangeError(uint,uint);
     error NotQueuedError(bytes32);
+
+    error NoReadingPermissionError(uint);
 }
