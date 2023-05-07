@@ -74,7 +74,6 @@ export const hookFactory: OwnedPurchasedBooksHookFactory =
           }
           return nfts;
         } catch (err) {
-          console.log(err);
           return [];
         }
       }
