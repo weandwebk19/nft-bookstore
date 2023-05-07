@@ -10,7 +10,10 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 import { Rendition } from "epubjs";
+import { useRouter } from "next/router";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useBookDetail } from "@/components/hooks/web3";
 import { ZenLayout } from "@/layouts/ZenLayout";
 import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
 import { StyledButton } from "@/styles/components/Button";
@@ -32,6 +35,11 @@ const ReadBook = () => {
   const tocRef = useRef<IToc | null>(null);
 
   const fileType = "epub";
+
+  const router = useRouter();
+  const { bookId } = router.query;
+  const { bookDetail } = useBookDetail(bookId as string);
+  const bookFileUrl = bookDetail.data?.meta.bookFile; // Url of file on pinata
 
   const locationChanged = (epubcifi: string) => {
     if (!firstRenderDone) {
