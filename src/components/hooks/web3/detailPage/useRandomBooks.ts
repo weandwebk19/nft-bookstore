@@ -10,15 +10,18 @@ type RandomBooksHookFactory = CryptoHookFactory<BookSellingCore[]>;
 export type UseRandomBooksHook = ReturnType<RandomBooksHookFactory>;
 
 export const hookFactory: RandomBooksHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookSellingContract }) =>
   () => {
     const { account } = useAccount();
 
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useRandomBooks" : null, account.data],
+      [
+        bookStoreContract && bookSellingContract ? "web3/useRandomBooks" : null,
+        account.data
+      ],
       async () => {
         const listedBooks = [] as BookSellingCore[];
-        const coreListedBooks = await contract!.getAllBooksOnSale();
+        const coreListedBooks = await bookSellingContract!.getAllListedBooks();
 
         let count = 0;
         while (count < 6 && count < coreListedBooks.length) {

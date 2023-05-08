@@ -22,7 +22,7 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 const ReviewManagement = () => {
   const { t } = useTranslation("reviewManagement");
   const { account } = useAccount();
-  const { ethereum, contract } = useWeb3();
+  const { ethereum, bookStoreContract } = useWeb3();
   const [rows, setRows] = useState<ReviewRowData[]>([]);
   const reviews = useSoldBooksReviews();
   // console.log("reviews", reviews);

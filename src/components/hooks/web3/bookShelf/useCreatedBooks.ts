@@ -25,20 +25,24 @@ type CreatedBooksHookFactory = CryptoHookFactory<
 export type UseCreatedBooksHook = ReturnType<CreatedBooksHookFactory>;
 
 export const hookFactory: CreatedBooksHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useCreatedBooks" : null, queryString, account.data],
+      [
+        bookStoreContract ? "web3/useCreatedBooks" : null,
+        queryString,
+        account.data
+      ],
       async () => {
         const nfts = [] as NftBook[];
-        const ownedBooks = await contract!.getOwnedNFTBooks();
+        const ownedBooks = await bookStoreContract!.getOwnedNFTBooks();
         const createdBooks = ownedBooks.filter((e) => e.author == account.data);
 
         for (let i = 0; i < createdBooks.length; i++) {
           const item = createdBooks[i];
 
-          const amountTradeable = await contract!.getAmountUnUsedBook(
+          const amountTradeable = await bookStoreContract!.getAmountUnUsedBook(
             item.tokenId
           );
 
@@ -55,7 +59,7 @@ export const hookFactory: CreatedBooksHookFactory =
               (await checkFilterBooks(
                 item.tokenId,
                 undefined,
-                contract!,
+                bookStoreContract!,
                 queryString
               )) === true
             ) {

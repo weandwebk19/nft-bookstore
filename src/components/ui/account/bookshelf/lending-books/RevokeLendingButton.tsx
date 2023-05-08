@@ -53,7 +53,7 @@ const RevokeLendingButton = ({
   tokenId
 }: RevokeLendingButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -70,7 +70,12 @@ const RevokeLendingButton = ({
         });
       }
 
-      const tx = await contract?.updateBookFromRenting(tokenId, 0, 0, renter);
+      const tx = await bookStoreContract?.updateBookFromRenting(
+        tokenId,
+        0,
+        0,
+        renter
+      );
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",

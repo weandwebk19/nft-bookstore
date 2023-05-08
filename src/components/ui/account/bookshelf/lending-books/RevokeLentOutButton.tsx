@@ -37,7 +37,7 @@ const RevokeLentOutButton = ({
   buttonName = "Revoke"
 }: RevokeLentOutButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { contract } = useWeb3();
+  const { bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -54,14 +54,14 @@ const RevokeLentOutButton = ({
         });
       }
 
-      const idBorrowedBook = await contract!.getIdBorrowedBook(
+      const idBorrowedBook = await bookRentingContract!.getIdBorrowedBook(
         tokenId,
         renter,
         borrower,
         startTime,
         endTime
       );
-      const tx = await contract?.recallBorrowedBooks(idBorrowedBook);
+      const tx = await bookStoreContract?.recallBorrowedBooks(idBorrowedBook);
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",

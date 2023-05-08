@@ -1,6 +1,9 @@
 import axios from "axios";
 import { BigNumber, ethers } from "ethers";
 
+import { BookRentingContract } from "@/types/BookRentingContract";
+import { BookSellingContract } from "@/types/BookSellingContract";
+import { BookSharingContract } from "@/types/BookSharingContract";
 import { BookStoreContract } from "@/types/BookStoreContract";
 import { FilterField } from "@/types/filter";
 import { BookInfo } from "@/types/nftBook";

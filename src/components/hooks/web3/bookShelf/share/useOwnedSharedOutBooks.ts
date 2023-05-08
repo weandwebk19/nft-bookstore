@@ -19,18 +19,20 @@ export type UseOwnedSharedOutBooksHook =
   ReturnType<OwnedSharedOutBooksHookFactory>;
 
 export const hookFactory: OwnedSharedOutBooksHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookSharingContract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
       [
-        contract ? "web3/useOwnedSharedOutBooks" : null,
+        bookStoreContract && bookSharingContract
+          ? "web3/useOwnedSharedOutBooks"
+          : null,
         queryString,
         account.data
       ],
       async () => {
         const nfts = [] as BookSharing[];
-        const allSharedBooks = await contract!.getAllSharedBook();
+        const allSharedBooks = await bookSharingContract!.getAllSharedBook();
         const coreNfts = allSharedBooks.filter((nft) => {
           return nft.sharer == account.data;
         });
@@ -61,7 +63,7 @@ export const hookFactory: OwnedSharedOutBooksHookFactory =
               (await checkFilterBooks(
                 item.tokenId,
                 item.price,
-                contract!,
+                bookStoreContract!,
                 queryString
               )) === true
             ) {

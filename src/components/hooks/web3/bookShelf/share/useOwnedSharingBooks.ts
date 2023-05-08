@@ -14,18 +14,20 @@ type OwnedSharingBooksHookFactory = CryptoHookFactory<BookSharing[]>;
 export type UseOwnedSharingBooksHook = ReturnType<OwnedSharingBooksHookFactory>;
 
 export const hookFactory: OwnedSharingBooksHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookSharingContract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
       [
-        contract ? "web3/useOwnedSharingBooks" : null,
+        bookStoreContract && bookSharingContract
+          ? "web3/useOwnedSharingBooks"
+          : null,
         queryString,
         account.data
       ],
       async () => {
         const nfts = [] as BookSharing[];
-        const coreNfts = await contract!.getAllOwnedBooksOnSharing();
+        const coreNfts = await bookSharingContract!.getAllOwnedBooksOnSharing();
 
         for (let i = 0; i < coreNfts.length; i++) {
           const item = coreNfts[i];
@@ -54,7 +56,7 @@ export const hookFactory: OwnedSharingBooksHookFactory =
               (await checkFilterBooks(
                 item.tokenId,
                 item.price,
-                contract!,
+                bookStoreContract!,
                 queryString
               )) === true
             ) {

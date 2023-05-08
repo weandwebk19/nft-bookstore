@@ -46,7 +46,7 @@ const defaultValues = {
 
 const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
   const [ownerName, setOwnerName] = useState();
-  const { ethereum, contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const metadata = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
@@ -78,8 +78,8 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
         });
       }
 
-      const listingPrice = await contract!.listingPrice();
-      const tx = await contract?.sellBooks(
+      const listingPrice = await bookStoreContract!.listingPrice();
+      const tx = await bookStoreContract?.sellBooks(
         tokenId,
         ethers.utils.parseEther(data.price.toString()),
         data.amount,

@@ -199,8 +199,6 @@ const SharingBooks = () => {
                                 <>
                                   <RevokeSharedOutButton
                                     tokenId={book?.tokenId}
-                                    title={book?.meta.title}
-                                    bookCover={book?.meta.bookCover}
                                     sharer={book?.sharer}
                                     sharedPer={book?.sharedPer}
                                     fromRenter={book?.fromRenter}

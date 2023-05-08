@@ -12,7 +12,6 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { Rendition } from "epubjs";
 import { useRouter } from "next/router";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useBookDetail } from "@/components/hooks/web3";
 import { ZenLayout } from "@/layouts/ZenLayout";
 import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
@@ -40,6 +39,7 @@ const ReadBook = () => {
   const { bookId } = router.query;
   const { bookDetail } = useBookDetail(bookId as string);
   const bookFileUrl = bookDetail.data?.meta.bookFile; // Url of file on pinata
+  console.log(bookFileUrl);
 
   const locationChanged = (epubcifi: string) => {
     if (!firstRenderDone) {

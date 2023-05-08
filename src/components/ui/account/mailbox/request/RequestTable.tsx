@@ -37,7 +37,7 @@ export default function RequestTable({ data }: RequestTableProps) {
   const router = useRouter();
   const { t } = useTranslation("request");
   const { account } = useAccount();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -70,7 +70,8 @@ export default function RequestTable({ data }: RequestTableProps) {
   const acceptRequest = useCallback(
     async (idBorrowedBook: number, borrower: string) => {
       try {
-        const tx = await contract?.doAcceptRequest(
+        console.log(idBorrowedBook, borrower);
+        const tx = await bookStoreContract?.doAcceptRequest(
           idBorrowedBook,
           borrower,
           true
@@ -87,13 +88,13 @@ export default function RequestTable({ data }: RequestTableProps) {
         });
       }
     },
-    [contract]
+    [bookStoreContract]
   );
 
   const refuseRequest = useCallback(
     async (idBorrowedBook: number, borrower: string) => {
       try {
-        const tx = await contract?.doAcceptRequest(
+        const tx = await bookStoreContract?.doAcceptRequest(
           idBorrowedBook,
           borrower,
           false
@@ -110,7 +111,7 @@ export default function RequestTable({ data }: RequestTableProps) {
         });
       }
     },
-    [contract]
+    [bookStoreContract]
   );
 
   const handleAcceptClick = (

@@ -15,19 +15,29 @@ type RealOwnerOfTokensHookFactory = CryptoHookFactory<BookSellingCore[]>;
 export type UseRealOwnerOfTokensHook = ReturnType<RealOwnerOfTokensHookFactory>;
 
 export const hookFactory: RealOwnerOfTokensHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookSellingContract }) =>
   (tokenId: number) => {
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useRealOwnerOfTokens" : null, tokenId],
+      [
+        bookStoreContract && bookSellingContract
+          ? "web3/useRealOwnerOfTokens"
+          : null,
+        tokenId
+      ],
       async () => {
         try {
           if (tokenId) {
             const nfts = [] as BookSellingCore[];
-            const coreNfts = await contract!.getAllRealOwnerOfTokenId(tokenId);
+            const coreNfts = await bookStoreContract!.getAllRealOwnerOfTokenId(
+              tokenId
+            );
 
             for (let i = 0; i < coreNfts.length; i++) {
               const item = coreNfts[i];
-              const listedBook = await contract!.getListedBook(tokenId, item);
+              const listedBook = await bookSellingContract!.getListedBook(
+                tokenId,
+                item
+              );
 
               if (
                 listedBook &&
