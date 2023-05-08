@@ -57,7 +57,7 @@ const ShareButton = ({
   borrowedAmount
 }: ShareButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -95,7 +95,7 @@ const ShareButton = ({
       }
 
       const sharingPrice = await bookStoreContract!.sharingPrice();
-      const idBorrowedBook = await bookStoreContract!.getIdBorrowedBook(
+      const idBorrowedBook = await bookRentingContract!.getIdBorrowedBook(
         tokenId,
         renter,
         borrower,

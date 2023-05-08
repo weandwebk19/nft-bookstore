@@ -68,7 +68,7 @@ const TakeButton = ({
 }: TakeButtonProps) => {
   const router = useRouter();
   const [sharerName, setSharerName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { bookStoreContract, bookSharingContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -141,7 +141,7 @@ const TakeButton = ({
           );
         }
 
-        const idBooksOnSharing = await bookStoreContract!.getIdBookOnSharing(
+        const idBooksOnSharing = await bookSharingContract!.getIdBookOnSharing(
           tokenId,
           fromRenter,
           sharer,
@@ -168,7 +168,7 @@ const TakeButton = ({
         });
       }
     },
-    [bookStoreContract, account.data]
+    [bookStoreContract, bookSharingContract, account.data]
   );
 
   const onSubmit = async (data: any) => {

@@ -11,6 +11,7 @@ import { BookRentingContract } from "@_types/BookRentingContract";
 import { BookSellingContract } from "@_types/BookSellingContract";
 import { BookSharingContract } from "@_types/BookSharingContract";
 import { BookStoreContract } from "@_types/BookStoreContract";
+import { BookTemporaryContract } from "@_types/BookTemporaryContract";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -69,6 +70,10 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
           window.ethereum as any
         );
         const bookStoreContract = await loadContract("BookStore", provider);
+        const bookTemporaryContract = await loadContract(
+          "BookTemporary",
+          provider
+        );
         const bookSellingContract = await loadContract(
           "BookSellingStorage",
           provider
@@ -84,6 +89,8 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
 
         const signer = provider.getSigner();
         const signedBookStoreContract = bookStoreContract.connect(signer);
+        const signedBookTemporaryContract =
+          bookTemporaryContract.connect(signer);
         const signedBookSellingContract = bookSellingContract.connect(signer);
         const signedBookRentingContract = bookRentingContract.connect(signer);
         const signedBookSharingContract = bookSharingContract.connect(signer);
@@ -95,6 +102,8 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
             provider,
             bookStoreContract:
               signedBookStoreContract as unknown as BookStoreContract,
+            bookTemporaryContract:
+              signedBookTemporaryContract as unknown as BookTemporaryContract,
             bookSellingContract:
               signedBookSellingContract as unknown as BookSellingContract,
             bookRentingContract:

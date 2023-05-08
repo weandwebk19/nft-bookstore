@@ -6,6 +6,7 @@ import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
@@ -18,8 +19,6 @@ interface RevokeSharedOutButtonProps {
   amount: number;
   isEnded?: boolean;
   countDown?: string;
-  title: string;
-  bookCover: string;
   fromRenter: string;
   tokenId: number;
   startTime: number;
@@ -33,8 +32,6 @@ const RevokeSharedOutButton = ({
   amount,
   isEnded,
   countDown,
-  bookCover,
-  title,
   fromRenter,
   startTime,
   endTime,
@@ -43,7 +40,8 @@ const RevokeSharedOutButton = ({
 }: RevokeSharedOutButtonProps) => {
   const [renterName, setRenterName] = useState();
   const { account } = useAccount();
-  const { bookStoreContract } = useWeb3();
+  const { bookStoreContract, bookSharingContract } = useWeb3();
+  const metadata = useMetadata(tokenId);
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
@@ -52,13 +50,13 @@ const RevokeSharedOutButton = ({
   const handleRevokeSharedOut = async () => {
     try {
       // handle errors
-      if (fromRenter !== account.data) {
+      if (sharer !== account.data) {
         return toast.error("Renter address is not valid.", {
           position: toast.POSITION.TOP_CENTER
         });
       }
 
-      const idSharedBook = await bookStoreContract!.getIdSharedBook(
+      const idSharedBook = await bookSharingContract!.getIdSharedBook(
         tokenId,
         sharedPer,
         sharer,
@@ -149,12 +147,12 @@ const RevokeSharedOutButton = ({
             <Grid item md={4}>
               <Stack>
                 <Image
-                  src={bookCover}
-                  alt={title}
+                  src={metadata.data?.bookCover}
+                  alt={metadata.data?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
                 <Typography>Amount: {amount}</Typography>
               </Stack>

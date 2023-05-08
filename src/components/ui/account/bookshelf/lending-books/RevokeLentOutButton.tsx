@@ -37,7 +37,7 @@ const RevokeLentOutButton = ({
   buttonName = "Revoke"
 }: RevokeLentOutButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -54,7 +54,7 @@ const RevokeLentOutButton = ({
         });
       }
 
-      const idBorrowedBook = await bookStoreContract!.getIdBorrowedBook(
+      const idBorrowedBook = await bookRentingContract!.getIdBorrowedBook(
         tokenId,
         renter,
         borrower,

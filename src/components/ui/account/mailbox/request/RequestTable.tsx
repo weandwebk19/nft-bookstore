@@ -70,6 +70,7 @@ export default function RequestTable({ data }: RequestTableProps) {
   const acceptRequest = useCallback(
     async (idBorrowedBook: number, borrower: string) => {
       try {
+        console.log(idBorrowedBook, borrower);
         const tx = await bookStoreContract?.doAcceptRequest(
           idBorrowedBook,
           borrower,

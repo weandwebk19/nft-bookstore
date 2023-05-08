@@ -18,8 +18,6 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const Request = () => {
   const { t } = useTranslation("request");
-  const { account } = useAccount();
-  const { ethereum, bookStoreContract } = useWeb3();
   const { swr } = useOwnedRequestsOnExtending();
   const data = swr.data as RequestExtendCore[];
 

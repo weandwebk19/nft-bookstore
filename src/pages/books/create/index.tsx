@@ -440,8 +440,8 @@ const CreateBook = () => {
         const tx = await bookStoreContract?.mintBook(
           nftUri,
           quantity,
-          cryptoConfig.privateKey as string,
-          cryptoConfig.ivKey as string,
+          "abc",
+          "abc",
           {
             value: listingPrice
           }

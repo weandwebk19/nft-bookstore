@@ -69,7 +69,7 @@ const RevokeSharingButton = ({
   buttonName = "Cancel Share"
 }: RevokeSharingButtonProps) => {
   const [sharerName, setSharerName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { bookSharingContract, bookTemporaryContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -86,7 +86,7 @@ const RevokeSharingButton = ({
         });
       }
 
-      const idBooksOnSharing = await bookStoreContract!.getIdBookOnSharing(
+      const idBooksOnSharing = await bookSharingContract!.getIdBookOnSharing(
         tokenId,
         fromRenter,
         sharer,
@@ -94,10 +94,11 @@ const RevokeSharingButton = ({
         endTime
       );
 
-      const tx = await bookStoreContract?.convertBookOnSharingToBorrowedBook(
-        idBooksOnSharing,
-        amount
-      );
+      const tx =
+        await bookTemporaryContract?.convertBookOnSharingToBorrowedBook(
+          idBooksOnSharing,
+          amount
+        );
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",

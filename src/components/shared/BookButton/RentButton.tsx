@@ -143,7 +143,7 @@ const RentButton = ({
           );
         }
 
-        const value = (price * amount * rentalDuration) / 604800;
+        const value = ((price * amount * rentalDuration) / 604800).toFixed(3);
         const result = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,

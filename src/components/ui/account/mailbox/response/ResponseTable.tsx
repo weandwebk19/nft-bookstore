@@ -38,7 +38,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
   const router = useRouter();
   const { t } = useTranslation("response");
   const { account } = useAccount();
-  const { bookStoreContract } = useWeb3();
+  const { bookStoreContract, bookRentingContract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -76,21 +76,22 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       time: number
     ) => {
       try {
-        const borrowedBook = await bookStoreContract?.getBorrowedBookFromId(
+        const borrowedBook = await bookRentingContract?.getBorrowedBookFromId(
           idBorrowedBook
         );
-        const totalPrice =
+        const totalPrice = (
           (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
             amount *
             time) /
-          604800;
+          604800
+        ).toFixed(3);
 
         const tx = await bookStoreContract?.transferForSendedRequest(
           idBorrowedBook,
           renter,
           true,
           {
-            value: ethers.utils.parseEther(totalPrice.toString())
+            value: ethers.utils.parseEther(totalPrice)
           }
         );
 
@@ -105,7 +106,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         });
       }
     },
-    [bookStoreContract]
+    [bookStoreContract, bookRentingContract]
   );
 
   const refuseResponse = useCallback(
@@ -116,21 +117,22 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       time: number
     ) => {
       try {
-        const borrowedBook = await bookStoreContract?.getBorrowedBookFromId(
+        const borrowedBook = await bookRentingContract?.getBorrowedBookFromId(
           idBorrowedBook
         );
-        const totalPrice =
+        const totalPrice = (
           (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
             amount *
             time) /
-          604800;
+          604800
+        ).toFixed(3);
 
         const tx = await bookStoreContract?.transferForSendedRequest(
           idBorrowedBook,
           renter,
           false,
           {
-            value: ethers.utils.parseEther(totalPrice.toString())
+            value: ethers.utils.parseEther(totalPrice)
           }
         );
 
@@ -145,7 +147,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         });
       }
     },
-    [bookStoreContract]
+    [bookStoreContract, bookRentingContract]
   );
 
   const handleAcceptClick = (

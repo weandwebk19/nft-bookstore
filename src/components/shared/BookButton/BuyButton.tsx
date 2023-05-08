@@ -134,7 +134,7 @@ const BuyButton = ({
         }
 
         const tx = await bookStoreContract?.buyBooks(tokenId, seller, amount, {
-          value: ethers.utils.parseEther((price * amount).toString())
+          value: ethers.utils.parseEther((price * amount).toFixed(3).toString())
         });
 
         const receipt: any = await toast.promise(tx!.wait(), {

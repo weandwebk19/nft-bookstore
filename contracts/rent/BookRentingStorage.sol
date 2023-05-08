@@ -459,8 +459,7 @@ contract BookRentingStorage is ExtendTime {
     return _amountOwnedBorrowedBooks[owner][tokenId];
   }
 
-  function getOwnedBorrowedBooks() 
-    public view returns (BorrowedBook[] memory) {
+  function getOwnedBorrowedBooks() public view returns (BorrowedBook[] memory) {
     uint totalBorrowedBook = _totalOwnedBorrowedBook[msg.sender];
     BorrowedBook[] memory borrowedBooks = new BorrowedBook[](totalBorrowedBook);
 
@@ -476,20 +475,23 @@ contract BookRentingStorage is ExtendTime {
     return borrowedBooks;
   }
 
-  function isBorrowedBookReadable(uint tokenId, address owner)
-    public view returns (bool) {
+  function isBorrowedBookReadable(
+    uint tokenId,
+    address owner
+  ) public view returns (bool) {
     for (uint i = 1; i <= _borrowedBooks.current(); i++) {
       BorrowedBook memory book = _idToBorrowedBook[i];
-      if (book.borrower == owner &&
+      if (
+        book.borrower == owner &&
         book.tokenId == tokenId &&
-        book.endTime > block.timestamp) {
+        book.endTime > block.timestamp
+      ) {
         return true;
       }
     }
 
     return false;
   }
-
 
   function borrowBooks(
     uint256 tokenId,

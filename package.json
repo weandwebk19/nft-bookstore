@@ -10,7 +10,8 @@
     "genBookStoreContractType": "abi-types-generator './public/contracts/BookStore.json' --output='./src/types' --name=BookStoreContract --provider=ethers_v5",
     "genBookSellingContractType": "abi-types-generator './public/contracts/BookSellingStorage.json' --output='./src/types' --name=BookSellingContract --provider=ethers_v5",
     "genBookRentingContractType": "abi-types-generator './public/contracts/BookRentingStorage.json' --output='./src/types' --name=BookRentingContract --provider=ethers_v5",
-    "genBookSharingContractType": "abi-types-generator './public/contracts/BookSharingStorage.json' --output='./src/types' --name=BookSharingContract --provider=ethers_v5"
+    "genBookSharingContractType": "abi-types-generator './public/contracts/BookSharingStorage.json' --output='./src/types' --name=BookSharingContract --provider=ethers_v5",
+    "genBookTemporaryContractType": "abi-types-generator './public/contracts/BookTemporary.json' --output='./src/types' --name=BookTemporaryContract --provider=ethers_v5"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
