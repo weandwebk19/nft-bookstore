@@ -40,7 +40,7 @@ import { deleteFile } from "../api/pinata/utils";
 
 const Book = () => {
   const formRef = useRef<any>();
-  const { provider, ethereum, contract } = useWeb3();
+  const { provider, ethereum, bookStoreContract } = useWeb3();
   const { network } = useNetwork();
   const { account } = useAccount();
   const transactions = useTransactionsHistory();
@@ -107,7 +107,7 @@ const Book = () => {
           isError: string;
           txreceipt_status: string;
           input: string;
-          contractAddress: string;
+          bookStoreContractAddress: string;
           cumulativeGasUsed: string;
           gasUsed: string;
           confirmations: string;

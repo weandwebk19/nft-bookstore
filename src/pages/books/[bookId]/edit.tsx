@@ -59,7 +59,7 @@ const EditBook = () => {
     privacyPolicy: false
   };
 
-  const { ethereum, contract } = useWeb3();
+  const { ethereum, bookStoreContract } = useWeb3();
   const [isLoading, setIsLoading] = useState(false);
 
   const schema = yup.object({

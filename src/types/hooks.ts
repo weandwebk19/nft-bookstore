@@ -2,11 +2,19 @@ import { MetaMaskInpageProvider } from "@metamask/providers";
 import { Contract, providers } from "ethers";
 import { SWRResponse } from "swr";
 
+import { BookRentingContract } from "./BookRentingContract";
+import { BookSellingContract } from "./BookSellingContract";
+import { BookSharingContract } from "./BookSharingContract";
 import { BookStoreContract } from "./BookStoreContract";
+import { BookTemporaryContract } from "./BookTemporaryContract";
 
 export type Web3Dependencies = {
   provider: providers.Web3Provider;
-  contract: BookStoreContract;
+  bookStoreContract: BookStoreContract;
+  bookTemporaryContract: BookTemporaryContract;
+  bookSellingContract: BookSellingContract;
+  bookRentingContract: BookRentingContract;
+  bookSharingContract: BookSharingContract;
   ethereum: MetaMaskInpageProvider;
   isLoading: boolean;
 };

@@ -72,7 +72,7 @@ const ExtendRequestButton = ({
   supplyAmount
 }: ExtendRequestButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -149,7 +149,7 @@ const ExtendRequestButton = ({
           );
         }
 
-        const tx = await contract?.requestExtendTimeOfBorrowedBooks(
+        const tx = await bookStoreContract?.requestExtendTimeOfBorrowedBooks(
           tokenId,
           renter,
           startTime,
@@ -170,7 +170,7 @@ const ExtendRequestButton = ({
         });
       }
     },
-    [contract, account.data]
+    [bookStoreContract, account.data]
   );
 
   const onSubmit = async (data: any) => {

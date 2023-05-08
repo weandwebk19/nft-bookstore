@@ -68,7 +68,7 @@ const RentButton = ({
 }: RentButtonProps) => {
   const router = useRouter();
   const [renterName, setAuthorName] = useState();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -143,8 +143,8 @@ const RentButton = ({
           );
         }
 
-        const value = (price * amount * rentalDuration) / 604800;
-        const result = await contract!.borrowBooks(
+        const value = ((price * amount * rentalDuration) / 604800).toFixed(3);
+        const result = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,
           ethers.utils.parseEther(price.toString()),
@@ -167,7 +167,7 @@ const RentButton = ({
         });
       }
     },
-    [account.data, contract]
+    [account.data, bookStoreContract]
   );
 
   const onSubmit = async (data: any) => {

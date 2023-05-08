@@ -11,7 +11,7 @@ import { StyledButton } from "@/styles/components/Button";
 
 const RevokeAllSharedOutButton = () => {
   const { t } = useTranslation("lendingBooks");
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
 
   const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
     null
@@ -24,7 +24,7 @@ const RevokeAllSharedOutButton = () => {
   ) => {
     e.preventDefault();
     try {
-      const tx = await contract?.recallAllSharedBooks();
+      const tx = await bookStoreContract?.recallAllSharedBooks();
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",

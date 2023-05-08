@@ -18,6 +18,10 @@ import Paper from "@mui/material/Paper";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Alert } from "@mui/lab";
+import {
+  convertArrayToHexString,
+  convertHexStringToUint8Array
+} from "@utils/convert";
 import getFileExtension from "@utils/getFileExtension";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -41,11 +45,11 @@ import {
   Step2,
   Step3
 } from "@/components/ui/books/create/steps";
+import { cryptoConfig } from "@/config/crypto";
 import { deleteFile } from "@/pages/api/pinata/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 import { Crypto } from "@/utils/crypto";
-import { convertArrayToHexString, convertHexStringToUint8Array} from "@utils/convert";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const MAX_BOOKFILE_SIZE = process.env.NEXT_PUBLIC_MAX_BOOKFILE_SIZE;
@@ -79,7 +83,7 @@ const defaultValues = {
   bookCover: "",
   bookSample: "",
 
-  // Signing contract
+  // Signing bookStoreContract
 
   // Step 3
   externalLink: "",
@@ -101,7 +105,7 @@ const CreateBook = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSigning, setIsSigning] = useState(false);
   const formRef = useRef<any>();
-  const { ethereum, contract } = useWeb3();
+  const { ethereum, bookStoreContract } = useWeb3();
   const [nftURI, setNftURI] = useState("");
   const [bookFileLink, setBookFileLink] = useState("");
   const [bookCoverLink, setBookCoverLink] = useState("");
@@ -369,7 +373,7 @@ const CreateBook = () => {
     }
     return "";
   };
-  
+
   const uploadBookCover = async (file: File) => {
     if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
@@ -434,9 +438,16 @@ const CreateBook = () => {
                                iv: string) => {
     try {
       if (nftUri !== "") {
-        const tx = await contract?.mintBook(nftUri, quantity, privateKey, iv, {
-          value: ethers.utils.parseEther((0.025).toString())
-        });
+        const listingPrice = await bookStoreContract!.listingPrice();
+        const tx = await bookStoreContract?.mintBook(
+          nftUri,
+          quantity,
+          privateKey,
+          iv,
+          {
+            value: listingPrice
+          }
+        );
 
         const receipt: any = await toast.promise(tx!.wait(), {
           pending: t("pendingMintingToken") as string,
@@ -447,7 +458,7 @@ const CreateBook = () => {
         const tokenId = receipt.events
           .find((x: any) => x.event == "NFTBookCreated")
           .args.tokenId.toNumber();
-        // const contractAddress = receipt.contractAdress;
+        // const bookStoreContractAddress = receipt.bookStoreContractAdress;
         return tokenId;
       }
     } catch (e: any) {

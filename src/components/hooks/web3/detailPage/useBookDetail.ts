@@ -15,17 +15,19 @@ type BookDetailHookFactory = CryptoHookFactory<NftBookDetail>;
 export type UseBookDetailHook = ReturnType<BookDetailHookFactory>;
 
 export const hookFactory: BookDetailHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookSellingContract }) =>
   (bookId: string, seller?: string) => {
     const { data, ...swr } = useSWR(
-      contract ? "web3/useBookDetail" : null,
+      bookStoreContract && bookSellingContract ? "web3/useBookDetail" : null,
       async () => {
         if (bookId) {
           const bookInfo = await (
             await axios.get(`/api/books/${bookId}`)
           ).data?.data;
-          const coreNftBook = await contract!.getNftBook(bookInfo?.tokenId);
-          const tokenURI = await contract!.getUri(bookInfo?.tokenId);
+          const coreNftBook = await bookStoreContract!.getNftBook(
+            bookInfo?.tokenId
+          );
+          const tokenURI = await bookStoreContract!.getUri(bookInfo?.tokenId);
           const metaRes = await (
             await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
           ).data;
@@ -35,14 +37,13 @@ export const hookFactory: BookDetailHookFactory =
           }
 
           const sellerDefault = seller ? seller : coreNftBook?.author;
-          // const isListing = await contract!.isListing(
-          //   bookInfo?.tokenId,
-          //   sellerDefault
-          // );
-          const isListing = false;
+          const isListing = await bookSellingContract!.isListing(
+            bookInfo?.tokenId,
+            sellerDefault
+          );
           if (isListing === true) {
             try {
-              const listedNftBook = await contract!.getListedBook(
+              const listedNftBook = await bookSellingContract!.getListedBook(
                 bookInfo?.tokenId,
                 sellerDefault
               );

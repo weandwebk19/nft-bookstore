@@ -19,15 +19,18 @@ export type UseOwnedRequestsOnExtendingHook =
   ReturnType<OwnedRequestsOnExtendingHookFactory>;
 
 export const hookFactory: OwnedRequestsOnExtendingHookFactory =
-  ({ contract }) =>
+  ({ bookRentingContract }) =>
   () => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useOwnedRequestsOnExtending" : null, account.data],
+      [
+        bookRentingContract ? "web3/useOwnedRequestsOnExtending" : null,
+        account.data
+      ],
       async () => {
         try {
           const requests = [] as RequestExtendCore[];
-          const coreRequests = await contract!.getAllOwnedRequestsOnExtending();
+          const coreRequests = await bookRentingContract!.getAllOwnedRequest();
 
           for (let i = 0; i < coreRequests.length; i++) {
             const item = coreRequests[i];

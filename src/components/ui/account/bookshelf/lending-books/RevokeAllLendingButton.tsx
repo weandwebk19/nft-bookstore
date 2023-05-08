@@ -17,7 +17,7 @@ interface CancelAllLendingButtonProps {
 
 const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
   const { t } = useTranslation("lendingBooks");
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
 
   const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
@@ -40,7 +40,7 @@ const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
             });
           }
 
-          const tx = await contract?.updateBookFromRenting(
+          const tx = await bookStoreContract?.updateBookFromRenting(
             book.tokenId,
             0,
             0,

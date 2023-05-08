@@ -16,14 +16,20 @@ type AllLendingBooksHookFactory = CryptoHookFactory<LendBookCore[]>;
 export type UseAllLendingBooksHook = ReturnType<AllLendingBooksHookFactory>;
 
 export const hookFactory: AllLendingBooksHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookRentingContract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useAllLendingBooks" : null, queryString, account.data],
+      [
+        bookStoreContract && bookRentingContract
+          ? "web3/useAllLendingBooks"
+          : null,
+        queryString,
+        account.data
+      ],
       async () => {
         const allLendingBooks = [] as LendBookCore[];
-        const coreLendBooks = await contract!.getAllBooksOnLending();
+        const coreLendBooks = await bookRentingContract!.getAllLendBooks();
         const limitItem = 30;
         const page = queryString.page
           ? parseInt(queryString.page as string)
@@ -54,7 +60,7 @@ export const hookFactory: AllLendingBooksHookFactory =
                 (await checkFilterBooks(
                   lendBook.tokenId,
                   lendBook.price,
-                  contract!,
+                  bookStoreContract!,
                   queryString
                 )) === true
               ) {

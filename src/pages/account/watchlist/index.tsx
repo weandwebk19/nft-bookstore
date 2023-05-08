@@ -20,7 +20,7 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 const Watchlist = () => {
   const { t } = useTranslation("watchlist");
   const { account } = useAccount();
-  const { ethereum, contract } = useWeb3();
+  const { ethereum, bookStoreContract } = useWeb3();
   const [rows, setRows] = useState<WatchlistRowData[]>([]);
 
   // Mock value
@@ -50,7 +50,7 @@ const Watchlist = () => {
         try {
           for (let i = 0; i < watchList.length; i++) {
             const item = watchList[i];
-            const tokenURI = await contract!.getUri(item.tokenId);
+            const tokenURI = await bookStoreContract!.getUri(item.tokenId);
             const metaRes = await (
               await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
             ).data;
