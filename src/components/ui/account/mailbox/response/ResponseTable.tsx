@@ -38,7 +38,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
   const router = useRouter();
   const { t } = useTranslation("response");
   const { account } = useAccount();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -76,7 +76,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       time: number
     ) => {
       try {
-        const borrowedBook = await contract?.getBorrowedBookFromId(
+        const borrowedBook = await bookStoreContract?.getBorrowedBookFromId(
           idBorrowedBook
         );
         const totalPrice =
@@ -85,7 +85,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
             time) /
           604800;
 
-        const tx = await contract?.transferForSendedRequest(
+        const tx = await bookStoreContract?.transferForSendedRequest(
           idBorrowedBook,
           renter,
           true,
@@ -105,7 +105,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         });
       }
     },
-    [contract]
+    [bookStoreContract]
   );
 
   const refuseResponse = useCallback(
@@ -116,7 +116,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
       time: number
     ) => {
       try {
-        const borrowedBook = await contract?.getBorrowedBookFromId(
+        const borrowedBook = await bookStoreContract?.getBorrowedBookFromId(
           idBorrowedBook
         );
         const totalPrice =
@@ -125,7 +125,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
             time) /
           604800;
 
-        const tx = await contract?.transferForSendedRequest(
+        const tx = await bookStoreContract?.transferForSendedRequest(
           idBorrowedBook,
           renter,
           false,
@@ -145,7 +145,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         });
       }
     },
-    [contract]
+    [bookStoreContract]
   );
 
   const handleAcceptClick = (

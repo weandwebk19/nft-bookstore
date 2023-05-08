@@ -62,7 +62,7 @@ const BuyButton = ({
   supplyAmount
 }: BuyButtonProps) => {
   const router = useRouter();
-  const { ethereum, contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const [sellerName, setSellerName] = useState();
   const metadata = useMetadata(tokenId);
@@ -133,7 +133,7 @@ const BuyButton = ({
           );
         }
 
-        const tx = await contract?.buyBooks(tokenId, seller, amount, {
+        const tx = await bookStoreContract?.buyBooks(tokenId, seller, amount, {
           value: ethers.utils.parseEther((price * amount).toString())
         });
 
@@ -149,7 +149,7 @@ const BuyButton = ({
         });
       }
     },
-    [contract, account.data]
+    [bookStoreContract, account.data]
   );
 
   const onSubmit = async (data: any) => {

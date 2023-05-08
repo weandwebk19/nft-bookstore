@@ -50,7 +50,7 @@ const UnListButton = ({
   tokenId
 }: UnListButtonProps) => {
   const [sellerName, setSellerName] = useState();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -67,7 +67,12 @@ const UnListButton = ({
         });
       }
 
-      const tx = await contract?.updateBookFromSale(tokenId, 0, 0, seller);
+      const tx = await bookStoreContract?.updateBookFromSale(
+        tokenId,
+        0,
+        0,
+        seller
+      );
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",

@@ -10,7 +10,7 @@ import { ReviewRowData } from "@/types/reviews";
 import { useOwnedSoldBooks } from "../web3";
 
 export const useSoldBooksReviews = () => {
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { nfts } = useOwnedSoldBooks({} as FilterField);
   const listTokens = nfts.data?.map((book: BookSellingCore) => book.tokenId);
   const [data, setData] = useState<ReviewRowData[]>();
@@ -25,7 +25,7 @@ export const useSoldBooksReviews = () => {
         const allReviews = await Promise.all(
           listTokens.map(async (tokenId: number) => {
             // get metadata
-            const tokenURI = await contract!.getUri(tokenId);
+            const tokenURI = await bookStoreContract!.getUri(tokenId);
             const metaRes = await (
               await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
             ).data;

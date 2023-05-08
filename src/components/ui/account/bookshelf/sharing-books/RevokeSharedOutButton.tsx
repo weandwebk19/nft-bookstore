@@ -43,7 +43,7 @@ const RevokeSharedOutButton = ({
 }: RevokeSharedOutButtonProps) => {
   const [renterName, setRenterName] = useState();
   const { account } = useAccount();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
@@ -58,7 +58,7 @@ const RevokeSharedOutButton = ({
         });
       }
 
-      const idSharedBook = await contract!.getIdSharedBook(
+      const idSharedBook = await bookStoreContract!.getIdSharedBook(
         tokenId,
         sharedPer,
         sharer,
@@ -66,7 +66,7 @@ const RevokeSharedOutButton = ({
         endTime
       );
 
-      const tx = await contract?.recallSharedBooks(idSharedBook);
+      const tx = await bookStoreContract?.recallSharedBooks(idSharedBook);
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",

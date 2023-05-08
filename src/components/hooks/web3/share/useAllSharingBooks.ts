@@ -16,14 +16,19 @@ type AllSharingBooksHookFactory = CryptoHookFactory<BookSharingCore[]>;
 export type UseAllSharingBooksHook = ReturnType<AllSharingBooksHookFactory>;
 
 export const hookFactory: AllSharingBooksHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookSharingContract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/useAllSharingBooks" : null, queryString, account.data],
+      [
+        bookSharingContract ? "web3/useAllSharingBooks" : null,
+        queryString,
+        account.data
+      ],
       async () => {
         const allSharingBooks = [] as BookSharingCore[];
-        const coreBookSharings = await contract!.getAllBooksOnSharing();
+        const coreBookSharings =
+          await bookSharingContract!.getAllBooksOnSharing();
         const limitItem = 30;
         const page = queryString.page
           ? parseInt(queryString.page as string)
@@ -64,7 +69,7 @@ export const hookFactory: AllSharingBooksHookFactory =
                 (await checkFilterBooks(
                   sharingBook.tokenId,
                   sharingBook.price,
-                  contract!,
+                  bookStoreContract!,
                   queryString
                 )) === true
               ) {

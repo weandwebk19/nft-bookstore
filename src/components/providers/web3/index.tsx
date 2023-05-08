@@ -7,6 +7,9 @@ import {
   useState
 } from "react";
 
+import { BookRentingContract } from "@_types/BookRentingContract";
+import { BookSellingContract } from "@_types/BookSellingContract";
+import { BookSharingContract } from "@_types/BookSharingContract";
 import { BookStoreContract } from "@_types/BookStoreContract";
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import axios from "axios";
@@ -65,17 +68,39 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
         const provider = new ethers.providers.Web3Provider(
           window.ethereum as any
         );
-        const contract = await loadContract("BookStore", provider);
+        const bookStoreContract = await loadContract("BookStore", provider);
+        const bookSellingContract = await loadContract(
+          "BookSellingStorage",
+          provider
+        );
+        const bookRentingContract = await loadContract(
+          "BookRentingStorage",
+          provider
+        );
+        const bookSharingContract = await loadContract(
+          "BookSharingStorage",
+          provider
+        );
 
         const signer = provider.getSigner();
-        const signedContract = contract.connect(signer);
+        const signedBookStoreContract = bookStoreContract.connect(signer);
+        const signedBookSellingContract = bookSellingContract.connect(signer);
+        const signedBookRentingContract = bookRentingContract.connect(signer);
+        const signedBookSharingContract = bookSharingContract.connect(signer);
 
         setTimeout(() => setGlobalListeners(window.ethereum), 500);
         setWeb3Api(
           createWeb3State({
             ethereum: window.ethereum,
             provider,
-            contract: signedContract as unknown as BookStoreContract,
+            bookStoreContract:
+              signedBookStoreContract as unknown as BookStoreContract,
+            bookSellingContract:
+              signedBookSellingContract as unknown as BookSellingContract,
+            bookRentingContract:
+              signedBookRentingContract as unknown as BookRentingContract,
+            bookSharingContract:
+              signedBookSharingContract as unknown as BookSharingContract,
             isLoading: false
           })
         );

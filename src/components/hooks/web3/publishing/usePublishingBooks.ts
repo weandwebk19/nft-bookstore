@@ -17,14 +17,18 @@ type PublishingBooksHookFactory = CryptoHookFactory<BookSellingCore[]>;
 export type UsePublishingBooksHook = ReturnType<PublishingBooksHookFactory>;
 
 export const hookFactory: PublishingBooksHookFactory =
-  ({ contract }) =>
+  ({ bookStoreContract, bookSellingContract }) =>
   (queryString: FilterField) => {
     const { account } = useAccount();
     const { data, ...swr } = useSWR(
-      [contract ? "web3/usePublishingBooks" : null, queryString, account.data],
+      [
+        bookSellingContract ? "web3/usePublishingBooks" : null,
+        queryString,
+        account.data
+      ],
       async () => {
         const listedBooks = [] as BookSellingCore[];
-        const coreListedBooks = await contract!.getAllBooksOnSale();
+        const coreListedBooks = await bookSellingContract!.getAllListedBooks();
         const limitItem = 30;
         const page = queryString.page
           ? parseInt(queryString.page as string)
@@ -56,13 +60,14 @@ export const hookFactory: PublishingBooksHookFactory =
                 (await checkFilterBooks(
                   listedBook.tokenId,
                   listedBook.price,
-                  contract!,
+                  bookStoreContract!,
                   queryString
                 )) === true
               ) {
                 listedBooks.push({
                   tokenId: listedBook.tokenId.toNumber(),
                   seller: listedBook.seller,
+                  buyer: listedBook.seller,
                   price: parseFloat(ethers.utils.formatEther(listedBook.price)),
                   amount: listedBook.amount.toNumber()
                 });

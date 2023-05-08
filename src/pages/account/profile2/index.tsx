@@ -56,7 +56,7 @@ const defaultValues = {
 
 const Profile = () => {
   const { t } = useTranslation("profile");
-  const { ethereum, contract } = useWeb3();
+  const { ethereum, bookStoreContract } = useWeb3();
   const { account } = useAccount();
 
   const [isLoading, setIsLoading] = useState(false);

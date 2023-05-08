@@ -69,7 +69,7 @@ const RevokeSharingButton = ({
   buttonName = "Cancel Share"
 }: RevokeSharingButtonProps) => {
   const [sharerName, setSharerName] = useState();
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const metadata = useMetadata(tokenId);
 
@@ -86,7 +86,7 @@ const RevokeSharingButton = ({
         });
       }
 
-      const idBooksOnSharing = await contract!.getIdBookOnSharing(
+      const idBooksOnSharing = await bookStoreContract!.getIdBookOnSharing(
         tokenId,
         fromRenter,
         sharer,
@@ -94,7 +94,7 @@ const RevokeSharingButton = ({
         endTime
       );
 
-      const tx = await contract?.convertBookOnSharingToBorrowedBook(
+      const tx = await bookStoreContract?.convertBookOnSharingToBorrowedBook(
         idBooksOnSharing,
         amount
       );

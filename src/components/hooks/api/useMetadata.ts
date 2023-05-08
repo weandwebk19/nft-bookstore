@@ -6,12 +6,12 @@ import useSWR from "swr";
 import { useWeb3 } from "@/components/providers/web3";
 
 export const useMetadata = (tokenId: number) => {
-  const { contract } = useWeb3();
+  const { bookStoreContract } = useWeb3();
   const [tokenURI, setTokenURI] = useState<string>();
   useEffect(() => {
     if (tokenId) {
       (async () => {
-        const tokenURI = await contract!.getUri(tokenId);
+        const tokenURI = await bookStoreContract!.getUri(tokenId);
         setTokenURI(tokenURI);
       })();
     }

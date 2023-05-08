@@ -19,7 +19,7 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 const Response = () => {
   const { t } = useTranslation("response");
   const { account } = useAccount();
-  const { ethereum, contract } = useWeb3();
+  const { ethereum, bookStoreContract } = useWeb3();
   const { swr } = useOwnedResponsesOnExtending();
   const data = swr.data as ResponseExtendCore[];
 
