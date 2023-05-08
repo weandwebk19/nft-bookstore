@@ -35,10 +35,11 @@ export const hookFactory: BookDetailHookFactory =
           }
 
           const sellerDefault = seller ? seller : coreNftBook?.author;
-          const isListing = await contract!.isListing(
-            bookInfo?.tokenId,
-            sellerDefault
-          );
+          // const isListing = await contract!.isListing(
+          //   bookInfo?.tokenId,
+          //   sellerDefault
+          // );
+          const isListing = false;
           if (isListing === true) {
             try {
               const listedNftBook = await contract!.getListedBook(

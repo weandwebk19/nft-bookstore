@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   ContractTransaction,
   ContractInterface,
@@ -574,11 +575,13 @@ export interface BookStoreContract {
    * StateMutability: payable
    * Type: function
    * @param tokenURI Type: string, Indexed: false
-   * @param quantity Type: uint256, Indexed: false
+   * @param quantity Type: uint256, Indexed: falseci
    */
   mintBook(
     tokenURI: string,
     quantity: BigNumberish,
+    privateKey: string,
+    iv: string,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**

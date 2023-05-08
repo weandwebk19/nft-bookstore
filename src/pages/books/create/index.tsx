@@ -26,6 +26,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
+import cryptoRandomString from 'crypto-random-string';
 
 import withAuth from "@/components/HOC/withAuth";
 import withAuthor from "@/components/HOC/withAuthor";
@@ -324,15 +325,13 @@ const CreateBook = () => {
     return "";
   };
 
-  const uploadBookFile = async (file: File) => {
+  const uploadBookFile = async (file: File, privateKey: any, iv: Uint8Array) => {
     if (!!file && file !== undefined) {
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
-      const encKey = await Crypto.generateKey("abc");  
-      const iv = Crypto.generateIVValue();
       // const hashOriginal = await Crypto.sha256(convertArrayToHexString(Array.from(bytes!)));
       // console.log("hashOriginal: ", hashOriginal);
-      const cipherText = await Crypto.encryption(bytes, encKey!, iv!);
+      const cipherText = await Crypto.encryption(bytes, privateKey!, iv!);
       // const hashCipherText = await Crypto.sha256(convertArrayToHexString(Array.from(cipherText!)));
       // const arrayCipherText = Array.from(cipherText!);
       // const hexString = convertArrayToHexString(arrayCipherText!);
@@ -429,10 +428,13 @@ const CreateBook = () => {
     return "";
   };
 
-  const createNFTBook = async (nftUri: string, quantity: number) => {
+  const createNFTBook = async (nftUri: string, 
+                               quantity: number, 
+                               privateKey: string, 
+                               iv: string) => {
     try {
       if (nftUri !== "") {
-        const tx = await contract?.mintBook(nftUri, quantity, {
+        const tx = await contract?.mintBook(nftUri, quantity, privateKey, iv, {
           value: ethers.utils.parseEther((0.025).toString())
         });
 
@@ -470,8 +472,11 @@ const CreateBook = () => {
   };
 
   const { handleSubmit, trigger, getValues, setValue } = methods;
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     setCurrentFile(data.bookFile.path);
+    const key = cryptoRandomString({length: 32, type: 'base64'});
+    const privateKey = await Crypto.generateKey(key);  
+    const iv = Crypto.generateIVValue();
     try {
       if (activeStep === 1) {
         (async () => {
@@ -479,7 +484,7 @@ const CreateBook = () => {
           let bookCoverRes, bookFileRes, bookSampleRes;
           bookCoverRes = await uploadBookCover(data.bookCover);
           if (bookCoverRes) {
-            bookFileRes = await uploadBookFile(data.bookFile);
+            bookFileRes = await uploadBookFile(data.bookFile, privateKey, iv!);
           }
           if (bookFileRes) {
             bookSampleRes = await uploadBookSample(data.bookSample);
@@ -521,8 +526,14 @@ const CreateBook = () => {
           if (nftURI !== "") {
             setIsSigning(true);
             // Mint book
-            const tokenId = await createNFTBook(nftURI, data.quantity);
+            const ivStr = convertArrayToHexString(Array.from(iv!));
+            const tokenId = await createNFTBook(nftURI, 
+                                                data.quantity, 
+                                                key, 
+                                                ivStr);
             console.log("Book is created with tokenId: " + tokenId);
+            console.log("Private key: " + key);
+            console.log("IV: " + ivStr);
 
             // Upload data to database
             if (tokenId) {
