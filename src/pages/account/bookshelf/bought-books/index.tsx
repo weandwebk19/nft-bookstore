@@ -113,8 +113,6 @@ const BoughtBooks = () => {
                                 />
                                 <LendButton
                                   tokenId={book?.listedBook.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   owner={book?.listedBook.seller}
                                   amountTradeable={book?.amountTradeable!}
                                 />

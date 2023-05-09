@@ -138,6 +138,14 @@ export const useBookDetail = (bookId: string, seller?: string) => {
   };
 };
 
+export const useMetadata = (tokenId: number) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useMetadata(tokenId);
+  return {
+    metadata: swrRes
+  };
+};
+
 export const useRandomBooks = () => {
   const hooks = useHooks();
   const swrRes = hooks.useRandomBooks();

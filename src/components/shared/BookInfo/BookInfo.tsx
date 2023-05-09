@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Box, Grid, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import axios from "axios";
 import { useTranslation } from "next-i18next";
 
+import { usePricingHistory } from "@/components/hooks/api/usePricingHistory";
 import { useRealOwnerOfTokens } from "@/components/hooks/web3";
 import {
   BookBriefing,
@@ -15,7 +15,6 @@ import {
 import BookPricingHistory from "@/components/shared/BookInfo/sections/BookPricingHistory";
 import { BookList } from "@/components/shared/BookList";
 import { ReadMore } from "@/components/shared/ReadMore";
-import { bookList } from "@/mocks";
 import { NftBookDetail } from "@/types/nftBook";
 
 import { FallbackNode } from "../FallbackNode";
@@ -84,6 +83,12 @@ const BookInfo = ({ bookDetail }: BookInfoProps) => {
   ];
 
   const { ownerTokens } = useRealOwnerOfTokens(bookDetail?.nftCore.tokenId!);
+  const sellPricingHistory = usePricingHistory(bookDetail?.bookId!, "SELL");
+  const lendPricingHistory = usePricingHistory(bookDetail?.bookId!, "LEND");
+  const sharePricingHistory = usePricingHistory(bookDetail?.bookId!, "SHARE");
+  console.log("sellPricingHistory", sellPricingHistory);
+  console.log("lendPricingHistory", lendPricingHistory);
+  console.log("sharePricingHistory", sharePricingHistory);
 
   return (
     <Box>

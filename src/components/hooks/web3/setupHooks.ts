@@ -78,6 +78,10 @@ import {
   hookFactory as createAllSharingBooksHook
 } from "./share/useAllSharingBooks";
 import { UseAccountHook, hookFactory as createAccountHook } from "./useAccount";
+import {
+  UseMetadataHook,
+  hookFactory as createMetadataHook
+} from "./useMetadata";
 import { UseNetworkHook, hookFactory as createNetworkHook } from "./useNetwork";
 
 export type Web3Hooks = {
@@ -98,6 +102,7 @@ export type Web3Hooks = {
   useOwnedSharedBooks: UseOwnedSharedBooksHook;
   useOwnedSharedOutBooks: UseOwnedSharedOutBooksHook;
   useBookDetail: UseBookDetailHook;
+  useMetadata: UseMetadataHook;
   useRandomBooks: UseRandomBooksHook;
   useRealOwnerOfTokens: UseRealOwnerOfTokensHook;
   useOwnedRequestsOnExtending: UseOwnedRequestsOnExtendingHook;
@@ -127,6 +132,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
     useOwnedSharedOutBooks: createOwnedSharedOutBooksHook(deps),
     useBookDetail: createBookDetailHook(deps),
+    useMetadata: createMetadataHook(deps),
     useRandomBooks: createRandomBooksHook(deps),
     useRealOwnerOfTokens: createRealOwnerOfTokensHook(deps),
     useOwnedRequestsOnExtending: createOwnedRequestsOnExtendingHook(deps),

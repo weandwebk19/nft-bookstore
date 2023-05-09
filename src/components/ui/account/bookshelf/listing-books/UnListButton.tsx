@@ -9,8 +9,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
-import { useAccount } from "@/components/hooks/web3";
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
@@ -52,7 +51,7 @@ const UnListButton = ({
   const [sellerName, setSellerName] = useState();
   const { bookStoreContract } = useWeb3();
   const { account } = useAccount();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);

@@ -24,6 +24,7 @@ import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useMetadata } from "@/components/hooks/api/useMetadata";
 import { NumericStepperController } from "@/components/shared/FormController";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
@@ -48,6 +49,9 @@ interface BookBriefingProps {
 
 const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
   const { t } = useTranslation("bookDetail");
+  const router = useRouter();
+  const { bookId, seller } = router.query;
+  // const metadata = useMetadata();
 
   const theme = useTheme();
   const [authorName, setAuthorName] = useState<string>("");

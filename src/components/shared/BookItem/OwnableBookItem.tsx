@@ -9,7 +9,7 @@ import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import useSWR from "swr";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { NftBookMeta } from "@/types/nftBook";
 
@@ -32,7 +32,7 @@ const OwnableBookItem = ({
 }: OwnableBookItemProps) => {
   const theme = useTheme();
   const [authorName, setAuthorName] = useState();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   useEffect(() => {
     (async () => {
