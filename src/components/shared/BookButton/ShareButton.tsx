@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,8 +11,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
-import { useAccount } from "@/components/hooks/web3";
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
@@ -59,7 +58,7 @@ const ShareButton = ({
   const [renterName, setRenterName] = useState();
   const { bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -81,46 +80,90 @@ const ShareButton = ({
 
   const { handleSubmit } = methods;
 
-  const onSubmit = async (data: any) => {
-    try {
-      // handle errors
-      if (data.amount > borrowedAmount) {
-        return toast.error(`Amount must be less than ${borrowedAmount}.`, {
-          position: toast.POSITION.TOP_CENTER
+  const shareBooks = useCallback(
+    async (
+      tokenId: number,
+      price: number,
+      amount: number,
+      borrowedAmount: number,
+      renter: string,
+      borrower: string,
+      startTime: number,
+      endTime: number
+    ) => {
+      try {
+        // handle errors
+        if (amount > borrowedAmount) {
+          return toast.error(`Amount must be less than ${borrowedAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (Math.floor(new Date().getTime() / 1000) >= endTime) {
+          return toast.error("Borrowing time has expired", {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+
+        const sharingPrice = await bookStoreContract!.sharingPrice();
+        const idBorrowedBook = await bookRentingContract!.getIdBorrowedBook(
+          tokenId,
+          renter,
+          borrower,
+          startTime,
+          endTime
+        );
+        const tx = await bookStoreContract?.shareBooks(
+          idBorrowedBook.toNumber(),
+          ethers.utils.parseEther(price.toString()),
+          amount,
+          {
+            value: sharingPrice
+          }
+        );
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Sharing NftBook Token",
+          success: "Share book successfully",
+          error: "There's an error in sharing process!"
         });
-      } else if (Math.floor(new Date().getTime() / 1000) >= endTime) {
-        return toast.error("Borrowing time has expired", {
+      } catch (e: any) {
+        console.error(e);
+        toast.error(`${e.message}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
+    },
+    [bookRentingContract, bookStoreContract]
+  );
 
-      const sharingPrice = await bookStoreContract!.sharingPrice();
-      const idBorrowedBook = await bookRentingContract!.getIdBorrowedBook(
-        tokenId,
-        renter,
-        borrower,
-        startTime,
-        endTime
-      );
-      const tx = await bookStoreContract?.shareBooks(
-        idBorrowedBook.toNumber(),
-        ethers.utils.parseEther(data.price.toString()),
-        data.amount,
-        {
-          value: sharingPrice
-        }
-      );
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Sharing NftBook Token",
-        success: "Share book successfully",
-        error: "There's an error in sharing process!"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
+  const createPricingHistory = useCallback(
+    async (tokenId: number, price: number) => {
+      // get bookId
+      const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      if (bookRes.data.success === true) {
+        const res = await axios.post("/api/pricingHistories/create", {
+          bookId: bookRes.data.data,
+          price,
+          currency: "ETH",
+          category: "SHARE",
+          userAddress: account.data?.toLowerCase(),
+          createdAt: new Date()
+        });
+      }
+    },
+    [account.data]
+  );
+
+  const onSubmit = async (data: any) => {
+    await shareBooks(
+      tokenId,
+      data.price,
+      data.amount,
+      borrowedAmount,
+      renter,
+      borrower,
+      startTime,
+      endTime
+    );
+    await createPricingHistory(tokenId, data.price);
   };
 
   useEffect(() => {

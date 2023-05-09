@@ -6,8 +6,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import styles from "@styles/BookBanner.module.scss";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
-import { NftBook } from "@/types/nftBook";
+import { useMetadata } from "@/components/hooks/web3";
 
 type BookBannerProps = {
   tokenId: number;
@@ -31,7 +30,7 @@ const BookBanner = ({
   onClick
 }: BookBannerProps) => {
   // const countDown = "7D:06:25:45";
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   return (
     <Box sx={{ cursor: "pointer" }} onClick={onClick}>

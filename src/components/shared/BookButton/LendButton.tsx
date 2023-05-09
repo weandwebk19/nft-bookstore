@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,7 +11,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
@@ -46,7 +46,8 @@ const defaultValues = {
 const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
   const [ownerName, setOwnerName] = useState();
   const { bookStoreContract } = useWeb3();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
+  const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -68,36 +69,67 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
 
   const { handleSubmit } = methods;
 
-  const onSubmit = async (data: any) => {
-    try {
-      // handle errors
-      if (data.amount > amountTradeable) {
-        return toast.error(`Amount must be less than ${amountTradeable}.`, {
+  const lendBooks = useCallback(
+    async (
+      tokenId: number,
+      price: number,
+      amount: number,
+      amountTradeable: number
+    ) => {
+      try {
+        // handle errors
+        if (amount > amountTradeable) {
+          return toast.error(`Amount must be less than ${amountTradeable}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+
+        const lendingPrice = await bookStoreContract!.lendingPrice();
+        const tx = await bookStoreContract?.lendBooks(
+          tokenId,
+          ethers.utils.parseEther(price.toString()),
+          amount,
+          {
+            value: lendingPrice
+          }
+        );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Lend NftBook Token",
+          success: "NftBook is successfully lent out!",
+          error: "Oops! There's a problem with lending process!"
+        });
+      } catch (e: any) {
+        console.log(e.message);
+        toast.error(`${e.message}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
+    },
+    [bookStoreContract]
+  );
 
-      const lendingPrice = await bookStoreContract!.lendingPrice();
-      const tx = await bookStoreContract?.lendBooks(
-        tokenId,
-        ethers.utils.parseEther(data.price.toString()),
-        data.amount,
-        {
-          value: lendingPrice
-        }
-      );
+  const createPricingHistory = useCallback(
+    async (tokenId: number, price: number) => {
+      // get bookId
+      const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      if (bookRes.data.success === true) {
+        const res = await axios.post("/api/pricingHistories/create", {
+          bookId: bookRes.data.data,
+          price,
+          currency: "ETH",
+          category: "LEND",
+          userAddress: account.data?.toLowerCase(),
+          createdAt: new Date()
+        });
+      }
+    },
+    [account.data]
+  );
 
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Lend NftBook Token",
-        success: "NftBook is successfully lent out!",
-        error: "Oops! There's a problem with lending process!"
-      });
-    } catch (e: any) {
-      console.log(e.message);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
+  const onSubmit = async (data: any) => {
+    await lendBooks(tokenId, data.price, data.amount, amountTradeable);
+    await createPricingHistory(tokenId, data.price);
   };
 
   useEffect(() => {

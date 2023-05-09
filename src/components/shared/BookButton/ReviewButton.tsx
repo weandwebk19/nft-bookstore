@@ -11,8 +11,7 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
-import { useAccount } from "@/components/hooks/web3";
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import {
   RatingController,
@@ -45,7 +44,7 @@ const defaultValues = {
 const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
   const [authorName, setAuthorName] = useState();
   const [reviews, setReviews] = useState<any>();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
   const { account } = useAccount();
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
