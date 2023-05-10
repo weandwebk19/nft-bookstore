@@ -41,10 +41,9 @@ const EditBook = () => {
 
   const { bookId } = router.query;
   const { bookDetail } = useBookDetail(bookId as string);
-  // console.log(bookDetail);
 
-  const genres = useGenres();
-  const languages = useLanguages();
+  // const genres = useGenres();
+  // const languages = useLanguages();
 
   const { t } = useTranslation("editBook");
 
@@ -53,13 +52,12 @@ const EditBook = () => {
     externalLink: bookDetail.data?.info.externalLink,
     totalPages: bookDetail.data?.info.totalPages,
     keywords: [""],
-    genres: [],
-    languages: [],
+    // genres: [],
+    // languages: [],
     termsOfService: false,
     privacyPolicy: false
   };
 
-  const { ethereum, bookStoreContract } = useWeb3();
   const [isLoading, setIsLoading] = useState(false);
 
   const schema = yup.object({
@@ -152,7 +150,7 @@ const EditBook = () => {
     // setValue("tokenId", bookDetail.data?.nftBook.tokenId);
     // setValue("oldLanguages", bookDetail.data?.nftBook.languages);
     // setValue("oldGenres", bookDetail.data?.nftBook.genres);
-  }, []);
+  }, [bookDetail.data]);
 
   useEffect(() => {
     if (bookDetail?.info?.genres) {
@@ -219,7 +217,7 @@ const EditBook = () => {
                           defaultValue={bookDetail?.info?.externalLink}
                         />
                       </FormGroup>
-                      <FormGroup label={t("genres") as string} required>
+                      {/* <FormGroup label={t("genres") as string} required>
                         <MultipleSelectController
                           items={genres.data}
                           name="genres"
@@ -230,7 +228,7 @@ const EditBook = () => {
                           items={languages.data}
                           name="languages"
                         />
-                      </FormGroup>
+                      </FormGroup> */}
                       <Stack
                         direction={{ xs: "column", md: "row" }}
                         spacing={{ xs: 2 }}

@@ -6,8 +6,7 @@ import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
-import { useAccount } from "@/components/hooks/web3";
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
@@ -41,7 +40,7 @@ const RevokeSharedOutButton = ({
   const [renterName, setRenterName] = useState();
   const { account } = useAccount();
   const { bookStoreContract, bookSharingContract } = useWeb3();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);

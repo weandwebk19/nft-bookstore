@@ -21,7 +21,7 @@ import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useAccount } from "wagmi";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useMetadata } from "@/components/hooks/web3";
 
 import { Image } from "../Image";
 import { NumericContainer } from "../NumericContainer";
@@ -80,7 +80,7 @@ const ActionableBookItem = ({
   const [sharedPersonName, setSharedPersonName] = useState("");
   const [borrowerName, setBorrowerName] = useState("");
 
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   useEffect(() => {
     (async () => {

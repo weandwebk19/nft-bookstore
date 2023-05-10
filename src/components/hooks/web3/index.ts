@@ -3,6 +3,7 @@ import { useHooks } from "@providers/web3";
 import { ParsedUrlQuery } from "querystring";
 
 import { FilterField } from "@/types/filter";
+import { NftBookSellingHookType } from "@/types/hooks";
 
 export const useAccount = () => {
   const hooks = useHooks();
@@ -138,6 +139,38 @@ export const useBookDetail = (bookId: string, seller?: string) => {
   };
 };
 
+export const useNftBookCore = (bookId: string) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useNftBookCore(bookId);
+  return {
+    nftBookCore: swrRes
+  };
+};
+
+export const useNftBookSelling = (params: NftBookSellingHookType) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useNftBookSelling(params);
+  return {
+    nftBookSelling: swrRes
+  };
+};
+
+export const useNftBookMeta = (bookId: string) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useNftBookMeta(bookId);
+  return {
+    nftBookMeta: swrRes
+  };
+};
+
+export const useMetadata = (tokenId: number) => {
+  const hooks = useHooks();
+  const swrRes = hooks.useMetadata(tokenId);
+  return {
+    metadata: swrRes
+  };
+};
+
 export const useRandomBooks = () => {
   const hooks = useHooks();
   const swrRes = hooks.useRandomBooks();
@@ -146,9 +179,9 @@ export const useRandomBooks = () => {
   };
 };
 
-export const useRealOwnerOfTokens = (tokenId: number) => {
+export const useRealOwnerOfTokens = (bookId: string) => {
   const hooks = useHooks();
-  const swrRes = hooks.useRealOwnerOfTokens(tokenId);
+  const swrRes = hooks.useRealOwnerOfTokens(bookId);
   return {
     ownerTokens: swrRes
   };

@@ -25,11 +25,13 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
+import cloudinary from "cloudinary";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import * as yup from "yup";
 
+import { useUserInfo } from "@/components/hooks/api/useUserInfo";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -54,7 +56,7 @@ const SUPPORTED_FORMATS = [
 ];
 
 const defaultValues = {
-  userName: "",
+  fullname: "",
   email: "",
   bio: "",
   website: "",
@@ -63,20 +65,19 @@ const defaultValues = {
   twitter: "",
   linkedIn: "",
   instagram: "",
-  picture: ""
+  avatar: ""
 };
 
 const Profile = () => {
   const { t } = useTranslation("profile");
-  const { ethereum, bookStoreContract } = useWeb3();
-  const { account } = useAccount();
+  const userInfo = useUserInfo();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
 
   const schema = yup
     .object({
-      userName: yup.string().required(t("textError1") as string),
+      fullname: yup.string().required(t("textError1") as string),
       email: yup
         .string()
         .required(t("textError2") as string)
@@ -88,7 +89,7 @@ const Profile = () => {
       twitter: yup.string(),
       linkedIn: yup.string(),
       instagram: yup.string(),
-      picture: yup
+      avatar: yup
         .mixed()
         .required(t("textError4") as string)
         .test("required", t("textError5") as string, (file: any) => {
@@ -120,10 +121,10 @@ const Profile = () => {
     watch,
     reset
   } = methods;
-  const watchPicture = watch("picture");
+  const watchPicture = watch("avatar");
 
   const handleRemoveImage = useCallback(async () => {
-    setValue("picture", "");
+    setValue("avatar", "");
   }, []);
 
   const handleCancel = useCallback(async () => {
@@ -133,26 +134,59 @@ const Profile = () => {
     }));
   }, []);
 
-  const onSubmit = useCallback((data: any) => {
-    console.log("data:", data);
-    (async () => {
-      try {
-        setIsLoading(true);
+  const onSubmit = useCallback(
+    (data: any) => {
+      (async () => {
+        try {
+          setIsLoading(true);
 
-        const { picture, ...authorInfo } = data;
+          const { avatar, ...authorInfo } = data;
+          const avatarLink = await uploadImage(avatar);
+          console.log("watchPicture", watchPicture);
 
-        // handleCancel();
-        setIsLoading(false);
-      } catch (error: any) {
-        console.log("error:", error);
-        setIsLoading(false);
-      }
-    })();
-  }, []);
+          const res = await axios.post(
+            `/api/users/${userInfo.data?.id}/update`,
+            {
+              ...authorInfo,
+              avatar: avatarLink.secure_url,
+              avatarPublicId: avatarLink.public_id
+            }
+          );
+
+          console.log("res:", res);
+
+          // handleCancel();
+          setIsLoading(false);
+        } catch (error: any) {
+          console.log("error:", error);
+          setIsLoading(false);
+        }
+      })();
+    },
+    [userInfo.data]
+  );
 
   useEffect(() => {
-    setValue("walletAddress", account.data);
-  }, [account.data]);
+    setValue("avatar", userInfo.data?.avatar);
+    setValue("fullname", userInfo.data?.fullname);
+    setValue("email", userInfo.data?.email);
+    setValue("walletAddress", userInfo.data?.walletAddress);
+    setValue("bio", userInfo.data?.bio ? userInfo.data?.bio : "");
+    setValue("website", userInfo.data?.website ? userInfo.data?.website : "");
+    setValue(
+      "facebook",
+      userInfo.data?.facebook ? userInfo.data?.facebook : ""
+    );
+    setValue("twitter", userInfo.data?.twitter ? userInfo.data?.twitter : "");
+    setValue(
+      "linkedIn",
+      userInfo.data?.linkedIn ? userInfo.data?.linkedIn : ""
+    );
+    setValue(
+      "instagram",
+      userInfo.data?.instagram ? userInfo.data?.instagram : ""
+    );
+  }, [userInfo.data]);
 
   return (
     <>
@@ -189,10 +223,14 @@ const Profile = () => {
                             spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
                           >
                             <Grid item xs={12} md={8}>
-                              {!errors.picture && watchPicture ? (
+                              {!errors.avatar && watchPicture ? (
                                 <Box
                                   component="img"
-                                  src={URL.createObjectURL(watchPicture as any)}
+                                  src={
+                                    userInfo.data?.avatar
+                                      ? userInfo.data?.avatar
+                                      : URL.createObjectURL(watchPicture as any)
+                                  }
                                   sx={{
                                     width: "100%",
                                     maxWidth: "400px",
@@ -234,7 +272,7 @@ const Profile = () => {
                                 >
                                   {t("uploadPhotoBtn") as string}
                                   <FileController
-                                    name="picture"
+                                    name="avatar"
                                     readOnly={isLoading}
                                   />
                                 </StyledButton>
@@ -249,13 +287,13 @@ const Profile = () => {
                             </Grid>
                           </Grid>
                         </Grid>
-                        {errors && errors.picture && (
+                        {errors && errors.avatar && (
                           <Grid item xs={12}>
                             <FormHelperText
                               error
                               sx={{ marginTop: "24px", fontSize: "14px" }}
                             >
-                              {errors?.picture?.message}
+                              {errors?.avatar?.message}
                             </FormHelperText>
                           </Grid>
                         )}
@@ -268,7 +306,7 @@ const Profile = () => {
                         <Grid item xs={12} sm={6}>
                           <FormGroup label={t("username") as string} required>
                             <TextFieldController
-                              name="userName"
+                              name="fullname"
                               readOnly={isLoading}
                             />
                           </FormGroup>

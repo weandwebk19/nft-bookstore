@@ -8,7 +8,7 @@ import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useMetadata } from "@/components/hooks/web3";
 
 import { Image } from "../Image";
 
@@ -20,7 +20,7 @@ interface DisplayBookItemProps {
 const DisplayBookItem = ({ tokenId, seller }: DisplayBookItemProps) => {
   const [sellerName, setSellerName] = useState();
   const router = useRouter();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   const handleBookClick = useCallback(
     (tokenId: number) => {

@@ -5,7 +5,7 @@ import { Button } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
+import { useMetadata } from "@/components/hooks/web3";
 import { StyledButton } from "@/styles/components/Button";
 
 interface ReadButtonProps {
@@ -14,7 +14,7 @@ interface ReadButtonProps {
 
 const ReadButton = ({ tokenId }: ReadButtonProps) => {
   const router = useRouter();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
   const bookFile = metadata.data?.bookFile;
   const urlFile = bookFile ? (bookFile as string) : "/#";
   const [bookId, setBookId] = useState();

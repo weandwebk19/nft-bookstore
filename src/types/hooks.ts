@@ -1,5 +1,6 @@
 import { MetaMaskInpageProvider } from "@metamask/providers";
 import { Contract, providers } from "ethers";
+import { type } from "os";
 import { SWRResponse } from "swr";
 
 import { BookRentingContract } from "./BookRentingContract";
@@ -32,3 +33,8 @@ export type CryptoSWRResponse<D = any, R = any> = SWRResponse<D> & R;
 // export type CryptoHookFactory<D = any, P = any> = {
 //   (d: Partial<Web3Dependencies>): (params: P) => SWRResponse<D>
 // }
+
+export type NftBookSellingHookType = {
+  bookId: string;
+  seller: string;
+};

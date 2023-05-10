@@ -22,8 +22,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
-import { useAccount } from "@/components/hooks/web3";
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
@@ -70,7 +69,7 @@ const TakeButton = ({
   const [sharerName, setSharerName] = useState();
   const { bookStoreContract, bookSharingContract } = useWeb3();
   const { account } = useAccount();
-  const metadata = useMetadata(tokenId);
+  const { metadata } = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
