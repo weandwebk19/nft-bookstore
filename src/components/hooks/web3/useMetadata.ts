@@ -12,14 +12,18 @@ export const hookFactory: MetadataHookFactory =
   ({ bookStoreContract }) =>
   (tokenId: number) => {
     const { data, ...swr } = useSWR(
-      [bookStoreContract ? "web3/useMetadata" : null],
+      [bookStoreContract ? "web3/useMetadata" : null, tokenId],
       async () => {
-        const tokenURI = await bookStoreContract!.getUri(tokenId);
+        if (tokenId) {
+          const tokenURI = await bookStoreContract!.getUri(tokenId);
 
-        const url = `/api/pinata/metadata?nftUri=${tokenURI}`;
-        const metaRes = await (await axios.get(url)).data;
+          const url = `/api/pinata/metadata?nftUri=${tokenURI}`;
+          const metaRes = await (await axios.get(url)).data;
 
-        return metaRes.data;
+          return metaRes.data;
+        } else {
+          return null;
+        }
       }
     );
 

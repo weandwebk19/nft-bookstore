@@ -16,45 +16,52 @@ export type UseRealOwnerOfTokensHook = ReturnType<RealOwnerOfTokensHookFactory>;
 
 export const hookFactory: RealOwnerOfTokensHookFactory =
   ({ bookStoreContract, bookSellingContract }) =>
-  (tokenId: number) => {
+  (bookId: string) => {
     const { data, ...swr } = useSWR(
       [
         bookStoreContract && bookSellingContract
           ? "web3/useRealOwnerOfTokens"
           : null,
-        tokenId
+        bookId
       ],
       async () => {
         try {
-          if (tokenId) {
-            const nfts = [] as BookSellingCore[];
-            const coreNfts = await bookStoreContract!.getAllRealOwnerOfTokenId(
-              tokenId
-            );
+          if (bookId) {
+            const tokenRes = await axios.get(`/api/books/${bookId}/tokenId`);
+            if (tokenRes.data.success === true) {
+              const tokenId = tokenRes.data.data;
+              const nfts = [] as BookSellingCore[];
+              const coreNfts =
+                await bookStoreContract!.getAllRealOwnerOfTokenId(tokenId);
 
-            for (let i = 0; i < coreNfts.length; i++) {
-              const item = coreNfts[i];
-              const listedBook = await bookSellingContract!.getListedBook(
-                tokenId,
-                item
-              );
+              for (let i = 0; i < coreNfts.length; i++) {
+                const item = coreNfts[i];
+                const listedBook = await bookSellingContract!.getListedBook(
+                  tokenId,
+                  item
+                );
 
-              if (
-                listedBook &&
-                listedBook.seller !==
-                  "0x0000000000000000000000000000000000000000"
-              )
-                nfts.push({
-                  tokenId: listedBook.tokenId.toNumber(),
-                  seller: listedBook.seller,
-                  buyer: listedBook.buyer,
-                  price: parseFloat(ethers.utils.formatEther(listedBook.price)),
-                  amount: listedBook.amount.toNumber()
-                });
+                if (
+                  listedBook &&
+                  listedBook.seller !==
+                    "0x0000000000000000000000000000000000000000"
+                )
+                  nfts.push({
+                    tokenId: listedBook.tokenId.toNumber(),
+                    seller: listedBook.seller,
+                    buyer: listedBook.buyer,
+                    price: parseFloat(
+                      ethers.utils.formatEther(listedBook.price)
+                    ),
+                    amount: listedBook.amount.toNumber()
+                  });
+              }
+              return nfts;
             }
-            return nfts;
+            return [];
+          } else {
+            return [];
           }
-          return [];
         } catch (err) {
           console.log(err);
         }

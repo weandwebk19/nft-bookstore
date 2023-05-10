@@ -54,6 +54,18 @@ import {
   hookFactory as createBookDetailHook
 } from "./detailPage/useBookDetail";
 import {
+  UseNftBookCoreHook,
+  hookFactory as createNftBookCoreHook
+} from "./detailPage/useNftBookCore";
+import {
+  UseNftBookMetaHook,
+  hookFactory as createNftBookMetaHook
+} from "./detailPage/useNftBookMeta";
+import {
+  UseNftBookSellingHook,
+  hookFactory as createNftBookSellingHook
+} from "./detailPage/useNftBookSelling";
+import {
   UseRandomBooksHook,
   hookFactory as createRandomBooksHook
 } from "./detailPage/useRandomBooks";
@@ -102,6 +114,9 @@ export type Web3Hooks = {
   useOwnedSharedBooks: UseOwnedSharedBooksHook;
   useOwnedSharedOutBooks: UseOwnedSharedOutBooksHook;
   useBookDetail: UseBookDetailHook;
+  useNftBookCore: UseNftBookCoreHook;
+  useNftBookMeta: UseNftBookMetaHook;
+  useNftBookSelling: UseNftBookSellingHook;
   useMetadata: UseMetadataHook;
   useRandomBooks: UseRandomBooksHook;
   useRealOwnerOfTokens: UseRealOwnerOfTokensHook;
@@ -132,6 +147,9 @@ export const setupHooks: SetupHooks = (deps) => {
     useOwnedSharedBooks: createOwnedSharedBooksHook(deps),
     useOwnedSharedOutBooks: createOwnedSharedOutBooksHook(deps),
     useBookDetail: createBookDetailHook(deps),
+    useNftBookCore: createNftBookCoreHook(deps),
+    useNftBookSelling: createNftBookSellingHook(deps),
+    useNftBookMeta: createNftBookMetaHook(deps),
     useMetadata: createMetadataHook(deps),
     useRandomBooks: createRandomBooksHook(deps),
     useRealOwnerOfTokens: createRealOwnerOfTokensHook(deps),

@@ -17,14 +17,12 @@ import { Comment, NestedComment } from "../../Comment";
 import { FallbackNode } from "../../FallbackNode";
 import { StaticRating } from "../../Rating";
 
-interface BookRatingProp {
-  bookId: string;
-}
-const BookRating = ({ bookId }: BookRatingProp) => {
+const BookRating = () => {
   // search book by its id to get its comments and ratings
 
   const theme = useTheme();
   const router = useRouter();
+  const { bookId } = router.query;
   const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
@@ -37,8 +35,6 @@ const BookRating = ({ bookId }: BookRatingProp) => {
       }
     })();
   }, [bookId]);
-
-  console.log("reviews", reviews);
 
   return (
     <Box component="section">

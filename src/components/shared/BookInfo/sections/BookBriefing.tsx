@@ -24,7 +24,12 @@ import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useMetadata } from "@/components/hooks/api/useMetadata";
+import {
+  useMetadata,
+  useNftBookCore,
+  useNftBookMeta,
+  useNftBookSelling
+} from "@/components/hooks/web3";
 import { NumericStepperController } from "@/components/shared/FormController";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
@@ -32,31 +37,23 @@ import { NftBookDetail } from "@/types/nftBook";
 
 import { AddToWatchlistButton } from "../../BookButton";
 import BuyButton from "../../BookButton/BuyButton";
+import { FallbackNode } from "../../FallbackNode";
 
-interface BookBriefingProps {
-  // bookCover: string;
-  // tokenId: number;
-  // bookSample?: string;
-  // title: string;
-  // authorName: string;
-  // contractAddress: string | undefined;
-  // listedCore?: ListedBookCore;
-  // isOpenForSale?: boolean;
-  // isOpenForTradeIn?: boolean;
-  // isOpenForBorrow?: boolean;
-  bookDetail?: NftBookDetail;
-}
-
-const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
+const BookBriefing = () => {
   const { t } = useTranslation("bookDetail");
   const router = useRouter();
   const { bookId, seller } = router.query;
-  // const metadata = useMetadata();
+  const [authorName, setAuthorName] = useState<string>("");
+  const [tokenId, setTokenId] = useState();
+  const { nftBookMeta } = useNftBookMeta(bookId as string);
+  const { nftBookSelling } = useNftBookSelling({
+    bookId: bookId as string,
+    seller: seller as string
+  });
 
   const theme = useTheme();
-  const [authorName, setAuthorName] = useState<string>("");
   const isOpenForSale =
-    bookDetail?.listedCore?.amount && bookDetail?.listedCore?.amount > 0
+    nftBookSelling.data?.amount && nftBookSelling.data?.amount > 0
       ? true
       : false;
   const isOpenForPurchase = false;
@@ -65,9 +62,25 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
   useEffect(() => {
     (async () => {
       try {
-        if (bookDetail && bookDetail?.nftCore) {
+        if (bookId) {
+          const tokenRes = await axios.get(`/api/books/${bookId}/tokenId`);
+
+          if (tokenRes.data.success === true) {
+            setTokenId(tokenRes.data.data);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [bookId]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (nftBookMeta.data) {
           const userRes = await axios.get(
-            `/api/users/wallet/${bookDetail.nftCore?.author}`
+            `/api/users/wallet/${nftBookMeta.data.author}`
           );
 
           if (userRes.data.success === true) {
@@ -78,7 +91,7 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
         console.log(err);
       }
     })();
-  }, [bookDetail]);
+  }, [nftBookMeta.data]);
 
   return (
     <Box
@@ -140,14 +153,28 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
                   })}
                 </Stack> */}
 
-              <Image
-                alt={bookDetail?.meta.title!}
-                src={bookDetail?.meta.bookCover!}
-                fill
-                style={{
-                  objectFit: "cover"
-                }}
-              />
+              {(() => {
+                if (nftBookMeta.isLoading) {
+                  return (
+                    <Typography>{t("loadingMessage") as string}</Typography>
+                  );
+                } else if (
+                  nftBookMeta?.data?.length === 0 ||
+                  nftBookMeta.error
+                ) {
+                  return <FallbackNode />;
+                }
+                return (
+                  <Image
+                    alt={nftBookMeta.data?.title}
+                    src={nftBookMeta.data?.bookCover}
+                    fill
+                    style={{
+                      objectFit: "cover"
+                    }}
+                  />
+                );
+              })()}
             </div>
           </Box>
         </Grid>
@@ -163,12 +190,12 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
                 </Box>
               </Stack>
             </Stack> */}
-            {bookDetail?.meta.bookSample !== "" && (
+            {nftBookMeta.data?.bookSample !== "" && (
               <StyledButton
                 customVariant="secondary"
                 sx={{ width: "100%" }}
                 onClick={() => {
-                  redirect(bookDetail?.meta.bookSample!);
+                  redirect(nftBookMeta.data?.bookSample);
                 }}
               >
                 Read sample
@@ -189,7 +216,7 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
           <Box>
             <Stack spacing={1}>
               {/* Title */}
-              <Typography variant="h4">{bookDetail?.meta.title}</Typography>
+              <Typography variant="h4">{nftBookMeta.data?.title}</Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
               <Typography>By</Typography>
@@ -204,7 +231,7 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
             {isOpenForSale && (
               <Stack direction="row" spacing={1} alignItems="center">
                 <Typography variant="h4">
-                  {bookDetail?.listedCore?.price?.toString()} ETH
+                  {nftBookSelling.data?.price?.toString()} ETH
                 </Typography>
                 {/* <Typography>(0.59489412 USD)</Typography> */}
               </Stack>
@@ -213,17 +240,17 @@ const BookBriefing = ({ bookDetail }: BookBriefingProps) => {
             <Stack direction="row" spacing={2}>
               {isOpenForSale && (
                 <BuyButton
-                  tokenId={bookDetail?.nftCore.tokenId!}
-                  seller={bookDetail?.listedCore?.seller!}
-                  price={bookDetail?.listedCore?.price!}
-                  supplyAmount={bookDetail?.listedCore?.amount!}
+                  tokenId={nftBookSelling.data?.tokenId}
+                  seller={nftBookSelling.data?.seller}
+                  price={nftBookSelling.data?.price}
+                  supplyAmount={nftBookSelling.data?.amount}
                 />
               )}
               {/* <StyledButton customVariant="secondary">
                 + Add to watchlist
               </StyledButton> */}
               <Tooltip title="Add to watchlist">
-                <AddToWatchlistButton tokenId={bookDetail?.nftCore.tokenId!} />
+                {tokenId ? <AddToWatchlistButton tokenId={tokenId} /> : <></>}
               </Tooltip>
             </Stack>
             {/* Publishing/Borrow navigate */}

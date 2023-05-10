@@ -8,7 +8,6 @@ export const usePricingHistory = (bookId: string, category: string) => {
   );
 
   const pricingHistories = data as PricingHistories[];
-  console.log("pricingHistories", pricingHistories);
   let pricingHistory = data;
   if (pricingHistories) {
     let highest = 0;
