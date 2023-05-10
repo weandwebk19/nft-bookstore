@@ -1,6 +1,10 @@
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+
+import { useBookInfo } from "@/components/hooks/api";
+import { useNftBookMeta } from "@/components/hooks/web3";
 
 interface BookDetailProps {
   bookId: string;
@@ -15,19 +19,12 @@ interface BookDetailProps {
   keywords?: string | string[];
 }
 
-const BookDetail = ({
-  bookId,
-  fileType,
-  totalPages,
-  languages,
-  genres,
-  version,
-  maxSupply,
-  publishingTime,
-  owners,
-  keywords
-}: BookDetailProps) => {
+const BookDetail = () => {
   const { t } = useTranslation("bookDetail");
+  const router = useRouter();
+  const { bookId, seller } = router.query;
+  const { nftBookMeta } = useNftBookMeta(bookId as string);
+  const bookInfo = useBookInfo(bookId as string);
 
   return (
     <>
@@ -46,13 +43,13 @@ const BookDetail = ({
         {/* File type */}
         <Stack direction="row" spacing={1}>
           <Typography variant="label">{t("file")}:</Typography>
-          <Typography>{fileType}</Typography>
+          <Typography>{nftBookMeta.data?.fileType}</Typography>
         </Stack>
 
         {/* № page */}
         <Stack direction="row" spacing={1}>
           <Typography variant="label">{t("noPages")}:</Typography>
-          <Typography>{totalPages}</Typography>
+          <Typography>{bookInfo.data?.totalPages}</Typography>
         </Stack>
 
         {/* Write in Language */}
@@ -63,7 +60,7 @@ const BookDetail = ({
               ?.filter((language: any) => languages?.includes(language._id))
               .map((languages: any) => languages.name)
               .join(" | ")} */}
-            {languages?.join(" | ")}
+            {bookInfo.data?.languages?.join(" | ")}
           </Typography>
         </Stack>
 
@@ -75,7 +72,7 @@ const BookDetail = ({
               ?.filter((genre: any) => genres?.includes(genre._id))
               .map((genres: any) => genres.name)
               .join(" | ")} */}
-            {genres?.join(" | ")}
+            {bookInfo.data?.genres?.join(" | ")}
           </Typography>
         </Stack>
 
@@ -84,10 +81,10 @@ const BookDetail = ({
           <Typography variant="label">{t("keywords")}:</Typography>
           <Box>
             {(() => {
-              if (typeof keywords === "string") {
-                return <Typography>{keywords}</Typography>;
+              if (typeof bookInfo.data?.keywords === "string") {
+                return <Typography>{bookInfo.data?.keywords}</Typography>;
               }
-              return keywords?.map((keyword) => {
+              return bookInfo.data?.keywords?.map((keyword: any) => {
                 return (
                   <Chip
                     key={keyword}
@@ -97,7 +94,7 @@ const BookDetail = ({
                 );
               });
 
-              // return keywords?.join(" | ");
+              // return bookInfo.data?.keywords?.join(" | ");
             })()}
           </Box>
         </Stack>
@@ -105,27 +102,31 @@ const BookDetail = ({
         {/* Edition version */}
         <Stack direction="row" spacing={1}>
           <Typography variant="label">{t("editionVersion")}:</Typography>
-          <Typography>{version}</Typography>
+          <Typography>{nftBookMeta.data?.version}</Typography>
         </Stack>
 
         {/* Max supply */}
         <Stack direction="row" spacing={1}>
           <Typography variant="label">{t("quantity")}:</Typography>
-          <Typography>{maxSupply}</Typography>
+          <Typography>{nftBookMeta.data?.quantity}</Typography>
         </Stack>
 
         {/* Owners */}
         <Stack spacing={1}>
           <Typography variant="label">{t("owners")}:</Typography>
           <Box sx={{ wordWrap: "break-word", width: "100%" }}>
-            <Typography>{owners}</Typography>
+            <Typography>
+              {seller ? seller : nftBookMeta.data?.author}
+            </Typography>
           </Box>
         </Stack>
 
         {/* Open on */}
         <Stack direction="row" spacing={1}>
           <Typography variant="label">{t("publishedDate")}:</Typography>
-          <Typography>{publishingTime?.toLocaleDateString("en-US")}</Typography>
+          <Typography>
+            {new Date(nftBookMeta.data?.createdAt).toLocaleDateString("en-US")}
+          </Typography>
         </Stack>
 
         {/* End on */}
