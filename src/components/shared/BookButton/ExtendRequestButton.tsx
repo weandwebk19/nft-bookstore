@@ -31,6 +31,11 @@ import {
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import {
+  createTransactionHistory,
+  createTransactionHistoryOnlyGasFee
+} from "@/components/utils";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
 
@@ -71,7 +76,7 @@ const ExtendRequestButton = ({
   supplyAmount
 }: ExtendRequestButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -162,6 +167,15 @@ const ExtendRequestButton = ({
           success: "Request extend successfully.",
           error: "Processing error"
         });
+
+        if (receipt) {
+          await createTransactionHistoryOnlyGasFee(
+            provider,
+            receipt,
+            tokenId,
+            "Request extend borrowed book"
+          );
+        }
       } catch (error: any) {
         console.error(error);
         toast.error(`${error.message}.`, {
@@ -169,7 +183,7 @@ const ExtendRequestButton = ({
         });
       }
     },
-    [bookStoreContract, account.data]
+    [supplyAmount, account.data, bookStoreContract, provider]
   );
 
   const onSubmit = async (data: any) => {

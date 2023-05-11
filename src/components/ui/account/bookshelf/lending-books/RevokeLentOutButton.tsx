@@ -10,6 +10,7 @@ import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 interface RevokeLentOutButtonProps {
@@ -36,7 +37,7 @@ const RevokeLentOutButton = ({
   buttonName = "Revoke"
 }: RevokeLentOutButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { bookStoreContract, bookRentingContract } = useWeb3();
+  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -67,6 +68,15 @@ const RevokeLentOutButton = ({
         success: "Revoke lent out book successfully",
         error: "Oops! There's a problem with lent out process!"
       });
+
+      if (receipt) {
+        await createTransactionHistoryOnlyGasFee(
+          provider,
+          receipt,
+          tokenId,
+          "Revoke lent out book"
+        );
+      }
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {

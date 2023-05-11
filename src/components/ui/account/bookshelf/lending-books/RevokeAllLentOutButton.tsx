@@ -7,11 +7,12 @@ import { useTranslation } from "next-i18next";
 
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 const RevokeAllLentOutButton = () => {
   const { t } = useTranslation("lendingBooks");
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
 
   const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
     null
@@ -31,6 +32,14 @@ const RevokeAllLentOutButton = () => {
         success: "Revoke lent out book successfully",
         error: "Oops! There's a problem with lent out process!"
       });
+      if (receipt) {
+        await createTransactionHistoryOnlyGasFee(
+          provider,
+          receipt,
+          NaN,
+          "Revoke all lent out book"
+        );
+      }
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {

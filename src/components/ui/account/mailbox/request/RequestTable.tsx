@@ -22,6 +22,7 @@ import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { RequestExtendRowData } from "@/types/nftBook";
 import { secondsToDhms } from "@/utils/secondsToDays";
@@ -37,7 +38,7 @@ export default function RequestTable({ data }: RequestTableProps) {
   const router = useRouter();
   const { t } = useTranslation("request");
   const { account } = useAccount();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -70,7 +71,6 @@ export default function RequestTable({ data }: RequestTableProps) {
   const acceptRequest = useCallback(
     async (idBorrowedBook: number, borrower: string) => {
       try {
-        console.log(idBorrowedBook, borrower);
         const tx = await bookStoreContract?.doAcceptRequest(
           idBorrowedBook,
           borrower,
@@ -82,13 +82,22 @@ export default function RequestTable({ data }: RequestTableProps) {
           success: "Accept request successfully",
           error: "Oops! There's a problem with accept process!"
         });
+
+        if (receipt) {
+          await createTransactionHistoryOnlyGasFee(
+            provider,
+            receipt,
+            NaN,
+            "Accept request extend borrow book"
+          );
+        }
       } catch (err: any) {
         toast.error(`${err.message}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     },
-    [bookStoreContract]
+    [bookStoreContract, provider]
   );
 
   const refuseRequest = useCallback(
@@ -105,6 +114,15 @@ export default function RequestTable({ data }: RequestTableProps) {
           success: "Refuse request successfully",
           error: "Oops! There's a problem with refuse process!"
         });
+
+        if (receipt) {
+          await createTransactionHistoryOnlyGasFee(
+            provider,
+            receipt,
+            NaN,
+            "Refuse request extend borrow book"
+          );
+        }
       } catch (err: any) {
         toast.error(`${err.message}.`, {
           position: toast.POSITION.TOP_CENTER

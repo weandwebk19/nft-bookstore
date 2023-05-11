@@ -28,6 +28,8 @@ import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import { createTransactionHistory } from "@/components/utils";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
 
@@ -67,7 +69,7 @@ const RentButton = ({
 }: RentButtonProps) => {
   const router = useRouter();
   const [renterName, setAuthorName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -143,7 +145,7 @@ const RentButton = ({
         }
 
         const value = ((price * amount * rentalDuration) / 604800).toFixed(3);
-        const result = await bookStoreContract!.borrowBooks(
+        const tx = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,
           ethers.utils.parseEther(price.toString()),
@@ -154,11 +156,76 @@ const RentButton = ({
           }
         );
 
-        await toast.promise(result!.wait(), {
+        const receipt = await toast.promise(tx!.wait(), {
           pending: "Processing transaction",
           success: "Nft is yours! Go to Profile page",
           error: "Processing error"
         });
+
+        if (receipt) {
+          const gasFee = await getGasFee(provider, receipt);
+
+          const createTransactionHistoryForBorrower = async (
+            borrowerAddress: string,
+            renterAddress: string,
+            value: string,
+            gasFee: string,
+            transactionHash: string
+          ) => {
+            // Caculate total fee
+            const totalFee = 0 - parseFloat(value) - parseFloat(gasFee);
+            // Get current balance of account
+            const balance = await provider?.getBalance(borrowerAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              totalFee,
+              balanceInEther,
+              "Borrow book",
+              transactionHash,
+              borrowerAddress,
+              renterAddress,
+              `Gas fee = ${gasFee}, borrow fee = ${parseFloat(
+                value
+              )}, total price = ${-totalFee} ETH`
+            );
+          };
+
+          const createTransactionHistoryForRenter = async (
+            borrowerAddress: string,
+            renterAddress: string,
+            value: string,
+            transactionHash: string
+          ) => {
+            // Get current balance of account
+            const balance = await provider?.getBalance(renterAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              parseFloat(value),
+              balanceInEther,
+              "From borrow book",
+              transactionHash,
+              renterAddress,
+              borrowerAddress,
+              `Total price received = ${parseFloat(value)} ETH`
+            );
+          };
+
+          await createTransactionHistoryForBorrower(
+            account.data!,
+            renter,
+            value,
+            gasFee,
+            receipt.transactionHash
+          );
+          await createTransactionHistoryForRenter(
+            account.data!,
+            renter,
+            value,
+            receipt.transactionHash
+          );
+        }
       } catch (e: any) {
         console.error(e.message);
         toast.error(`${e.message}.`, {
@@ -166,7 +233,7 @@ const RentButton = ({
         });
       }
     },
-    [account.data, bookStoreContract]
+    [account.data, bookStoreContract, provider]
   );
 
   const onSubmit = async (data: any) => {
