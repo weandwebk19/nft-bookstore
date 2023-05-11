@@ -224,7 +224,7 @@ const TakeButton = ({
         }
       } catch (error: any) {
         console.error(error);
-        toast.error(`${error.message}.`, {
+        toast.error(`${error.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
