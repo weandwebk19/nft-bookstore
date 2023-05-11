@@ -14,6 +14,7 @@ import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 interface RevokeLendingButtonProps {
@@ -52,7 +53,7 @@ const RevokeLendingButton = ({
   tokenId
 }: RevokeLendingButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -81,6 +82,15 @@ const RevokeLendingButton = ({
         success: "Cancel Lend NftBook successfully",
         error: "Oops! There's a problem with lending cancel process!"
       });
+
+      if (receipt) {
+        await createTransactionHistoryOnlyGasFee(
+          provider,
+          receipt,
+          tokenId,
+          "Revoke lending book"
+        );
+      }
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message}.`, {
