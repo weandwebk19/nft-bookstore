@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
 
-import { getMetadata } from "../utils";
+import { getMetadata } from "../../utils";
 
 export default async function handler(
   req: NextApiRequest,

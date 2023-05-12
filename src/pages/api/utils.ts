@@ -9,7 +9,7 @@ import { ironSession } from "iron-session/express";
 import { withIronSessionApiRoute, withIronSessionSsr } from "iron-session/next";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import contract from "../../../../public/contracts/BookStore.json";
+import contract from "../../../public/contracts/BookStore.json";
 
 axiosRetry(axios, {
   retries: 3, // number of retries
@@ -23,8 +23,8 @@ axiosRetry(axios, {
 });
 
 const NETWORKS = {
-  "5777": "Ganache"
-  // "3": "Ropsten"
+  "5777": "Ganache",
+  "11155111": "Sepolia"
 };
 
 type NETWORK = typeof NETWORKS;
@@ -59,7 +59,7 @@ export function withSessionAPI(handler: any) {
 
 const url =
   process.env.NODE_ENV === "production"
-    ? process.env.BASE_URL
+    ? process.env.INFURA_SEPOLIA_URL
     : "http://127.0.0.1:7545";
 
 export const addressCheckMiddleware = async (

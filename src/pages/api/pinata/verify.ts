@@ -9,7 +9,7 @@ import {
   pinataApiKey,
   pinataSecretApiKey,
   withSessionAPI
-} from "./utils";
+} from "../utils";
 
 export default withSessionAPI(
   async (req: NextApiRequest & { session: any }, res: NextApiResponse) => {

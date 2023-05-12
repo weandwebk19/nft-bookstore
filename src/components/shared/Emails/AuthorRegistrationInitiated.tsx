@@ -18,7 +18,7 @@ export default function AuthorRegistrationInitiated(authorInfo: AuthorInfo) {
           Hi <b>{authorInfo.pseudonym}</b>,
         </Text>
         <Text style={paragraph}>
-          Thank you for completing the NFTBOOKS author registration. You're on
+          Thank you for completing the NFTBOOKS author registration. You are on
           your way to joining millions of book-loving - authors, book lovers,
           readers and translators in the NFTBOOKS community. Your application
           will be reviewed for 1-3 business days before you can start
