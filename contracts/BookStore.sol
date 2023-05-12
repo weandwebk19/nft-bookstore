@@ -50,7 +50,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     BookTemporary bookTemporary,
     ListRealOwners listRealOwners,
     SecretKeyStorage secretKeyStorage
-
   ) ERC1155("https://example.com/api/{id}.json") {
     _bookSellingStorage = bookSellingStorage;
     _bookTemporary = bookTemporary;
@@ -222,8 +221,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return newTokenId;
   }
 
-  function getSecretKey(uint tokenId) 
-    public payable returns (string[] memory) {
+  function getSecretKey(uint tokenId) public payable returns (string[] memory) {
     // Need check is readable?
     if (!isBookReadableByUser(tokenId)) {
       revert Error.NoReadingPermissionError(tokenId);
@@ -232,7 +230,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return sk;
   }
 
-  function isBookReadableByUser(uint tokenId) public view returns(bool) {
+  function isBookReadableByUser(uint tokenId) public view returns (bool) {
     if (!isOwnerOfToken(tokenId, msg.sender)) {
       return false;
     }

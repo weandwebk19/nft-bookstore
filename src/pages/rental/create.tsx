@@ -36,7 +36,7 @@ import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
-import { deleteFile } from "../api/pinata/utils";
+import { deleteFile } from "../api/utils";
 
 const Book = () => {
   const formRef = useRef<any>();

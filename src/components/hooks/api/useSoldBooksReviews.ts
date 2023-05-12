@@ -61,7 +61,7 @@ export const useSoldBooksReviews = () => {
       }
       setIsLoading(false);
     })();
-  }, []);
+  }, [bookStoreContract, listTokens]);
 
   return { data, isLoading, error };
 };

@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/books/create/steps";
 import { createTransactionHistory } from "@/components/utils";
 import { getGasFee } from "@/components/utils/getGasFee";
-import { deleteFile } from "@/pages/api/pinata/utils";
+import { deleteFile } from "@/pages/api/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 import { Crypto } from "@/utils/crypto";

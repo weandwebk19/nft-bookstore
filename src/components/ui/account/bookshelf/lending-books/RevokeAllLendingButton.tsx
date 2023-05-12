@@ -64,7 +64,7 @@ const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
           return receipt;
         } catch (e: any) {
           console.error(e);
-          return toast.error(`${e.message}.`, {
+          return toast.error(`${e.message.substr(0, 65)}.`, {
             position: toast.POSITION.TOP_CENTER
           });
         }

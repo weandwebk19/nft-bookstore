@@ -129,7 +129,7 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
         }
       } catch (e: any) {
         console.log(e.message);
-        toast.error(`${e.message}.`, {
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }

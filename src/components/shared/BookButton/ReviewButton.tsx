@@ -78,12 +78,12 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
       if (reviewRes.data.success === true) {
         toast.success("Review book successfully.");
       } else {
-        toast.error(`${reviewRes.data.message}.`, {
+        toast.error(`${reviewRes.data.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     } catch (e: any) {
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }

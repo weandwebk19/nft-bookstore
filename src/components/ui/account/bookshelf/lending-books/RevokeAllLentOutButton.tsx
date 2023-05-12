@@ -42,7 +42,7 @@ const RevokeAllLentOutButton = () => {
       }
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }
