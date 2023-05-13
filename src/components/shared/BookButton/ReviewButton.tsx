@@ -65,7 +65,12 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
     mode: "all"
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setValue } = methods;
+
+  useEffect(() => {
+    setValue("rating", 5);
+    setValue("review", "");
+  });
 
   const onSubmit = async (data: any) => {
     try {
@@ -117,7 +122,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
 
           if (userRes.data.success === true && bookRes.data.success === true) {
             const reviewRes = await axios.get(
-              `/api/reviews/${bookRes.data.data}/${userRes.data.data.id}`
+              `/api/books/${bookRes.data.data}/reviews/${userRes.data.data.id}`
             );
             if (reviewRes.data.success == true) {
               setReviews(reviewRes.data.data);
@@ -129,8 +134,6 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
       }
     })();
   }, [tokenId, account.data]);
-
-  // console.log("reviews", reviews);
 
   return (
     <>

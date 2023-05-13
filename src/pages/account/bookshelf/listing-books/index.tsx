@@ -102,14 +102,6 @@ const ListingBooks = () => {
           }}
         >
           <BreadCrumbs breadCrumbs={breadCrumbs} />
-          <Button
-            variant="outlined"
-            onClick={() => {
-              router.push("/review-management");
-            }}
-          >
-            Reviews Management
-          </Button>
         </Box>
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>

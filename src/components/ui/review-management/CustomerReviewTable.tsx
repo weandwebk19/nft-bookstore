@@ -140,12 +140,12 @@ export default function CustomerReviewTable({
         return (
           <Stack py={3}>
             <Image
-              src={params.value.bookCover}
-              alt={params.value.title} // should be replace to bookId
+              src={params?.value?.bookCover}
+              alt={params?.value?.title} // should be replace to bookId
               sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
               className={styles["book-item__book-cover"]}
             />
-            <Typography>{params.value.title}</Typography>
+            <Typography>{params?.value?.title}</Typography>
           </Stack>
         );
       }
@@ -156,8 +156,8 @@ export default function CustomerReviewTable({
       width: 150,
       renderCell: (params) => (
         <Stack>
-          <Avatar src={params.value.avatar} />
-          <Typography>{params.value.username}</Typography>
+          <Avatar src={params?.value?.avatar} />
+          <Typography>{params?.value?.username}</Typography>
         </Stack>
       )
     },
@@ -169,10 +169,10 @@ export default function CustomerReviewTable({
       renderCell: (params) => (
         <Stack my={3}>
           <Typography variant="inherit">
-            {params.value.rating ? StaticRating(params.value.rating) : "_"}
+            {params?.value?.rating ? StaticRating(params?.value?.rating) : "_"}
           </Typography>
-          <ReadMore>{params.value.comment}</ReadMore>
-          <Typography variant="caption">{params.value.date}</Typography>
+          <ReadMore>{params?.value?.comment}</ReadMore>
+          <Typography variant="caption">{params?.value?.date}</Typography>
         </Stack>
       )
     },
@@ -184,7 +184,7 @@ export default function CustomerReviewTable({
       renderCell: (params) => (
         <Tooltip title={t("tooltip_reply")}>
           <IconButton onClick={(e) => handleOpenDeleteDialogClick(e, params)}>
-            {params.value}
+            {params?.value}
           </IconButton>
         </Tooltip>
       )
