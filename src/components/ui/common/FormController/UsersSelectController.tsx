@@ -5,7 +5,6 @@ import { useDebounce } from "@hooks/common";
 import axios from "axios";
 
 import UsersSelect from "@/components/ui/common/UsersSelect";
-import { users } from "@/mocks";
 
 interface UsersSelectControllerProps {
   name: string;

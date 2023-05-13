@@ -24,3 +24,22 @@ export type ReviewInfo = {
   rating: number;
   createdAt: Date;
 };
+
+export type ReviewColumns = {
+  id: string;
+  buyer: {
+    avatar?: string;
+    username: string;
+  };
+  book: {
+    title?: string;
+    bookCover?: string;
+  };
+  review: {
+    date: string;
+    rating?: number;
+    comment?: string;
+    reply?: string;
+  };
+  action?: JSX.Element;
+};

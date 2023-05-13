@@ -6,19 +6,6 @@ import { useRouter } from "next/router";
 import { useBookInfo } from "@/components/hooks/api";
 import { useNftBookMeta } from "@/components/hooks/web3";
 
-interface BookDetailProps {
-  bookId: string;
-  fileType: string;
-  totalPages: number | undefined;
-  languages: string[];
-  genres: string[];
-  version: string | number;
-  maxSupply: number;
-  publishingTime: Date | undefined;
-  owners: string | string[];
-  keywords?: string | string[];
-}
-
 const BookDetail = () => {
   const { t } = useTranslation("bookDetail");
   const router = useRouter();
@@ -77,14 +64,11 @@ const BookDetail = () => {
         </Stack>
 
         {/* Keywords */}
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Typography variant="label">{t("keywords")}:</Typography>
-          <Box>
-            {(() => {
-              if (typeof bookInfo.data?.keywords === "string") {
-                return <Typography>{bookInfo.data?.keywords}</Typography>;
-              }
-              return bookInfo.data?.keywords?.map((keyword: any) => {
+        {bookInfo.data?.keywords.length > 0 && (
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="label">{t("keywords")}:</Typography>
+            <Box>
+              {bookInfo.data?.keywords?.map((keyword: any) => {
                 return (
                   <Chip
                     key={keyword}
@@ -92,12 +76,10 @@ const BookDetail = () => {
                     sx={{ m: 0.5 }}
                   />
                 );
-              });
-
-              // return bookInfo.data?.keywords?.join(" | ");
-            })()}
-          </Box>
-        </Stack>
+              })}
+            </Box>
+          </Stack>
+        )}
 
         {/* Edition version */}
         <Stack direction="row" spacing={1}>

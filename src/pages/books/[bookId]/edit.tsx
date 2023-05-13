@@ -39,8 +39,12 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 const EditBook = () => {
   const router = useRouter();
 
-  const { bookId } = router.query;
-  const { bookDetail } = useBookDetail(bookId as string);
+  const { bookId, seller } = router.query;
+
+  const { bookDetail } = useBookDetail({
+    bookId: bookId as string,
+    seller: seller as string
+  });
 
   // const genres = useGenres();
   // const languages = useLanguages();
@@ -153,12 +157,12 @@ const EditBook = () => {
   }, [bookDetail.data]);
 
   useEffect(() => {
-    if (bookDetail?.info?.genres) {
+    if (bookDetail.data?.info?.genres) {
       (async () => {
-        console.log(bookDetail.info.genres);
+        console.log(bookDetail.data.info.genres);
         try {
           const res = await axios.get(
-            `api/genres/${bookDetail?.info?.genres[0]}`
+            `api/genres/${bookDetail.data?.info?.genres[0]}`
           );
           console.log("res", res);
         } catch (err) {
@@ -166,7 +170,7 @@ const EditBook = () => {
         }
       })();
     }
-  }, [bookDetail?.info?.genres]);
+  }, [bookDetail.data?.info?.genres]);
 
   return (
     <>
@@ -182,12 +186,14 @@ const EditBook = () => {
             <Paper elevation={1} sx={{ mx: "auto", mt: 4, p: 3 }}>
               <Stack justifyContent="center" alignItems="center">
                 <Image
-                  src={bookDetail?.meta?.bookCover}
-                  alt={bookDetail?.meta?.title}
+                  src={bookDetail.data?.meta?.bookCover}
+                  alt={bookDetail.data?.meta?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h6">{bookDetail?.meta?.title}</Typography>
+                <Typography variant="h6">
+                  {bookDetail.data?.meta?.title}
+                </Typography>
               </Stack>
 
               <FormProvider {...methods}>
@@ -205,7 +211,7 @@ const EditBook = () => {
                       <FormGroup label={t("bookDesc") as string}>
                         <TextAreaController
                           name="description"
-                          defaultValue={bookDetail?.info?.description}
+                          defaultValue={bookDetail.data?.info?.description}
                         />
                       </FormGroup>
                       <FormGroup
@@ -214,7 +220,7 @@ const EditBook = () => {
                       >
                         <TextFieldController
                           name="externalLink"
-                          defaultValue={bookDetail?.info?.externalLink}
+                          defaultValue={bookDetail.data?.info?.externalLink}
                         />
                       </FormGroup>
                       {/* <FormGroup label={t("genres") as string} required>
@@ -239,7 +245,7 @@ const EditBook = () => {
                         >
                           <TextFieldController
                             name="totalPages"
-                            defaultValue={bookDetail?.info?.totalPages}
+                            defaultValue={bookDetail.data?.info?.totalPages}
                           />
                         </FormGroup>
                         <FormGroup
@@ -248,7 +254,7 @@ const EditBook = () => {
                         >
                           <AutoCompleteController
                             name="keywords"
-                            defaultValue={bookDetail?.info?.keywords}
+                            defaultValue={bookDetail.data?.info?.keywords}
                           />
                         </FormGroup>
                       </Stack>
@@ -291,7 +297,7 @@ const EditBook = () => {
 
 export default withAuth(withAuthor(EditBook));
 
-export async function getStaticProps({ locale }: any) {
+export async function getServerSideProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
@@ -302,9 +308,9 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export const getStaticPaths = () => {
-  return {
-    paths: [],
-    fallback: true
-  };
-};
+// export const getStaticPaths = () => {
+//   return {
+//     paths: [],
+//     fallback: true
+//   };
+// };

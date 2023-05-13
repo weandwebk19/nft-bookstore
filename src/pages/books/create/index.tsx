@@ -92,7 +92,7 @@ const defaultValues = {
   genres: [],
   languages: [],
   totalPages: 1,
-  keywords: [""],
+  keywords: [],
 
   // Final step
   termsOfService: false,
@@ -584,7 +584,7 @@ const CreateBook = () => {
                 keywords: data.keywords,
                 publishingTime: data.publishingTime,
                 userCreated: account.data
-              });
+              } as BookInfo);
               if (detailRes) {
                 setIsSigning(false);
                 setOpen(true);

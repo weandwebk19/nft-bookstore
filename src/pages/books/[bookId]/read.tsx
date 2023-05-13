@@ -36,8 +36,11 @@ const ReadBook = () => {
   const fileType = "epub";
 
   const router = useRouter();
-  const { bookId } = router.query;
-  const { bookDetail } = useBookDetail(bookId as string);
+  const { bookId, seller } = router.query;
+  const { bookDetail } = useBookDetail({
+    bookId: bookId as string,
+    seller: seller as string
+  });
   const bookFileUrl = bookDetail.data?.meta.bookFile; // Url of file on pinata
   console.log(bookFileUrl);
 
@@ -51,9 +54,9 @@ const ReadBook = () => {
     setLocation(epubcifi);
 
     if (renditionRef.current && tocRef.current) {
-      console.log(renditionRef);
       const { displayed, href } = renditionRef.current.location.start;
-      const chapter = tocRef.current.find((item) => item.href === href);
+      const tocArray = Object.values(tocRef.current);
+      const chapter = tocArray.find((item) => item.href === href);
       setPage(
         `Page ${displayed.page} of ${displayed.total} in chapter ${
           chapter ? chapter.label : "n/a"
@@ -160,7 +163,8 @@ const ReadBook = () => {
       )}
 
       {/* Render pdf file into browser view */}
-      {fileType === "pdf" && (
+      {/* Comment for run build */}
+      {/* {fileType === "pdf" && (
         <Box
           sx={{ position: "relative" }}
           onKeyPress={(event) => {
@@ -193,17 +197,8 @@ const ReadBook = () => {
               <ChevronRightIcon />
             </IconButton>
           </Stack>
-          {/* 
-          <Box sx={{ position: "absolute", top: 0 }}>
-            <IconButton disabled={pageNumber <= 1} onClick={previousPage}>
-              <ChevronLeftIcon />
-            </IconButton>
-            <IconButton disabled={pageNumber >= numPages} onClick={nextPage}>
-              <ChevronRightIcon />
-            </IconButton>
-          </Box> */}
         </Box>
-      )}
+      )} */}
     </Box>
   );
 };
