@@ -42,6 +42,7 @@ export type BookInfo = {
   totalPages?: number;
   keywords?: string | string[];
   publishingTime?: Date;
+  userCreated?: string;
 };
 
 export type BookInfoForUpdate = {
