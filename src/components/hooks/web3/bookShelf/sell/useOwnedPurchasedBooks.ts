@@ -37,8 +37,9 @@ export const hookFactory: OwnedPurchasedBooksHookFactory =
           const coreNfts = await bookSellingContract!.getOwnedPurchasedBooks();
 
           for (let i = 0; i < coreNfts.length; i++) {
-            const item = coreNfts[i];
-            if (item.tokenId.toNumber() !== 0) {
+            try {
+              const item = coreNfts[i];
+
               const amountTradeable =
                 await bookStoreContract!.getAmountUnUsedBook(item.tokenId);
 
@@ -71,6 +72,8 @@ export const hookFactory: OwnedPurchasedBooksHookFactory =
                   });
                 }
               }
+            } catch (err) {
+              console.log(err);
             }
           }
           return nfts;

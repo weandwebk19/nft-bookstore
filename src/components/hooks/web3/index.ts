@@ -171,6 +171,14 @@ export const useMetadata = (tokenId: number) => {
   };
 };
 
+export const useReviewsManagement = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useReviewsManagement();
+  return {
+    swr: swrRes
+  };
+};
+
 export const useRandomBooks = () => {
   const hooks = useHooks();
   const swrRes = hooks.useRandomBooks();

@@ -582,7 +582,8 @@ const CreateBook = () => {
                 externalLink: data.externalLink,
                 totalPages: data.totalPages,
                 keywords: data.keywords,
-                publishingTime: data.publishingTime
+                publishingTime: data.publishingTime,
+                userCreated: account.data
               });
               if (detailRes) {
                 setIsSigning(false);

@@ -36,7 +36,7 @@ export const useSoldBooksReviews = () => {
             );
             if (bookRes.data.success === true) {
               const reviewRes = await axios.get(
-                `/api/reviews/${bookRes.data.data}`
+                `/api/books/${bookRes.data.data}/reviews`
               );
               if (reviewRes.data.success == true && metaRes.success === true) {
                 reviewRes.data.data?.map((review: ReviewRowData) => {
