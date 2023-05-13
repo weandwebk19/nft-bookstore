@@ -114,7 +114,7 @@ const BookRating = () => {
         <Typography variant="h6">Community Reviews</Typography>
 
         <Paper>
-          {reviews ? (
+          {reviews.length > 0 ? (
             reviews.map((review: ReviewInfo) => {
               return (
                 <NestedComment

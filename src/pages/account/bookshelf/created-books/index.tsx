@@ -46,7 +46,11 @@ const CreatedBooks = () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
       if (res.data.success === true) {
         const bookId = res.data.data;
-        router.push(`/books/${bookId}`);
+        // router.push(`/books/${bookId}`);
+        router.push({
+          pathname: "/books/[bookId]",
+          query: { bookId }
+        });
       }
     })();
   };

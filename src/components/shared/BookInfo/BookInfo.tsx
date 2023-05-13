@@ -15,6 +15,7 @@ import { ReadMore } from "@/components/shared/ReadMore";
 
 import { FallbackNode } from "../FallbackNode";
 import BookListing from "./sections/BookListing";
+import BookPricingHistory from "./sections/BookPricingHistory";
 
 const BookInfo = () => {
   const { t } = useTranslation("bookDetail");
@@ -137,8 +138,37 @@ const BookInfo = () => {
               })()}
             </Stack>
           </Box>
-          <Box>
-            <Box
+          <Grid container columns={{ xm: 1, md: 9 }}>
+            <Grid
+              item
+              xs={1}
+              md={6}
+              sx={{
+                borderRight: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                borderBottom: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                borderLeft: {
+                  md: 0,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                width: "100%"
+              }}
+              p={3}
+            >
+              <BookDetail />
+            </Grid>
+            <Grid
+              item
+              xs={1}
+              md={3}
               sx={{
                 borderRight: {
                   md: `1px solid ${theme.palette.primary.main}`,
@@ -158,9 +188,9 @@ const BookInfo = () => {
               }}
               p={3}
             >
-              <BookDetail />
-            </Box>
-          </Box>
+              <BookPricingHistory />
+            </Grid>
+          </Grid>
           <BookListing />
           <Box
             sx={{

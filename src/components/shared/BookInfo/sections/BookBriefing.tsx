@@ -6,6 +6,7 @@ import {
   Grid,
   IconButton,
   Link,
+  Skeleton,
   Stack,
   Tooltip,
   Typography
@@ -100,7 +101,6 @@ const BookBriefing = () => {
         border: `1px solid ${theme.palette.primary.main}`,
         position: "sticky",
         top: 64,
-
         overflowY: { sm: "scroll" },
         height: { sm: "90vh" }
       }}
@@ -156,13 +156,12 @@ const BookBriefing = () => {
               {(() => {
                 if (nftBookMeta.isLoading) {
                   return (
-                    <Typography>{t("loadingMessage") as string}</Typography>
+                    <Skeleton
+                      variant="rectangular"
+                      width="100%"
+                      height="100%"
+                    />
                   );
-                } else if (
-                  nftBookMeta?.data?.length === 0 ||
-                  nftBookMeta.error
-                ) {
-                  return <FallbackNode />;
                 }
                 return (
                   <Image
