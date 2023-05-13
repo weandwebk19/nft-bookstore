@@ -33,6 +33,8 @@ import { NftBookMeta } from "@/types/nftBook";
 
 import Step1 from "../../ui/publishing/steps/Step1";
 import Step2 from "../../ui/publishing/steps/Step2";
+import { createTransactionHistory } from "../../utils";
+import { getGasFee } from "../../utils/getGasFee";
 
 interface BuyButtonProps {
   tokenId: number;
@@ -61,7 +63,7 @@ const BuyButton = ({
   supplyAmount
 }: BuyButtonProps) => {
   const router = useRouter();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const [sellerName, setSellerName] = useState();
   const { metadata } = useMetadata(tokenId);
@@ -141,14 +143,83 @@ const BuyButton = ({
           success: "Nft Book is yours! Go to Profile page",
           error: "Processing error"
         });
+
+        if (receipt) {
+          const gasFee = await getGasFee(provider, receipt);
+
+          const createTransactionHistoryForBuyer = async (
+            buyerAddress: string,
+            sellerAddress: string,
+            price: number,
+            amount: number,
+            gasFee: string,
+            transactionHash: string
+          ) => {
+            // Caculate total fee
+            const totalFee = 0 - price * amount - parseFloat(gasFee);
+            // Get current balance of account
+            const balance = await provider?.getBalance(buyerAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              totalFee,
+              balanceInEther,
+              "Buy book",
+              transactionHash,
+              buyerAddress,
+              sellerAddress,
+              `Gas fee = ${gasFee}, book fee = ${
+                price * amount
+              }, total price =  = ${0 - totalFee} ETH`
+            );
+          };
+
+          const createTransactionHistoryForSeller = async (
+            buyerAddress: string,
+            sellerAddress: string,
+            price: number,
+            amount: number,
+            transactionHash: string
+          ) => {
+            // Get current balance of account
+            const balance = await provider?.getBalance(sellerAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              price * amount,
+              balanceInEther,
+              "From buy book",
+              transactionHash,
+              sellerAddress,
+              buyerAddress,
+              `Total price received= ${price * amount} ETH`
+            );
+          };
+
+          await createTransactionHistoryForBuyer(
+            account.data!,
+            seller,
+            price,
+            amount,
+            gasFee,
+            receipt.transactionHash
+          );
+          await createTransactionHistoryForSeller(
+            account.data!,
+            seller,
+            price,
+            amount,
+            receipt.transactionHash
+          );
+        }
       } catch (e: any) {
         console.error(e);
-        toast.error(`${e.message}.`, {
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     },
-    [bookStoreContract, account.data]
+    [account.data, bookStoreContract, provider]
   );
 
   const onSubmit = async (data: any) => {

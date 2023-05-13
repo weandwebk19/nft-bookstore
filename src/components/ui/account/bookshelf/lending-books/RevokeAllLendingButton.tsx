@@ -8,6 +8,7 @@ import { useTranslation } from "next-i18next";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { LendBook } from "@/types/nftBook";
 
@@ -17,7 +18,7 @@ interface CancelAllLendingButtonProps {
 
 const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
   const { t } = useTranslation("lendingBooks");
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
 
   const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
@@ -52,10 +53,18 @@ const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
             success: "Cancel Lending NftBook successfully",
             error: "Oops! There's a problem with lending cancel process!"
           });
+          if (receipt) {
+            await createTransactionHistoryOnlyGasFee(
+              provider,
+              receipt,
+              book.tokenId,
+              "Revoke all lending book"
+            );
+          }
           return receipt;
         } catch (e: any) {
           console.error(e);
-          return toast.error(`${e.message}.`, {
+          return toast.error(`${e.message.substr(0, 65)}.`, {
             position: toast.POSITION.TOP_CENTER
           });
         }

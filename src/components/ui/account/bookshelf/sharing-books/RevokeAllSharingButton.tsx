@@ -7,11 +7,12 @@ import { useTranslation } from "next-i18next";
 
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 const RevokeAllSharingButton = () => {
   const { t } = useTranslation("lendingBooks");
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
 
   const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
     null
@@ -31,9 +32,18 @@ const RevokeAllSharingButton = () => {
         success: "Revoke sharing book successfully",
         error: "Oops! There's a problem with sharing process!"
       });
+
+      if (receipt) {
+        await createTransactionHistoryOnlyGasFee(
+          provider,
+          receipt,
+          NaN,
+          "Revoke all sharing book"
+        );
+      }
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }

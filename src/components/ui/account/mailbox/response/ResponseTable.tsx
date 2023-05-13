@@ -23,6 +23,7 @@ import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
+import { createTransactionHistory, getGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { ResponseExtendRowData } from "@/types/nftBook";
 import { secondsToDhms } from "@/utils/secondsToDays";
@@ -38,7 +39,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
   const router = useRouter();
   const { t } = useTranslation("response");
   const { account } = useAccount();
-  const { bookStoreContract, bookRentingContract } = useWeb3();
+  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
 
@@ -100,13 +101,78 @@ export default function ResponseTable({ data }: ResponseTableProps) {
           success: "Accept response successfully",
           error: "Oops! There's a problem with accept process!"
         });
+
+        if (receipt) {
+          const gasFee = await getGasFee(provider, receipt);
+
+          const createTransactionHistoryForBorrower = async (
+            borrowerAddress: string,
+            renterAddress: string,
+            totalPrice: string,
+            gasFee: string,
+            transactionHash: string
+          ) => {
+            // Caculate total fee
+            const totalFee = 0 - parseFloat(totalPrice) - parseFloat(gasFee);
+            // Get current balance of account
+            const balance = await provider?.getBalance(borrowerAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              NaN,
+              totalFee,
+              balanceInEther,
+              "Extend borrow book",
+              transactionHash,
+              borrowerAddress,
+              renterAddress,
+              `Gas fee = ${gasFee}, Extend fee = ${parseFloat(
+                totalPrice
+              )}, total price = ${-totalFee} ETH`
+            );
+          };
+
+          const createTransactionHistoryForRenter = async (
+            borrowerAddress: string,
+            renterAddress: string,
+            totalPrice: string,
+            transactionHash: string
+          ) => {
+            // Get current balance of account
+            const balance = await provider?.getBalance(renterAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              NaN,
+              parseFloat(totalPrice),
+              balanceInEther,
+              "From extend borrow book",
+              transactionHash,
+              renterAddress,
+              borrowerAddress,
+              `Total price received = ${parseFloat(totalPrice)} ETH`
+            );
+          };
+
+          await createTransactionHistoryForBorrower(
+            account.data!,
+            renter,
+            totalPrice,
+            gasFee,
+            receipt.transactionHash
+          );
+          await createTransactionHistoryForRenter(
+            account.data!,
+            renter,
+            totalPrice,
+            receipt.transactionHash
+          );
+        }
       } catch (err: any) {
-        toast.error(`${err.message}.`, {
+        toast.error(`${err.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     },
-    [bookStoreContract, bookRentingContract]
+    [bookRentingContract, bookStoreContract, provider, account.data]
   );
 
   const refuseResponse = useCallback(
@@ -142,7 +208,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
           error: "Oops! There's a problem with refuse process!"
         });
       } catch (err: any) {
-        toast.error(`${err.message}.`, {
+        toast.error(`${err.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }

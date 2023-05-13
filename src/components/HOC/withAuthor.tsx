@@ -1,9 +1,10 @@
 import { NextComponentType } from "next";
+import { BaseContext } from "next/dist/shared/lib/utils";
 
 import { useUserInfo } from "../hooks/api/useUserInfo";
 import { UnauthorizedMessage } from "../shared/UnauthorizedMessage";
 
-function withAuthor<T>(Component: NextComponentType<T>) {
+function withAuthor<T extends BaseContext>(Component: NextComponentType<T>) {
   const Auth = (props: any) => {
     const { data } = useUserInfo();
 

@@ -67,6 +67,7 @@ const MailBox = () => {
           >
             {categories.map((item) => (
               <StyledCard
+                key={item.to}
                 customVariant={item.variant as customVariant}
                 sx={{ m: 2, width: "260px", height: "100%" }}
                 id={item.to}

@@ -16,8 +16,10 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
+import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { Image } from "../Image";
 
 interface ShareButtonProps {
@@ -56,7 +58,7 @@ const ShareButton = ({
   borrowedAmount
 }: ShareButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { bookStoreContract, bookRentingContract } = useWeb3();
+  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -124,29 +126,50 @@ const ShareButton = ({
           success: "Share book successfully",
           error: "There's an error in sharing process!"
         });
+
+        if (receipt) {
+          // Create Transaction History
+          const gasFee = await getGasFee(provider, receipt);
+          // Caculate total fee
+          const sharingPriceNumber = parseFloat(
+            ethers.utils.formatEther(sharingPrice)
+          );
+          const totalFee = 0 - sharingPriceNumber - parseFloat(gasFee);
+          // Get current balance of account
+          const balance = await provider?.getBalance(account.data!);
+          const balanceInEther = ethers.utils.formatEther(balance!);
+          await createTransactionHistory(
+            tokenId,
+            totalFee,
+            balanceInEther,
+            "Share book",
+            receipt.transactionHash,
+            receipt.from,
+            receipt.to,
+            `Gas fee = ${gasFee}, sharing fee = ${sharingPriceNumber}, total fee = ${
+              0 - totalFee
+            } ETH`
+          );
+        }
       } catch (e: any) {
         console.error(e);
-        toast.error(`${e.message}.`, {
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     },
-    [bookRentingContract, bookStoreContract]
+    [account.data, bookRentingContract, bookStoreContract, provider]
   );
 
-  const createPricingHistory = useCallback(
+  const createPricingHistoryCallback = useCallback(
     async (tokenId: number, price: number) => {
-      // get bookId
-      const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      if (bookRes.data.success === true) {
-        const res = await axios.post("/api/pricingHistories/create", {
-          bookId: bookRes.data.data,
+      if (account.data) {
+        await createPricingHistory(
+          tokenId,
           price,
-          currency: "ETH",
-          category: "SHARE",
-          userAddress: account.data?.toLowerCase(),
-          createdAt: new Date()
-        });
+          "SHARE",
+          account.data.toLowerCase()
+        );
       }
     },
     [account.data]
@@ -163,7 +186,7 @@ const ShareButton = ({
       startTime,
       endTime
     );
-    await createPricingHistory(tokenId, data.price);
+    await createPricingHistoryCallback(tokenId, data.price);
   };
 
   useEffect(() => {

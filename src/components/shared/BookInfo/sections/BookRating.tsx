@@ -28,7 +28,7 @@ const BookRating = () => {
   useEffect(() => {
     (async () => {
       if (bookId) {
-        const reviewsRes = await axios.get(`/api/reviews/${bookId}`);
+        const reviewsRes = await axios.get(`/api/books/${bookId}/reviews`);
         if (reviewsRes.data.success === true) {
           setReviews(reviewsRes.data.data);
         }

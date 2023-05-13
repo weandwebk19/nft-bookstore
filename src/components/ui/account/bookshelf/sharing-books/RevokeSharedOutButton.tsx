@@ -10,6 +10,7 @@ import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 interface RevokeSharedOutButtonProps {
@@ -39,7 +40,7 @@ const RevokeSharedOutButton = ({
 }: RevokeSharedOutButtonProps) => {
   const [renterName, setRenterName] = useState();
   const { account } = useAccount();
-  const { bookStoreContract, bookSharingContract } = useWeb3();
+  const { provider, bookStoreContract, bookSharingContract } = useWeb3();
   const { metadata } = useMetadata(tokenId);
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
@@ -70,9 +71,18 @@ const RevokeSharedOutButton = ({
         success: "Revoke share NftBook successfully",
         error: "Oops! There's a problem with sharing revoke process!"
       });
+
+      if (receipt) {
+        await createTransactionHistoryOnlyGasFee(
+          provider,
+          receipt,
+          tokenId,
+          "Revoke shared out book"
+        );
+      }
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }
@@ -87,7 +97,7 @@ const RevokeSharedOutButton = ({
         await handleRevokeSharedOut();
       } catch (e: any) {
         console.error(e);
-        toast.error(`${e.message}.`, {
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
@@ -103,7 +113,7 @@ const RevokeSharedOutButton = ({
       await handleRevokeSharedOut();
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }

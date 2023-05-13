@@ -44,8 +44,9 @@ import {
   Step2,
   Step3
 } from "@/components/ui/books/create/steps";
-import { cryptoConfig } from "@/config/crypto";
-import { deleteFile } from "@/pages/api/pinata/utils";
+import { createTransactionHistory } from "@/components/utils";
+import { getGasFee } from "@/components/utils/getGasFee";
+import { deleteFile } from "@/pages/api/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 import { Crypto } from "@/utils/crypto";
@@ -104,7 +105,8 @@ const CreateBook = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isSigning, setIsSigning] = useState(false);
   const formRef = useRef<any>();
-  const { ethereum, bookStoreContract } = useWeb3();
+  const { provider, ethereum, bookStoreContract } = useWeb3();
+  const { account } = useAccount();
   const [nftURI, setNftURI] = useState("");
   const [bookFileLink, setBookFileLink] = useState("");
   const [bookCoverLink, setBookCoverLink] = useState("");
@@ -452,11 +454,17 @@ const CreateBook = () => {
           success: t("successMintingToken") as string,
           error: t("errorMintingToken") as string
         });
-        console.log("receipt", receipt);
         const tokenId = receipt.events
           .find((x: any) => x.event == "NFTBookCreated")
           .args.tokenId.toNumber();
         // const bookStoreContractAddress = receipt.bookStoreContractAdress;
+        createTransactionHistoryCallback(
+          provider,
+          receipt,
+          listingPrice,
+          account.data!,
+          tokenId
+        );
         return tokenId;
       }
     } catch (e: any) {
@@ -478,6 +486,35 @@ const CreateBook = () => {
     } catch (e: any) {
       await handleError(e);
     }
+  };
+
+  const createTransactionHistoryCallback = async (
+    provider: any,
+    receipt: any,
+    listingPrice: any,
+    userAddress: string,
+    tokenId: number
+  ) => {
+    // create Transaction History For Seller
+    const gasFee = await getGasFee(provider, receipt);
+    // Caculate total fee
+    const listingPriceNumber = parseFloat(
+      ethers.utils.formatEther(listingPrice)
+    );
+    const totalFee = 0 - listingPriceNumber - parseFloat(gasFee);
+    // Get current balance of account
+    const balance = await provider?.getBalance(userAddress);
+    const balanceInEther = ethers.utils.formatEther(balance);
+    await createTransactionHistory(
+      tokenId,
+      totalFee,
+      balanceInEther,
+      "Mint book",
+      receipt.transactionHash,
+      receipt.from,
+      receipt.to,
+      `Gas fee = ${gasFee}, listing fee = ${listingPriceNumber}, total fee = ${-totalFee} ETH`
+    );
   };
 
   const { handleSubmit, trigger, getValues, setValue } = methods;
@@ -545,7 +582,8 @@ const CreateBook = () => {
                 externalLink: data.externalLink,
                 totalPages: data.totalPages,
                 keywords: data.keywords,
-                publishingTime: data.publishingTime
+                publishingTime: data.publishingTime,
+                userCreated: account.data
               });
               if (detailRes) {
                 setIsSigning(false);

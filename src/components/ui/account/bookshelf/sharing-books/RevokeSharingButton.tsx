@@ -22,6 +22,7 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { Snackbar } from "@/components/shared/Snackbar";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 interface RevokeSharingButtonProps {
@@ -68,7 +69,7 @@ const RevokeSharingButton = ({
   buttonName = "Cancel Share"
 }: RevokeSharingButtonProps) => {
   const [sharerName, setSharerName] = useState();
-  const { bookSharingContract, bookTemporaryContract } = useWeb3();
+  const { provider, bookSharingContract, bookTemporaryContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -104,10 +105,19 @@ const RevokeSharingButton = ({
         success: "Cancel share NftBook successfully",
         error: "Oops! There's a problem with sharing cancel process!"
       });
+
+      if (receipt) {
+        await createTransactionHistoryOnlyGasFee(
+          provider,
+          receipt,
+          tokenId,
+          "Revoke sharing book"
+        );
+      }
       console.log(receipt);
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }

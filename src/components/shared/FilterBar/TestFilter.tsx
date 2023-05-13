@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -21,6 +22,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import { faBorderAll, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { yupResolver } from "@hookform/resolvers/yup";
+import TreeView from "@mui/lab/TreeView/TreeView";
 import styles from "@styles/FilterBar.module.scss";
 import nestify from "@utils/nestify";
 import { useTranslation } from "next-i18next";
@@ -40,7 +42,7 @@ import {
   TextFieldController,
   TreeViewController
 } from "../FormController";
-import TreeView from "../TreeView/TreeView";
+// import TreeView from "../TreeView/TreeView";
 import RecursiveTreeView from "./TestFilter";
 
 config.autoAddCss = false;
@@ -85,7 +87,7 @@ interface FilterBarProps {
 const FilterBar = ({ data, pathname }: FilterBarProps) => {
   const { t } = useTranslation("filter");
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState();
 
   const genres = useGenres();
   const languages = useLanguages();
@@ -143,6 +145,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
   }: {
     genre?: string;
     title?: string;
+    rating?: string;
   }) => {
     const { query } = router;
     if (genre) query.genre = genre;
@@ -159,7 +162,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
     filterSearch({ genre: nodeId });
   };
 
-  const titleHandler = (e) => {
+  const titleHandler = (e: any) => {
     e.preventDefault();
     // router.push(`${router.pathname}?title=${query}`);
     filterSearch({ title: query });
@@ -186,7 +189,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
               </Typography>
               {(query !== "all" &&
                 query !== "" &&
-                Object.keys(query).length === 0) ||
+                Object.keys(query!).length === 0) ||
               genre !== "all" ||
               title !== "all" ? (
                 <Tooltip title="Clear all filters">
@@ -235,7 +238,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
               "Oops! There was a problem loading genres \n Try refresh the page."}
             <TreeView items={nestedItems} name="genre" onClick={genreHandler} />
           </FormGroup>
-          <FormGroup label={t("searchBook") as string}>
+          <FormGroup label={t("searchBook") as string}></FormGroup>
             <OutlinedInput
               id="outlined-adornment-title-search"
               fullWidth

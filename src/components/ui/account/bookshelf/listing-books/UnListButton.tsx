@@ -13,6 +13,7 @@ import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
+import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 interface UnListButtonProps {
@@ -49,7 +50,7 @@ const UnListButton = ({
   tokenId
 }: UnListButtonProps) => {
   const [sellerName, setSellerName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -78,9 +79,18 @@ const UnListButton = ({
         success: "Cancel Lend NftBook successfully",
         error: "Oops! There's a problem with lending cancel process!"
       });
+
+      if (receipt) {
+        await createTransactionHistoryOnlyGasFee(
+          provider,
+          receipt,
+          tokenId,
+          "Unlist listing book"
+        );
+      }
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }
@@ -95,7 +105,7 @@ const UnListButton = ({
         await handleCancelLending();
       } catch (e: any) {
         console.error(e);
-        toast.error(`${e.message}.`, {
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
@@ -120,7 +130,7 @@ const UnListButton = ({
       await handleCancelLending();
     } catch (e: any) {
       console.error(e);
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }

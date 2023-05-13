@@ -28,6 +28,8 @@ import { Dialog } from "@/components/shared/Dialog";
 import { InputController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import { createTransactionHistory } from "@/components/utils";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
 import Step1 from "../../ui/publishing/steps/Step1";
@@ -67,7 +69,7 @@ const TakeButton = ({
 }: TakeButtonProps) => {
   const router = useRouter();
   const [sharerName, setSharerName] = useState();
-  const { bookStoreContract, bookSharingContract } = useWeb3();
+  const { provider, bookStoreContract, bookSharingContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -117,20 +119,14 @@ const TakeButton = ({
   const takeBooks = useCallback(
     async (
       tokenId: number,
+      price: number,
       fromRenter: string,
       sharer: string,
       startTime: number,
-      endTime: number,
-      amount: number,
-      supplyAmount: number
+      endTime: number
     ) => {
       try {
         // Handle errors
-        if (amount > supplyAmount) {
-          return toast.error(`Amount must be less than ${supplyAmount}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
-        }
         if (account.data == sharer || account.data == fromRenter) {
           return toast.error(
             "You are not allowed to take the book shared or lent by yourself.",
@@ -148,8 +144,11 @@ const TakeButton = ({
           endTime
         );
 
+        console.log("idBooksOnSharing", idBooksOnSharing.toNumber());
+        console.log("price", price);
+
         const tx = await bookStoreContract?.takeBooksOnSharing(
-          idBooksOnSharing.toNumber(),
+          idBooksOnSharing,
           {
             value: ethers.utils.parseEther(price.toString())
           }
@@ -160,26 +159,81 @@ const TakeButton = ({
           success: "Nft Book is yours! Go to Profile page",
           error: "Processing error"
         });
+
+        if (receipt) {
+          const gasFee = await getGasFee(provider, receipt);
+
+          const createTransactionHistoryForSharedPer = async (
+            sharedPerAddress: string,
+            sharerAddress: string,
+            price: number,
+            gasFee: string,
+            transactionHash: string
+          ) => {
+            // Caculate total fee
+            const totalFee = 0 - price - parseFloat(gasFee);
+            // Get current balance of account
+            const balance = await provider?.getBalance(sharedPerAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              totalFee,
+              balanceInEther,
+              "Take book on share",
+              transactionHash,
+              sharedPerAddress,
+              sharerAddress,
+              `Gas fee = ${gasFee}, take book fee = ${price}, total price = ${-totalFee} ETH`
+            );
+          };
+
+          const createTransactionHistoryForSharer = async (
+            sharedPerAddress: string,
+            sharerAddress: string,
+            price: number,
+            transactionHash: string
+          ) => {
+            // Get current balance of account
+            const balance = await provider?.getBalance(sharerAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              price,
+              balanceInEther,
+              "From share book",
+              transactionHash,
+              sharerAddress,
+              sharedPerAddress,
+              `Total price received = ${price} ETH`
+            );
+          };
+
+          await createTransactionHistoryForSharedPer(
+            account.data!,
+            sharer,
+            price,
+            gasFee,
+            receipt.transactionHash
+          );
+          await createTransactionHistoryForSharer(
+            account.data!,
+            sharer,
+            price,
+            receipt.transactionHash
+          );
+        }
       } catch (error: any) {
         console.error(error);
-        toast.error(`${error.message}.`, {
+        toast.error(`${error.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     },
-    [bookStoreContract, bookSharingContract, account.data]
+    [account.data, bookSharingContract, bookStoreContract, provider]
   );
 
   const onSubmit = async (data: any) => {
-    await takeBooks(
-      tokenId,
-      fromRenter,
-      sharer,
-      startTime,
-      endTime,
-      data.amount,
-      supplyAmount
-    );
+    await takeBooks(tokenId, price, fromRenter, sharer, startTime, endTime);
   };
 
   useEffect(() => {

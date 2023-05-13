@@ -82,7 +82,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
   });
   const [authorName, setAuthorName] = useState();
   const isPublished = bookDetail?.listedCore ? true : false;
-  const isSelled = bookDetail?.nftCore?.balance > 0 ? false : true;
+  const isSelled = bookDetail?.nftCore?.quantity > 0 ? false : true;
 
   const onSubmitSeller = (data: any) => {
     console.log("data:", data);
@@ -395,13 +395,13 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                   {/* Edition version */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Edition version:</Typography>
-                    <Typography>{bookDetail?.info.version}</Typography>
+                    <Typography>{bookDetail?.meta.version}</Typography>
                   </Stack>
 
                   {/* Max supply */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Max supply:</Typography>
-                    <Typography>{bookDetail?.info.maxSupply}</Typography>
+                    <Typography>{bookDetail?.meta.quantity}</Typography>
                   </Stack>
 
                   {/* Owners */}

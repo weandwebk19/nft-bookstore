@@ -22,7 +22,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
-import { useTransactionsHistory } from "@/components/hooks/api";
+import { useTransactionHistories } from "@/components/hooks/api";
 import { useAccount, useBookDetail, useNetwork } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
@@ -36,14 +36,14 @@ import { StyledButton } from "@/styles/components/Button";
 import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
-import { deleteFile } from "../api/pinata/utils";
+import { deleteFile } from "../api/utils";
 
 const Book = () => {
   const formRef = useRef<any>();
   const { provider, ethereum, bookStoreContract } = useWeb3();
   const { network } = useNetwork();
   const { account } = useAccount();
-  const transactions = useTransactionsHistory();
+  const transactions = useTransactionHistories(account.data!);
   console.log(transactions);
 
   const getSignedData = async () => {
