@@ -125,7 +125,7 @@ const BookRating = () => {
                   rating={review?.rating}
                   content={review.review}
                   avatar={""}
-                  // replies={[]}
+                  reply={review.reply}
                 />
               );
             })

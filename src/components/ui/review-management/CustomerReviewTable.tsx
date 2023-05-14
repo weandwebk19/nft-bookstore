@@ -40,7 +40,7 @@ import { Image } from "@/components/shared/Image";
 import { StaticRating } from "@/components/shared/Rating";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
-import { ReviewColumns, ReviewRowData } from "@/types/reviews";
+import { ReviewColumns, ReviewInfo, ReviewRowData } from "@/types/reviews";
 
 interface CustomerReviewTableProps {
   data: ReviewRowData[];
@@ -261,12 +261,32 @@ export default function CustomerReviewTable({
 
   const { handleSubmit } = methods;
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
-  };
+  // const onSubmit = async (data: any) => {
+  //   console.log(data);
+  // };
 
-  const onEditSubmit = async (data: any) => {
-    console.log("edit", data);
+  const updateReview = React.useCallback(async (review: ReviewInfo) => {
+    const res = await axios.put(`/api/reviews/${review.id}/update`, {
+      reviewInfo: review
+    });
+    if (res.data.success === true) {
+      toast.success("Update review successfully.");
+    } else {
+      toast.error(`${res.data.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+    return res.data.data;
+  }, []);
+
+  const handleSendReplpy = async (review: any) => {
+    try {
+      const newReview = await updateReview(review);
+    } catch (e: any) {
+      toast.error(`${e.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
   };
 
   return (
@@ -368,11 +388,25 @@ export default function CustomerReviewTable({
                 {t("button_cancel")}
               </StyledButton>
               {targetItem?.review?.reply ? (
-                <StyledButton onClick={handleSubmit(onEditSubmit)}>
+                <StyledButton
+                  onClick={handleSubmit(async (data: any) => {
+                    await handleSendReplpy({
+                      id: targetItem?.id,
+                      reply: data.reply
+                    });
+                  })}
+                >
                   {t("button_editReply")}
                 </StyledButton>
               ) : (
-                <StyledButton onClick={handleSubmit(onSubmit)}>
+                <StyledButton
+                  onClick={handleSubmit(async (data: any) => {
+                    await handleSendReplpy({
+                      id: targetItem?.id,
+                      reply: data.reply
+                    });
+                  })}
+                >
                   {t("button_reply")}
                 </StyledButton>
               )}

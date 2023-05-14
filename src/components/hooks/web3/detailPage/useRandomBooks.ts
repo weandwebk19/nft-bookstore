@@ -14,6 +14,19 @@ export const hookFactory: RandomBooksHookFactory =
   () => {
     const { account } = useAccount();
 
+    const isTokenIdExist = (
+      listedBooks: BookSellingCore[],
+      tokenId: number
+    ) => {
+      let isExists = false;
+      listedBooks.forEach((book) => {
+        if (book.tokenId == tokenId) {
+          isExists = true;
+        }
+      });
+      return isExists;
+    };
+
     const { data, ...swr } = useSWR(
       [
         bookStoreContract && bookSellingContract ? "web3/useRandomBooks" : null,
@@ -37,7 +50,7 @@ export const hookFactory: RandomBooksHookFactory =
             amount: randomItem.amount.toNumber()
           };
           if (
-            !listedBooks.includes(listedBook) &&
+            !isTokenIdExist(listedBooks, listedBook.tokenId) &&
             listedBook.seller !== account.data
           ) {
             listedBooks.push(listedBook);

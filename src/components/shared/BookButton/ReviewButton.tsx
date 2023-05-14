@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,6 +20,7 @@ import {
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
+import { ReviewInfo } from "@/types/reviews";
 
 import { ContentGroup } from "../ContentGroup";
 import { Image } from "../Image";
@@ -94,8 +95,32 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
     }
   };
 
+  const updateReview = useCallback(async (review: ReviewInfo) => {
+    const res = await axios.put(`/api/reviews/${review.id}/update`, {
+      reviewInfo: review
+    });
+    if (res.data.success === true) {
+      toast.success("Update review successfully.");
+    } else {
+      toast.error(`${res.data.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+    return res.data.data;
+  }, []);
+
   const onEditSubmit = async (data: any) => {
     try {
+      const newReview = await updateReview({
+        ...reviews,
+        review: data.review,
+        rating: data.rating
+      });
+
+      const reviewRes = await axios.get(`/api/reviews/${reviews.id}`);
+      if (reviewRes.data.success == true) {
+        setReviews(reviewRes.data.data);
+      }
     } catch (e: any) {
       toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
