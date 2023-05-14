@@ -223,7 +223,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   function getSecretKey(uint tokenId) 
-    public payable returns (string[] memory) {
+    public view returns (string[] memory) {
     // Need check is readable?
     if (!isBookReadableByUser(tokenId)) {
       revert Error.NoReadingPermissionError(tokenId);

@@ -111,6 +111,8 @@ const CreateBook = () => {
   const [bookCoverLink, setBookCoverLink] = useState("");
   const [bookSampleLink, setBookSampleLink] = useState("");
   const [currentFile, setCurrentFile] = useState("");
+  const [ivStr, setIvStr] = useState<string>();
+  const [key, setKey] = useState<string>();
 
   const steps = [
     t("titleStep1") as string,
@@ -328,21 +330,24 @@ const CreateBook = () => {
     }
     return "";
   };
-
-  const uploadBookFile = async (file: File, privateKey: any, iv: Uint8Array) => {
+88
+  const uploadBookFile = async (file: File) => {
+    let cipherText;
     if (!!file && file !== undefined) {
-      const buffer = await file.arrayBuffer();
-      const bytes = new Uint8Array(buffer);
-      // const hashOriginal = await Crypto.sha256(convertArrayToHexString(Array.from(bytes!)));
-      // console.log("hashOriginal: ", hashOriginal);
-      const cipherText = await Crypto.encryption(bytes, privateKey!, iv!);
-      // const hashCipherText = await Crypto.sha256(convertArrayToHexString(Array.from(cipherText!)));
-      // const arrayCipherText = Array.from(cipherText!);
-      // const hexString = convertArrayToHexString(arrayCipherText!);
-      // const arr = convertHexStringToUint8Array(hexString!);
-      // const plainText = await Crypto.decryption(arr, encKey!, iv!);
-      // const hashPlainText = await Crypto.sha256(convertArrayToHexString(Array.from(plainText!)));
-      // console.log("hashPlainText: ", hashPlainText);
+      const key = cryptoRandomString({length: 32, type: 'alphanumeric'});
+      const privateKey = await Crypto.generateKey(key);  
+      setKey(key);
+      const iv = Crypto.generateIVValue();
+      const ivStr = convertArrayToHexString(Array.from(iv!));
+      setIvStr(ivStr);
+
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+      reader.onload = async () => {
+        const pdfData = reader.result as ArrayBuffer;
+        const bytes = new Uint8Array(pdfData);
+        cipherText = await Crypto.encryption(bytes, privateKey!, iv!);
+      }
 
       try {
         const { signedData, account } = await getSignedData();
@@ -434,7 +439,7 @@ const CreateBook = () => {
 
   const createNFTBook = async (nftUri: string, 
                                quantity: number, 
-                               privateKey: string, 
+                               key: string, 
                                iv: string) => {
     try {
       if (nftUri !== "") {
@@ -442,7 +447,7 @@ const CreateBook = () => {
         const tx = await bookStoreContract?.mintBook(
           nftUri,
           quantity,
-          privateKey,
+          key,
           iv,
           {
             value: listingPrice
@@ -458,7 +463,6 @@ const CreateBook = () => {
         const tokenId = receipt.events
           .find((x: any) => x.event == "NFTBookCreated")
           .args.tokenId.toNumber();
-        // const bookStoreContractAddress = receipt.bookStoreContractAdress;
         return tokenId;
       }
     } catch (e: any) {
@@ -485,9 +489,6 @@ const CreateBook = () => {
   const { handleSubmit, trigger, getValues, setValue } = methods;
   const onSubmit = async (data: any) => {
     setCurrentFile(data.bookFile.path);
-    const key = cryptoRandomString({length: 32, type: 'base64'});
-    const privateKey = await Crypto.generateKey(key);  
-    const iv = Crypto.generateIVValue();
     try {
       if (activeStep === 1) {
         (async () => {
@@ -495,7 +496,7 @@ const CreateBook = () => {
           let bookCoverRes, bookFileRes, bookSampleRes;
           bookCoverRes = await uploadBookCover(data.bookCover);
           if (bookCoverRes) {
-            bookFileRes = await uploadBookFile(data.bookFile, privateKey, iv!);
+            bookFileRes = await uploadBookFile(data.bookFile);
           }
           if (bookFileRes) {
             bookSampleRes = await uploadBookSample(data.bookSample);
@@ -537,14 +538,10 @@ const CreateBook = () => {
           if (nftURI !== "") {
             setIsSigning(true);
             // Mint book
-            const ivStr = convertArrayToHexString(Array.from(iv!));
             const tokenId = await createNFTBook(nftURI, 
                                                 data.quantity, 
-                                                key, 
-                                                ivStr);
-            console.log("Book is created with tokenId: " + tokenId);
-            console.log("Private key: " + key);
-            console.log("IV: " + ivStr);
+                                                key!, 
+                                                ivStr!);
 
             // Upload data to database
             if (tokenId) {
