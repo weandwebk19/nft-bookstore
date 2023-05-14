@@ -23,6 +23,8 @@ contract BookStore is ERC1155URIStorage, Ownable {
   }
 
   event NFTBookCreated(uint256 tokenId, address author, uint256 quantity);
+  // Event handler when recall book
+  event RecallBookResult(bool isSuccess);
 
   BookSellingStorage private _bookSellingStorage;
   BookTemporary private _bookTemporary;
@@ -579,8 +581,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
           ""
         );
       }
+      emit RecallBookResult(res);
       return res;
     }
+    emit RecallBookResult(false);
     return false;
   }
 
@@ -741,8 +745,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
           ""
         );
       }
+      emit RecallBookResult(res);
       return res;
     }
+    emit RecallBookResult(false);
     return false;
   }
 
