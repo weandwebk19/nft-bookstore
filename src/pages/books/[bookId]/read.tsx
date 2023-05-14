@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/TextLayer.css";
@@ -12,18 +13,40 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { Rendition } from "epubjs";
 import { useRouter } from "next/router";
 
-import { useBookDetail } from "@/components/hooks/web3";
+import { useNftBookMeta } from "@/components/hooks/web3";
 import { ZenLayout } from "@/layouts/ZenLayout";
 import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
 import { StyledButton } from "@/styles/components/Button";
+import axios from "axios";
+import { convertHexStringToUint8Array } from "@/utils/convert";
+import {Crypto} from "@/utils/crypto";
+import { useWeb3 } from "@/components/providers/web3";
 
-const LINK_EPUB =
-  "https://altmshfkgudtjr.github.io/react-epub-viewer/files/Alices%20Adventures%20in%20Wonderland.epub";
-const LINK_PDF =
-  "https://cors-anywhere.herokuapp.com/http://www.pdf995.com/samples/pdf.pdf";
+
+// let LINK_EPUB =
+//   "https://altmshfkgudtjr.github.io/react-epub-viewer/files/Alices%20Adventures%20in%20Wonderland.epub";
+// let LINK_PDF =
+//   "https://cors-anywhere.herokuapp.com/http://www.pdf995.com/samples/pdf.pdf";
+
+async function decryptPdfFile(cipherText: Uint8Array, privateKey: any, iv: Uint8Array) {
+  let plainText;
+  if (cipherText) {
+    plainText = await Crypto.decryption(cipherText!, privateKey!, iv!);
+  }
+  if (plainText) {
+    const blob = new Blob([plainText], { type: 'application/pdf' });
+    return URL.createObjectURL(blob);
+  }
+    // URL.revokeObjectURL(link.href);
+}
+  
 
 const ReadBook = () => {
-  const [page, setPage] = useState("");
+  const [tokenId, setTokenId] = useState();
+  const [linkPdf, setLinkPdf] = useState<string>();
+  const [linkEpub, setLinkEpub] = useState();
+  const { bookStoreContract } = useWeb3();
+  const [page, setPage] = useState<number | string>();
   const [location, setLocation] = useState<string | number | undefined>(0);
   const [firstRenderDone, setFirstRenderDone] = useState(false);
 
@@ -32,17 +55,54 @@ const ReadBook = () => {
 
   const renditionRef = useRef<Rendition | null>(null);
   const tocRef = useRef<IToc | null>(null);
-
-  const fileType = "epub";
+  const [fileType, setFileType] = useState<string>("pdf");
 
   const router = useRouter();
-  const { bookId, seller } = router.query;
-  const { bookDetail } = useBookDetail({
-    bookId: bookId as string,
-    seller: seller as string
-  });
-  const bookFileUrl = bookDetail.data?.meta.bookFile; // Url of file on pinata
-  console.log(bookFileUrl);
+  const { bookId } = router.query;
+  const { nftBookMeta } = useNftBookMeta(bookId as string);
+  const bookFileUrl = nftBookMeta.data?.bookFile; // Url of file on pinata
+  useEffect(() => {
+    (async () => {
+      if (bookFileUrl) {
+
+        const dataFile = axios({
+          method: "get",
+          url: bookFileUrl,
+          responseType: "arraybuffer",
+          headers: {
+            'Accept': 'application/pdf application/epub+zip',
+          }
+        }).then(async function(response) {
+          const cipherText = new Uint8Array(response.data); 
+          if (tokenId) {     
+            const secrectKey = await bookStoreContract!.getSecretKey(tokenId) as unknown as string[];
+            if (secrectKey.length === 2) {
+              const privateKey = await Crypto.generateKey(secrectKey[1]);  
+              const iv = convertHexStringToUint8Array(secrectKey[0]);
+              const linkPdf = await decryptPdfFile(cipherText, privateKey, iv) as string;
+              setLinkPdf(linkPdf);
+            }
+          }
+        })
+      }
+    })()
+  },[bookFileUrl, bookStoreContract, tokenId]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (bookId) {
+          const tokenRes = await axios.get(`/api/books/${bookId}/tokenId`);
+
+          if (tokenRes.data.success === true) {
+            setTokenId(tokenRes.data.data);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [bookId]);
 
   const locationChanged = (epubcifi: string) => {
     if (!firstRenderDone) {
@@ -68,11 +128,11 @@ const ReadBook = () => {
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
   /*To Prevent right click on screen*/
-  // useEffect(() => {
-  // document.addEventListener("contextmenu", (event) => {
-  //   event.preventDefault();
-  // });
-  // }, []);
+  useEffect(() => {
+  document.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+  });
+  }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handlePageNavigate);
@@ -82,7 +142,6 @@ const ReadBook = () => {
   }, [numPages]);
 
   const handlePageNavigate = (event: KeyboardEvent) => {
-    console.log("pageNumber", pageNumber);
     if (!event.repeat) {
       switch (event.key) {
         case "ArrowLeft":
@@ -140,7 +199,7 @@ const ReadBook = () => {
       </Button>
 
       {/* Render epub file into browser view */}
-      {fileType === "epub" && (
+      {fileType === "epub" && linkEpub && (
         <Box
           sx={{
             width: 600,
@@ -150,7 +209,7 @@ const ReadBook = () => {
           <ReactReader
             location={location}
             locationChanged={locationChanged}
-            url={LINK_EPUB}
+            url={linkEpub}
             swipeable
             getRendition={(rendition) => (renditionRef.current = rendition)}
             tocChanged={(toc) => (tocRef.current = toc)}
@@ -163,8 +222,7 @@ const ReadBook = () => {
       )}
 
       {/* Render pdf file into browser view */}
-      {/* Comment for run build */}
-      {/* {fileType === "pdf" && (
+      {fileType === "pdf" && linkPdf && (
         <Box
           sx={{ position: "relative" }}
           onKeyPress={(event) => {
@@ -179,7 +237,7 @@ const ReadBook = () => {
             }
           }}
         >
-          <Document file={LINK_PDF} onLoadSuccess={onDocumentLoadSuccess}>
+          <Document file={linkPdf} onLoadSuccess={onDocumentLoadSuccess}>
             <Page pageNumber={pageNumber} renderAnnotationLayer={false} />
           </Document>
           <Stack
@@ -198,7 +256,7 @@ const ReadBook = () => {
             </IconButton>
           </Stack>
         </Box>
-      )} */}
+      )}
     </Box>
   );
 };
