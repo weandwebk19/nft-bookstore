@@ -93,7 +93,7 @@ const Comment = ({
                   startIcon={<SubdirectoryArrowRightOutlinedIcon />}
                   onClick={onShowNestedComment}
                 >
-                  {showNestedComments ? "Hide replies" : "View replies"}
+                  {showNestedComments ? "Hide reply" : "View reply"}
                 </Button>
               )}
             </Stack>

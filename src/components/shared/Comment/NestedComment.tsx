@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import { Box, Collapse, Typography } from "@mui/material";
+import { Box, Collapse, Divider, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+
+import AssistantIcon from "@mui/icons-material/Assistant";
 
 import axios from "axios";
 
@@ -73,14 +75,32 @@ const NestedComments = ({
             onShowReplyInput={() => handleReplyCommentClick(user)}
             showNestedComments={showNestedComments}
             onShowNestedComment={handleNestedCommentsToggle}
-            // hasChildren={reply && reply?.length > 0}
+            hasChildren={reply ? true : false}
           />
         </Box>
-        {reply && (
+        <Collapse in={showNestedComments} timeout="auto" unmountOnExit>
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              borderLeft: `1px solid ${theme.palette.background.default}`,
+              borderBottom: `1px solid ${theme.palette.background.default}`,
+              borderBottomLeftRadius: "1em",
+              mb: 2,
+              p: 3
+            }}
+          >
+            <AssistantIcon fontSize="inherit" />
+            <Typography>{reply}</Typography>
+          </Stack>
+        </Collapse>
+
+        {/* {reply && (
           <Box sx={{ ml: 2 }}>
             <Collapse in={showNestedComments} timeout="auto" unmountOnExit>
               <Box>
-                {/* {reply.map((comment) => (
+                {reply.map((comment) => (
                   <Box
                     key={comment}
                     sx={{
@@ -99,15 +119,15 @@ const NestedComments = ({
                       onShowNestedComment={handleNestedCommentsToggle}
                     />
                   </Box>
-                ))} */}
-                <Typography>{reply}</Typography>
+                ))}
               </Box>
               {showReplyInput && (
                 <InputComment username={userName} replyTo={targetReply} />
               )}
             </Collapse>
           </Box>
-        )}
+        )} */}
+        <Divider />
       </Box>
     </div>
   );

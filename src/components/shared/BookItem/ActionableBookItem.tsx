@@ -200,319 +200,132 @@ const ActionableBookItem = ({
           }}
         >
           <Stack>
-            {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
-              <Skeleton variant="text" width="20%" />
-            ) : (
-              <Stack direction="row" spacing={0.5}>
-                <InsertDriveFileIcon fontSize="small" color="action" />
-                <Typography variant="caption">
-                  {metadata.data?.fileType}
-                </Typography>
-              </Stack>
-            )}
-            {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
-              <Skeleton variant="text" width="100%" />
-            ) : (
-              <Typography
-                variant="h6"
-                className="text-limit text-limit--2"
-                sx={{ minHeight: "64px" }}
-              >
-                {metadata.data?.title}
+            <Stack direction="row" spacing={0.5}>
+              <InsertDriveFileIcon fontSize="small" color="action" />
+              <Typography variant="caption">
+                {metadata.data?.fileType}
               </Typography>
+            </Stack>
+
+            <Typography
+              variant="h6"
+              className="text-limit text-limit--2"
+              sx={{ minHeight: "64px" }}
+            >
+              {metadata.data?.title}
+            </Typography>
+
+            {status !== "isCreated" && (
+              <Typography variant="body2">{ownerName}</Typography>
             )}
-            {(() => {
-              if (status !== "isCreated") {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return <Skeleton variant="text" width="80%" />;
-                else
-                  return <Typography variant="body2">{ownerName}</Typography>;
-              }
-            })()}
             {status === "isBorrowed" && (
               <Stack>
                 <Typography variant="subtitle2">Borrowed from:</Typography>
                 <Typography variant="label">{renterName}</Typography>
               </Stack>
             )}
-            {(() => {
-              if (status === "isBorrowed") {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return (
-                    <>
-                      <Skeleton variant="text" width="20%" />;
-                      <Skeleton variant="text" width="80%" />;
-                    </>
-                  );
-                else
-                  return (
-                    <Stack>
-                      <Typography variant="subtitle2">
-                        Borrowed from:
-                      </Typography>
-                      <Typography variant="label">{renterName}</Typography>
-                    </Stack>
-                  );
-              }
-            })()}
-            {(() => {
-              if (status === "isShared") {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return (
-                    <>
-                      <Skeleton variant="text" width="20%" />;
-                      <Skeleton variant="text" width="80%" />;
-                    </>
-                  );
-                else
-                  return (
-                    <Stack>
-                      <Typography variant="subtitle2">Shared by:</Typography>
-                      <Typography variant="label">{sharerName}</Typography>
-                    </Stack>
-                  );
-              }
-            })()}
-            {(() => {
-              if (status === "isLending" && borrower) {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return (
-                    <>
-                      <Skeleton variant="text" width="20%" />;
-                      <Skeleton variant="text" width="80%" />;
-                    </>
-                  );
-                else
-                  return (
-                    <Tooltip title={borrower}>
-                      <Stack>
-                        <Typography variant="subtitle2">
-                          Borrowed by:
-                        </Typography>
-                        <Typography variant="label">{borrowerName}</Typography>
-                      </Stack>
-                    </Tooltip>
-                  );
-              }
-            })()}
-            {(() => {
-              if (status === "isSharing") {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return (
-                    <>
-                      <Skeleton variant="text" width="20%" />;
-                      <Skeleton variant="text" width="80%" />;
-                    </>
-                  );
-                else
-                  return (
-                    <Stack>
-                      <Typography variant="subtitle2">Shared to:</Typography>
-                      <Typography variant="label">
-                        {sharedPersonName}
-                      </Typography>
-                    </Stack>
-                  );
-              }
-            })()}
+            {status === "isBorrowed" && (
+              <Stack>
+                <Typography variant="subtitle2">Borrowed from:</Typography>
+                <Typography variant="label">{renterName}</Typography>
+              </Stack>
+            )}
+            {status === "isShared" && (
+              <Stack>
+                <Typography variant="subtitle2">Shared by:</Typography>
+                <Typography variant="label">{sharerName}</Typography>
+              </Stack>
+            )}
+            {status === "isLending" && borrower && (
+              <Tooltip title={borrower}>
+                <Stack>
+                  <Typography variant="subtitle2">Borrowed by:</Typography>
+                  <Typography variant="label">{borrowerName}</Typography>
+                </Stack>
+              </Tooltip>
+            )}
+            {status === "isSharing" && (
+              <Stack>
+                <Typography variant="subtitle2">Shared to:</Typography>
+                <Typography variant="label">{sharedPersonName}</Typography>
+              </Stack>
+            )}
           </Stack>
 
           <Divider />
 
           <Stack spacing={2} mt={2}>
-            {(() => {
-              if (
-                status !== "isCreated" &&
-                status !== "isOwned" &&
-                status !== "isPurchased" &&
-                status !== "isListing"
-              ) {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return <Skeleton width="100%" height={26} />;
-                else
-                  return (
-                    <NumericContainer
-                      icon={
-                        <TripOriginIcon fontSize="inherit" color="action" />
-                      }
-                      label="Orig. Supply:"
-                      amount={quantity}
-                    />
-                  );
-              }
-            })()}
+            {status !== "isCreated" &&
+              status !== "isOwned" &&
+              status !== "isPurchased" &&
+              status !== "isListing" && (
+                <NumericContainer
+                  icon={<TripOriginIcon fontSize="inherit" color="action" />}
+                  label="Orig. Supply:"
+                  amount={quantity}
+                />
+              )}
 
-            {(() => {
-              if (status === "isCreated" || status === "isOwned") {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return <Skeleton width="100%" height={26} />;
-                else
-                  return (
-                    <NumericContainer
-                      icon={
-                        <TripOriginIcon fontSize="inherit" color="action" />
-                      }
-                      label="Orig. Supply:"
-                      amount={quantity}
-                    />
-                  );
-              }
-            })()}
-            {(() => {
-              if (
-                status === "isPurchased" ||
-                status === "isLending" ||
-                status === "isBorrowed" ||
-                status === "isSharing" ||
-                status === "isListing"
-              ) {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return <Skeleton width="100%" height={26} />;
-                else
-                  return (
-                    <NumericContainer
-                      icon={<InventoryIcon fontSize="inherit" color="action" />}
-                      label="Inventory:"
-                      amount={amount}
-                    />
-                  );
-              }
-            })()}
-            {(() => {
-              if (
-                status === "isBorrowed" ||
-                status === "isShared" ||
-                status === "isSharing" ||
-                (status === "isLending" && borrower)
-              ) {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return (
-                    <>
-                      <Skeleton variant="text" width="20%" />;
-                      <Skeleton variant="text" width="80%" />;
-                    </>
-                  );
-                else
-                  return (
-                    <Stack>
-                      <Typography variant="subtitle2">Return in:</Typography>
-                      <Typography variant="label">
-                        {countDown !== "0D:0:0:0" ? countDown : "Ended"}
-                      </Typography>
-                    </Stack>
-                  );
-              }
-            })()}
-            {(() => {
-              if (status === "isOwned") {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return <Skeleton width="100%" height={26} />;
-                else
-                  return (
-                    <NumericContainer
-                      icon={<InventoryIcon fontSize="inherit" color="action" />}
-                      label="Inventory:"
-                      amount={amountOwned}
-                    />
-                  );
-              }
-            })()}
-            {(() => {
-              if (
-                status !== "isCreated" &&
-                status !== "isOwned" &&
-                status !== "isPurchased"
-              ) {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return (
-                    <>
-                      <Skeleton variant="text" width="20%" />
-                      <Skeleton variant="text" width="80%" />
-                    </>
-                  );
-                else
-                  return (
-                    <Stack>
-                      <Typography variant="subtitle2">Price:</Typography>
-                      <Typography
-                        variant="label"
-                        color={`${theme.palette.success.main}`}
-                      >
-                        {price} ETH
-                      </Typography>
-                    </Stack>
-                  );
-              }
-            })()}
-            {(() => {
-              if (
-                status === "isOwned" ||
-                status === "isCreated" ||
-                status === "isPurchased"
-              ) {
-                if (
-                  metadata.isLoading ||
-                  !metadata ||
-                  !metadata.data?.bookCover
-                )
-                  return <Skeleton width="100%" height={26} />;
-                else
-                  return (
-                    <NumericContainer
-                      variant="outlined"
-                      icon={
-                        <SellOutlinedIcon fontSize="inherit" color="action" />
-                      }
-                      label="Tradeable:"
-                      amount={amountTradeable}
-                    />
-                  );
-              }
-            })()}
+            {status === "isCreated" ||
+              (status === "isOwned" && (
+                <NumericContainer
+                  icon={<TripOriginIcon fontSize="inherit" color="action" />}
+                  label="Orig. Supply:"
+                  amount={quantity}
+                />
+              ))}
+            {(status === "isPurchased" ||
+              status === "isLending" ||
+              status === "isBorrowed" ||
+              status === "isSharing" ||
+              status === "isListing") && (
+              <NumericContainer
+                icon={<InventoryIcon fontSize="inherit" color="action" />}
+                label="Inventory:"
+                amount={amount}
+              />
+            )}
+            {(status === "isBorrowed" ||
+              status === "isShared" ||
+              status === "isSharing" ||
+              (status === "isLending" && borrower)) && (
+              <Stack>
+                <Typography variant="subtitle2">Return in:</Typography>
+                <Typography variant="label">
+                  {countDown !== "0D:0:0:0" ? countDown : "Ended"}
+                </Typography>
+              </Stack>
+            )}
+            {status === "isOwned" && (
+              <NumericContainer
+                icon={<InventoryIcon fontSize="inherit" color="action" />}
+                label="Inventory:"
+                amount={amountOwned}
+              />
+            )}
+            {status !== "isCreated" &&
+              status !== "isOwned" &&
+              status !== "isPurchased" && (
+                <Stack>
+                  <Typography variant="subtitle2">Price:</Typography>
+                  <Typography
+                    variant="label"
+                    color={`${theme.palette.success.main}`}
+                  >
+                    {price} ETH
+                  </Typography>
+                </Stack>
+              )}
+            {(status === "isOwned" ||
+              status === "isCreated" ||
+              status === "isPurchased") && (
+              <NumericContainer
+                variant="outlined"
+                icon={<SellOutlinedIcon fontSize="inherit" color="action" />}
+                label="Tradeable:"
+                amount={amountTradeable}
+              />
+            )}
 
             {/* {status === "isCreated" && (
                 <Stack>
@@ -525,16 +338,10 @@ const ActionableBookItem = ({
               <Typography>{renter}</Typography>
               {status !== undefined ? <Chip label={status} /> : <></>}
             </Stack> */}
-          {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
-            <Stack direction="row" spacing={0.5}>
-              <Skeleton variant="rectangular" width="50%" height={36.5} />
-              <Skeleton variant="rectangular" width="50%" height={36.5} />
-            </Stack>
-          ) : (
-            <Stack direction="row" spacing={2} mt={3}>
-              {buttons}
-            </Stack>
-          )}
+
+          <Stack direction="row" spacing={2} mt={3}>
+            {buttons}
+          </Stack>
         </Stack>
       </Stack>
     </Box>

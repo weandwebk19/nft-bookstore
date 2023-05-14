@@ -221,7 +221,8 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "listingBooks"
+        "listingBooks",
+        "bookButtons"
       ]))
     }
   };
