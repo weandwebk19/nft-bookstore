@@ -11,7 +11,6 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BookBanner } from "@shared/BookBanner";
-import { BookItem } from "@shared/BookItem";
 import { ContentPaper } from "@shared/ContentPaper";
 import { useRouter } from "next/router";
 
@@ -35,10 +34,10 @@ const DisplayBox = () => {
         <Grid item xs={4} sm={8} md={12} lg={18}>
           <Stack spacing={3}>
             {/* Book Banner */}
-            <BookBanner
+            {/* <BookBanner
               meta={book.meta}
               details={book.details}
-              tokenId={book.tokenId}
+              tokenId={Number(book.tokenId)}
               author={book.author}
               price={book.price}
               onClick={() => {
@@ -66,7 +65,7 @@ const DisplayBox = () => {
               }
             >
               <BookList bookList={bookList} onClick={handleBookClick} />
-            </ContentPaper>
+            </ContentPaper> */}
           </Stack>
         </Grid>
         <Grid item xs={4} sm={8} md={12} lg={6}>

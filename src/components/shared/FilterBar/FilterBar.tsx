@@ -21,7 +21,7 @@ import styles from "@styles/FilterBar.module.scss";
 import pluralize from "@utils/pluralize";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import querystring from "querystring";
+import querystring from "query-string";
 import * as yup from "yup";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
