@@ -18,6 +18,8 @@ import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 
+import { createPricingHistory, createTransactionHistory } from "../../utils";
+import { getGasFee } from "../../utils/getGasFee";
 import { Image } from "../Image";
 
 interface SellButtonProps {
@@ -46,7 +48,7 @@ const defaultValues = {
 
 const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
   const [ownerName, setOwnerName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { metadata } = useMetadata(tokenId);
   const { account } = useAccount();
 
@@ -100,29 +102,50 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
           success: "NftBook is successfully put on sale",
           error: "Oops! There's a problem with listing process!"
         });
+
+        if (receipt) {
+          // create Transaction History For Seller
+          const gasFee = await getGasFee(provider, receipt);
+          // Caculate total fee
+          const listingPriceNumber = parseFloat(
+            ethers.utils.formatEther(listingPrice)
+          );
+          const totalFee = 0 - listingPriceNumber - parseFloat(gasFee);
+          // Get current balance of account
+          const balance = await provider?.getBalance(account.data!);
+          const balanceInEther = ethers.utils.formatEther(balance!);
+          await createTransactionHistory(
+            tokenId,
+            totalFee,
+            balanceInEther,
+            "Sell book",
+            receipt.transactionHash,
+            receipt.from,
+            receipt.to,
+            `Gas fee = ${gasFee}, listing fee =  ${listingPriceNumber}, total fee = ${
+              0 - totalFee
+            } ETH`
+          );
+        }
       } catch (e: any) {
         console.error(e);
-        toast.error(`${e.message}.`, {
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     },
-    [bookStoreContract]
+    [account.data, bookStoreContract, provider]
   );
 
-  const createPricingHistory = useCallback(
+  const createPricingHistoryCallback = useCallback(
     async (tokenId: number, price: number) => {
-      // get bookId
-      const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      if (bookRes.data.success === true) {
-        const res = await axios.post("/api/pricingHistories/create", {
-          bookId: bookRes.data.data,
+      if (account.data) {
+        await createPricingHistory(
+          tokenId,
           price,
-          currency: "ETH",
-          category: "SELL",
-          userAddress: account.data?.toLowerCase(),
-          createdAt: new Date()
-        });
+          "SELL",
+          account.data.toLowerCase()
+        );
       }
     },
     [account.data]
@@ -130,7 +153,7 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
 
   const onSubmit = async (data: any) => {
     await sellBooks(tokenId, data.price, data.amount, amountTradeable);
-    await createPricingHistory(tokenId, data.price);
+    await createPricingHistoryCallback(tokenId, data.price);
   };
 
   useEffect(() => {

@@ -1,39 +1,21 @@
-import { useEffect, useState } from "react";
+import { Box, CircularProgress, Grid, Paper } from "@mui/material";
 
-import { Grid, Paper, Stack, Typography } from "@mui/material";
-
-import axios from "axios";
-import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
-import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
-import { useSoldBooksReviews } from "@/components/hooks/api/useSoldBooksReviews";
-import { useAccount } from "@/components/hooks/web3";
+import { useAccount, useReviewsManagement } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import CustomerReviewTable from "@/components/ui/review-management/CustomerReviewTable";
-import { bookReviews } from "@/mocks";
-import { ReviewRowData, ReviewStatus } from "@/types/reviews";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const ReviewManagement = () => {
   const { t } = useTranslation("reviewManagement");
   const { account } = useAccount();
   const { ethereum, bookStoreContract } = useWeb3();
-  const [rows, setRows] = useState<ReviewRowData[]>([]);
-  const reviews = useSoldBooksReviews();
-  // console.log("reviews", reviews);
-
-  useEffect(() => {
-    (async () => {
-      const rows = bookReviews;
-
-      setRows(rows);
-    })();
-  }, [account.data]);
+  const { swr } = useReviewsManagement();
 
   return (
     <>
@@ -46,7 +28,23 @@ const ReviewManagement = () => {
       <ContentContainer titles={[`${t("containerTitle")}`]}>
         <Grid container columns={{ xs: 4, sm: 8, md: 12, lg: 12 }}>
           <Paper sx={{ p: 3, width: "100%" }}>
-            <CustomerReviewTable data={rows!} />
+            {(() => {
+              if (swr.isLoading) {
+                return (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      minHeight: "200px"
+                    }}
+                  >
+                    <CircularProgress />
+                  </Box>
+                );
+              }
+              return <CustomerReviewTable data={swr.data} />;
+            })()}
           </Paper>
         </Grid>
       </ContentContainer>
@@ -54,8 +52,7 @@ const ReviewManagement = () => {
   );
 };
 
-// export default withAuth(ReviewManagement);
-export default ReviewManagement;
+export default withAuth(ReviewManagement);
 
 export async function getStaticProps({ locale }: any) {
   return {

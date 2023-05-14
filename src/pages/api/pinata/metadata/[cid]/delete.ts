@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session } from "next-iron-session";
 
-import { addressCheckMiddleware, withSessionSSR } from "../../utils";
-import { deleteFile } from "../../utils";
+import { addressCheckMiddleware, withSessionSSR } from "../../../utils";
+import { deleteFile } from "../../../utils";
 
 export default withSessionSSR(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {

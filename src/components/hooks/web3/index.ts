@@ -131,9 +131,9 @@ export const useOwnedSharedOutBooks = (queryString: FilterField) => {
   };
 };
 
-export const useBookDetail = (bookId: string, seller?: string) => {
+export const useBookDetail = (params: NftBookSellingHookType) => {
   const hooks = useHooks();
-  const swrRes = hooks.useBookDetail(bookId, seller);
+  const swrRes = hooks.useBookDetail(params);
   return {
     bookDetail: swrRes
   };
@@ -168,6 +168,14 @@ export const useMetadata = (tokenId: number) => {
   const swrRes = hooks.useMetadata(tokenId);
   return {
     metadata: swrRes
+  };
+};
+
+export const useReviewsManagement = () => {
+  const hooks = useHooks();
+  const swrRes = hooks.useReviewsManagement();
+  return {
+    swr: swrRes
   };
 };
 

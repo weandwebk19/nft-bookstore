@@ -24,34 +24,17 @@ export const hookFactory: OwnedNftsHookFactory =
         const coreNfts = await bookStoreContract!.getOwnedNFTBooks();
 
         for (let i = 0; i < coreNfts.length; i++) {
-          const item = coreNfts[i];
+          try {
+            const item = coreNfts[i];
 
-          const amountOwned = await bookStoreContract!.getBalanceOfOwnerBook(
-            item.tokenId
-          );
+            const amountOwned = await bookStoreContract!.getBalanceOfOwnerBook(
+              item.tokenId
+            );
 
-          const amountTradeable = await bookStoreContract!.getAmountUnUsedBook(
-            item.tokenId
-          );
+            const amountTradeable =
+              await bookStoreContract!.getAmountUnUsedBook(item.tokenId);
 
-          if (!Object.keys(queryString).length) {
-            nfts.push({
-              tokenId: item.tokenId.toNumber(),
-              author: item.author,
-              quantity: item.quantity.toNumber(),
-              amountOwned: amountOwned.toNumber(),
-              amountTradeable: amountTradeable.toNumber()
-            });
-          } else {
-            // Filter
-            if (
-              (await checkFilterBooks(
-                item.tokenId,
-                undefined,
-                bookStoreContract!,
-                queryString
-              )) === true
-            ) {
+            if (!Object.keys(queryString).length) {
               nfts.push({
                 tokenId: item.tokenId.toNumber(),
                 author: item.author,
@@ -59,7 +42,27 @@ export const hookFactory: OwnedNftsHookFactory =
                 amountOwned: amountOwned.toNumber(),
                 amountTradeable: amountTradeable.toNumber()
               });
+            } else {
+              // Filter
+              if (
+                (await checkFilterBooks(
+                  item.tokenId,
+                  undefined,
+                  bookStoreContract!,
+                  queryString
+                )) === true
+              ) {
+                nfts.push({
+                  tokenId: item.tokenId.toNumber(),
+                  author: item.author,
+                  quantity: item.quantity.toNumber(),
+                  amountOwned: amountOwned.toNumber(),
+                  amountTradeable: amountTradeable.toNumber()
+                });
+              }
             }
+          } catch (err) {
+            console.error(err);
           }
         }
         return nfts;

@@ -17,7 +17,10 @@ import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+
+import { createPricingHistory, createTransactionHistory } from "../../utils";
 
 interface LendButtonProps {
   owner: string;
@@ -45,7 +48,7 @@ const defaultValues = {
 
 const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
   const [ownerName, setOwnerName] = useState();
-  const { bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
   const { metadata } = useMetadata(tokenId);
   const { account } = useAccount();
 
@@ -99,29 +102,50 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
           success: "NftBook is successfully lent out!",
           error: "Oops! There's a problem with lending process!"
         });
+
+        if (receipt) {
+          // create Transaction History
+          const gasFee = await getGasFee(provider, receipt);
+          // Caculate total fee
+          const lendingPriceNumber = parseFloat(
+            ethers.utils.formatEther(lendingPrice)
+          );
+          const totalFee = 0 - lendingPriceNumber - parseFloat(gasFee);
+          // Get current balance of account
+          const balance = await provider?.getBalance(account.data!);
+          const balanceInEther = ethers.utils.formatEther(balance!);
+          await createTransactionHistory(
+            tokenId,
+            totalFee,
+            balanceInEther,
+            "Lend book",
+            receipt.transactionHash,
+            receipt.from,
+            receipt.to,
+            `Gas fee = ${gasFee}, lending fee = ${lendingPriceNumber}, total fee = ${
+              0 - totalFee
+            } ETH`
+          );
+        }
       } catch (e: any) {
         console.log(e.message);
-        toast.error(`${e.message}.`, {
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     },
-    [bookStoreContract]
+    [account.data, bookStoreContract, provider]
   );
 
-  const createPricingHistory = useCallback(
+  const createPricingHistoryCallback = useCallback(
     async (tokenId: number, price: number) => {
-      // get bookId
-      const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      if (bookRes.data.success === true) {
-        const res = await axios.post("/api/pricingHistories/create", {
-          bookId: bookRes.data.data,
+      if (account.data) {
+        await createPricingHistory(
+          tokenId,
           price,
-          currency: "ETH",
-          category: "LEND",
-          userAddress: account.data?.toLowerCase(),
-          createdAt: new Date()
-        });
+          "LEND",
+          account.data.toLowerCase()
+        );
       }
     },
     [account.data]
@@ -129,7 +153,7 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
 
   const onSubmit = async (data: any) => {
     await lendBooks(tokenId, data.price, data.amount, amountTradeable);
-    await createPricingHistory(tokenId, data.price);
+    await createPricingHistoryCallback(tokenId, data.price);
   };
 
   useEffect(() => {

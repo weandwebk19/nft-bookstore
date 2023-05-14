@@ -31,6 +31,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import * as yup from "yup";
 
+import withAuth from "@/components/HOC/withAuth";
 import { useUserInfo } from "@/components/hooks/api/useUserInfo";
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
@@ -503,7 +504,7 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default withAuth(Profile);
 
 export async function getStaticProps({ locale }: any) {
   return {

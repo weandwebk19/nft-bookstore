@@ -95,6 +95,10 @@ import {
   hookFactory as createMetadataHook
 } from "./useMetadata";
 import { UseNetworkHook, hookFactory as createNetworkHook } from "./useNetwork";
+import {
+  UseReviewsManagementHook,
+  hookFactory as createReviewsManagementHook
+} from "./useReviewsManagement";
 
 export type Web3Hooks = {
   useAccount: UseAccountHook;
@@ -118,6 +122,7 @@ export type Web3Hooks = {
   useNftBookMeta: UseNftBookMetaHook;
   useNftBookSelling: UseNftBookSellingHook;
   useMetadata: UseMetadataHook;
+  useReviewsManagement: UseReviewsManagementHook;
   useRandomBooks: UseRandomBooksHook;
   useRealOwnerOfTokens: UseRealOwnerOfTokensHook;
   useOwnedRequestsOnExtending: UseOwnedRequestsOnExtendingHook;
@@ -151,6 +156,7 @@ export const setupHooks: SetupHooks = (deps) => {
     useNftBookSelling: createNftBookSellingHook(deps),
     useNftBookMeta: createNftBookMetaHook(deps),
     useMetadata: createMetadataHook(deps),
+    useReviewsManagement: createReviewsManagementHook(deps),
     useRandomBooks: createRandomBooksHook(deps),
     useRealOwnerOfTokens: createRealOwnerOfTokensHook(deps),
     useOwnedRequestsOnExtending: createOwnedRequestsOnExtendingHook(deps),

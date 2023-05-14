@@ -2,7 +2,7 @@
 import { useCallback } from "react";
 import { toast } from "react-toastify";
 
-import { CryptoHookFactory } from "@_types/hooks";
+import { CryptoHookFactory, NftBookSellingHookType } from "@_types/hooks";
 import axios from "axios";
 import { ethers } from "ethers";
 import useSWR from "swr";
@@ -16,13 +16,13 @@ export type UseBookDetailHook = ReturnType<BookDetailHookFactory>;
 
 export const hookFactory: BookDetailHookFactory =
   ({ bookStoreContract, bookSellingContract }) =>
-  (bookId: string, seller?: string) => {
+  (params: NftBookSellingHookType) => {
     const { data, ...swr } = useSWR(
       bookStoreContract && bookSellingContract ? "web3/useBookDetail" : null,
       async () => {
-        if (bookId) {
+        if (params.bookId) {
           const bookInfo = await (
-            await axios.get(`/api/books/${bookId}`)
+            await axios.get(`/api/books/${params.bookId}`)
           ).data?.data;
           const coreNftBook = await bookStoreContract!.getNftBook(
             bookInfo?.tokenId
@@ -36,7 +36,9 @@ export const hookFactory: BookDetailHookFactory =
             meta = metaRes.data;
           }
 
-          const sellerDefault = seller ? seller : coreNftBook?.author;
+          const sellerDefault = params.seller
+            ? params.seller
+            : coreNftBook?.author;
           const isListing = await bookSellingContract!.isListing(
             bookInfo?.tokenId,
             sellerDefault
@@ -49,7 +51,7 @@ export const hookFactory: BookDetailHookFactory =
               );
               const { price, tokenId, seller, amount } = listedNftBook;
               return {
-                bookId: bookId,
+                bookId: params.bookId,
                 nftCore: toNumber(coreNftBook),
                 listedCore: toNumber({
                   tokenId,
@@ -65,7 +67,7 @@ export const hookFactory: BookDetailHookFactory =
             }
           } else {
             return {
-              bookId: bookId,
+              bookId: params.bookId,
               nftCore: toNumber(coreNftBook),
               listedCore: null,
               meta: meta,

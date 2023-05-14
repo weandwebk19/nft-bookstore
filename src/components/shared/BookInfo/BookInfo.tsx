@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import { useBookInfo } from "@/components/hooks/api";
+import { useBookInfo, usePricingHistory } from "@/components/hooks/api";
 import {
   BookBriefing,
   BookDetail,
@@ -15,16 +15,16 @@ import { ReadMore } from "@/components/shared/ReadMore";
 
 import { FallbackNode } from "../FallbackNode";
 import BookListing from "./sections/BookListing";
+import BookPricingHistory from "./sections/BookPricingHistory";
 
 const BookInfo = () => {
   const { t } = useTranslation("bookDetail");
   const router = useRouter();
-  const { bookId, seller } = router.query;
+  const { bookId } = router.query;
   const bookInfo = useBookInfo(bookId as string);
-  // const { bookDetail } = useBookDetail(bookId as string, seller as string);
   const theme = useTheme();
 
-  const isOpenForPurchase = false;
+  // const isOpenForPurchase = false;
   // const [isPublishedState, setIsPublishedState] = useState(false);
 
   // useEffect(() => {
@@ -46,41 +46,6 @@ const BookInfo = () => {
   //   }
   //   return [];
   // }, [bookDetail]);
-
-  // const bookListActionable = [
-  //   {
-  //     id: "1",
-  //     price: 0.75,
-  //     owner: "Tho Le"
-  //   },
-  //   {
-  //     id: "2",
-  //     price: 3.54,
-  //     owner: "Nhat Nguyen"
-  //   },
-  //   {
-  //     id: "3",
-  //     price: 2.84,
-  //     owner: "Cao Le"
-  //   },
-  //   {
-  //     id: "4",
-  //     price: 1.58,
-  //     owner: "Vinh Tran"
-  //   },
-  //   {
-  //     id: "5",
-  //     price: 2.33,
-  //     owner: "Hoa Phan"
-  //   }
-  // ];
-
-  // const sellPricingHistory = usePricingHistory(bookDetail?.bookId!, "SELL");
-  // const lendPricingHistory = usePricingHistory(bookDetail?.bookId!, "LEND");
-  // const sharePricingHistory = usePricingHistory(bookDetail?.bookId!, "SHARE");
-  // console.log("sellPricingHistory", sellPricingHistory);
-  // console.log("lendPricingHistory", lendPricingHistory);
-  // console.log("sharePricingHistory", sharePricingHistory);
 
   return (
     <Box>
@@ -137,8 +102,11 @@ const BookInfo = () => {
               })()}
             </Stack>
           </Box>
-          <Box>
-            <Box
+          <Grid container columns={{ xm: 1, md: 9 }}>
+            <Grid
+              item
+              xs={1}
+              md={6}
               sx={{
                 borderRight: {
                   md: `1px solid ${theme.palette.primary.main}`,
@@ -154,13 +122,40 @@ const BookInfo = () => {
                   md: 0,
                   sm: 0,
                   xs: `1px solid ${theme.palette.primary.main}`
-                }
+                },
+                width: "100%"
               }}
               p={3}
             >
               <BookDetail />
-            </Box>
-          </Box>
+            </Grid>
+            <Grid
+              item
+              xs={1}
+              md={3}
+              sx={{
+                borderRight: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                borderBottom: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                borderLeft: {
+                  md: 0,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                width: "100%"
+              }}
+              p={3}
+            >
+              <BookPricingHistory />
+            </Grid>
+          </Grid>
           <BookListing />
           <Box
             sx={{
@@ -189,7 +184,7 @@ const BookInfo = () => {
             <Typography variant="h5" gutterBottom>
               {t("recommended")}
             </Typography>
-            <BookList />
+            {/* <BookList /> */}
           </Box>
         </Grid>
       </Grid>

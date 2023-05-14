@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   FunctionComponent,
   ReactElement,
@@ -95,10 +96,10 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
         const signedBookRentingContract = bookRentingContract.connect(signer);
         const signedBookSharingContract = bookSharingContract.connect(signer);
 
-        setTimeout(() => setGlobalListeners(window.ethereum), 500);
+        setTimeout(() => setGlobalListeners(window.ethereum!), 500);
         setWeb3Api(
           createWeb3State({
-            ethereum: window.ethereum,
+            ethereum: window.ethereum!,
             provider,
             bookStoreContract:
               signedBookStoreContract as unknown as BookStoreContract,
@@ -125,7 +126,7 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
     }
 
     initWeb3();
-    return () => removeGlobalListeners(window.ethereum);
+    return () => removeGlobalListeners(window.ethereum!);
   }, []);
 
   return (

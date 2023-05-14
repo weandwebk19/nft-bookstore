@@ -21,7 +21,7 @@ import styles from "@styles/FilterBar.module.scss";
 import pluralize from "@utils/pluralize";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import querystring from "querystring";
+import querystring from "query-string";
 import * as yup from "yup";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
@@ -139,7 +139,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
             alignItems="center"
           >
             <Box>
-              <Typography>{pluralize(data.length, t("result"))}</Typography>
+              <Typography>{pluralize(data?.length, t("result"))}</Typography>
             </Box>
             {!(Object.keys(router.query).length === 0) && (
               <Tooltip title={t("clearAllFilter")}>

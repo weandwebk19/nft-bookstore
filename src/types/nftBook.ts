@@ -32,17 +32,22 @@ export type NftBookAttribute = {
   value: number;
 };
 
-export type BookInfo = {
+export type BookInfoInDB = {
+  id: string;
   tokenId: number;
-  contractAddress?: string;
   description: string;
-  languages: string[];
-  genres: string[];
   externalLink?: string;
   totalPages?: number;
   keywords?: string | string[];
-  publishingTime?: Date;
+  userCreated?: string;
 };
+
+export type BookInfo = {
+  contractAddress?: string;
+  languages: string[];
+  genres: string[];
+  publishingTime?: Date;
+} & BookInfoInDB;
 
 export type BookInfoForUpdate = {
   id: string;

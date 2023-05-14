@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,6 +20,7 @@ import {
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
+import { ReviewInfo } from "@/types/reviews";
 
 import { ContentGroup } from "../ContentGroup";
 import { Image } from "../Image";
@@ -65,7 +66,12 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
     mode: "all"
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setValue } = methods;
+
+  useEffect(() => {
+    setValue("rating", 5);
+    setValue("review", "");
+  });
 
   const onSubmit = async (data: any) => {
     try {
@@ -73,17 +79,50 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
         walletAddress: account.data,
         tokenId,
         review: data.review,
-        rating: data.rating
+        rating: data.rating ? data.review : 5
       });
       if (reviewRes.data.success === true) {
         toast.success("Review book successfully.");
       } else {
-        toast.error(`${reviewRes.data.message}.`, {
+        toast.error(`${reviewRes.data.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     } catch (e: any) {
-      toast.error(`${e.message}.`, {
+      toast.error(`${e.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
+
+  const updateReview = useCallback(async (review: ReviewInfo) => {
+    const res = await axios.put(`/api/reviews/${review.id}/update`, {
+      reviewInfo: review
+    });
+    if (res.data.success === true) {
+      toast.success("Update review successfully.");
+    } else {
+      toast.error(`${res.data.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+    return res.data.data;
+  }, []);
+
+  const onEditSubmit = async (data: any) => {
+    try {
+      const newReview = await updateReview({
+        ...reviews,
+        review: data.review,
+        rating: data.rating
+      });
+
+      const reviewRes = await axios.get(`/api/reviews/${reviews.id}`);
+      if (reviewRes.data.success == true) {
+        setReviews(reviewRes.data.data);
+      }
+    } catch (e: any) {
+      toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }
@@ -117,7 +156,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
 
           if (userRes.data.success === true && bookRes.data.success === true) {
             const reviewRes = await axios.get(
-              `/api/reviews/${bookRes.data.data}/${userRes.data.data.id}`
+              `/api/books/${bookRes.data.data}/reviews/${userRes.data.data.id}`
             );
             if (reviewRes.data.success == true) {
               setReviews(reviewRes.data.data);
@@ -129,8 +168,6 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
       }
     })();
   }, [tokenId, account.data]);
-
-  // console.log("reviews", reviews);
 
   return (
     <>
@@ -205,9 +242,15 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
                 >
                   Cancel
                 </StyledButton>
-                <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Send review
-                </StyledButton>
+                {reviews ? (
+                  <StyledButton onClick={handleSubmit(onEditSubmit)}>
+                    Edit review
+                  </StyledButton>
+                ) : (
+                  <StyledButton onClick={handleSubmit(onSubmit)}>
+                    Send review
+                  </StyledButton>
+                )}
               </Box>
             </Stack>
           </Stack>

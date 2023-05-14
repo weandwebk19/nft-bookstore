@@ -114,9 +114,9 @@ const ReadBook = () => {
     setLocation(epubcifi);
 
     if (renditionRef.current && tocRef.current) {
-      console.log(renditionRef);
       const { displayed, href } = renditionRef.current.location.start;
-      const chapter = tocRef.current.find((item) => item.href === href);
+      const tocArray = Object.values(tocRef.current);
+      const chapter = tocArray.find((item) => item.href === href);
       setPage(
         `Page ${displayed.page} of ${displayed.total} in chapter ${
           chapter ? chapter.label : "n/a"
@@ -255,15 +255,6 @@ const ReadBook = () => {
               <ChevronRightIcon />
             </IconButton>
           </Stack>
-          {/* 
-          <Box sx={{ position: "absolute", top: 0 }}>
-            <IconButton disabled={pageNumber <= 1} onClick={previousPage}>
-              <ChevronLeftIcon />
-            </IconButton>
-            <IconButton disabled={pageNumber >= numPages} onClick={nextPage}>
-              <ChevronRightIcon />
-            </IconButton>
-          </Box> */}
         </Box>
       )}
     </Box>

@@ -48,3 +48,4 @@ public/contracts/
 
 .vscode/
 yarn.lock
+keys.json

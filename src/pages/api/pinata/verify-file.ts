@@ -10,7 +10,7 @@ import {
   pinataApiKey,
   pinataSecretApiKey,
   withSessionAPI
-} from "./utils";
+} from "../utils";
 
 export const config = {
   api: {

@@ -36,42 +36,51 @@ export const hookFactory: CreatedBooksHookFactory =
       ],
       async () => {
         const nfts = [] as NftBook[];
-        const ownedBooks = await bookStoreContract!.getOwnedNFTBooks();
-        const createdBooks = ownedBooks.filter((e) => e.author == account.data);
+        const res = await axios.get(
+          `/api/users/wallet/${account.data}/created-books`
+        );
+        if (res.data.success === true) {
+          const createdBooks = res.data.data;
 
-        for (let i = 0; i < createdBooks.length; i++) {
-          const item = createdBooks[i];
+          for (let i = 0; i < createdBooks.length; i++) {
+            try {
+              const item = createdBooks[i];
+              const nftBook = await bookStoreContract!.getNftBook(item.tokenId);
 
-          const amountTradeable = await bookStoreContract!.getAmountUnUsedBook(
-            item.tokenId
-          );
+              const amountTradeable =
+                await bookStoreContract!.getAmountUnUsedBook(item.tokenId);
 
-          if (!Object.keys(queryString).length) {
-            nfts.push({
-              tokenId: item?.tokenId?.toNumber(),
-              author: item?.author,
-              quantity: item?.quantity?.toNumber(),
-              amountTradeable: amountTradeable.toNumber()
-            });
-          } else {
-            // Filter
-            if (
-              (await checkFilterBooks(
-                item.tokenId,
-                undefined,
-                bookStoreContract!,
-                queryString
-              )) === true
-            ) {
-              nfts.push({
-                tokenId: item?.tokenId?.toNumber(),
-                author: item?.author,
-                quantity: item?.quantity?.toNumber(),
-                amountTradeable: amountTradeable.toNumber()
-              });
+              if (!Object.keys(queryString).length) {
+                nfts.push({
+                  tokenId: item?.tokenId,
+                  author: nftBook?.author,
+                  quantity: nftBook?.quantity?.toNumber(),
+                  amountTradeable: amountTradeable.toNumber()
+                });
+              } else {
+                // Filter
+                if (
+                  (await checkFilterBooks(
+                    item.tokenId,
+                    undefined,
+                    bookStoreContract!,
+                    queryString
+                  )) === true
+                ) {
+                  nfts.push({
+                    tokenId: item?.tokenId,
+                    author: nftBook?.author,
+                    quantity: nftBook?.quantity?.toNumber(),
+                    amountTradeable: amountTradeable.toNumber()
+                  });
+                }
+              }
+            } catch (err) {
+              console.error(err);
             }
           }
         }
+
         return nfts;
       }
     );
