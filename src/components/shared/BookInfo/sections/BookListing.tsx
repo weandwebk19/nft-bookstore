@@ -10,7 +10,6 @@ import { t } from "i18next";
 import { useRouter } from "next/router";
 
 import { useRealOwnerOfTokens } from "@/components/hooks/web3";
-import { bookComments, comments } from "@/mocks";
 import { StyledButton } from "@/styles/components/Button";
 import { StyledLinearProgress } from "@/styles/components/LinearProgress";
 import { ReviewInfo } from "@/types/reviews";

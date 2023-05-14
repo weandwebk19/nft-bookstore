@@ -77,10 +77,7 @@ const Comment = ({
               <ReadMore>{comment}</ReadMore>
             </Box>
             <Stack direction="row" spacing={3} alignItems="center">
-              <Typography variant="body2">
-                1 hour ago
-                {/* {date} */}
-              </Typography>
+              <Typography variant="body2">{date as string}</Typography>
               {/* <Button
                 size="small"
                 variant="text"

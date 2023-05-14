@@ -13,7 +13,7 @@ const ReadMore = ({ children, maxLines = 200 }: ReadMoreProps) => {
   const typeofChildren = typeof children;
 
   const text = children;
-  const textLength = (text as any)?.length;
+  const textLength = typeof text === "string" ? text.length : 0;
   const [isReadMore, setIsReadMore] = useState(false);
   const toggleReadMore = () => {
     setIsReadMore(!isReadMore);
@@ -64,7 +64,7 @@ const ReadMore = ({ children, maxLines = 200 }: ReadMoreProps) => {
       )}
       {typeofChildren === "string" && (
         <Typography>
-          {!isReadMore ? (text as any)?.slice(0, maxLines) : text}
+          {!isReadMore ? (text as string).slice(0, maxLines) : (text as string)}
           <Box
             component="span"
             onClick={toggleReadMore}

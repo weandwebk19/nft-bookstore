@@ -66,11 +66,27 @@ const RevokeSharedOutButton = ({
 
       const tx = await bookStoreContract?.recallSharedBooks(idSharedBook);
 
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Pending.",
-        success: "Revoke share NftBook successfully",
-        error: "Oops! There's a problem with sharing revoke process!"
-      });
+      // const receipt: any = await toast.promise(tx!.wait(), {
+      //   pending: "Pending.",
+      //   success: "Revoke share NftBook successfully",
+      //   error: "Oops! There's a problem with sharing revoke process!"
+      // });
+
+      const receipt = await tx?.wait();
+
+      const isSuccess = receipt?.events
+        ? receipt?.events[0].args?.isSuccess
+        : null;
+
+      if (isSuccess === true) {
+        toast.success("Revoke shared out book successfully");
+      } else if (isSuccess === false) {
+        toast.error(
+          "You are not allowed to revoke the book when it hasn't expired yet."
+        );
+      } else {
+        toast.error("Oops! There's a problem with revoke  process!");
+      }
 
       if (receipt) {
         await createTransactionHistoryOnlyGasFee(

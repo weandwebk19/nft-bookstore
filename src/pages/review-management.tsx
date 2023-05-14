@@ -1,28 +1,14 @@
-import { useEffect, useState } from "react";
+import { Box, CircularProgress, Grid, Paper } from "@mui/material";
 
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  Paper,
-  Stack,
-  Typography
-} from "@mui/material";
-
-import axios from "axios";
-import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
-import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
 import { useAccount, useReviewsManagement } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import CustomerReviewTable from "@/components/ui/review-management/CustomerReviewTable";
-import { bookReviews } from "@/mocks";
-import { ReviewRowData, ReviewStatus } from "@/types/reviews";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const ReviewManagement = () => {
@@ -30,7 +16,6 @@ const ReviewManagement = () => {
   const { account } = useAccount();
   const { ethereum, bookStoreContract } = useWeb3();
   const { swr } = useReviewsManagement();
-  console.log(swr);
 
   return (
     <>
@@ -67,8 +52,7 @@ const ReviewManagement = () => {
   );
 };
 
-// export default withAuth(ReviewManagement);
-export default ReviewManagement;
+export default withAuth(ReviewManagement);
 
 export async function getStaticProps({ locale }: any) {
   return {

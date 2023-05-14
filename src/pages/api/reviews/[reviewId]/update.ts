@@ -17,16 +17,17 @@ export default async function handler(
       const reviewId: string = req.query.reviewId as string;
       const reviewInfo = req.body.reviewInfo;
 
+      let objForUpdate: any = {};
+
+      if (reviewInfo.reply) objForUpdate.reply = reviewInfo.reply;
+      if (reviewInfo.review) objForUpdate.review = reviewInfo.review;
+      if (reviewInfo.rating) objForUpdate.rating = reviewInfo.rating;
       const newReview = await db.collection("reviews").updateOne(
         {
           _id: new ObjectId(reviewId)
         },
         {
-          $set: {
-            reply: reviewInfo.reply,
-            review: reviewInfo.review,
-            rating: reviewInfo.rating
-          }
+          $set: objForUpdate
         }
       );
 

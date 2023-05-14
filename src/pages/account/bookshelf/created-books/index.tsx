@@ -46,7 +46,11 @@ const CreatedBooks = () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
       if (res.data.success === true) {
         const bookId = res.data.data;
-        router.push(`/books/${bookId}`);
+        // router.push(`/books/${bookId}`);
+        router.push({
+          pathname: "/books/[bookId]",
+          query: { bookId }
+        });
       }
     })();
   };
@@ -60,7 +64,7 @@ const CreatedBooks = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Stack sx={{ pt: 3 }}>
-        <Box sx={{ mb: 3 }}>
+        <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
           <BreadCrumbs breadCrumbs={breadCrumbs} />
           <Button
             variant="outlined"
@@ -70,7 +74,7 @@ const CreatedBooks = () => {
           >
             Reviews Management
           </Button>
-        </Box>
+        </Stack>
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9} lg={9}>

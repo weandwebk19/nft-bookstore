@@ -5,10 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import {
   Avatar,
-  Box,
   Button,
   ButtonGroup,
-  Chip,
   Divider,
   IconButton,
   Stack,
@@ -33,6 +31,7 @@ import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { useAccount } from "@/components/hooks/web3";
+import { Comment } from "@/components/shared/Comment";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextAreaController } from "@/components/shared/FormController";
@@ -41,7 +40,7 @@ import { Image } from "@/components/shared/Image";
 import { StaticRating } from "@/components/shared/Rating";
 import { ReadMore } from "@/components/shared/ReadMore";
 import { StyledButton } from "@/styles/components/Button";
-import { ReviewRowData } from "@/types/reviews";
+import { ReviewColumns, ReviewInfo, ReviewRowData } from "@/types/reviews";
 
 interface CustomerReviewTableProps {
   data: ReviewRowData[];
@@ -67,19 +66,61 @@ export default function CustomerReviewTable({
   const { account } = useAccount();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
+  const [reviewDate, setReviewDate] = React.useState<string>("");
+  const [reformattedData, setReformattedData] = React.useState<ReviewColumns[]>(
+    []
+  );
 
   const [anchorDeleteButton, setAnchorDeleteButton] =
     React.useState<Element | null>(null);
 
   const openDeleteDialog = Boolean(anchorDeleteButton);
 
+  React.useEffect(() => {
+    if (data) {
+      const reformattedData = data.map((item) => {
+        const {
+          id,
+          avatar,
+          username,
+          title,
+          bookCover,
+          date,
+          rating,
+          comment,
+          reply
+        } = item;
+        return {
+          id,
+          buyer: {
+            avatar,
+            username
+          },
+          book: {
+            title,
+            bookCover
+          },
+          review: {
+            date,
+            rating,
+            comment,
+            reply
+          }
+        } as ReviewColumns;
+      });
+      setReformattedData(reformattedData);
+    }
+  }, [data]);
+
   const handleOpenDeleteDialogClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     params: GridRenderCellParams<any, any, any, GridTreeNodeWithRender>
   ) => {
     e.preventDefault();
+    const d = new Date(params.row?.review.date);
     setAnchorDeleteButton(e.currentTarget);
     setTargetItem(params.row);
+    setReviewDate(d.toDateString());
   };
 
   const handleReplyClick = (
@@ -166,15 +207,20 @@ export default function CustomerReviewTable({
       headerName: t("review") as string,
       width: 200,
       flex: 1,
-      renderCell: (params) => (
-        <Stack my={3}>
-          <Typography variant="inherit">
-            {params?.value?.rating ? StaticRating(params?.value?.rating) : "_"}
-          </Typography>
-          <ReadMore>{params?.value?.comment}</ReadMore>
-          <Typography variant="caption">{params?.value?.date}</Typography>
-        </Stack>
-      )
+      renderCell: (params) => {
+        const date = new Date(params?.value?.date);
+        return (
+          <Stack my={3}>
+            <Typography variant="inherit">
+              {params?.value?.rating
+                ? StaticRating(params?.value?.rating)
+                : "_"}
+            </Typography>
+            <ReadMore>{params?.value?.comment}</ReadMore>
+            <Typography variant="caption">{date.toDateString()}</Typography>
+          </Stack>
+        );
+      }
     },
     {
       field: "action",
@@ -182,8 +228,17 @@ export default function CustomerReviewTable({
       sortable: false,
       width: 100,
       renderCell: (params) => (
-        <Tooltip title={t("tooltip_reply")}>
-          <IconButton onClick={(e) => handleOpenDeleteDialogClick(e, params)}>
+        <Tooltip
+          title={
+            targetItem?.review?.reply
+              ? t("tooltip_editReply")
+              : t("tooltip_reply")
+          }
+        >
+          <IconButton
+            onClick={(e) => handleOpenDeleteDialogClick(e, params)}
+            color={params?.value?.reply ? "default" : "secondary"}
+          >
             {params?.value}
           </IconButton>
         </Tooltip>
@@ -192,10 +247,10 @@ export default function CustomerReviewTable({
   ];
 
   React.useEffect(() => {
-    data.forEach((object) => {
+    reformattedData.forEach((object) => {
       object.action = <AssistantOutlinedIcon />;
     });
-  }, [data]);
+  }, [reformattedData]);
 
   const methods = useForm({
     shouldUnregister: false,
@@ -206,8 +261,32 @@ export default function CustomerReviewTable({
 
   const { handleSubmit } = methods;
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
+  // const onSubmit = async (data: any) => {
+  //   console.log(data);
+  // };
+
+  const updateReview = React.useCallback(async (review: ReviewInfo) => {
+    const res = await axios.put(`/api/reviews/${review.id}/update`, {
+      reviewInfo: review
+    });
+    if (res.data.success === true) {
+      toast.success("Update review successfully.");
+    } else {
+      toast.error(`${res.data.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+    return res.data.data;
+  }, []);
+
+  const handleSendReplpy = async (review: any) => {
+    try {
+      const newReview = await updateReview(review);
+    } catch (e: any) {
+      toast.error(`${e.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
   };
 
   return (
@@ -247,7 +326,11 @@ export default function CustomerReviewTable({
           </Button>
         </ButtonGroup>
       </Stack>
-      <DataGrid getRowId={(row: any) => row.id} columns={columns} rows={data} />
+      <DataGrid
+        getRowId={(row: any) => row.id}
+        columns={columns}
+        rows={reformattedData}
+      />
       <Dialog
         title={t("dialogTitle") as string}
         open={openDeleteDialog}
@@ -255,6 +338,9 @@ export default function CustomerReviewTable({
       >
         <FormProvider {...methods}>
           <Stack spacing={3}>
+            <Typography variant="caption">
+              Review ID: {targetItem?.id}
+            </Typography>
             <Stack
               direction={{ xs: "column", sm: "row" }}
               spacing={{ xs: 1, sm: 2, md: 4 }}
@@ -265,22 +351,33 @@ export default function CustomerReviewTable({
                 sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                 className={styles["book-item__book-cover"]}
               />
-              <Stack justifyContent="space-between">
+              <Stack
+                justifyContent="space-between"
+                sx={{
+                  width: "100%"
+                }}
+              >
                 <Typography variant="h5">{targetItem?.book?.title}</Typography>
                 <Stack>
-                  <Avatar src={targetItem?.buyer?.avatar} />
-                  <Typography>{targetItem?.buyer?.username}</Typography>
-                  <Typography variant="inherit">
-                    {targetItem?.review?.rating
-                      ? StaticRating(targetItem?.review?.rating)
-                      : "_"}
-                  </Typography>
+                  <Comment
+                    avatar={targetItem?.buyer?.avatar}
+                    username={targetItem?.buyer?.username}
+                    rating={targetItem?.review?.rating}
+                    comment={targetItem?.review?.comment}
+                    date={reviewDate}
+                  />
                 </Stack>
               </Stack>
             </Stack>
             <Divider />
             <FormGroup label="Reply">
-              <TextAreaController name="reply" maxCharacters={8000} />
+              <TextAreaController
+                name="reply"
+                defaultValue={
+                  targetItem?.review?.reply ? targetItem?.review?.reply : ""
+                }
+                maxCharacters={8000}
+              />
             </FormGroup>
             <Divider />
             <Stack direction="row" spacing={3} justifyContent="end">
@@ -290,12 +387,29 @@ export default function CustomerReviewTable({
               >
                 {t("button_cancel")}
               </StyledButton>
-              <StyledButton
-                // onClick={(e) => handleReplyClick(e, targetItem)}
-                onClick={handleSubmit(onSubmit)}
-              >
-                {t("button_reply")}
-              </StyledButton>
+              {targetItem?.review?.reply ? (
+                <StyledButton
+                  onClick={handleSubmit(async (data: any) => {
+                    await handleSendReplpy({
+                      id: targetItem?.id,
+                      reply: data.reply
+                    });
+                  })}
+                >
+                  {t("button_editReply")}
+                </StyledButton>
+              ) : (
+                <StyledButton
+                  onClick={handleSubmit(async (data: any) => {
+                    await handleSendReplpy({
+                      id: targetItem?.id,
+                      reply: data.reply
+                    });
+                  })}
+                >
+                  {t("button_reply")}
+                </StyledButton>
+              )}
             </Stack>
           </Stack>
         </FormProvider>

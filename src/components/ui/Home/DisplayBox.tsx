@@ -14,19 +14,23 @@ import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import { useRouter } from "next/router";
 
-import images from "@/assets/images";
+import { usePublishingBooks } from "@/components/hooks/web3";
 import { BookList } from "@/components/shared/BookList";
-import { book, bookList } from "@/mocks";
-import { BookGenres, NftBookAttribute, NftBookDetail } from "@/types/nftBook";
+import { FilterField } from "@/types/filter";
 
 config.autoAddCss = false;
 
 const DisplayBox = () => {
   const router = useRouter();
+  const query = router.query;
+  const { listedBooks } = usePublishingBooks(query as FilterField);
 
   const handleBookClick = (tokenId: number | string) => {
     router.push(`/books/${tokenId}`);
   };
+
+  // should be replaced with the newest book that has been published
+  const firstBook = listedBooks?.data?.[0];
 
   return (
     <Box>
@@ -34,18 +38,21 @@ const DisplayBox = () => {
         <Grid item xs={4} sm={8} md={12} lg={18}>
           <Stack spacing={3}>
             {/* Book Banner */}
-            {/* <BookBanner
-              meta={book.meta}
-              details={book.details}
-              tokenId={Number(book.tokenId)}
-              author={book.author}
-              price={book.price}
-              onClick={() => {
-                alert(book.meta.title);
-              }}
-            />
+            {firstBook && (
+              <BookBanner
+                tokenId={firstBook?.tokenId}
+                author={firstBook?.seller}
+                //  description={firstBook?.info.description}
+                //  price={firstBook?.price}
+                //  genres={}
+                //  languages={}
+                onClick={() => {
+                  alert(firstBook.meta.title);
+                }}
+              />
+            )}
 
-            <ContentPaper
+            {/* <ContentPaper
               isPaginate={true}
               title={
                 <>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Box, Collapse } from "@mui/material";
+import { Box, Collapse, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import axios from "axios";
@@ -16,7 +16,7 @@ interface CommentProps {
   avatar: string;
   content: string;
   rating?: number;
-  // replies: CommentProps[];
+  reply?: string;
 }
 
 const NestedComments = ({
@@ -24,9 +24,9 @@ const NestedComments = ({
   user,
   avatar,
   content,
-  rating
-}: // replies
-CommentProps) => {
+  rating,
+  reply
+}: CommentProps) => {
   const theme = useTheme();
 
   const [showNestedComments, setShowNestedComments] = useState(false);
@@ -73,16 +73,16 @@ CommentProps) => {
             onShowReplyInput={() => handleReplyCommentClick(user)}
             showNestedComments={showNestedComments}
             onShowNestedComment={handleNestedCommentsToggle}
-            // hasChildren={replies && replies?.length > 0}
+            // hasChildren={reply && reply?.length > 0}
           />
         </Box>
-        {/* {replies && (
+        {reply && (
           <Box sx={{ ml: 2 }}>
             <Collapse in={showNestedComments} timeout="auto" unmountOnExit>
               <Box>
-                {replies.map((comment) => (
+                {/* {reply.map((comment) => (
                   <Box
-                    key={comment.id}
+                    key={comment}
                     sx={{
                       borderLeft: `1px solid ${theme.palette.background.default}`,
                       borderBottom: `1px solid ${theme.palette.background.default}`,
@@ -99,14 +99,15 @@ CommentProps) => {
                       onShowNestedComment={handleNestedCommentsToggle}
                     />
                   </Box>
-                ))}
+                ))} */}
+                <Typography>{reply}</Typography>
               </Box>
               {showReplyInput && (
                 <InputComment username={userName} replyTo={targetReply} />
               )}
             </Collapse>
           </Box>
-        )} */}
+        )}
       </Box>
     </div>
   );

@@ -63,11 +63,26 @@ const RevokeLentOutButton = ({
       );
       const tx = await bookStoreContract?.recallBorrowedBooks(idBorrowedBook);
 
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Pending.",
-        success: "Revoke lent out book successfully",
-        error: "Oops! There's a problem with lent out process!"
-      });
+      const receipt = await tx?.wait();
+
+      const isSuccess = receipt?.events
+        ? receipt?.events[0].args?.isSuccess
+        : null;
+
+      if (isSuccess === true) {
+        toast.success("Revoke lent out book successfully");
+      } else if (isSuccess === false) {
+        toast.error(
+          "You are not allowed to revoke the book when it hasn't expired yet."
+        );
+      } else {
+        toast.error("Oops! There's a problem with revoke  process!");
+      }
+      // const receipt: any = await toast.promise(tx!.wait(), {
+      //   pending: "Pending.",
+      //   success: "Revoke lent out book successfully",
+      //   error: "Oops! There's a problem with lent out process!"
+      // });
 
       if (receipt) {
         await createTransactionHistoryOnlyGasFee(
