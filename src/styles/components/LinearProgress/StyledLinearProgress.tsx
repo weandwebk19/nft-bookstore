@@ -35,7 +35,7 @@ const StyledLinearProgress = (
           mr: 1
         }}
       >
-        <BorderLinearProgress variant="determinate" {...props} />
+        <BorderLinearProgress variant="determinate" value={props.value} />
       </Box>
       <Box sx={{ minWidth: 35 }}>
         <Typography
