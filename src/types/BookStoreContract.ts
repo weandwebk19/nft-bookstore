@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { EthersContractContextV5 } from "ethereum-abi-types-generator";
 import {
   BytesLike as Arrayish,
