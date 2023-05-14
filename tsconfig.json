@@ -33,6 +33,6 @@
       "@config/*": ["./src/config/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "mongodb.d.ts"],
   "exclude": ["node_modules"]
 }

@@ -78,7 +78,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
         walletAddress: account.data,
         tokenId,
         review: data.review,
-        rating: data.rating
+        rating: data.rating ? data.review : 5
       });
       if (reviewRes.data.success === true) {
         toast.success("Review book successfully.");
@@ -87,6 +87,15 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
           position: toast.POSITION.TOP_CENTER
         });
       }
+    } catch (e: any) {
+      toast.error(`${e.message.substr(0, 65)}.`, {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
+
+  const onEditSubmit = async (data: any) => {
+    try {
     } catch (e: any) {
       toast.error(`${e.message.substr(0, 65)}.`, {
         position: toast.POSITION.TOP_CENTER
@@ -208,9 +217,15 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
                 >
                   Cancel
                 </StyledButton>
-                <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Send review
-                </StyledButton>
+                {reviews ? (
+                  <StyledButton onClick={handleSubmit(onEditSubmit)}>
+                    Edit review
+                  </StyledButton>
+                ) : (
+                  <StyledButton onClick={handleSubmit(onSubmit)}>
+                    Send review
+                  </StyledButton>
+                )}
               </Box>
             </Stack>
           </Stack>
