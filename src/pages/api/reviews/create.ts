@@ -14,7 +14,7 @@ export default async function handler(
       const { walletAddress, tokenId, review, rating } = req.body;
 
       const user = await db.collection("users").findOne({
-        wallet_address: walletAddress.toLowerCase()
+        wallet_address: walletAddress
       });
 
       const book = await db.collection("books").findOne({

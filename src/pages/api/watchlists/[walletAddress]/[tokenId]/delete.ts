@@ -15,7 +15,7 @@ export default async function handler(
       const { walletAddress, tokenId } = req.query;
 
       const watchlist = await db.collection("watchlists").deleteOne({
-        wallet_address: (walletAddress as string).toLowerCase(),
+        wallet_address: walletAddress as string,
         token_id: parseInt(tokenId as string)
       });
 

@@ -17,23 +17,25 @@ export default async function handler(
       const userInfo = req.body;
 
       if (userId) {
+        let objForUpdate: any = {};
+        if (userInfo.avatar) objForUpdate.avatar = userInfo.avatar;
+        if (userInfo.avatarPublicId)
+          objForUpdate.avatar_public_id = userInfo.avatarPublicId;
+        if (userInfo.fullname) objForUpdate.fullname = userInfo.fullname;
+        if (userInfo.email) objForUpdate.email = userInfo.email;
+        if (userInfo.fullname) objForUpdate.fullname = userInfo.fullname;
+        if (userInfo.bio) objForUpdate.bio = userInfo.bio;
+        if (userInfo.website) objForUpdate.website = userInfo.website;
+        if (userInfo.facebook) objForUpdate.facebook = userInfo.facebook;
+        if (userInfo.twitter) objForUpdate.twitter = userInfo.twitter;
+        if (userInfo.instagram) objForUpdate.instagram = userInfo.instagram;
+        if (userInfo.linkedIn) objForUpdate.linked_in = userInfo.linkedIn;
         const newAccount = await db.collection("users").updateOne(
           {
             _id: new ObjectId(userId as string)
           },
           {
-            $set: {
-              avatar: userInfo.avatar,
-              avatar_public_id: userInfo.avatarPublicId,
-              fullname: userInfo.fullname,
-              email: userInfo.email,
-              bio: userInfo.bio,
-              website: userInfo.website,
-              facebook: userInfo.facebook,
-              twitter: userInfo.twitter,
-              instagram: userInfo.instagram,
-              linked_in: userInfo.linkedIn
-            }
+            $set: objForUpdate
           }
         );
 

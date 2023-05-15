@@ -17,7 +17,12 @@ import {
   goerli,
   mainnet
 } from "wagmi";
-import { polygon } from "wagmi/chains";
+import { polygon, sepolia } from "wagmi/chains";
+import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
+import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
 import { Web3Provider } from "@/components/providers";
@@ -46,14 +51,41 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export const { chains, provider } = configureChains(
-  [mainnet, polygon, goerli],
-  [publicProvider()]
+export const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet, polygon, goerli, sepolia],
+  [
+    alchemyProvider({ apiKey: "sqU5f8EM6nGsof_7HCwxqxwGBQPQUTxa" }),
+    publicProvider()
+  ]
 );
 
 const client = createClient({
   autoConnect: true,
-  provider
+  connectors: [
+    new MetaMaskConnector({ chains }),
+    new CoinbaseWalletConnector({
+      chains,
+      options: {
+        appName: "wagmi"
+      }
+    }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId: "c06100850b08bbad923d20bb6ef2e5a9",
+        showQrModal: true
+      }
+    }),
+    new InjectedConnector({
+      chains,
+      options: {
+        name: "Injected",
+        shimDisconnect: true
+      }
+    })
+  ],
+  provider,
+  webSocketProvider
 });
 
 function App({ Component, pageProps }: ComponentWithPageLayout) {
