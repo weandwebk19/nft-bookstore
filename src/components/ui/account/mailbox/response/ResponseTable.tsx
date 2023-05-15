@@ -125,9 +125,9 @@ export default function ResponseTable({ data }: ResponseTableProps) {
               transactionHash,
               borrowerAddress,
               renterAddress,
-              `Gas fee = ${gasFee}, Extend fee = ${parseFloat(
+              `Gas fee = ${gasFee} ETH, Extend fee = ${parseFloat(
                 totalPrice
-              )}, total price = ${-totalFee} ETH`
+              )} ETH, total price = ${-totalFee} ETH`
             );
           };
 

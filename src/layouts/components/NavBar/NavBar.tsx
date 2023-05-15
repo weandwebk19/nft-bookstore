@@ -293,7 +293,7 @@ const NavBar = () => {
   };
 
   const handleCreateRentalClick = () => {
-    router.push("/rental/create");
+    router.push("/account/bookshelf/purchased-books");
   };
 
   const handlePublishingClick = () => {

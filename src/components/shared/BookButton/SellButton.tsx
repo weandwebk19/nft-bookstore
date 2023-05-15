@@ -143,7 +143,7 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
             receipt.transactionHash,
             receipt.from,
             receipt.to,
-            `Gas fee = ${gasFee}, listing fee =  ${listingPriceNumber}, total fee = ${
+            `Gas fee = ${gasFee} ETH, listing fee =  ${listingPriceNumber} ETH, total fee = ${
               0 - totalFee
             } ETH`
           );

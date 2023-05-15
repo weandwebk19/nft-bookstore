@@ -8,6 +8,7 @@ const NETWORKS: { [k: string]: string } = {
   5: "Goerli Test Network",
   42: "Kovan Test Network",
   56: "Binance Smart Chain",
+  11155111: "Sepolia Test Network",
   1337: "Ganache"
 };
 

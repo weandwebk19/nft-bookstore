@@ -168,9 +168,9 @@ const BuyButton = ({
               transactionHash,
               buyerAddress,
               sellerAddress,
-              `Gas fee = ${gasFee}, book fee = ${
+              `Gas fee = ${gasFee} ETH, book fee = ${
                 price * amount
-              }, total price =  = ${0 - totalFee} ETH`
+              } ETH, total price =  = ${0 - totalFee} ETH`
             );
           };
 

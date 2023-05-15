@@ -72,6 +72,8 @@ export const hookFactory: AccountHookFactory =
               }
             ]
           });
+        } else {
+          window.alert("Not implemented yet.");
         }
       } catch (e) {
         console.error(e);

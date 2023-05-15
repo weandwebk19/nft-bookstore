@@ -328,8 +328,8 @@ const WalletBar = ({
 WalletBar.propTypes = {
   isInstalled: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  account: PropTypes.string,
-  connect: PropTypes.func.isRequired
+  account: PropTypes.string
+  // connect: PropTypes.func.isRequired
 };
 
 WalletBar.defaultProps = {

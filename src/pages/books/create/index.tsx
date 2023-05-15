@@ -291,13 +291,13 @@ const CreateBook = () => {
   };
 
   const handleError = async (err: any) => {
-    await deleteFileOnCloud();
+    // await deleteFileOnCloud();
     toast.error(err.message, {
       position: toast.POSITION.TOP_CENTER
     });
-    setTimeout(() => {
-      window.location.reload();
-    }, 3000);
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 3000);
   };
 
   const uploadBookSample = async (file: File) => {
@@ -423,8 +423,6 @@ const CreateBook = () => {
         nftBook: { ...nftBookMeta, author: account }
       });
 
-      console.log("account", account);
-
       const res = await toast.promise(promise, {
         pending: t("pendingUploadMetadata") as string,
         success: t("successUploadMetadata") as string,
@@ -524,7 +522,7 @@ const CreateBook = () => {
       receipt.transactionHash,
       receipt.from,
       receipt.to,
-      `Gas fee = ${gasFee}, listing fee = ${listingPriceNumber}, total fee = ${-totalFee} ETH`
+      `Gas fee = ${gasFee} ETH, listing fee = ${listingPriceNumber} ETH, total fee = ${-totalFee} ETH`
     );
   };
 
