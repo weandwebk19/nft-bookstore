@@ -23,7 +23,7 @@ export default async function handler(
       // Update user is author
       await db.collection("users").updateOne(
         {
-          wallet_address: authorInfo.walletAddress.toLowerCase()
+          wallet_address: authorInfo.walletAddress
         },
         { $set: { is_author: true } }
       );

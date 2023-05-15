@@ -31,10 +31,10 @@ const pageReload = () => {
 const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
   try {
     //create new account
-    let response = await axios.post("/api/users/create", {
-      wallet_address: ethereum.selectedAddress,
-      fullname: "Anonymous"
-    });
+    // let response = await axios.post("/api/users/create", {
+    //   wallet_address: ethereum.selectedAddress,
+    //   fullname: "Anonymous"
+    // });
 
     const isLocked = !(await ethereum._metamask.isUnlocked());
     if (isLocked) {

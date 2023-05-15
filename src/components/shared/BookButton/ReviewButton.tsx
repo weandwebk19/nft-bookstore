@@ -75,14 +75,16 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
 
   const onSubmit = async (data: any) => {
     try {
-      const reviewRes = await axios.post(`/api/reviews/create`, {
+      const newReview = {
         walletAddress: account.data,
         tokenId,
         review: data.review,
-        rating: data.rating ? data.review : 5
-      });
+        rating: data.rating ? data.rating : 5
+      };
+      const reviewRes = await axios.post(`/api/reviews/create`, newReview);
       if (reviewRes.data.success === true) {
         toast.success("Review book successfully.");
+        setReviews(newReview);
       } else {
         toast.error(`${reviewRes.data.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
@@ -111,7 +113,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
 
   const onEditSubmit = async (data: any) => {
     try {
-      const newReview = await updateReview({
+      await updateReview({
         ...reviews,
         review: data.review,
         rating: data.rating
@@ -148,9 +150,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
     (async () => {
       try {
         if (tokenId && account.data) {
-          const userRes = await axios.get(
-            `/api/users/wallet/${account.data?.toLowerCase()}`
-          );
+          const userRes = await axios.get(`/api/users/wallet/${account.data}`);
 
           const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
 

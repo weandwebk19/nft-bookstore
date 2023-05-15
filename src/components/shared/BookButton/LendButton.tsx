@@ -140,12 +140,7 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
   const createPricingHistoryCallback = useCallback(
     async (tokenId: number, price: number) => {
       if (account.data) {
-        await createPricingHistory(
-          tokenId,
-          price,
-          "LEND",
-          account.data.toLowerCase()
-        );
+        await createPricingHistory(tokenId, price, "LEND", account.data);
       }
     },
     [account.data]

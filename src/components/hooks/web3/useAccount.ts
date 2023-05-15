@@ -63,14 +63,16 @@ export const hookFactory: AccountHookFactory =
 
     const switchAccount = async () => {
       try {
-        ethereum?.request({
-          method: "wallet_requestPermissions",
-          params: [
-            {
-              eth_accounts: {}
-            }
-          ]
-        });
+        if (ethereum?.isMetaMask) {
+          ethereum?.request({
+            method: "wallet_requestPermissions",
+            params: [
+              {
+                eth_accounts: {}
+              }
+            ]
+          });
+        }
       } catch (e) {
         console.error(e);
       }

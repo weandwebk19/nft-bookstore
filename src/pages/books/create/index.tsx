@@ -24,13 +24,13 @@ import {
 } from "@utils/convert";
 import getFileExtension from "@utils/getFileExtension";
 import axios from "axios";
+import cryptoRandomString from "crypto-random-string";
 import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import * as yup from "yup";
-import cryptoRandomString from 'crypto-random-string';
 
 import withAuth from "@/components/HOC/withAuth";
 import withAuthor from "@/components/HOC/withAuthor";
@@ -332,12 +332,12 @@ const CreateBook = () => {
     }
     return "";
   };
-88
+  88;
   const uploadBookFile = async (file: File) => {
     let cipherText;
     if (!!file && file !== undefined) {
-      const key = cryptoRandomString({length: 32, type: 'alphanumeric'});
-      const privateKey = await Crypto.generateKey(key);  
+      const key = cryptoRandomString({ length: 32, type: "alphanumeric" });
+      const privateKey = await Crypto.generateKey(key);
       setKey(key);
       const iv = Crypto.generateIVValue();
       const ivStr = convertArrayToHexString(Array.from(iv!));
@@ -349,7 +349,7 @@ const CreateBook = () => {
         const pdfData = reader.result as ArrayBuffer;
         const bytes = new Uint8Array(pdfData);
         cipherText = await Crypto.encryption(bytes, privateKey!, iv!);
-      }
+      };
 
       try {
         const { signedData, account } = await getSignedData();
@@ -423,6 +423,8 @@ const CreateBook = () => {
         nftBook: { ...nftBookMeta, author: account }
       });
 
+      console.log("account", account);
+
       const res = await toast.promise(promise, {
         pending: t("pendingUploadMetadata") as string,
         success: t("successUploadMetadata") as string,
@@ -439,10 +441,12 @@ const CreateBook = () => {
     return "";
   };
 
-  const createNFTBook = async (nftUri: string, 
-                               quantity: number, 
-                               key: string, 
-                               iv: string) => {
+  const createNFTBook = async (
+    nftUri: string,
+    quantity: number,
+    key: string,
+    iv: string
+  ) => {
     try {
       if (nftUri !== "") {
         const listingPrice = await bookStoreContract!.listingPrice();
@@ -576,10 +580,12 @@ const CreateBook = () => {
           if (nftURI !== "") {
             setIsSigning(true);
             // Mint book
-            const tokenId = await createNFTBook(nftURI, 
-                                                data.quantity, 
-                                                key!, 
-                                                ivStr!);
+            const tokenId = await createNFTBook(
+              nftURI,
+              data.quantity,
+              key!,
+              ivStr!
+            );
 
             // Upload data to database
             if (tokenId) {

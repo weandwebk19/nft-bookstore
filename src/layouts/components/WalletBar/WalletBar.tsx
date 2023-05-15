@@ -21,8 +21,10 @@ import { getCsrfToken } from "next-auth/react";
 import { signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
+import { useConnect } from "wagmi";
 
 import images from "@/assets/images";
+import { Dialog } from "@/components/shared/Dialog";
 import { StyledChip } from "@/styles/components/Chip";
 import { ListItemProps } from "@/types/list";
 import { truncate } from "@/utils/truncate";
@@ -35,7 +37,6 @@ interface WalletBarProps {
   account?: string;
   userName?: string;
   avatar?: string;
-  connect(...args: unknown[]): unknown;
   handleLogin: () => Promise<void>;
   switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
@@ -46,7 +47,6 @@ interface WalletBarProps {
 const WalletBar = ({
   isInstalled,
   isLoading,
-  connect,
   account,
   userName,
   avatar,
@@ -59,6 +59,12 @@ const WalletBar = ({
   const { t } = useTranslation();
   const { data, status } = useSession();
   const [address, setAddress] = useState(data?.address as string);
+  const { connect, connectors, error, pendingConnector } = useConnect();
+
+  const [anchorWalletCard, setAnchorWalletCard] = useState<Element | null>(
+    null
+  );
+  const openWalletCard = Boolean(anchorWalletCard);
 
   const createList: ListItemProps[] = [
     {
@@ -111,6 +117,14 @@ const WalletBar = ({
 
   const handleCreateRentalClick = () => {
     alert("Create Rental");
+  };
+
+  const handleWalletCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorWalletCard(e.currentTarget);
+  };
+
+  const handleWalletCardClose = () => {
+    setAnchorWalletCard(null);
   };
 
   useEffect(() => {
@@ -245,13 +259,7 @@ const WalletBar = ({
       <>
         <StyledButton
           customVariant="primary"
-          onClick={() => {
-            if (!isConnected) {
-              connect();
-            } else {
-              handleLogin();
-            }
-          }}
+          onClick={handleWalletCardClick}
           sx={{
             display: {
               xs: "none",
@@ -262,13 +270,7 @@ const WalletBar = ({
           {t("navbar:connectWallet")}
         </StyledButton>
         <IconButton
-          onClick={() => {
-            if (!isConnected) {
-              connect();
-            } else {
-              handleLogin();
-            }
-          }}
+          onClick={handleWalletCardClick}
           sx={{
             display: {
               xs: "flex",
@@ -279,6 +281,34 @@ const WalletBar = ({
         >
           <AccountBalanceWalletOutlinedIcon color="primary" />
         </IconButton>
+
+        <Dialog
+          title={t("navbar:connectWallet")!}
+          open={openWalletCard}
+          onClose={handleWalletCardClose}
+        >
+          {connectors.map((connector) => (
+            <button
+              disabled={!connector.ready}
+              key={connector.id}
+              onClick={() => {
+                if (!isConnected) {
+                  connect({ connector });
+                } else {
+                  handleLogin();
+                }
+              }}
+            >
+              {connector.name}
+              {!connector.ready && " (unsupported)"}
+              {isLoading &&
+                connector.id === pendingConnector?.id &&
+                " (connecting)"}
+            </button>
+          ))}
+
+          {error && <div>{error.message}</div>}
+        </Dialog>
       </>
     );
   } else {

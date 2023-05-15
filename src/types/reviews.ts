@@ -41,5 +41,5 @@ export type ReviewColumns = {
     comment?: string;
     reply?: string;
   };
-  action?: JSX.Element;
+  action?: ReviewRowData;
 };

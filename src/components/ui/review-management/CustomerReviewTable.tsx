@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import {
   Avatar,
+  Badge,
   Button,
   ButtonGroup,
   Divider,
@@ -101,6 +102,17 @@ export default function CustomerReviewTable({
             bookCover
           },
           review: {
+            date,
+            rating,
+            comment,
+            reply
+          },
+          action: {
+            id,
+            avatar,
+            username,
+            title,
+            bookCover,
             date,
             rating,
             comment,
@@ -227,28 +239,133 @@ export default function CustomerReviewTable({
       headerName: t("action") as string,
       sortable: false,
       width: 100,
-      renderCell: (params) => (
-        <Tooltip
-          title={
-            targetItem?.review?.reply
-              ? t("tooltip_editReply")
-              : t("tooltip_reply")
-          }
-        >
-          <IconButton
-            onClick={(e) => handleOpenDeleteDialogClick(e, params)}
-            color={params?.value?.reply ? "default" : "secondary"}
-          >
-            {params?.value}
-          </IconButton>
-        </Tooltip>
-      )
+      renderCell: (params) => {
+        console.log(params.value);
+        return (
+          <>
+            <Tooltip
+              title={
+                params?.value?.reply
+                  ? t("tooltip_editReply")
+                  : t("tooltip_reply")
+              }
+            >
+              <IconButton
+                onClick={(e) => handleOpenDeleteDialogClick(e, params)}
+                color={params?.value?.reply ? "default" : "secondary"}
+              >
+                {params?.value?.reply ? (
+                  params?.value.action
+                ) : (
+                  <Badge color="secondary" variant="dot">
+                    {params?.value.action}
+                  </Badge>
+                )}
+              </IconButton>
+            </Tooltip>
+
+            <Dialog
+              title={t("dialogTitle") as string}
+              open={openDeleteDialog}
+              onClose={handleDeleteClose}
+            >
+              <FormProvider {...methods}>
+                <Stack spacing={3}>
+                  <Typography variant="caption">
+                    Review ID: {targetItem?.id}
+                  </Typography>
+                  <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={{ xs: 1, sm: 2, md: 4 }}
+                  >
+                    <Image
+                      src={targetItem?.book?.bookCover}
+                      alt={targetItem?.book?.title}
+                      sx={{
+                        flexShrink: 0,
+                        aspectRatio: "2 / 3",
+                        width: "100px"
+                      }}
+                      className={styles["book-item__book-cover"]}
+                    />
+                    <Stack
+                      justifyContent="space-between"
+                      sx={{
+                        width: "100%"
+                      }}
+                    >
+                      <Typography variant="h5">
+                        {targetItem?.book?.title}
+                      </Typography>
+                      <Stack>
+                        <Comment
+                          avatar={targetItem?.buyer?.avatar}
+                          username={targetItem?.buyer?.username}
+                          rating={targetItem?.review?.rating}
+                          comment={targetItem?.review?.comment}
+                          date={reviewDate}
+                        />
+                      </Stack>
+                    </Stack>
+                  </Stack>
+                  <Divider />
+                  <FormGroup label="Reply">
+                    <TextAreaController
+                      name="reply"
+                      defaultValue={
+                        targetItem?.review?.reply
+                          ? targetItem?.review?.reply
+                          : ""
+                      }
+                      maxCharacters={8000}
+                    />
+                  </FormGroup>
+                  <Divider />
+                  <Stack direction="row" spacing={3} justifyContent="end">
+                    <StyledButton
+                      customVariant="secondary"
+                      onClick={(e) => handleCancelClick(e)}
+                    >
+                      {t("button_cancel")}
+                    </StyledButton>
+                    {targetItem?.review?.reply ? (
+                      <StyledButton
+                        onClick={handleSubmit(async (data: any) => {
+                          await handleSendReplpy({
+                            id: targetItem?.id,
+                            reply: data.reply
+                          });
+                        })}
+                      >
+                        {t("button_editReply")}
+                      </StyledButton>
+                    ) : (
+                      <StyledButton
+                        onClick={handleSubmit(async (data: any) => {
+                          await handleSendReplpy({
+                            id: targetItem?.id,
+                            reply: data.reply
+                          });
+                        })}
+                      >
+                        {t("button_reply")}
+                      </StyledButton>
+                    )}
+                  </Stack>
+                </Stack>
+              </FormProvider>
+            </Dialog>
+          </>
+        );
+      }
     }
   ];
 
   React.useEffect(() => {
     reformattedData.forEach((object) => {
-      object.action = <AssistantOutlinedIcon />;
+      if (object.action) {
+        object.action.action = <AssistantOutlinedIcon />;
+      }
     });
   }, [reformattedData]);
 
@@ -331,89 +448,6 @@ export default function CustomerReviewTable({
         columns={columns}
         rows={reformattedData}
       />
-      <Dialog
-        title={t("dialogTitle") as string}
-        open={openDeleteDialog}
-        onClose={handleDeleteClose}
-      >
-        <FormProvider {...methods}>
-          <Stack spacing={3}>
-            <Typography variant="caption">
-              Review ID: {targetItem?.id}
-            </Typography>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1, sm: 2, md: 4 }}
-            >
-              <Image
-                src={targetItem?.book?.bookCover}
-                alt={targetItem?.book?.title}
-                sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-                className={styles["book-item__book-cover"]}
-              />
-              <Stack
-                justifyContent="space-between"
-                sx={{
-                  width: "100%"
-                }}
-              >
-                <Typography variant="h5">{targetItem?.book?.title}</Typography>
-                <Stack>
-                  <Comment
-                    avatar={targetItem?.buyer?.avatar}
-                    username={targetItem?.buyer?.username}
-                    rating={targetItem?.review?.rating}
-                    comment={targetItem?.review?.comment}
-                    date={reviewDate}
-                  />
-                </Stack>
-              </Stack>
-            </Stack>
-            <Divider />
-            <FormGroup label="Reply">
-              <TextAreaController
-                name="reply"
-                defaultValue={
-                  targetItem?.review?.reply ? targetItem?.review?.reply : ""
-                }
-                maxCharacters={8000}
-              />
-            </FormGroup>
-            <Divider />
-            <Stack direction="row" spacing={3} justifyContent="end">
-              <StyledButton
-                customVariant="secondary"
-                onClick={(e) => handleCancelClick(e)}
-              >
-                {t("button_cancel")}
-              </StyledButton>
-              {targetItem?.review?.reply ? (
-                <StyledButton
-                  onClick={handleSubmit(async (data: any) => {
-                    await handleSendReplpy({
-                      id: targetItem?.id,
-                      reply: data.reply
-                    });
-                  })}
-                >
-                  {t("button_editReply")}
-                </StyledButton>
-              ) : (
-                <StyledButton
-                  onClick={handleSubmit(async (data: any) => {
-                    await handleSendReplpy({
-                      id: targetItem?.id,
-                      reply: data.reply
-                    });
-                  })}
-                >
-                  {t("button_reply")}
-                </StyledButton>
-              )}
-            </Stack>
-          </Stack>
-        </FormProvider>
-      </Dialog>
       <ToastContainer />
     </Stack>
   );
