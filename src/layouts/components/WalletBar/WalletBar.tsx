@@ -4,7 +4,14 @@ import {
   Avatar,
   Box,
   Chip,
+  FormHelperText,
+  Grid,
   IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Menu,
   Stack,
   Tooltip
@@ -287,27 +294,50 @@ const WalletBar = ({
           open={openWalletCard}
           onClose={handleWalletCardClose}
         >
-          {connectors.map((connector) => (
-            <button
-              disabled={!connector.ready}
-              key={connector.id}
-              onClick={() => {
-                if (!isConnected) {
-                  connect({ connector });
-                } else {
-                  handleLogin();
-                }
+          <Grid item xs={4} md={6}>
+            <List
+              sx={{
+                border: "1px solid ",
+                borderRadius: "5px"
               }}
             >
-              {connector.name}
-              {!connector.ready && " (unsupported)"}
-              {isLoading &&
-                connector.id === pendingConnector?.id &&
-                " (connecting)"}
-            </button>
-          ))}
+              {connectors.map((connector) => (
+                <Box key={connector.id}>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      disabled={!connector.ready}
+                      onClick={() => {
+                        if (!isConnected) {
+                          connect({ connector });
+                        } else {
+                          handleLogin();
+                        }
+                      }}
+                    >
+                      <ListItemText
+                        primary={`${connector.name}${
+                          !connector.ready ? " (unsupported)" : ""
+                        }${
+                          isLoading && connector.id === pendingConnector?.id
+                            ? " (connecting)"
+                            : ""
+                        }`}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </Box>
+              ))}
+            </List>
 
-          {error && <div>{error.message}</div>}
+            {error && (
+              <FormHelperText
+                error
+                sx={{ marginTop: "24px", fontSize: "14px" }}
+              >
+                {error.message}
+              </FormHelperText>
+            )}
+          </Grid>
         </Dialog>
       </>
     );

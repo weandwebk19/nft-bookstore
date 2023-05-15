@@ -157,14 +157,14 @@ export default function TransactionHistoryTable({
       sortable: false,
       renderCell: (params) => {
         let detail = params.value.split(", ");
-        console.log("detail:", detail);
+        // console.log("detail:", detail);
 
         detail = detail.map((item: string) => {
           const value = item.split(" = ");
           return value;
         });
 
-        console.log("detail2:", detail);
+        // console.log("detail2:", detail);
 
         return <Typography>{params.value}</Typography>;
       }
