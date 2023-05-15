@@ -16,7 +16,7 @@ export default async function handler(
 
     const user = await db
       .collection("users")
-      .findOne({ wallet_address: walletAddress.toLowerCase() });
+      .findOne({ wallet_address: walletAddress });
 
     if (user) {
       return res.json({

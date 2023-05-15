@@ -423,6 +423,8 @@ const CreateBook = () => {
         nftBook: { ...nftBookMeta, author: account }
       });
 
+      console.log("account", account);
+
       const res = await toast.promise(promise, {
         pending: t("pendingUploadMetadata") as string,
         success: t("successUploadMetadata") as string,

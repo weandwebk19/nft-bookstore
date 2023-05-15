@@ -38,24 +38,26 @@ export const hookFactory: RandomBooksHookFactory =
 
         let count = 0;
         while (count < 6 && count < coreListedBooks.length) {
-          const randomIndex = Math.floor(
-            Math.random() * coreListedBooks.length
-          );
-          const randomItem = coreListedBooks[randomIndex];
-          const listedBook = {
-            tokenId: randomItem.tokenId.toNumber(),
-            seller: randomItem.seller,
-            buyer: randomItem.buyer,
-            price: parseFloat(ethers.utils.formatEther(randomItem.price)),
-            amount: randomItem.amount.toNumber()
-          };
-          if (
-            !isTokenIdExist(listedBooks, listedBook.tokenId) &&
-            listedBook.seller !== account.data
-          ) {
-            listedBooks.push(listedBook);
-            count++;
-          }
+          try {
+            const randomIndex = Math.floor(
+              Math.random() * coreListedBooks.length
+            );
+            const randomItem = coreListedBooks[randomIndex];
+            const listedBook = {
+              tokenId: randomItem.tokenId.toNumber(),
+              seller: randomItem.seller,
+              buyer: randomItem.buyer,
+              price: parseFloat(ethers.utils.formatEther(randomItem.price)),
+              amount: randomItem.amount.toNumber()
+            };
+            if (
+              !isTokenIdExist(listedBooks, listedBook.tokenId) &&
+              listedBook.seller !== account.data
+            ) {
+              listedBooks.push(listedBook);
+              count++;
+            }
+          } catch (e) {}
         }
 
         return listedBooks;

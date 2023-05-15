@@ -80,7 +80,7 @@ export const checkFilterBooks = async (
 
   // TODO: author check
   if (queryString.author !== "") {
-    const author = queryString.author.toLowerCase();
+    const author = queryString.author;
     if (!metaRes?.data.author.includes(author)) {
       isAuthorPass = false;
     }

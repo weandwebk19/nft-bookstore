@@ -94,9 +94,6 @@ const NavBar = () => {
   const { signMessageAsync } = useSignMessage();
 
   const { chain } = useNetwork();
-  const { connect: wagmiConnect } = useConnect({
-    connector: new InjectedConnector()
-  });
   const { address: wagmiAddress, isConnected } = useWagmiAccount();
   const [address, setAddress] = useState(wagmiAddress as string);
 
@@ -140,7 +137,7 @@ const NavBar = () => {
       //create new account
       await axios
         .post("/api/users/create", {
-          wallet_address: wagmiAddress?.toLowerCase(),
+          wallet_address: wagmiAddress,
           fullname: "Anonymous"
         })
         .catch((e) => {
@@ -635,7 +632,7 @@ const NavBar = () => {
                 <WalletBar
                   isInstalled={account.isInstalled}
                   isLoading={account.isLoading}
-                  connect={wagmiConnect}
+                  // connect={wagmiConnect}
                   // account={account.data}
                   account={wagmiAddress}
                   userName={userInfo?.fullname}

@@ -88,8 +88,10 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
   });
 
   const { handleSubmit } = methods;
-  console.log(metadata);
-  const sellPricingHistory = usePricingHistory(bookId as string, "SELL");
+  const sellPricingHistory = usePricingHistory(
+    bookId as unknown as string,
+    "SELL"
+  );
 
   const sellBooks = useCallback(
     async (
@@ -159,12 +161,7 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
   const createPricingHistoryCallback = useCallback(
     async (tokenId: number, price: number) => {
       if (account.data) {
-        await createPricingHistory(
-          tokenId,
-          price,
-          "SELL",
-          account.data.toLowerCase()
-        );
+        await createPricingHistory(tokenId, price, "SELL", account.data);
       }
     },
     [account.data]

@@ -164,12 +164,7 @@ const ShareButton = ({
   const createPricingHistoryCallback = useCallback(
     async (tokenId: number, price: number) => {
       if (account.data) {
-        await createPricingHistory(
-          tokenId,
-          price,
-          "SHARE",
-          account.data.toLowerCase()
-        );
+        await createPricingHistory(tokenId, price, "SHARE", account.data);
       }
     },
     [account.data]
