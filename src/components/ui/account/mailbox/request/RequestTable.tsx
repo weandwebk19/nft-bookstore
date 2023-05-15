@@ -3,8 +3,7 @@ import { useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -16,9 +15,7 @@ import {
   GridTreeNodeWithRender
 } from "@mui/x-data-grid";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 
-import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
@@ -33,11 +30,7 @@ interface RequestTableProps {
 }
 
 export default function RequestTable({ data }: RequestTableProps) {
-  const matches = useMediaQuery("(min-width:700px)");
-
-  const router = useRouter();
   const { t } = useTranslation("request");
-  const { account } = useAccount();
   const { provider, bookStoreContract } = useWeb3();
 
   const [targetItem, setTargetItem] = React.useState<any>({});
