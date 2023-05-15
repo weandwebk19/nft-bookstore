@@ -1,42 +1,25 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import {
-  Box,
-  CircularProgress,
-  Grid,
-  Paper,
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, CircularProgress, Grid, Paper } from "@mui/material";
 
-import axios from "axios";
-import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 
-import images from "@/assets/images";
 import withAuth from "@/components/HOC/withAuth";
 import { useTransactionHistories } from "@/components/hooks/api";
 import { useAccount } from "@/components/hooks/web3";
-import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import TransactionHistoryTable from "@/components/ui/account/transactionHistory/TransactionHistoryTable";
-// import { WatchlistRowData, WatchlistStatus } from "@/types/watchlist";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const TransactionHistory = () => {
   const { t } = useTranslation("transactionHistory");
   const { account } = useAccount();
 
-  // const [rows, setRows] = useState<WatchlistRowData[]>([]);
-  const [rows, setRows] = useState([]);
-
   const { data = [], isLoading } = useTransactionHistories(
     account.data as string
   );
-  console.log("data:", data);
-  console.log("isLoading:", isLoading);
 
   return (
     <>

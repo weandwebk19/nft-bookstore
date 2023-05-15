@@ -1,12 +1,13 @@
 {
   "titlePage": "Transaction History - NFT Bookstore",
   "containerTitle": "Transaction History",
-  "name": "Name",
-  "hash": "Hash",
+  "method": "Method",
+  "hash": "Transaction Hash",
   "amount": "Amount",
   "balance": "Balance",
   "from": "From",
   "to": "To",
-  "detail": "Detail",
-  "time": "Time"
+  "time": "Time",
+  "dialogTitleInfo": "Additional information",
+  "tooltip_additionalInfo": "Additional information"
 }

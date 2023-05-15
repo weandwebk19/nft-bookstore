@@ -1,12 +1,13 @@
 {
   "titlePage": "Lịch sử giao dịch - NFT Bookstore",
   "containerTitle": "Lịch sử giao dịch",
-  "name": "Tên",
-  "hash": "Hash",
+  "method": "Phương thức",
+  "hash": "ID giao dịch",
   "amount": "Giá trị",
   "balance": "Số dư",
   "from": "Từ",
   "to": "Đến",
-  "detail": "Chi tiết",
-  "time": "Thời gian"
+  "time": "Thời gian",
+  "dialogTitleInfo": "Thông tin bổ sung",
+  "tooltip_additionalInfo": "Thông tin bổ sung"
 }
