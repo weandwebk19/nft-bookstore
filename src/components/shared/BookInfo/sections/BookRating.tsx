@@ -36,6 +36,8 @@ const BookRating = () => {
     })();
   }, [bookId]);
 
+  console.log(reviews);
+
   return (
     <Box component="section">
       <Stack spacing={3}>

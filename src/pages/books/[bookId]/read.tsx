@@ -10,36 +10,38 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
+import axios from "axios";
 import { Rendition } from "epubjs";
 import { useRouter } from "next/router";
 
 import { useNftBookMeta } from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { ZenLayout } from "@/layouts/ZenLayout";
 import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
 import { StyledButton } from "@/styles/components/Button";
-import axios from "axios";
 import { convertHexStringToUint8Array } from "@/utils/convert";
-import {Crypto} from "@/utils/crypto";
-import { useWeb3 } from "@/components/providers/web3";
-
+import { Crypto } from "@/utils/crypto";
 
 // let LINK_EPUB =
 //   "https://altmshfkgudtjr.github.io/react-epub-viewer/files/Alices%20Adventures%20in%20Wonderland.epub";
 // let LINK_PDF =
 //   "https://cors-anywhere.herokuapp.com/http://www.pdf995.com/samples/pdf.pdf";
 
-async function decryptPdfFile(cipherText: Uint8Array, privateKey: any, iv: Uint8Array) {
+async function decryptPdfFile(
+  cipherText: Uint8Array,
+  privateKey: any,
+  iv: Uint8Array
+) {
   let plainText;
   if (cipherText) {
     plainText = await Crypto.decryption(cipherText!, privateKey!, iv!);
   }
   if (plainText) {
-    const blob = new Blob([plainText], { type: 'application/pdf' });
+    const blob = new Blob([plainText], { type: "application/pdf" });
     return URL.createObjectURL(blob);
   }
-    // URL.revokeObjectURL(link.href);
+  // URL.revokeObjectURL(link.href);
 }
-  
 
 const ReadBook = () => {
   const [tokenId, setTokenId] = useState();
@@ -64,29 +66,34 @@ const ReadBook = () => {
   useEffect(() => {
     (async () => {
       if (bookFileUrl) {
-
         const dataFile = axios({
           method: "get",
           url: bookFileUrl,
           responseType: "arraybuffer",
           headers: {
-            'Accept': 'application/pdf application/epub+zip',
+            Accept: "application/pdf application/epub+zip"
           }
-        }).then(async function(response) {
-          const cipherText = new Uint8Array(response.data); 
-          if (tokenId) {     
-            const secrectKey = await bookStoreContract!.getSecretKey(tokenId) as unknown as string[];
+        }).then(async function (response) {
+          const cipherText = new Uint8Array(response.data);
+          if (tokenId) {
+            const secrectKey = (await bookStoreContract!.getSecretKey(
+              tokenId
+            )) as unknown as string[];
             if (secrectKey.length === 2) {
-              const privateKey = await Crypto.generateKey(secrectKey[1]);  
+              const privateKey = await Crypto.generateKey(secrectKey[1]);
               const iv = convertHexStringToUint8Array(secrectKey[0]);
-              const linkPdf = await decryptPdfFile(cipherText, privateKey, iv) as string;
+              const linkPdf = (await decryptPdfFile(
+                cipherText,
+                privateKey,
+                iv
+              )) as string;
               setLinkPdf(linkPdf);
             }
           }
-        })
+        });
       }
-    })()
-  },[bookFileUrl, bookStoreContract, tokenId]);
+    })();
+  }, [bookFileUrl, bookStoreContract, tokenId]);
 
   useEffect(() => {
     (async () => {
@@ -129,9 +136,9 @@ const ReadBook = () => {
 
   /*To Prevent right click on screen*/
   useEffect(() => {
-  document.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-  });
+    document.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+    });
   }, []);
 
   useEffect(() => {
@@ -217,7 +224,7 @@ const ReadBook = () => {
               openAs: "epub"
             }}
           />
-          <PageIndicator page={page} />
+          <PageIndicator page={page as string} />
         </Box>
       )}
 

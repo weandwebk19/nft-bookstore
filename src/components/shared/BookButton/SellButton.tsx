@@ -9,8 +9,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
+import { usePricingHistory } from "@/components/hooks/api";
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
@@ -47,10 +49,25 @@ const defaultValues = {
 };
 
 const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const [ownerName, setOwnerName] = useState();
   const { provider, bookStoreContract } = useWeb3();
   const { metadata } = useMetadata(tokenId);
   const { account } = useAccount();
+  const [bookId, setBookId] = useState();
+
+  useEffect(() => {
+    (async () => {
+      // get bookId
+      try {
+        const bookRes = await axios.get(`/api/books/token/${tokenId}/bookId`);
+        if (bookRes.data.success === true) {
+          setBookId(bookRes.data.data);
+        }
+      } catch (err) {}
+    })();
+  }, [tokenId]);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -71,6 +88,8 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
   });
 
   const { handleSubmit } = methods;
+  console.log(metadata);
+  const sellPricingHistory = usePricingHistory(bookId as string, "SELL");
 
   const sellBooks = useCallback(
     async (
@@ -206,6 +225,40 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
                   mb: 5
                 }}
               >
+                {sellPricingHistory?.data?.lastest && (
+                  <Stack spacing={2}>
+                    <Typography variant="h6" mb={1}>
+                      {t("pricingHistory$listing")}
+                    </Typography>
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="label">{t("average")}:</Typography>
+                      <Typography>
+                        {sellPricingHistory.data.average} ETH
+                      </Typography>
+                    </Stack>
+
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="label">{t("highest")}:</Typography>
+                      <Typography>
+                        {sellPricingHistory.data.highest} ETH
+                      </Typography>
+                    </Stack>
+
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="label">{t("lowest")}:</Typography>
+                      <Typography>
+                        {sellPricingHistory.data.lowest} ETH
+                      </Typography>
+                    </Stack>
+
+                    <Stack direction="row" spacing={1}>
+                      <Typography variant="label">{t("lastest")}:</Typography>
+                      <Typography>
+                        {sellPricingHistory.data.lastest} ETH
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                )}
                 <FormGroup label="Listing price" required>
                   <TextFieldController name="price" type="number" />
                 </FormGroup>
