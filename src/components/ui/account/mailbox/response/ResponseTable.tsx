@@ -3,8 +3,7 @@ import { useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -17,7 +16,6 @@ import {
 } from "@mui/x-data-grid";
 import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 
 import { useAccount } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
@@ -34,9 +32,6 @@ interface ResponseTableProps {
 }
 
 export default function ResponseTable({ data }: ResponseTableProps) {
-  const matches = useMediaQuery("(min-width:700px)");
-
-  const router = useRouter();
   const { t } = useTranslation("response");
   const { account } = useAccount();
   const { provider, bookStoreContract, bookRentingContract } = useWeb3();
@@ -319,64 +314,6 @@ export default function ResponseTable({ data }: ResponseTableProps) {
     }
   ];
 
-  const mockData = [
-    {
-      id: 1,
-      amount: 1,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BB",
-      time: 7 * 24 * 60 * 60,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 2,
-      amount: 1,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
-      time: 1 * 24 * 60 * 60,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 3,
-      amount: 2,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
-      time: 2 * 24 * 60 * 60,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 4,
-      amount: 4,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BC",
-      time: 4 * 24 * 60 * 60,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    },
-    {
-      id: 5,
-      amount: 1,
-      sender: "0xB2aa8d249c8addFDA77d8bD5813d5080A39D91BD",
-      time: 5 * 24 * 60 * 60,
-      action: {
-        delete: <DeleteOutlineOutlinedIcon />,
-        accept: <CheckOutlinedIcon />,
-        refuse: <CloseOutlinedIcon />
-      }
-    }
-  ];
-
   React.useEffect(() => {
     data.forEach((object) => {
       object.action = {
@@ -389,12 +326,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
 
   return (
     <Stack spacing={3}>
-      <DataGrid
-        getRowId={(row: any) => row.id}
-        columns={columns}
-        rows={data}
-        // rows={mockData}
-      />
+      <DataGrid getRowId={(row: any) => row.id} columns={columns} rows={data} />
       <Dialog
         title={t("dialogTitleAccept") as string}
         open={openAcceptDialog}

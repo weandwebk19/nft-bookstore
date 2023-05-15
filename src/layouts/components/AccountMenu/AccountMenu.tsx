@@ -22,6 +22,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
+import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
 import SwitchAccountOutlinedIcon from "@mui/icons-material/SwitchAccountOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
@@ -67,7 +68,7 @@ const AccountMenu = ({
       icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
       content: t("navbar:my_profile") as string,
       onClick: () => {
-        router.push("/account/profile2");
+        router.push("/account/profile");
       }
     },
     // {
@@ -105,6 +106,13 @@ const AccountMenu = ({
       content: t("navbar:mailBox") as string,
       onClick: () => {
         router.push("/account/mailbox");
+      }
+    },
+    {
+      icon: <PaidOutlinedIcon color="primary" fontSize="small" />,
+      content: t("navbar:transactionHistory") as string,
+      onClick: () => {
+        router.push("/account/transaction-history");
       }
     },
     {
