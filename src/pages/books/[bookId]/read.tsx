@@ -4,7 +4,14 @@ import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import { IToc, ReactReader } from "react-reader";
 
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Stack,
+  Typography
+} from "@mui/material";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -62,9 +69,12 @@ const ReadBook = () => {
   const router = useRouter();
   const { bookId } = router.query;
   const { nftBookMeta } = useNftBookMeta(bookId as string);
+  const [decrypting, setDecrypting] = useState(false);
   const bookFileUrl = nftBookMeta.data?.bookFile; // Url of file on pinata
   useEffect(() => {
     (async () => {
+      setDecrypting(true);
+
       if (bookFileUrl) {
         const dataFile = axios({
           method: "get",
@@ -92,6 +102,7 @@ const ReadBook = () => {
           }
         });
       }
+      setDecrypting(false);
     })();
   }, [bookFileUrl, bookStoreContract, tokenId]);
 
@@ -135,11 +146,11 @@ const ReadBook = () => {
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
   /*To Prevent right click on screen*/
-  useEffect(() => {
-    document.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-    });
-  }, []);
+  // useEffect(() => {
+  //   document.addEventListener("contextmenu", (event) => {
+  //     event.preventDefault();
+  //   });
+  // }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handlePageNavigate);
@@ -195,15 +206,25 @@ const ReadBook = () => {
   }
 
   return (
-    <Box>
+    <Stack>
       <Button
         variant="outlined"
         size="small"
         startIcon={<KeyboardBackspaceIcon />}
         sx={{ mb: 3 }}
+        onClick={() => {
+          router.push("/account/bookshelf");
+        }}
       >
         My bookshelf
       </Button>
+
+      {decrypting && (
+        <Stack spacing={2} justifyContent="center" alignItems="center">
+          <CircularProgress />
+          <Typography>Decrypting your book...</Typography>
+        </Stack>
+      )}
 
       {/* Render epub file into browser view */}
       {fileType === "epub" && linkEpub && (
@@ -264,7 +285,7 @@ const ReadBook = () => {
           </Stack>
         </Box>
       )}
-    </Box>
+    </Stack>
   );
 };
 
