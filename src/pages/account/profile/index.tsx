@@ -92,16 +92,26 @@ const Profile = () => {
       instagram: yup.string(),
       avatar: yup
         .mixed()
-        .required(t("textError4") as string)
         .test("required", t("textError5") as string, (file: any) => {
           if (file) return true;
+
+          if (userInfo.data?.avatar) return true;
+
           return false;
         })
         .test("fileSize", t("textError6") as string, (file: any) => {
-          return file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE;
+          if (file && file?.size <= MAXIMUM_ATTACHMENTS_SIZE) return true;
+
+          if (userInfo.data?.avatar) return true;
+
+          return false;
         })
         .test("fileFormat", t("textError7") as string, (file: any) => {
-          return file && SUPPORTED_FORMATS.includes(file.type);
+          if (file && SUPPORTED_FORMATS.includes(file.type)) return true;
+
+          if (userInfo.data?.avatar) return true;
+
+          return false;
         })
     })
     .required();
@@ -142,21 +152,32 @@ const Profile = () => {
           setIsLoading(true);
 
           const { avatar, ...authorInfo } = data;
-          const avatarLink = await uploadImage(avatar);
-          console.log("watchPicture", watchPicture);
+          let avatarLink = null;
 
-          const res = await axios.post(
-            `/api/users/${userInfo.data?.id}/update`,
+          if (avatar) {
+            avatarLink = await uploadImage(avatar);
+          }
+
+          const promise = axios.post(`/api/users/${userInfo.data?.id}/update`, {
+            ...authorInfo,
+            avatar:
+              avatarLink && avatarLink?.secure_url ? avatarLink.secure_url : "",
+            avatarPublicId:
+              avatarLink && avatarLink?.public_id ? avatarLink.public_id : ""
+          });
+
+          const res = await toast.promise(
+            promise,
             {
-              ...authorInfo,
-              avatar: avatarLink.secure_url,
-              avatarPublicId: avatarLink.public_id
+              pending: t("pendingProfile") as string,
+              success: t("successProfile") as string,
+              error: t("errorProfile") as string
+            },
+            {
+              position: toast.POSITION.TOP_CENTER
             }
           );
 
-          console.log("res:", res);
-
-          // handleCancel();
           setIsLoading(false);
         } catch (error: any) {
           console.log("error:", error);
@@ -168,7 +189,6 @@ const Profile = () => {
   );
 
   useEffect(() => {
-    setValue("avatar", userInfo.data?.avatar);
     setValue("fullname", userInfo.data?.fullname);
     setValue("email", userInfo.data?.email);
     setValue("walletAddress", userInfo.data?.walletAddress);
@@ -224,14 +244,37 @@ const Profile = () => {
                             spacing={{ xs: 4, sm: 4, md: 8, lg: 10 }}
                           >
                             <Grid item xs={12} md={8}>
-                              {!errors.avatar && watchPicture ? (
+                              {errors.avatar ? (
+                                <Avatar
+                                  alt="avatar"
+                                  src=""
+                                  sx={{
+                                    display: "flex",
+                                    maxWidth: "400px",
+                                    width: "100%",
+                                    height: "100%",
+                                    aspectRatio: "1 / 1",
+                                    borderRadius: "100rem",
+                                    margin: "auto"
+                                  }}
+                                />
+                              ) : watchPicture ? (
                                 <Box
                                   component="img"
-                                  src={
-                                    userInfo.data?.avatar
-                                      ? userInfo.data?.avatar
-                                      : URL.createObjectURL(watchPicture as any)
-                                  }
+                                  src={URL.createObjectURL(watchPicture as any)}
+                                  sx={{
+                                    width: "100%",
+                                    maxWidth: "400px",
+                                    aspectRatio: "1 / 1",
+                                    borderRadius: "100rem",
+                                    objectFit: "cover",
+                                    margin: "auto"
+                                  }}
+                                />
+                              ) : userInfo.data?.avatar ? (
+                                <Box
+                                  component="img"
+                                  src={userInfo.data?.avatar}
                                   sx={{
                                     width: "100%",
                                     maxWidth: "400px",
@@ -277,13 +320,23 @@ const Profile = () => {
                                     readOnly={isLoading}
                                   />
                                 </StyledButton>
-                                <StyledButton
-                                  customVariant="secondary"
-                                  onClick={handleRemoveImage}
-                                  disabled={isLoading}
-                                >
-                                  {t("removeBtn") as string}
-                                </StyledButton>
+                                {userInfo.data?.avatar ? (
+                                  <StyledButton
+                                    customVariant="secondary"
+                                    onClick={handleRemoveImage}
+                                    disabled={isLoading}
+                                  >
+                                    {t("originalPhotoBtn") as string}
+                                  </StyledButton>
+                                ) : (
+                                  <StyledButton
+                                    customVariant="secondary"
+                                    onClick={handleRemoveImage}
+                                    disabled={isLoading}
+                                  >
+                                    {t("removeBtn") as string}
+                                  </StyledButton>
+                                )}
                               </Stack>
                             </Grid>
                           </Grid>

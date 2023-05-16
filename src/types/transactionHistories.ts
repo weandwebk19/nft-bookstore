@@ -1,6 +1,7 @@
 export type TransactionHistoriesNoId = {
+  tokenId: number;
   amount: number;
-  balance: number;
+  currentBalance: number;
   transactionName: string;
   transactionHash: string;
   fromAddress: string;

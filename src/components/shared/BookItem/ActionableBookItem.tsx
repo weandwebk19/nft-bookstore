@@ -339,9 +339,16 @@ const ActionableBookItem = ({
               {status !== undefined ? <Chip label={status} /> : <></>}
             </Stack> */}
 
-          <Stack direction="row" spacing={2} mt={3}>
-            {buttons}
-          </Stack>
+          {status === "isOwned" && (metadata.isLoading || !metadata) ? (
+            <Stack direction="row" spacing={0.5}>
+              <Skeleton variant="rectangular" width="50%" height={36.5} />
+              <Skeleton variant="rectangular" width="50%" height={36.5} />
+            </Stack>
+          ) : (
+            <Stack direction="row" spacing={2} mt={3}>
+              {buttons}
+            </Stack>
+          )}
         </Stack>
       </Stack>
     </Box>
