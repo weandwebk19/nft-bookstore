@@ -192,7 +192,7 @@ const BuyButton = ({
               transactionHash,
               sellerAddress,
               buyerAddress,
-              `Total price received= ${price * amount} ETH`
+              `Total price received = ${price * amount} ETH`
             );
           };
 

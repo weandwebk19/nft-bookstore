@@ -420,7 +420,7 @@ const CreateBook = () => {
       const promise = axios.post("/api/pinata/verify", {
         address: account,
         signature: signedData,
-        nftBook: { ...nftBookMeta, author: account }
+        nftBook: nftBookMeta
       });
 
       const res = await toast.promise(promise, {
@@ -554,7 +554,7 @@ const CreateBook = () => {
       } else if (activeStep === 2) {
         (async () => {
           // Upload metadata to pinata
-          if (bookCoverLink !== "" && bookFileLink !== "") {
+          if (bookCoverLink !== "" && bookFileLink !== "" && account.data) {
             setIsSigning(true);
             const nftUriRes = await uploadMetadata({
               title: data.title,
@@ -563,7 +563,7 @@ const CreateBook = () => {
               bookSample: bookSampleLink,
               fileType: data.fileType,
               version: data.version,
-              author: "",
+              author: account.data,
               quantity: data.quantity,
               createdAt: new Date().toString()
             });
