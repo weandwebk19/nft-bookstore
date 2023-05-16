@@ -144,9 +144,6 @@ const TakeButton = ({
           endTime
         );
 
-        console.log("idBooksOnSharing", idBooksOnSharing.toNumber());
-        console.log("price", price);
-
         const tx = await bookStoreContract?.takeBooksOnSharing(
           idBooksOnSharing,
           {

@@ -87,7 +87,6 @@ const NavBar = () => {
   const router = useRouter();
 
   const { disconnect } = useDisconnect();
-  // const { disconnect: switchAccount } = useAccount();
 
   const { data: session, status } = useSession();
 
@@ -637,7 +636,6 @@ const NavBar = () => {
                   account={wagmiAddress}
                   userName={userInfo?.fullname}
                   avatar={userInfo?.avatar}
-                  switchAccount={account.switchAccount}
                   disconnect={disconnect}
                   handleLogin={handleLogin}
                   isConnected={isConnected}
@@ -649,7 +647,6 @@ const NavBar = () => {
                   avatar={userInfo?.avatar}
                   open={openAccountMenu}
                   onClose={handleAccountMenuClose}
-                  switchAccount={account.switchAccount}
                   disconnect={disconnect}
                   isAuthor={isAuthor}
                 />

@@ -44,7 +44,6 @@ interface WalletBarProps {
   userName?: string;
   avatar?: string;
   handleLogin: () => Promise<void>;
-  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
   isConnected: boolean;
   isAuthor: boolean;
@@ -57,7 +56,6 @@ const WalletBar = ({
   userName,
   avatar,
   handleLogin,
-  switchAccount,
   disconnect,
   isConnected,
   isAuthor
@@ -181,9 +179,6 @@ const WalletBar = ({
           avatar={avatar}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
-          switchAccount={() => {
-            switchAccount();
-          }}
           disconnect={() => {
             disconnect();
             signOut({

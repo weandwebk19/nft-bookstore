@@ -86,12 +86,14 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
         toast.success("Review book successfully.");
         setReviews(newReview);
       } else {
-        toast.error(`${reviewRes.data.message.substr(0, 65)}.`, {
+        toast.error(`${reviewRes.data.message}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
     } catch (e: any) {
-      toast.error(`${e.message.substr(0, 65)}.`, {
+      console.log("e", e);
+
+      toast.error(`${e.message}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }
@@ -104,7 +106,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
     if (res.data.success === true) {
       toast.success("Update review successfully.");
     } else {
-      toast.error(`${res.data.message.substr(0, 65)}.`, {
+      toast.error(`${res.data.message}.`, {
         position: toast.POSITION.TOP_CENTER
       });
     }
