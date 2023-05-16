@@ -50,10 +50,11 @@ async function decryptPdfFile(
   // URL.revokeObjectURL(link.href);
 }
 
+const SUPPORT_FILE_TYPE = ["epub", "pdf"]
 const ReadBook = () => {
   const [tokenId, setTokenId] = useState();
   const [linkPdf, setLinkPdf] = useState<string>();
-  const [linkEpub, setLinkEpub] = useState();
+  const [linkEpub, setLinkEpub] = useState<string>();
   const { bookStoreContract } = useWeb3();
   const [page, setPage] = useState<number | string>();
   const [location, setLocation] = useState<string | number | undefined>(0);
@@ -64,17 +65,17 @@ const ReadBook = () => {
 
   const renditionRef = useRef<Rendition | null>(null);
   const tocRef = useRef<IToc | null>(null);
-  const [fileType, setFileType] = useState<string>("pdf");
+  const [fileType, setFileType] = useState<string>("epub");
 
   const router = useRouter();
   const { bookId } = router.query;
   const { nftBookMeta } = useNftBookMeta(bookId as string);
   const [decrypting, setDecrypting] = useState(false);
   const bookFileUrl = nftBookMeta.data?.bookFile; // Url of file on pinata
+  const metaDataType = nftBookMeta.data?.fileType;
   useEffect(() => {
     (async () => {
       setDecrypting(true);
-
       if (bookFileUrl) {
         const dataFile = axios({
           method: "get",
@@ -92,19 +93,26 @@ const ReadBook = () => {
             if (secrectKey.length === 2) {
               const privateKey = await Crypto.generateKey(secrectKey[1]);
               const iv = convertHexStringToUint8Array(secrectKey[0]);
-              const linkPdf = (await decryptPdfFile(
+              const link = (await decryptPdfFile(
                 cipherText,
                 privateKey,
                 iv
               )) as string;
-              setLinkPdf(linkPdf);
+              if (SUPPORT_FILE_TYPE.includes(metaDataType)) {
+                setFileType(metaDataType);
+                if (metaDataType === "pdf") {
+                  setLinkPdf(link);
+                } else {
+                  setLinkEpub(link);
+                }
+              }
             }
           }
         });
       }
       setDecrypting(false);
     })();
-  }, [bookFileUrl, bookStoreContract, tokenId]);
+  }, [bookFileUrl, bookStoreContract, tokenId, metaDataType]);
 
   useEffect(() => {
     (async () => {
