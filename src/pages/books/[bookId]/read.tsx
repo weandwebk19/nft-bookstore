@@ -43,6 +43,7 @@ async function decryptPdfFile(
   // URL.revokeObjectURL(link.href);
 }
 
+const SUPPORT_FILE_TYPE = ["epub", "pdf"]
 const ReadBook = () => {
   const [tokenId, setTokenId] = useState();
   const [linkPdf, setLinkPdf] = useState<string>();
@@ -57,12 +58,13 @@ const ReadBook = () => {
 
   const renditionRef = useRef<Rendition | null>(null);
   const tocRef = useRef<IToc | null>(null);
-  const [fileType, setFileType] = useState<string>("pdf");
+  const [fileType, setFileType] = useState<string>("epub");
 
   const router = useRouter();
   const { bookId } = router.query;
   const { nftBookMeta } = useNftBookMeta(bookId as string);
   const bookFileUrl = nftBookMeta.data?.bookFile; // Url of file on pinata
+  const metaDataType = nftBookMeta.data?.fileType;
   useEffect(() => {
     (async () => {
       if (bookFileUrl) {
@@ -88,12 +90,15 @@ const ReadBook = () => {
                 iv
               )) as string;
               setLinkPdf(linkPdf);
+              if (SUPPORT_FILE_TYPE.includes(metaDataType)) {
+                setFileType(metaDataType);
+              }
             }
           }
         });
       }
     })();
-  }, [bookFileUrl, bookStoreContract, tokenId]);
+  }, [bookFileUrl, bookStoreContract, tokenId, metaDataType]);
 
   useEffect(() => {
     (async () => {
