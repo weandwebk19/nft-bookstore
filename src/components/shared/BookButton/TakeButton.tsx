@@ -144,9 +144,6 @@ const TakeButton = ({
           endTime
         );
 
-        console.log("idBooksOnSharing", idBooksOnSharing.toNumber());
-        console.log("price", price);
-
         const tx = await bookStoreContract?.takeBooksOnSharing(
           idBooksOnSharing,
           {
@@ -183,7 +180,7 @@ const TakeButton = ({
               transactionHash,
               sharedPerAddress,
               sharerAddress,
-              `Gas fee = ${gasFee}, take book fee = ${price}, total price = ${-totalFee} ETH`
+              `Gas fee = ${gasFee} ETH, take book fee = ${price} ETH, total price = ${-totalFee} ETH`
             );
           };
 

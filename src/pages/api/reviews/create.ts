@@ -34,7 +34,7 @@ export default async function handler(
           created_at: new Date()
         });
 
-        return res.json({
+        return res.status(201).json({
           success: true,
           message: "Review created.",
           data: newReview

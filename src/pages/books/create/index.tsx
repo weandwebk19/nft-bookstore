@@ -291,13 +291,13 @@ const CreateBook = () => {
   };
 
   const handleError = async (err: any) => {
-    await deleteFileOnCloud();
+    // await deleteFileOnCloud();
     toast.error(err.message, {
       position: toast.POSITION.TOP_CENTER
     });
-    setTimeout(() => {
-      window.location.reload();
-    }, 3000);
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 3000);
   };
 
   const uploadBookSample = async (file: File) => {
@@ -420,9 +420,9 @@ const CreateBook = () => {
       const promise = axios.post("/api/pinata/verify", {
         address: account,
         signature: signedData,
-        nftBook: { ...nftBookMeta, author: account }
+        nftBook: nftBookMeta
       });
-      
+
       const res = await toast.promise(promise, {
         pending: t("pendingUploadMetadata") as string,
         success: t("successUploadMetadata") as string,
@@ -522,7 +522,7 @@ const CreateBook = () => {
       receipt.transactionHash,
       receipt.from,
       receipt.to,
-      `Gas fee = ${gasFee}, listing fee = ${listingPriceNumber}, total fee = ${-totalFee} ETH`
+      `Gas fee = ${gasFee} ETH, listing fee = ${listingPriceNumber} ETH, total fee = ${-totalFee} ETH`
     );
   };
 
@@ -554,7 +554,7 @@ const CreateBook = () => {
       } else if (activeStep === 2) {
         (async () => {
           // Upload metadata to pinata
-          if (bookCoverLink !== "" && bookFileLink !== "") {
+          if (bookCoverLink !== "" && bookFileLink !== "" && account.data) {
             setIsSigning(true);
             const nftUriRes = await uploadMetadata({
               title: data.title,
@@ -563,7 +563,7 @@ const CreateBook = () => {
               bookSample: bookSampleLink,
               fileType: data.fileType,
               version: data.version,
-              author: "",
+              author: account.data,
               quantity: data.quantity,
               createdAt: new Date().toString()
             });

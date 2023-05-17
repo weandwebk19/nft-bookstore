@@ -142,8 +142,6 @@ export default function CustomerReviewTable({
     e.preventDefault();
     setAnchorDeleteButton(null);
 
-    console.log(item.id);
-    console.log(account.data);
     (async () => {
       try {
         if (account.data) {
@@ -240,7 +238,6 @@ export default function CustomerReviewTable({
       sortable: false,
       width: 100,
       renderCell: (params) => {
-        console.log(params.value);
         return (
           <>
             <Tooltip

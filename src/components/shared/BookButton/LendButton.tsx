@@ -122,7 +122,7 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
             receipt.transactionHash,
             receipt.from,
             receipt.to,
-            `Gas fee = ${gasFee}, lending fee = ${lendingPriceNumber}, total fee = ${
+            `Gas fee = ${gasFee} ETH, lending fee = ${lendingPriceNumber} ETH, total fee = ${
               0 - totalFee
             } ETH`
           );

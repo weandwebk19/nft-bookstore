@@ -23,6 +23,6 @@ export const createTransactionHistoryOnlyGasFee = async (
     receipt.transactionHash,
     receipt.from,
     receipt.to,
-    `Gas fee = ${gasFee}`
+    `Gas fee = ${gasFee} ETH`
   );
 };

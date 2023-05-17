@@ -35,7 +35,6 @@ const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
     //   wallet_address: ethereum.selectedAddress,
     //   fullname: "Anonymous"
     // });
-
     const isLocked = !(await ethereum._metamask.isUnlocked());
     if (isLocked) {
       pageReload();

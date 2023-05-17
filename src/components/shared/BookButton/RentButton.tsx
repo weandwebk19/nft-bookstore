@@ -185,9 +185,9 @@ const RentButton = ({
               transactionHash,
               borrowerAddress,
               renterAddress,
-              `Gas fee = ${gasFee}, borrow fee = ${parseFloat(
+              `Gas fee = ${gasFee} ETH, borrow fee = ${parseFloat(
                 value
-              )}, total price = ${-totalFee} ETH`
+              )} ETH, total price = ${-totalFee} ETH`
             );
           };
 

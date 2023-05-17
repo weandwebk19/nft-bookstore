@@ -146,7 +146,7 @@ const ShareButton = ({
             receipt.transactionHash,
             receipt.from,
             receipt.to,
-            `Gas fee = ${gasFee}, sharing fee = ${sharingPriceNumber}, total fee = ${
+            `Gas fee = ${gasFee} ETH, sharing fee = ${sharingPriceNumber} ETH, total fee = ${
               0 - totalFee
             } ETH`
           );

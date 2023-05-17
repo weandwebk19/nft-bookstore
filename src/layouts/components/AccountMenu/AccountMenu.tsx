@@ -45,7 +45,6 @@ interface AccountMenuProps {
   avatar?: string;
   open: boolean;
   onClose(...args: unknown[]): unknown;
-  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
   isAuthor: boolean;
 }
@@ -56,7 +55,6 @@ const AccountMenu = ({
   avatar,
   open,
   onClose,
-  switchAccount,
   disconnect,
   isAuthor
 }: AccountMenuProps) => {
@@ -113,13 +111,6 @@ const AccountMenu = ({
       content: t("navbar:transactionHistory") as string,
       onClick: () => {
         router.push("/account/transaction-history");
-      }
-    },
-    {
-      icon: <SwitchAccountOutlinedIcon color="primary" fontSize="small" />,
-      content: t("navbar:switchAccount") as string,
-      onClick: () => {
-        switchAccount();
       }
     },
     {
