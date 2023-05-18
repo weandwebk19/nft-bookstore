@@ -1,15 +1,30 @@
 import { useEffect, useState } from "react";
 
-import { Box, Chip, Divider, Grid, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Chip,
+  Divider,
+  Grid,
+  Skeleton,
+  Stack,
+  Tooltip,
+  Typography
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import SellOutlinedIcon from "@mui/icons-material/SellOutlined";
+import TripOriginIcon from "@mui/icons-material/TripOrigin";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { useAccount } from "wagmi";
 
+import { useMetadata } from "@/components/hooks/web3";
+
 import { Image } from "../Image";
+import { NumericContainer } from "../NumericContainer";
 
 type ActionableBookItemStatus =
   | "isCreated"
@@ -18,13 +33,10 @@ type ActionableBookItemStatus =
   | "isBorrowed"
   | "isSharing"
   | "isListing"
-  | "isLeasing"
-  | "isBought";
+  | "isLending"
+  | "isPurchased";
 
 interface ActionableBookItemProps {
-  bookCover: string;
-  title: string;
-  fileType: string;
   tokenId: number;
   owner?: string; // !!! 'author' should ALWAYS be display !!!  => /// In some cases, we can use seller instead
   onClick: (tokenId: number) => void;
@@ -43,9 +55,6 @@ interface ActionableBookItemProps {
 }
 
 const ActionableBookItem = ({
-  bookCover,
-  title,
-  fileType,
   tokenId,
   owner,
   onClick,
@@ -70,6 +79,8 @@ const ActionableBookItem = ({
   const [renterName, setRenterName] = useState("");
   const [sharedPersonName, setSharedPersonName] = useState("");
   const [borrowerName, setBorrowerName] = useState("");
+
+  const { metadata } = useMetadata(tokenId);
 
   useEffect(() => {
     (async () => {
@@ -160,21 +171,25 @@ const ActionableBookItem = ({
       }}
     >
       <Stack
-        direction={{ xs: "column", sm: "row" }}
+        direction={{ xs: "column" }}
         sx={{
           height: "100%"
         }}
       >
         <Box
-          sx={{ flexShrink: 0, aspectRatio: "2 / 3", cursor: "pointer" }}
+          sx={{ flexShrink: 0, aspectRatio: "1 / 1", cursor: "pointer" }}
           onClick={() => onClick(tokenId)}
         >
-          <Image
-            src={bookCover}
-            alt={title}
-            sx={{ flexShrink: 0, aspectRatio: "2 / 3" }}
-            className={styles["book-item__book-cover"]}
-          />
+          {metadata.isLoading || !metadata || !metadata.data?.bookCover ? (
+            <Skeleton variant="rectangular" width="100%" height="100%" />
+          ) : (
+            <Image
+              src={metadata.data?.bookCover}
+              alt={metadata.data?.title}
+              sx={{ flexShrink: 0, aspectRatio: "1 / 1" }}
+              className={styles["book-item__book-cover"]}
+            />
+          )}
         </Box>
         <Stack
           justifyContent="space-between"
@@ -187,17 +202,27 @@ const ActionableBookItem = ({
           <Stack>
             <Stack direction="row" spacing={0.5}>
               <InsertDriveFileIcon fontSize="small" color="action" />
-              <Typography variant="caption">{fileType}</Typography>
+              <Typography variant="caption">
+                {metadata.data?.fileType}
+              </Typography>
             </Stack>
+
             <Typography
               variant="h6"
               className="text-limit text-limit--2"
               sx={{ minHeight: "64px" }}
             >
-              {title}
+              {metadata.data?.title}
             </Typography>
+
             {status !== "isCreated" && (
               <Typography variant="body2">{ownerName}</Typography>
+            )}
+            {status === "isBorrowed" && (
+              <Stack>
+                <Typography variant="subtitle2">Borrowed from:</Typography>
+                <Typography variant="label">{renterName}</Typography>
+              </Stack>
             )}
             {status === "isBorrowed" && (
               <Stack>
@@ -211,11 +236,13 @@ const ActionableBookItem = ({
                 <Typography variant="label">{sharerName}</Typography>
               </Stack>
             )}
-            {status === "isLeasing" && borrower && (
-              <Stack>
-                <Typography variant="subtitle2">Borrowed by:</Typography>
-                <Typography variant="label">{borrowerName}</Typography>
-              </Stack>
+            {status === "isLending" && borrower && (
+              <Tooltip title={borrower}>
+                <Stack>
+                  <Typography variant="subtitle2">Borrowed by:</Typography>
+                  <Typography variant="label">{borrowerName}</Typography>
+                </Stack>
+              </Tooltip>
             )}
             {status === "isSharing" && (
               <Stack>
@@ -225,77 +252,103 @@ const ActionableBookItem = ({
             )}
           </Stack>
 
-          <Divider sx={{ my: 3 }} />
-          <Stack spacing={3}>
-            <Stack spacing={{ xs: 1, sm: 2, md: 4 }}>
-              <Stack
-                direction={{ xs: "row", sm: "row", md: "row" }}
-                spacing={{ xs: 1, sm: 2, md: 4 }}
-                justifyContent="space-between"
-              >
-                {status !== "isCreated" &&
-                  status !== "isOwned" &&
-                  status !== "isBought" && (
-                    <Stack>
-                      <Typography variant="subtitle2">Price:</Typography>
-                      <Typography variant="label">{price} ETH</Typography>
-                    </Stack>
-                  )}
-                {status !== "isCreated" &&
-                  status !== "isOwned" &&
-                  status === "isBought" && (
-                    <Stack>
-                      <Typography variant="subtitle2">Amount:</Typography>
-                      <Typography variant="label">{amount}</Typography>
-                    </Stack>
-                  )}
+          <Divider />
+
+          <Stack spacing={2} mt={2}>
+            {status !== "isCreated" &&
+              status !== "isOwned" &&
+              status !== "isPurchased" &&
+              status !== "isListing" && (
+                <NumericContainer
+                  icon={<TripOriginIcon fontSize="inherit" color="action" />}
+                  label="Orig. Supply:"
+                  amount={quantity}
+                />
+              )}
+
+            {status === "isCreated" ||
+              (status === "isOwned" && (
+                <NumericContainer
+                  icon={<TripOriginIcon fontSize="inherit" color="action" />}
+                  label="Orig. Supply:"
+                  amount={quantity}
+                />
+              ))}
+            {(status === "isPurchased" ||
+              status === "isLending" ||
+              status === "isBorrowed" ||
+              status === "isSharing" ||
+              status === "isListing") && (
+              <NumericContainer
+                icon={<InventoryIcon fontSize="inherit" color="action" />}
+                label="Inventory:"
+                amount={amount}
+              />
+            )}
+            {(status === "isBorrowed" ||
+              status === "isShared" ||
+              status === "isSharing" ||
+              (status === "isLending" && borrower)) && (
+              <Stack>
+                <Typography variant="subtitle2">Return in:</Typography>
+                <Typography variant="label">
+                  {countDown !== "0D:0:0:0" ? countDown : "Ended"}
+                </Typography>
               </Stack>
-              {(status === "isBorrowed" ||
-                status === "isShared" ||
-                status === "isSharing" ||
-                (status === "isLeasing" && borrower)) && (
+            )}
+            {status === "isOwned" && (
+              <NumericContainer
+                icon={<InventoryIcon fontSize="inherit" color="action" />}
+                label="Inventory:"
+                amount={amountOwned}
+              />
+            )}
+            {status !== "isCreated" &&
+              status !== "isOwned" &&
+              status !== "isPurchased" && (
                 <Stack>
-                  <Typography variant="subtitle2">Return in:</Typography>
-                  <Typography variant="label">
-                    {countDown !== "0D:0:0:0" ? countDown : "Ended"}
+                  <Typography variant="subtitle2">Price:</Typography>
+                  <Typography
+                    variant="label"
+                    color={`${theme.palette.success.main}`}
+                  >
+                    {price} ETH
                   </Typography>
                 </Stack>
               )}
-              {status === "isOwned" && (
-                <Stack>
-                  <Typography variant="subtitle2">Owned amount:</Typography>
-                  <Typography variant="label">{amountOwned}</Typography>
-                </Stack>
-              )}
-              {(status === "isOwned" ||
-                status === "isCreated" ||
-                status === "isBought") && (
-                <Stack>
-                  <Typography variant="subtitle2">Tradeable amount:</Typography>
-                  <Typography variant="label">{amountTradeable}</Typography>
-                </Stack>
-              )}
-              {status === "isCreated" && (
-                <Stack>
-                  <Typography variant="subtitle2">Quantity:</Typography>
-                  <Typography variant="label">{quantity}</Typography>
-                </Stack>
-              )}
-              {/* {status === "isCreated" && (
+            {(status === "isOwned" ||
+              status === "isCreated" ||
+              status === "isPurchased") && (
+              <NumericContainer
+                variant="outlined"
+                icon={<SellOutlinedIcon fontSize="inherit" color="action" />}
+                label="Tradeable:"
+                amount={amountTradeable}
+              />
+            )}
+
+            {/* {status === "isCreated" && (
                 <Stack>
                   <Typography variant="subtitle2">Tradeable amount:</Typography>
                   <Typography variant="label">{amountTradeable}</Typography>
                 </Stack>
               )} */}
-            </Stack>
-            {/* <Stack direction="row" justifyContent="space-between">
+          </Stack>
+          {/* <Stack direction="row" justifyContent="space-between">
               <Typography>{renter}</Typography>
               {status !== undefined ? <Chip label={status} /> : <></>}
             </Stack> */}
-            <Stack direction="row" spacing={2}>
+
+          {status === "isOwned" && (metadata.isLoading || !metadata) ? (
+            <Stack direction="row" spacing={0.5}>
+              <Skeleton variant="rectangular" width="50%" height={36.5} />
+              <Skeleton variant="rectangular" width="50%" height={36.5} />
+            </Stack>
+          ) : (
+            <Stack direction="row" spacing={2} mt={3}>
               {buttons}
             </Stack>
-          </Stack>
+          )}
         </Stack>
       </Stack>
     </Box>

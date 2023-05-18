@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
@@ -11,18 +11,18 @@ import axios from "axios";
 import { ethers } from "ethers";
 import * as yup from "yup";
 
-import { useAccount } from "@/components/hooks/web3";
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
+import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
+import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { Image } from "../Image";
 
 interface ShareButtonProps {
-  title: string;
-  bookCover: string;
   renter: string;
   borrower: string;
   tokenId: number;
@@ -50,8 +50,6 @@ const defaultValues = {
 };
 
 const ShareButton = ({
-  bookCover,
-  title,
   renter,
   borrower,
   startTime,
@@ -60,8 +58,9 @@ const ShareButton = ({
   borrowedAmount
 }: ShareButtonProps) => {
   const [renterName, setRenterName] = useState();
-  const { ethereum, contract } = useWeb3();
+  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
+  const { metadata } = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -83,46 +82,106 @@ const ShareButton = ({
 
   const { handleSubmit } = methods;
 
-  const onSubmit = async (data: any) => {
-    try {
-      // handle errors
-      if (data.amount > borrowedAmount) {
-        return toast.error(`Amount must be less than ${borrowedAmount}.`, {
-          position: toast.POSITION.TOP_CENTER
+  const shareBooks = useCallback(
+    async (
+      tokenId: number,
+      price: number,
+      amount: number,
+      borrowedAmount: number,
+      renter: string,
+      borrower: string,
+      startTime: number,
+      endTime: number
+    ) => {
+      try {
+        // handle errors
+        if (amount > borrowedAmount) {
+          return toast.error(`Amount must be less than ${borrowedAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (Math.floor(new Date().getTime() / 1000) >= endTime) {
+          return toast.error("Borrowing time has expired", {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+
+        const sharingPrice = await bookStoreContract!.sharingPrice();
+        const idBorrowedBook = await bookRentingContract!.getIdBorrowedBook(
+          tokenId,
+          renter,
+          borrower,
+          startTime,
+          endTime
+        );
+        const tx = await bookStoreContract?.shareBooks(
+          idBorrowedBook.toNumber(),
+          ethers.utils.parseEther(price.toString()),
+          amount,
+          {
+            value: sharingPrice
+          }
+        );
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Sharing NftBook Token",
+          success: "Share book successfully",
+          error: "There's an error in sharing process!"
         });
-      } else if (Math.floor(new Date().getTime() / 1000) >= endTime) {
-        return toast.error("Borrowing time has expired", {
+
+        if (receipt) {
+          // Create Transaction History
+          const gasFee = await getGasFee(provider, receipt);
+          // Caculate total fee
+          const sharingPriceNumber = parseFloat(
+            ethers.utils.formatEther(sharingPrice)
+          );
+          const totalFee = 0 - sharingPriceNumber - parseFloat(gasFee);
+          // Get current balance of account
+          const balance = await provider?.getBalance(account.data!);
+          const balanceInEther = ethers.utils.formatEther(balance!);
+          await createTransactionHistory(
+            tokenId,
+            totalFee,
+            balanceInEther,
+            "Share book",
+            receipt.transactionHash,
+            receipt.from,
+            receipt.to,
+            `Gas fee = ${gasFee} ETH, sharing fee = ${sharingPriceNumber} ETH, total fee = ${
+              0 - totalFee
+            } ETH`
+          );
+        }
+      } catch (e: any) {
+        console.error(e);
+        toast.error(`${e.message.substr(0, 65)}.`, {
           position: toast.POSITION.TOP_CENTER
         });
       }
+    },
+    [account.data, bookRentingContract, bookStoreContract, provider]
+  );
 
-      const sharingPrice = await contract!.sharingPrice();
-      const idBorrowedBook = await contract!.getIdBorrowedBook(
-        tokenId,
-        renter,
-        borrower,
-        startTime,
-        endTime
-      );
-      const tx = await contract?.shareBooks(
-        idBorrowedBook.toNumber(),
-        ethers.utils.parseEther(data.price.toString()),
-        data.amount,
-        {
-          value: sharingPrice
-        }
-      );
-      const receipt: any = await toast.promise(tx!.wait(), {
-        pending: "Sharing NftBook Token",
-        success: "Share book successfully",
-        error: "There's an error in sharing process!"
-      });
-    } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
-    }
+  const createPricingHistoryCallback = useCallback(
+    async (tokenId: number, price: number) => {
+      if (account.data) {
+        await createPricingHistory(tokenId, price, "SHARE", account.data);
+      }
+    },
+    [account.data]
+  );
+
+  const onSubmit = async (data: any) => {
+    await shareBooks(
+      tokenId,
+      data.price,
+      data.amount,
+      borrowedAmount,
+      renter,
+      borrower,
+      startTime,
+      endTime
+    );
+    await createPricingHistoryCallback(tokenId, data.price);
   };
 
   useEffect(() => {
@@ -143,7 +202,14 @@ const ShareButton = ({
 
   return (
     <>
-      <StyledButton onClick={handleBookCardClick}>Share</StyledButton>
+      <Button
+        variant="outlined"
+        size="small"
+        sx={{ width: "100%" }}
+        onClick={handleBookCardClick}
+      >
+        Share
+      </Button>
 
       <Dialog title="Share" open={openBookCard} onClose={handleBookCardClose}>
         <FormProvider {...methods}>
@@ -151,12 +217,12 @@ const ShareButton = ({
             <Grid item md={4}>
               <Stack>
                 <Image
-                  src={bookCover}
-                  alt={title}
+                  src={metadata.data?.bookCover}
+                  alt={metadata.data?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
                 <Typography>{borrowedAmount} left</Typography>
               </Stack>
@@ -169,10 +235,10 @@ const ShareButton = ({
                 }}
               >
                 <FormGroup label="Price" required>
-                  <InputController name="price" type="number" />
+                  <TextFieldController name="price" type="number" />
                 </FormGroup>
                 <FormGroup label="Amount" required>
-                  <InputController name="amount" type="number" />
+                  <TextFieldController name="amount" type="number" />
                 </FormGroup>
               </Stack>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

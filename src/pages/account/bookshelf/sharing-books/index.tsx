@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
@@ -10,19 +12,23 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
-import { useOwnedSharingBooks } from "@/components/hooks/web3";
-import { RecallButton } from "@/components/shared/BookButton";
+import {
+  useOwnedSharedOutBooks,
+  useOwnedSharingBooks
+} from "@/components/hooks/web3";
+import { useWeb3 } from "@/components/providers/web3";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
-import { Dialog } from "@/components/shared/Dialog";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import { bookList } from "@/mocks";
-import { StyledButton } from "@/styles/components/Button";
+import RevokeAllSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeAllSharedOutButton";
+import RevokeAllSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeAllSharingButton";
+import RevokeSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharedOutButton";
+import RevokeSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharingButton";
+import { FilterField } from "@/types/filter";
 import { BookSharing } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
-import pluralize from "@/utils/pluralize";
 import { secondsToDhms } from "@/utils/secondsToDhms";
 
 const SharingBooks = () => {
@@ -39,9 +45,16 @@ const SharingBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedSharingBooks();
   const router = useRouter();
-  const sharingBooks = nfts.data as BookSharing[];
+  const { nfts: sharingNfts } = useOwnedSharingBooks(
+    router.query as FilterField
+  );
+  const sharingBooks = sharingNfts.data as BookSharing[];
+
+  const { nfts: sharedNfts } = useOwnedSharedOutBooks(
+    router.query as FilterField
+  );
+  const sharedBooks = sharedNfts.data as BookSharing[];
 
   const [nowTime, setNowTime] = useState<number>(0);
 
@@ -49,37 +62,6 @@ const SharingBooks = () => {
     const seconds = new Date().getTime() / 1000;
     setNowTime(seconds);
   }, []);
-
-  const handleOpenRecallDialogClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(e.currentTarget);
-  };
-
-  const [anchorRecallButton, setAnchorRecallButton] = useState<Element | null>(
-    null
-  );
-
-  const openRecallDialog = Boolean(anchorRecallButton);
-
-  const handleRecallClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(null);
-  };
-
-  const handleCancelClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    setAnchorRecallButton(null);
-  };
-
-  const handleRecallClose = () => {
-    setAnchorRecallButton(null);
-  };
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -110,43 +92,14 @@ const SharingBooks = () => {
               {/* Shared books that have not been borrowed by anyone */}
               <ContentPaper
                 title={t("sharingBooksTitle")}
-                button={
-                  <>
-                    <StyledButton
-                      customVariant="secondary"
-                      onClick={(e) => handleOpenRecallDialogClick(e)}
-                    >
-                      Recall All
-                    </StyledButton>
-                    <Dialog
-                      title={t("dialogTitle") as string}
-                      open={openRecallDialog}
-                      onClose={handleRecallClose}
-                    >
-                      <Stack spacing={3}>
-                        <Typography>{t("message")}</Typography>
-                        <Stack direction="row" spacing={3} justifyContent="end">
-                          <StyledButton
-                            customVariant="secondary"
-                            onClick={(e) => handleCancelClick(e)}
-                          >
-                            {t("button_cancel")}
-                          </StyledButton>
-                          <StyledButton onClick={(e) => handleRecallClick(e)}>
-                            {t("button_recall")}
-                          </StyledButton>
-                        </Stack>
-                      </Stack>
-                    </Dialog>
-                  </>
-                }
+                button={<RevokeAllSharingButton />}
               >
                 {(() => {
-                  if (nfts.isLoading) {
+                  if (sharingNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (sharingBooks?.length === 0 || nfts.error) {
+                  } else if (sharingBooks?.length === 0 || sharingNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>{t("emptyMessage") as string}</Typography>
@@ -159,7 +112,7 @@ const SharingBooks = () => {
                       spacing={3}
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
-                      {sharingBooks!.map((book) => {
+                      {sharingBooks!.map((book: BookSharing) => {
                         return (
                           <Grid
                             item
@@ -167,30 +120,29 @@ const SharingBooks = () => {
                             xs={4}
                             sm={8}
                             md={6}
-                            lg={12}
+                            lg={6}
                           >
                             <ActionableBookItem
                               status="isSharing"
                               tokenId={book?.tokenId}
-                              bookCover={book?.meta.bookCover}
-                              title={book?.meta.title}
-                              fileType={book?.meta.fileType}
+                              amount={book?.amount}
+                              price={book?.price}
+                              countDown={secondsToDhms(book?.endTime - nowTime)}
                               onClick={handleBookClick}
                               buttons={
                                 <>
-                                  <RecallButton
-                                    buttonName="Un share"
-                                    borrower={book?.sharedPer}
+                                  <RevokeSharingButton
+                                    sharedPer={book?.sharedPer}
                                     isEnded={book?.endTime - nowTime === 0}
                                     countDown={secondsToDhms(
                                       book?.endTime - nowTime
                                     )}
                                     tokenId={book?.tokenId}
-                                    title={book?.meta.title}
-                                    bookCover={book?.meta.bookCover}
-                                    renter={book?.sharer}
+                                    sharer={book?.sharer}
                                     amount={book?.amount}
-                                    handleRecall={() => {}}
+                                    fromRenter={book?.fromRenter}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
                                   />
                                 </>
                               }
@@ -206,43 +158,14 @@ const SharingBooks = () => {
               {/* Shared books that have been borrowed by others */}
               <ContentPaper
                 title={t("sharedOutBooksTitle")}
-                button={
-                  <>
-                    <StyledButton
-                      customVariant="secondary"
-                      onClick={(e) => handleOpenRecallDialogClick(e)}
-                    >
-                      Recall All
-                    </StyledButton>
-                    <Dialog
-                      title={t("dialogTitle") as string}
-                      open={openRecallDialog}
-                      onClose={handleRecallClose}
-                    >
-                      <Stack spacing={3}>
-                        <Typography>{t("message")}</Typography>
-                        <Stack direction="row" spacing={3} justifyContent="end">
-                          <StyledButton
-                            customVariant="secondary"
-                            onClick={(e) => handleCancelClick(e)}
-                          >
-                            {t("button_cancel")}
-                          </StyledButton>
-                          <StyledButton onClick={(e) => handleRecallClick(e)}>
-                            {t("button_recall")}
-                          </StyledButton>
-                        </Stack>
-                      </Stack>
-                    </Dialog>
-                  </>
-                }
+                button={<RevokeAllSharedOutButton />}
               >
                 {(() => {
-                  if (nfts.isLoading) {
+                  if (sharedNfts.isLoading) {
                     return (
                       <Typography>{t("loadingMessage") as string}</Typography>
                     );
-                  } else if (sharingBooks?.length === 0 || nfts.error) {
+                  } else if (sharedBooks?.length === 0 || sharedNfts.error) {
                     return (
                       <FallbackNode>
                         <Typography>
@@ -257,32 +180,31 @@ const SharingBooks = () => {
                       spacing={3}
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
-                      {sharingBooks!.map((book) => {
+                      {sharedBooks!.map((book: BookSharing) => {
                         return (
                           <Grid
                             item
                             key={book.tokenId}
                             xs={4}
-                            sm={8}
+                            sm={4}
                             md={6}
-                            lg={12}
+                            lg={6}
                           >
                             <ActionableBookItem
                               status="isSharing"
                               tokenId={book?.tokenId}
-                              bookCover={book?.meta.bookCover}
-                              title={book?.meta.title}
-                              fileType={book?.meta.fileType}
+                              amount={book?.amount}
                               onClick={handleBookClick}
                               buttons={
                                 <>
-                                  <RecallButton
+                                  <RevokeSharedOutButton
                                     tokenId={book?.tokenId}
-                                    title={book?.meta.title}
-                                    bookCover={book?.meta.bookCover}
-                                    renter={book?.sharer}
+                                    sharer={book?.sharer}
+                                    sharedPer={book?.sharedPer}
+                                    fromRenter={book?.fromRenter}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
                                     amount={book?.amount}
-                                    handleRecall={() => {}}
                                   />
                                 </>
                               }
@@ -297,11 +219,13 @@ const SharingBooks = () => {
             </Stack>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar
+              data={sharingBooks}
+              pathname="/bookshelf/sharing-books"
+            />
           </Grid>
         </Grid>
+        <ToastContainer />
       </Stack>
     </>
   );
@@ -315,7 +239,8 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "sharingBooks"
+        "sharingBooks",
+        "bookButtons"
       ]))
     }
   };

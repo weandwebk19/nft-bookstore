@@ -14,5 +14,7 @@
   "price": "Giá",
   "searchByAuthor": "Tác giả",
   "languagesSupport": "Ngôn ngữ",
-  "apply": "Áp dụng"
+  "apply": "Lọc",
+  "result": "Kết quả",
+  "clearAllFilter": "Hủy bộ lọc"
 }

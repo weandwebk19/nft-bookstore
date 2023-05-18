@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,11 +22,14 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
+import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import { createTransactionHistory } from "@/components/utils";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
 
@@ -35,19 +38,9 @@ import Step2 from "../../ui/borrow/steps/Step2";
 
 interface RentButtonProps {
   tokenId: number;
-  title: string;
-  bookCover: string;
   renter: string;
   price: number;
   supplyAmount: number;
-  borrowBooks: (
-    tokenId: number,
-    renter: string,
-    price: number,
-    amount: number,
-    rentalDuration: number,
-    supplyAmount: number
-  ) => Promise<void>;
 }
 
 const schema = yup
@@ -70,16 +63,15 @@ const defaultValues = {
 
 const RentButton = ({
   tokenId,
-  bookCover,
-  title,
   renter,
   price,
-  supplyAmount,
-  borrowBooks
+  supplyAmount
 }: RentButtonProps) => {
   const router = useRouter();
   const [renterName, setAuthorName] = useState();
-  const { ethereum, contract } = useWeb3();
+  const { provider, bookStoreContract } = useWeb3();
+  const { account } = useAccount();
+  const { metadata } = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -123,6 +115,126 @@ const RentButton = ({
   });
 
   const { handleSubmit, setValue } = methods;
+
+  const borrowBooks = useCallback(
+    async (
+      tokenId: number,
+      renter: string,
+      price: number,
+      amount: number,
+      rentalDuration: number,
+      supplyAmount: number
+    ) => {
+      try {
+        // Handle errors
+        if (rentalDuration < 604800) {
+          return toast.error("Minimum borrow book period is 7 days", {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (amount > supplyAmount) {
+          return toast.error(`Amount must be less than ${supplyAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        } else if (account.data == renter) {
+          return toast.error(
+            "You are not allowed to borrow the book lent by yourself.",
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
+        }
+
+        const value = ((price * amount * rentalDuration) / 604800).toFixed(3);
+        const tx = await bookStoreContract!.borrowBooks(
+          tokenId,
+          renter,
+          ethers.utils.parseEther(price.toString()),
+          amount,
+          rentalDuration,
+          {
+            value: ethers.utils.parseEther(value.toString())
+          }
+        );
+
+        const receipt = await toast.promise(tx!.wait(), {
+          pending: "Processing transaction",
+          success: "Nft is yours! Go to Profile page",
+          error: "Processing error"
+        });
+
+        if (receipt) {
+          const gasFee = await getGasFee(provider, receipt);
+
+          const createTransactionHistoryForBorrower = async (
+            borrowerAddress: string,
+            renterAddress: string,
+            value: string,
+            gasFee: string,
+            transactionHash: string
+          ) => {
+            // Caculate total fee
+            const totalFee = 0 - parseFloat(value) - parseFloat(gasFee);
+            // Get current balance of account
+            const balance = await provider?.getBalance(borrowerAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              totalFee,
+              balanceInEther,
+              "Borrow book",
+              transactionHash,
+              borrowerAddress,
+              renterAddress,
+              `Gas fee = ${gasFee} ETH, borrow fee = ${parseFloat(
+                value
+              )} ETH, total price = ${-totalFee} ETH`
+            );
+          };
+
+          const createTransactionHistoryForRenter = async (
+            borrowerAddress: string,
+            renterAddress: string,
+            value: string,
+            transactionHash: string
+          ) => {
+            // Get current balance of account
+            const balance = await provider?.getBalance(renterAddress);
+            const balanceInEther = ethers.utils.formatEther(balance!);
+            await createTransactionHistory(
+              tokenId,
+              parseFloat(value),
+              balanceInEther,
+              "From borrow book",
+              transactionHash,
+              renterAddress,
+              borrowerAddress,
+              `Total price received = ${parseFloat(value)} ETH`
+            );
+          };
+
+          await createTransactionHistoryForBorrower(
+            account.data!,
+            renter,
+            value,
+            gasFee,
+            receipt.transactionHash
+          );
+          await createTransactionHistoryForRenter(
+            account.data!,
+            renter,
+            value,
+            receipt.transactionHash
+          );
+        }
+      } catch (e: any) {
+        console.error(e.message);
+        toast.error(`${e.message.substr(0, 65)}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [account.data, bookStoreContract, provider]
+  );
 
   const onSubmit = async (data: any) => {
     try {
@@ -178,13 +290,13 @@ const RentButton = ({
               spacing={{ xs: 1, sm: 2, md: 4 }}
             >
               <Image
-                src={bookCover}
-                alt={title}
+                src={metadata.data?.bookCover}
+                alt={metadata.data?.title}
                 sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                 className={styles["book-item__book-cover"]}
               />
               <Box>
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
               </Box>

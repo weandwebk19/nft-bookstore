@@ -9,12 +9,13 @@ import { useRouter } from "next/router";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedSharedBooks } from "@/components/hooks/web3";
-import { ReadButton } from "@/components/shared/BookButton";
+import { ReadButton, ReviewButton } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
 import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { FilterField } from "@/types/filter";
 import { BookSharing } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
@@ -32,8 +33,8 @@ const SharedBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedSharedBooks();
   const router = useRouter();
+  const { nfts } = useOwnedSharedBooks(router.query as FilterField);
   const sharedBooks = nfts.data as BookSharing[];
 
   const handleBookClick = (tokenId: number | string) => {
@@ -86,21 +87,22 @@ const SharedBooks = () => {
                           item
                           key={book.tokenId}
                           xs={4}
-                          sm={8}
+                          sm={4}
                           md={6}
-                          lg={12}
+                          lg={6}
                         >
                           <ActionableBookItem
                             status="isShared"
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             sharer={book?.sharer}
                             onClick={handleBookClick}
                             buttons={
                               <>
-                                <ReadButton bookFile={book?.meta.bookFile} />
+                                <ReviewButton
+                                  tokenId={book?.tokenId}
+                                  author={book?.fromRenter}
+                                />
+                                <ReadButton tokenId={book?.tokenId} />
                               </>
                             }
                           />
@@ -113,9 +115,7 @@ const SharedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar data={sharedBooks} pathname="/bookshelf/shared-books" />
           </Grid>
         </Grid>
       </Stack>
@@ -131,7 +131,8 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "sharedBooks"
+        "sharedBooks",
+        "bookButtons"
       ]))
     }
   };

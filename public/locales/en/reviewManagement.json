@@ -1,0 +1,19 @@
+{
+  "titlePage": "Reviews Management - NFT Bookstore",
+  "containerTitle": "Reviews Management",
+  "button_cancel": "Cancel",
+  "button_reply": "Send Reply",
+  "button_editReply": "Edit Reply",
+  "tooltip_reply": "Send Reply",
+  "tooltip_editReply": "Edit Reply",
+  "dialogTitle": "Reply",
+  "filter": "Filter",
+  "all": "All",
+  "replied": "Replied",
+  "notReplied": "Not Replied",
+  "id": "ID",
+  "bookInfo": "Book info",
+  "buyer": "Buyer",
+  "review": "Buyer's review",
+  "action": "Action"
+}

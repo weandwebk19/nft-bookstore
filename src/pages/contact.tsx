@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Box, Grid, TextField } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "next-i18next";
@@ -10,8 +10,8 @@ import * as yup from "yup";
 
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import {
-  InputController,
-  TextAreaController
+  TextAreaController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
@@ -68,12 +68,12 @@ export default function Contact() {
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <FormGroup label={t("name")} required>
-                      <InputController name="name" />
+                      <TextFieldController name="name" />
                     </FormGroup>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormGroup label={t("email")} required>
-                      <InputController name="email" />
+                      <TextFieldController name="email" />
                     </FormGroup>
                   </Grid>
                   <Grid item xs={12}>

@@ -1,4 +1,5 @@
 export { default as AttachmentController } from "./AttachmentController";
+export { default as AutoCompleteController } from "./AutoCompleteController";
 export { default as CheckboxController } from "./CheckboxController";
 export { default as InputController } from "./InputController";
 export { default as MultipleSelectController } from "./MultipleSelectController";
@@ -8,4 +9,6 @@ export { default as RangeSliderController } from "./RangeSliderController";
 export { default as RatingController } from "./RatingController";
 export { default as SelectController } from "./SelectController";
 export { default as TextAreaController } from "./TextAreaController";
+export { default as TextFieldController } from "./TextFieldController";
 export { default as TreeViewController } from "./TreeViewController";
+// export { default as EnhancedSelectController } from "./EnhancedSelectController";

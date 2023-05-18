@@ -1,0 +1,18 @@
+{
+  "titlePage": "Edit book by author - NFT Bookstore",
+  "titleContent1": "Edit",
+  "titleContent2": "book details",
+  "titleContentPaper": "Modify book details",
+  "required": "Required",
+  "bookDesc": "Description",
+  "externalLink": "External link",
+  "descExternalLink": "NFT Bookstore will include a link to this URL on this item's detail page, so that users can click to learn more about it. This may contain extra items for buyers.",
+  "numberOfPages": "Number of pages",
+  "keywords": "Keywords",
+  "genres": "Genres",
+  "languages": "Languages",
+  "reset": "Reset",
+  "saveChanges": "Save changes",
+  "textError1": "Please enter your book genres",
+  "textError2": "Please enter your book languages"
+}

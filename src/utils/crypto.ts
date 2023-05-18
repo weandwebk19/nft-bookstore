@@ -1,3 +1,5 @@
+import { convertArrayToHexString } from "./convert";
+
 export const Crypto = {
   lengthOfGenerator: 16,
 
@@ -12,19 +14,10 @@ export const Crypto = {
       // convert ArrayBuffer to Array
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       // convert bytes to hex string
-      return this.convertArrayToHexString(hashArray);
+      return convertArrayToHexString(hashArray);
     } catch (error: any) {
       console.error("Error hash(sha256): ", error.message);
     }
-  },
-
-  convertArrayToHexString: function (array: Number[]): string {
-    return array
-      .map((value) => {
-        const str = value.toString(16) as string;
-        return str.padStart(2, "0");
-      })
-      .join("");
   },
 
   encryption: async function (

@@ -1,0 +1,17 @@
+{
+  "titlePage": "Sách cho thuê - NFT Bookstore",
+  "lendingBooksTitle": "Sách cho thuê",
+  "lentOutBooksTitle": "Sách đã có người thuê",
+  "emptyMessage": "Bạn chưa cho thuê quyển sách nào!",
+  "emptyMessage__lentOutBooks": "Chưa có quyển sách nào được thuê!",
+  "loadingMessage": "Đang đặt sách lên kệ...",
+  "button_ownedBooks": "Sách đã sở hữu",
+  "breadcrumbs_bookshelf": "Kệ sách",
+  "breadcrumbs_lendingBooks": "Sách cho thuê",
+  "dialogTitle": "Lấy lại toàn bộ",
+  "message": "Bạn có chắc muốn lấy lại toàn bộ sách?",
+  "button_cancel": "Hủy",
+  "button_revoke": "Lấy lại",
+  "button_yes": "Đồng ý",
+  "button_no": "Không"
+}

@@ -1,3 +1,4 @@
+// [DEPRECATED]
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -25,7 +26,7 @@ import * as yup from "yup";
 import { useGenres, useLanguages } from "@/components/hooks/api";
 import { useCountdown } from "@/components/hooks/common";
 import { StyledButton } from "@/styles/components/Button";
-import { ListedBook, NftBook, NftBookDetails } from "@/types/nftBook";
+import { NftBook, NftBookDetail } from "@/types/nftBook";
 
 import { FormGroup } from "../FormGroup";
 import { ReadMore } from "../ReadMore";
@@ -33,7 +34,7 @@ import { Timer } from "../Timer";
 
 type BookDetailsProps = {
   onClick: () => void;
-  bookDetail: NftBookDetails;
+  bookDetail: NftBookDetail;
 };
 
 const schema = yup
@@ -81,12 +82,12 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
   });
   const [authorName, setAuthorName] = useState();
   const isPublished = bookDetail?.listedCore ? true : false;
-  const isSelled = bookDetail?.nftCore?.balance > 0 ? false : true;
+  const isSelled = bookDetail?.nftCore?.quantity > 0 ? false : true;
 
   const onSubmitSeller = (data: any) => {
     console.log("data:", data);
 
-    // handle set isListed is true
+    // handle set isListing is true
   };
 
   useEffect(() => {
@@ -247,7 +248,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
           {/* {isPublished && !isSelled && (
             <Stack direction="row" spacing={2}>
               <StyledButton customVariant="secondary">Edit book</StyledButton>
-              {isListed ? (
+              {isListing ? (
                 <StyledButton customVariant="primary" onClick={() => {}}>
                   Edit listing
                 </StyledButton>
@@ -394,13 +395,13 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
                   {/* Edition version */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Edition version:</Typography>
-                    <Typography>{bookDetail?.info.version}</Typography>
+                    <Typography>{bookDetail?.meta.version}</Typography>
                   </Stack>
 
                   {/* Max supply */}
                   <Stack direction="row" spacing={1}>
                     <Typography variant="label">Max supply:</Typography>
-                    <Typography>{bookDetail?.info.maxSupply}</Typography>
+                    <Typography>{bookDetail?.meta.quantity}</Typography>
                   </Stack>
 
                   {/* Owners */}

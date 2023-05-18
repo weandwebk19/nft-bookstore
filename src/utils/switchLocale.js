@@ -1,10 +1,8 @@
-import { useRouter } from "next/router";
+function switchLocale(locale, pathname, query) {
+  // const router = useRouter();
 
-function switchLocale(locale) {
-  const router = useRouter();
-
-  const pathname = router.pathname;
-  const query = router.query;
+  // const pathname = router.pathname;
+  // const query = router.query;
 
   // Remove the current locale from the pathname
   const newPathname = pathname.replace(`/${router.locale}`, "");

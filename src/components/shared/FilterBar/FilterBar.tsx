@@ -1,29 +1,41 @@
 import { FormProvider, useForm } from "react-hook-form";
 
-import { Divider, IconButton, Stack, Tooltip } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography
+} from "@mui/material";
 
-import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import SelectAllOutlinedIcon from "@mui/icons-material/SelectAllOutlined";
 
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { faBorderAll, faUndoAlt } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/FilterBar.module.scss";
+import pluralize from "@utils/pluralize";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import querystring from "query-string";
 import * as yup from "yup";
 
 import { useGenres, useLanguages } from "@/components/hooks/api";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { UsersSelectController } from "@/components/ui/common/FormController";
 import { StyledButton } from "@/styles/components/Button";
 import { Language } from "@/types/languages";
 
+import { ContentPaper } from "../ContentPaper";
 import {
-  InputController,
   RangeSliderController,
   RatingController,
   SelectController,
+  TextFieldController,
   TreeViewController
 } from "../FormController";
 
@@ -61,8 +73,14 @@ const defaultValues = {
   priceRange: [MIN_PRICE, MAX_PRICE]
 };
 
-const FilterBar = () => {
+interface FilterBarProps {
+  data?: any[];
+  pathname: string;
+}
+
+const FilterBar = ({ data, pathname }: FilterBarProps) => {
   const { t } = useTranslation("filter");
+  const router = useRouter();
 
   const genres = useGenres();
   const languages = useLanguages();
@@ -77,7 +95,10 @@ const FilterBar = () => {
   const { handleSubmit, setValue } = methods;
 
   const onSubmit = (data: any) => {
-    console.log("data:", data);
+    const newQueryString = { ...router.query, ...data };
+    const queryString = querystring.stringify(newQueryString);
+    const url = `?${queryString}`;
+    router.push(url);
   };
 
   const handleResetGenres = () => {
@@ -103,82 +124,119 @@ const FilterBar = () => {
   }
 
   return (
-    <FormProvider {...methods}>
-      <Stack
-        direction="column"
-        divider={<Divider orientation="horizontal" />}
-        spacing={3}
-        sx={{ marginTop: 4 }}
-        className={styles["filter-bar"]}
-      >
-        <FormGroup
-          label={
-            <Stack
-              direction={{ xs: "row" }}
-              spacing={{ xs: 2 }}
-              sx={{
-                alignItems: "center",
-                justifyContent: "space-between"
-              }}
-            >
-              {t("genres")}
-              <Stack direction={{ xs: "row" }}>
-                <Tooltip title={t("tooltip_reset") as string}>
-                  <IconButton onClick={handleResetGenres}>
-                    <RestartAltOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t("tooltip_selectAll") as string}>
-                  <IconButton onClick={handleSelectAllGenres}>
-                    <SelectAllOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
+    <ContentPaper title={t("filter") as string}>
+      <FormProvider {...methods}>
+        <Stack
+          direction="column"
+          divider={<Divider orientation="horizontal" />}
+          spacing={3}
+          sx={{ marginTop: 4 }}
+          className={styles["filter-bar"]}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>
+              <Typography>{pluralize(data?.length, t("result"))}</Typography>
+            </Box>
+            {!(Object.keys(router.query).length === 0) && (
+              <Tooltip title={t("clearAllFilter")}>
+                <IconButton
+                  onClick={() => {
+                    router.push(pathname);
+                  }}
+                >
+                  <CancelOutlinedIcon fontSize="small" color="inherit" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
+          <FormGroup
+            label={
+              <Stack
+                direction={{ xs: "row" }}
+                spacing={{ xs: 2 }}
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }}
+              >
+                {t("genres")}
+                <Stack direction={{ xs: "row" }}>
+                  <Tooltip title={t("tooltip_reset") as string}>
+                    <IconButton onClick={handleResetGenres}>
+                      <RefreshOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t("tooltip_selectAll") as string}>
+                    <IconButton onClick={handleSelectAllGenres}>
+                      <SelectAllOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
               </Stack>
-            </Stack>
-          }
-        >
-          {genres.isLoading && "Loading..."}
-          {genres.error &&
-            "Oops! There was a problem loading genres \n Try refresh the page."}
-          <TreeViewController name="genre" items={genres.data} />
-        </FormGroup>
-        <FormGroup label={t("searchBook") as string}>
-          <InputController name="title" />
-        </FormGroup>
-        <FormGroup label={t("rating") as string}>
-          <RatingController
-            name="rating"
-            getLabelText={getLabelText}
-            labels={labels}
-          />
-        </FormGroup>
-        <FormGroup label={t("price") as string}>
-          <RangeSliderController
-            name="priceRange"
-            min={MIN_PRICE}
-            max={MAX_PRICE}
-            step={0.5}
-          />
-        </FormGroup>
-        <FormGroup label={t("searchByAuthor") as string}>
-          <InputController name="author" />
-        </FormGroup>
-        <FormGroup label={t("languagesSupport") as string}>
-          <SelectController
-            name="language"
-            items={languages.data}
-            itemValue="_id"
-          />
-        </FormGroup>
-        <StyledButton
-          customVariant="primary"
-          type="submit"
-          onClick={handleSubmit(onSubmit)}
-        >
-          {t("apply") as string}
-        </StyledButton>
-      </Stack>
-    </FormProvider>
+            }
+          >
+            {genres.isLoading && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            )}
+            {genres.error &&
+              "Oops! There was a problem loading genres \n Try refresh the page."}
+            <TreeViewController name="genre" items={genres.data} />
+          </FormGroup>
+          <FormGroup label={t("searchBook") as string}>
+            <TextFieldController name="title" />
+          </FormGroup>
+          <FormGroup label={t("rating") as string}>
+            <RatingController
+              name="rating"
+              getLabelText={getLabelText}
+              labels={labels}
+            />
+          </FormGroup>
+          <FormGroup label={t("price") as string}>
+            <RangeSliderController
+              name="priceRange"
+              min={MIN_PRICE}
+              max={MAX_PRICE}
+              step={0.5}
+            />
+          </FormGroup>
+          <FormGroup label={t("searchByAuthor") as string}>
+            {/* <TextFieldController name="author" /> */}
+            <UsersSelectController
+              name="author"
+              itemValue="walletAddress"
+              itemName="pseudonym"
+            />
+          </FormGroup>
+          <FormGroup label={t("languagesSupport") as string}>
+            <SelectController
+              name="language"
+              items={languages.data}
+              itemValue="name"
+            />
+          </FormGroup>
+          <StyledButton
+            customVariant="primary"
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+          >
+            {t("apply") as string}
+          </StyledButton>
+        </Stack>
+      </FormProvider>
+    </ContentPaper>
   );
 };
 

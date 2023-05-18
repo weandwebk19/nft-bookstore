@@ -14,9 +14,10 @@ interface TicketProps {
   image?: string;
   footer?: string;
   href: string;
+  icon?: string;
 }
 
-const Ticket = ({ header, body, image, footer, href }: TicketProps) => {
+const Ticket = ({ header, body, image, footer, href, icon }: TicketProps) => {
   const theme = useTheme();
   const router = useRouter();
 
@@ -150,7 +151,7 @@ const Ticket = ({ header, body, image, footer, href }: TicketProps) => {
         position: "relative",
         p: 1,
         transition: "all 0.3s ease",
-        minHeight: "337px",
+        minHeight: "400px",
         ":hover": {
           p: 0,
           "> .ticket-text": {
@@ -167,7 +168,10 @@ const Ticket = ({ header, body, image, footer, href }: TicketProps) => {
           },
           "> .ticket-image": {
             backgroundImage: `linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.2)), url(${image})`,
-            height: "21em"
+            height: "24em"
+          },
+          "> .ticket-image .ticket-icon": {
+            display: "none"
           }
         }
       }}
@@ -192,12 +196,35 @@ const Ticket = ({ header, body, image, footer, href }: TicketProps) => {
           sx={{
             width: "100%",
             height: "12em",
-            backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.0)), url(${image})`,
+            backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.0)), url(${image})`,
             backgroundSize: "cover",
-            transition: "all 0.3s ease"
+            transition: "all 0.3s ease",
+            position: "relative"
           }}
-        />
+        >
+          {icon && (
+            // <img src={icon} />
+            <Box
+              className="ticket-icon"
+              sx={{
+                position: "absolute",
+                width: 170,
+                height: 150,
+                top: "50%",
+                left: "50%",
+                transform: "translateX(-50%) translateY(-50%)"
+              }}
+            >
+              <Image
+                src={icon}
+                alt={header}
+                sx={{ width: "100%", height: "100%" }}
+              />
+            </Box>
+          )}
+        </Box>
       )}
+
       <Stack
         className="ticket-text"
         sx={{

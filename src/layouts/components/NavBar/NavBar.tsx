@@ -87,16 +87,12 @@ const NavBar = () => {
   const router = useRouter();
 
   const { disconnect } = useDisconnect();
-  // const { disconnect: switchAccount } = useAccount();
 
   const { data: session, status } = useSession();
 
   const { signMessageAsync } = useSignMessage();
 
   const { chain } = useNetwork();
-  const { connect: wagmiConnect } = useConnect({
-    connector: new InjectedConnector()
-  });
   const { address: wagmiAddress, isConnected } = useWagmiAccount();
   const [address, setAddress] = useState(wagmiAddress as string);
 
@@ -140,11 +136,11 @@ const NavBar = () => {
       //create new account
       await axios
         .post("/api/users/create", {
-          wallet_address: wagmiAddress?.toLowerCase(),
+          wallet_address: wagmiAddress,
           fullname: "Anonymous"
         })
         .catch((e) => {
-          console.log(e);
+          console.error(e);
         });
     } catch (error) {
       // window.alert(error);
@@ -174,7 +170,6 @@ const NavBar = () => {
   useEffect(() => {
     if (userInfo?.isAuthor !== undefined) {
       setIsAuthor(userInfo?.isAuthor);
-      console.log(userInfo?.isAuthor);
     } else {
       setIsAuthor(false);
     }
@@ -289,7 +284,7 @@ const NavBar = () => {
   };
 
   const handlePublishABookClick = () => {
-    router.push("/author/create");
+    router.push("/books/create");
   };
 
   const handleCreateListingClick = () => {
@@ -297,7 +292,7 @@ const NavBar = () => {
   };
 
   const handleCreateRentalClick = () => {
-    router.push("/rental/create");
+    router.push("/account/bookshelf/purchased-books");
   };
 
   const handlePublishingClick = () => {
@@ -490,7 +485,7 @@ const NavBar = () => {
           onClick: () => handlePublishABookClick(),
           disabled: false,
           subList: [],
-          href: "/author/create"
+          href: "/books/create"
         }
       : {
           type: "divider",
@@ -515,6 +510,16 @@ const NavBar = () => {
       href: "/account/create-rental"
     }
   ];
+
+  useEffect(() => {
+    if (router.locale !== openLanguage.currentState) {
+      setClientLocale(openLanguage.currentState);
+
+      router.push({ pathname, query }, asPath, {
+        locale: openLanguage.currentState
+      });
+    }
+  }, []);
 
   return (
     <motion.div
@@ -610,7 +615,7 @@ const NavBar = () => {
                   />
                 </Box>
 
-                {session && (
+                {session && wagmiAddress && (
                   <Box sx={{ mr: 2 }}>
                     <DropdownMenu
                       buttonVariant="outlined"
@@ -626,10 +631,11 @@ const NavBar = () => {
                 <WalletBar
                   isInstalled={account.isInstalled}
                   isLoading={account.isLoading}
-                  connect={wagmiConnect}
+                  // connect={wagmiConnect}
                   // account={account.data}
                   account={wagmiAddress}
-                  switchAccount={account.switchAccount}
+                  userName={userInfo?.fullname}
+                  avatar={userInfo?.avatar}
                   disconnect={disconnect}
                   handleLogin={handleLogin}
                   isConnected={isConnected}
@@ -637,9 +643,10 @@ const NavBar = () => {
                 />
                 <AccountMenu
                   account={wagmiAddress}
+                  userName={userInfo?.fullname}
+                  avatar={userInfo?.avatar}
                   open={openAccountMenu}
                   onClose={handleAccountMenuClose}
-                  switchAccount={account.switchAccount}
                   disconnect={disconnect}
                   isAuthor={isAuthor}
                 />

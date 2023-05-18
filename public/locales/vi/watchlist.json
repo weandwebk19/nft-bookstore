@@ -10,13 +10,14 @@
   "all": "Tất cả",
   "justPublished": "Vừa xuất bản",
   "waitingForOpen": "Chờ mở",
-  "leasings": "Có thể thuê",
+  "lendings": "Có thể thuê",
   "listings": "Có thể mua",
   "frozen": "Đóng băng",
   "id": "ID",
   "bookCover": "Bìa sách",
   "title": "Tựa sách",
   "price": "Giá (ETH)",
+  "author": "Tác giả",
   "status": "Trạng thái",
   "action": "Hành động"
 }

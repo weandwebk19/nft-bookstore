@@ -1,9 +1,10 @@
 import { NextComponentType } from "next";
 import { useSession } from "next-auth/react";
+import { BaseContext } from "next/dist/shared/lib/utils";
 
 import { UnauthenticatedMessage } from "../shared/UnauthenticatedMessage";
 
-function withAuth<T>(Component: NextComponentType<T>) {
+function withAuth<T extends BaseContext>(Component: NextComponentType<T>) {
   const Auth = (props: any) => {
     const { status } = useSession();
 

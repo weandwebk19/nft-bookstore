@@ -2,7 +2,7 @@
   "titlePage": "Sách đang chia sẻ - NFT Bookstore",
   "sharingBooksTitle": "Sách đangchia sẻ",
   "emptyMessage": "Bạn chưa chia sẻ quyển sách nào!",
-  "emptyMessage__leasedOutBooks": "Chưa có quyển sách nào được thuê!",
+  "emptyMessage__lentOutBooks": "Chưa có quyển sách nào được thuê!",
   "loadingMessage": "Đang đặt sách lên kệ...",
   "breadcrumbs_bookshelf": "Kệ sách",
   "breadcrumbs_sharingBooks": "Sách đang chia sẻ"

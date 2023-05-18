@@ -13,8 +13,9 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedBorrowedBooks } from "@/components/hooks/web3";
 import {
-  LeaseButton,
+  LendButton,
   ReadButton,
+  ReviewButton,
   SellButton
 } from "@/components/shared/BookButton";
 import ExtendRequestButton from "@/components/shared/BookButton/ExtendRequestButton";
@@ -24,6 +25,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { FilterField } from "@/types/filter";
 import { BorrowedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import { secondsToDhms } from "@/utils/secondsToDhms";
@@ -42,8 +44,8 @@ const BorrowedBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedBorrowedBooks();
   const router = useRouter();
+  const { nfts } = useOwnedBorrowedBooks(router.query as FilterField);
   const rentedBooks = nfts.data as BorrowedBook[];
   const [nowTime, setNowTime] = useState<number>(0);
 
@@ -103,44 +105,49 @@ const BorrowedBooks = () => {
                           item
                           key={book.tokenId}
                           xs={4}
-                          sm={8}
+                          sm={4}
                           md={6}
-                          lg={12}
+                          lg={6}
                         >
                           <ActionableBookItem
                             status="isBorrowed"
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             renter={book?.renter}
                             onClick={handleBookClick}
                             price={book?.price}
                             amount={book?.amount}
                             countDown={secondsToDhms(book?.endTime - nowTime)}
                             buttons={
-                              <>
-                                <ShareButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  renter={book?.renter}
-                                  borrower={book?.borrower}
-                                  startTime={book?.startTime}
-                                  endTime={book?.endTime}
-                                  borrowedAmount={book?.amount}
-                                />
-                                <ExtendRequestButton
-                                  tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
-                                  renter={book?.renter}
-                                  price={book?.price}
-                                  supplyAmount={book?.amount}
-                                  borrowBooks={nfts?.borrowBooks}
-                                />
-                                <ReadButton bookFile={book?.meta.bookFile} />
-                              </>
+                              <Grid container columns={{ xs: 2, sm: 2 }}>
+                                <Grid item xs={1} sm={1}>
+                                  <ShareButton
+                                    tokenId={book?.tokenId}
+                                    renter={book?.renter}
+                                    borrower={book?.borrower}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
+                                    borrowedAmount={book?.amount}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ExtendRequestButton
+                                    tokenId={book?.tokenId}
+                                    renter={book?.renter}
+                                    supplyAmount={book?.amount}
+                                    startTime={book?.startTime}
+                                    endTime={book?.endTime}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReviewButton
+                                    tokenId={book?.tokenId}
+                                    author={book?.renter}
+                                  />
+                                </Grid>
+                                <Grid item xs={1} sm={1}>
+                                  <ReadButton tokenId={book?.tokenId} />
+                                </Grid>
+                              </Grid>
                             }
                           />
                         </Grid>
@@ -152,9 +159,10 @@ const BorrowedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar
+              data={rentedBooks}
+              pathname="/bookshelf/borrowed-books"
+            />
           </Grid>
         </Grid>
       </Stack>
@@ -170,7 +178,8 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "borrowedBooks"
+        "borrowedBooks",
+        "bookButtons"
       ]))
     }
   };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,14 +22,20 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
+import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import {
-  InputController,
-  NumericStepperController
+  NumericStepperController,
+  TextFieldController
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import {
+  createTransactionHistory,
+  createTransactionHistoryOnlyGasFee
+} from "@/components/utils";
+import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
 
@@ -38,18 +44,10 @@ import Step2 from "../../ui/borrow/steps/Step2";
 
 interface ExtendRequestButtonProps {
   tokenId: number;
-  title: string;
-  bookCover: string;
   renter: string;
-  price: number;
+  startTime: number;
+  endTime: number;
   supplyAmount: number;
-  borrowBooks: (
-    tokenId: number,
-    renter: string,
-    price: number,
-    amount: number,
-    rentalDuration: number
-  ) => Promise<void>;
 }
 
 const schema = yup
@@ -58,7 +56,7 @@ const schema = yup
       .number()
       .min(1, `The price must be higher than 0.`)
       .typeError("Amount must be a number"),
-    rentalDays: yup
+    extendDays: yup
       .number()
       .min(1, `The day must be higher than 0.`)
       .typeError("Rental days must be a number")
@@ -67,21 +65,20 @@ const schema = yup
 
 const defaultValues = {
   amount: 1,
-  rentalDays: 7
+  extendDays: 7
 };
 
 const ExtendRequestButton = ({
   tokenId,
-  bookCover,
-  title,
   renter,
-  price,
-  supplyAmount,
-  borrowBooks
+  startTime,
+  endTime,
+  supplyAmount
 }: ExtendRequestButtonProps) => {
-  const router = useRouter();
-  const [renterName, setAuthorName] = useState();
-  const { ethereum, contract } = useWeb3();
+  const [renterName, setRenterName] = useState();
+  const { provider, bookStoreContract } = useWeb3();
+  const { account } = useAccount();
+  const { metadata } = useMetadata(tokenId);
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
@@ -126,10 +123,80 @@ const ExtendRequestButton = ({
 
   const { handleSubmit, setValue } = methods;
 
+  const requestExtendTime = useCallback(
+    async (
+      tokenId: number,
+      renter: string,
+      startTime: number,
+      endTime: number,
+      extendedAmount: number,
+      extendedTime: number
+    ) => {
+      try {
+        // Handle errors
+        if (extendedTime < 604800) {
+          return toast.error(`Extend time must be greater than 7 days.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+        if (extendedAmount > supplyAmount) {
+          return toast.error(`Amount must be less than ${supplyAmount}.`, {
+            position: toast.POSITION.TOP_CENTER
+          });
+        }
+        if (account.data == renter) {
+          return toast.error(
+            "You are not allowed to extend the book borrowed by yourself.",
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
+        }
+
+        const tx = await bookStoreContract?.requestExtendTimeOfBorrowedBooks(
+          tokenId,
+          renter,
+          startTime,
+          endTime,
+          extendedAmount,
+          extendedTime
+        );
+
+        const receipt: any = await toast.promise(tx!.wait(), {
+          pending: "Processing transaction",
+          success: "Request extend successfully.",
+          error: "Processing error"
+        });
+
+        if (receipt) {
+          await createTransactionHistoryOnlyGasFee(
+            provider,
+            receipt,
+            tokenId,
+            "Request extend borrowed book"
+          );
+        }
+      } catch (error: any) {
+        console.error(error);
+        toast.error(`${error.message.substr(0, 65)}.`, {
+          position: toast.POSITION.TOP_CENTER
+        });
+      }
+    },
+    [supplyAmount, account.data, bookStoreContract, provider]
+  );
+
   const onSubmit = async (data: any) => {
     try {
-      const rentalDuration = daysToSeconds(data.rentalDays);
-      await borrowBooks(tokenId, renter, price, data.amount, rentalDuration);
+      const extendedTime = daysToSeconds(data.extendDays);
+      await requestExtendTime(
+        tokenId,
+        renter,
+        startTime,
+        endTime,
+        data.amount,
+        extendedTime
+      );
     } catch (e: any) {
       console.error(e.message);
     }
@@ -142,7 +209,7 @@ const ExtendRequestButton = ({
           const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setRenterName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
@@ -154,26 +221,31 @@ const ExtendRequestButton = ({
   return (
     <>
       <Button
-        variant="contained"
-        sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
+        variant="outlined"
+        size="small"
+        sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        Rent now
+        Extend
       </Button>
 
-      <Dialog title="Sell" open={openBookCard} onClose={handleBookCardClose}>
+      <Dialog
+        title="Make an Extension Request"
+        open={openBookCard}
+        onClose={handleBookCardClose}
+      >
         <FormProvider {...methods}>
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
               <Stack>
                 <Image
-                  src={bookCover}
-                  alt={title}
+                  src={metadata.data?.bookCover}
+                  alt={metadata.data?.title}
                   sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
                 />
-                <Typography variant="h5">{title}</Typography>
-                <Typography>{renter}</Typography>
+                <Typography variant="h5">{metadata.data?.title}</Typography>
+                <Typography>{renterName}</Typography>
                 <Typography>{supplyAmount} left</Typography>
               </Stack>
             </Grid>
@@ -184,11 +256,11 @@ const ExtendRequestButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Listing price" required>
-                  <InputController name="price" type="number" />
-                </FormGroup>
                 <FormGroup label="Amount" required>
-                  <InputController name="amount" type="number" />
+                  <TextFieldController name="amount" type="number" />
+                </FormGroup>
+                <FormGroup label="Extend for (day)" required>
+                  <NumericStepperController name="extendDays" />
                 </FormGroup>
               </Stack>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -200,7 +272,7 @@ const ExtendRequestButton = ({
                   Cancel
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start selling
+                  Request extend
                 </StyledButton>
               </Box>
             </Grid>

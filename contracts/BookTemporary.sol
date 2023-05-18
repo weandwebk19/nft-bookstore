@@ -7,6 +7,7 @@ import "./share/BookSharingStorage.sol";
 contract BookTemporary {
   BookRentingStorage private _bookRentingStorage;
   BookSharingStorage private _bookSharingStorage;
+  uint public convertPrice = 0.000005 ether;
 
   constructor(
     BookRentingStorage bookRentingStorage,
@@ -25,34 +26,38 @@ contract BookTemporary {
   }
 
   function getAmountOfAllTypeBooksInTemporary(
-    uint256 tokenId, 
+    uint256 tokenId,
     address owner
   ) public view returns (uint) {
-    return _bookRentingStorage.getAmountOfLeaseBooks(tokenId, owner) +
-           _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, owner) +
-           _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, owner) +
-           _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, owner);
+    return
+      _bookRentingStorage.getAmountOfLendBooks(tokenId, owner) +
+      _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, owner) +
+      _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, owner) +
+      _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, owner);
   }
 
   function getAmountOfUnsalableBooksInTemporary(
-    uint256 tokenId, 
+    uint256 tokenId,
     address owner
   ) public view returns (uint) {
-    return _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, owner) +
-           _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, owner) +
-           _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, owner);
+    return
+      _bookSharingStorage.getAmountOfAllSharedBooks(tokenId, owner) +
+      _bookSharingStorage.getAmountOfAllBooksOnSharing(tokenId, owner) +
+      _bookRentingStorage.getAmountOfBorrowedBooks(tokenId, owner);
   }
 
   function convertBookOnSharingToBorrowedBook(
     uint idBookOnSharing,
-    address owner,
     uint amount
   ) public payable {
+    if (msg.value != convertPrice) {
+      revert Error.InvalidPriceError(msg.value);
+    }
     BookSharingStorage.BookSharing memory booksOnSharing = _bookSharingStorage
       .getBooksOnSharing(idBookOnSharing);
 
-    if (booksOnSharing.sharer != owner) {
-      revert Error.InvalidAddressError(owner);
+    if (booksOnSharing.sharer != msg.sender) {
+      revert Error.InvalidAddressError(msg.sender);
     }
     if (booksOnSharing.amount < amount) {
       revert Error.InvalidAmountError(amount);
@@ -69,7 +74,7 @@ contract BookTemporary {
     } else {
       _bookSharingStorage.updateBooksOnSharing(
         idBookOnSharing,
-        owner,
+        msg.sender,
         booksOnSharing.tokenId,
         booksOnSharing.price,
         booksOnSharing.amount - amount
@@ -79,7 +84,7 @@ contract BookTemporary {
     uint idBorrowedBook = _bookRentingStorage.getIdBorrowedBook(
       booksOnSharing.tokenId,
       booksOnSharing.fromRenter,
-      owner,
+      msg.sender,
       booksOnSharing.startTime,
       booksOnSharing.endTime
     );
@@ -91,7 +96,7 @@ contract BookTemporary {
         amount,
         booksOnSharing.startTime,
         booksOnSharing.endTime,
-        owner
+        msg.sender
       );
     } else {
       _bookRentingStorage.updateAmountBorrowedBookFromBorrowing(
@@ -101,5 +106,4 @@ contract BookTemporary {
       );
     }
   }
-  
 }

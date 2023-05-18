@@ -17,7 +17,7 @@ export default async function handler(
     const watchlists = await db
       .collection("watchlists")
       .find({
-        wallet_address: (walletAddress as string).toLowerCase()
+        wallet_address: walletAddress as string
       })
       .toArray();
 

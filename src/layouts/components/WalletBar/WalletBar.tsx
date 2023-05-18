@@ -4,7 +4,13 @@ import {
   Avatar,
   Box,
   Chip,
+  FormHelperText,
+  Grid,
   IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   Menu,
   Stack,
   Tooltip
@@ -21,8 +27,10 @@ import { getCsrfToken } from "next-auth/react";
 import { signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
+import { useConnect } from "wagmi";
 
 import images from "@/assets/images";
+import { Dialog } from "@/components/shared/Dialog";
 import { StyledChip } from "@/styles/components/Chip";
 import { ListItemProps } from "@/types/list";
 import { truncate } from "@/utils/truncate";
@@ -33,9 +41,9 @@ interface WalletBarProps {
   isInstalled: boolean;
   isLoading: boolean;
   account?: string;
-  connect(...args: unknown[]): unknown;
+  userName?: string;
+  avatar?: string;
   handleLogin: () => Promise<void>;
-  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
   isConnected: boolean;
   isAuthor: boolean;
@@ -44,10 +52,10 @@ interface WalletBarProps {
 const WalletBar = ({
   isInstalled,
   isLoading,
-  connect,
   account,
+  userName,
+  avatar,
   handleLogin,
-  switchAccount,
   disconnect,
   isConnected,
   isAuthor
@@ -55,6 +63,12 @@ const WalletBar = ({
   const { t } = useTranslation();
   const { data, status } = useSession();
   const [address, setAddress] = useState(data?.address as string);
+  const { connect, connectors, error, pendingConnector } = useConnect();
+
+  const [anchorWalletCard, setAnchorWalletCard] = useState<Element | null>(
+    null
+  );
+  const openWalletCard = Boolean(anchorWalletCard);
 
   const createList: ListItemProps[] = [
     {
@@ -109,6 +123,14 @@ const WalletBar = ({
     alert("Create Rental");
   };
 
+  const handleWalletCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorWalletCard(e.currentTarget);
+  };
+
+  const handleWalletCardClose = () => {
+    setAnchorWalletCard(null);
+  };
+
   useEffect(() => {
     if (account) {
       setAddress(account);
@@ -124,7 +146,7 @@ const WalletBar = ({
   if (isLoading)
     return <StyledButton customVariant="secondary">Loading...</StyledButton>;
 
-  if (data)
+  if (address && account)
     return (
       <Stack direction="row" alignItems="center" sx={{ flexGrow: 0 }}>
         <Stack
@@ -134,7 +156,7 @@ const WalletBar = ({
         >
           {isAuthor ? (
             <StyledChip
-              avatar={<AdjustIcon color="primary" />}
+              icon={<AdjustIcon color="primary" />}
               label={truncate(account ? account : "", 6, -4)}
               background={images.gradient1}
             />
@@ -153,11 +175,10 @@ const WalletBar = ({
         </Stack>
         <AccountMenu
           account={account}
+          userName={userName}
+          avatar={avatar}
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
-          switchAccount={() => {
-            switchAccount();
-          }}
           disconnect={() => {
             disconnect();
             signOut({
@@ -239,13 +260,7 @@ const WalletBar = ({
       <>
         <StyledButton
           customVariant="primary"
-          onClick={() => {
-            if (!isConnected) {
-              connect();
-            } else {
-              handleLogin();
-            }
-          }}
+          onClick={handleWalletCardClick}
           sx={{
             display: {
               xs: "none",
@@ -256,13 +271,7 @@ const WalletBar = ({
           {t("navbar:connectWallet")}
         </StyledButton>
         <IconButton
-          onClick={() => {
-            if (!isConnected) {
-              connect();
-            } else {
-              handleLogin();
-            }
-          }}
+          onClick={handleWalletCardClick}
           sx={{
             display: {
               xs: "flex",
@@ -273,6 +282,57 @@ const WalletBar = ({
         >
           <AccountBalanceWalletOutlinedIcon color="primary" />
         </IconButton>
+
+        <Dialog
+          title={t("navbar:connectWallet")!}
+          open={openWalletCard}
+          onClose={handleWalletCardClose}
+        >
+          <Grid item xs={4} md={6}>
+            <List
+              sx={{
+                border: "1px solid ",
+                borderRadius: "5px"
+              }}
+            >
+              {connectors.map((connector) => (
+                <Box key={connector.id}>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      disabled={!connector.ready}
+                      onClick={() => {
+                        if (!isConnected) {
+                          connect({ connector });
+                        } else {
+                          handleLogin();
+                        }
+                      }}
+                    >
+                      <ListItemText
+                        primary={`${connector.name}${
+                          !connector.ready ? " (unsupported)" : ""
+                        }${
+                          isLoading && connector.id === pendingConnector?.id
+                            ? " (connecting)"
+                            : ""
+                        }`}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </Box>
+              ))}
+            </List>
+
+            {error && (
+              <FormHelperText
+                error
+                sx={{ marginTop: "24px", fontSize: "14px" }}
+              >
+                {error.message}
+              </FormHelperText>
+            )}
+          </Grid>
+        </Dialog>
       </>
     );
   } else {
@@ -292,8 +352,8 @@ const WalletBar = ({
 WalletBar.propTypes = {
   isInstalled: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  account: PropTypes.string,
-  connect: PropTypes.func.isRequired
+  account: PropTypes.string
+  // connect: PropTypes.func.isRequired
 };
 
 WalletBar.defaultProps = {

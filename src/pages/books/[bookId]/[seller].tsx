@@ -6,20 +6,21 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 export default BookDetail;
 
-export async function getStaticProps({ locale }: any) {
+export async function getServerSideProps({ locale }: any) {
   return {
     props: {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
-        "bookDetail"
+        "bookDetail",
+        "fallback"
       ]))
     }
   };
 }
 
-export const getStaticPaths = () => {
-  return {
-    paths: [],
-    fallback: true
-  };
-};
+// export const getStaticPaths = () => {
+//   return {
+//     paths: [],
+//     fallback: true
+//   };
+// };

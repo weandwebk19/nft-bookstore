@@ -2,14 +2,14 @@ import { Box, Grid, Typography } from "@mui/material";
 
 import { useTranslation } from "next-i18next";
 
-import { ListedBookCore } from "@/types/nftBook";
+import { BookSellingCore } from "@/types/nftBook";
 
 import BookCardActionable from "./BookCardActionable";
 
 interface BookListActionableProps {
   isOpenForPurchase: boolean;
   isOpenForBorrow: boolean;
-  bookListActionable: ListedBookCore[];
+  bookListActionable: BookSellingCore[];
 }
 
 const BookListActionable = ({
@@ -28,7 +28,7 @@ const BookListActionable = ({
       )}
       {isOpenForBorrow && (
         <Typography variant="h5" gutterBottom>
-          {t("leasings")}
+          {t("lendings")}
         </Typography>
       )}
       <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}>

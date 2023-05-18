@@ -32,22 +32,33 @@ export type NftBookAttribute = {
   value: number;
 };
 
-export type BookInfo = {
+export type BookInfoInDB = {
+  id: string;
   tokenId: number;
-  contractAddress?: string;
   description: string;
-  languages: string[];
-  genres: string[];
   externalLink?: string;
   totalPages?: number;
-  keywords?: string;
-  publishingTime?: Date;
+  keywords?: string | string[];
+  userCreated?: string;
 };
 
-export type NftBookDetails = {
+export type BookInfo = {
+  contractAddress?: string;
+  languages: string[];
+  genres: string[];
+  publishingTime?: Date;
+} & BookInfoInDB;
+
+export type BookInfoForUpdate = {
+  id: string;
+  oldLanguages?: string[];
+  oldGenres?: string[];
+} & BookInfo;
+
+export type NftBookDetail = {
   bookId: string;
   nftCore: NftBookCore; // Data from smartcontract
-  listedCore?: ListedBookCore; // Data from smartcontract
+  listedCore?: BookSellingCore; // Data from smartcontract
   meta: NftBookMeta; // Data from metadata
   info: BookInfo; // Data from database
 };
@@ -73,23 +84,18 @@ export type NftBookCore = {
 export type NftBook = {
   amountOwned?: number;
   amountTradeable?: number;
-  meta: NftBookMeta;
+  // meta: NftBookMeta;
 } & NftBookCore;
 
-export type ListedBookCore = {
+export type BookSellingCore = {
   tokenId: number;
   seller: string;
+  buyer: string;
   price: number;
   amount: number;
 };
 
-export type PurchasedBookCore = {
-  listedId: number;
-  buyer: string;
-  amount: number;
-};
-
-export type LeaseBookCore = {
+export type LendBookCore = {
   tokenId: number;
   renter: string;
   price: number;
@@ -130,35 +136,23 @@ export type SharedBookCore = {
   endTime: number;
 };
 
-export type ListedBook = {
-  meta: NftBookMeta;
-} & ListedBookCore;
-
-export type PurchasedBook = {
-  listedBook: ListedBookCore;
+export type BookSelling = {
   amountTradeable: number;
-  meta: NftBookMeta;
-} & PurchasedBookCore;
+} & BookSellingCore;
 
-export type LeaseBook = {
-  meta: NftBookMeta;
-} & LeaseBookCore;
+export type LendBook = {} & LendBookCore;
 
-export type BorrowedBook = {
-  meta: NftBookMeta;
-} & BorrowedBookCore;
+export type BorrowedBook = {} & BorrowedBookCore;
 
 export type SharedBook = {
   meta: NftBookMeta;
 } & SharedBookCore;
 
-export type BookSharing = {
-  meta: NftBookMeta;
-} & BookSharingCore;
+export type BookSharing = {} & BookSharingCore;
 
 export type NftListedBook = {
   meta: NftBookMeta;
-} & ListedBookCore &
+} & BookSellingCore &
   NftBookCore;
 
 export type PinataRes = {
@@ -173,6 +167,33 @@ export type FileReq = {
   contentType: string;
   fileName: string;
 };
+
+export type RequestExtendCore = {
+  id: number; // id of Borrowed Books
+  time: number; // Extended time
+  amount: number;
+  sender: string; // Borrower
+  isAccept: boolean;
+};
+
+export type RequestExtend = {} & RequestExtendCore;
+
+export type RequestExtendRowData = {
+  action?: any;
+} & RequestExtendCore;
+
+export type ResponseExtendCore = {
+  id: number;
+  time: number;
+  amount: number;
+  sender: string; // Renter
+};
+
+export type ResponseExtend = {} & ResponseExtendCore;
+
+export type ResponseExtendRowData = {
+  action?: any;
+} & ResponseExtendCore;
 
 export enum BookGenres {
   "Art & photography",

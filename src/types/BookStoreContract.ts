@@ -1,11 +1,12 @@
+/* eslint-disable prettier/prettier */
+import { EthersContractContextV5 } from "ethereum-abi-types-generator";
 import {
-  ContractTransaction,
-  ContractInterface,
   BytesLike as Arrayish,
   BigNumber,
-  BigNumberish
+  BigNumberish,
+  ContractInterface,
+  ContractTransaction
 } from "ethers";
-import { EthersContractContextV5 } from "ethereum-abi-types-generator";
 
 export type ContractContext = EthersContractContextV5<
   BookStoreContract,
@@ -73,9 +74,8 @@ export type BookStoreContractMethodNames =
   | "new"
   | "balanceOf"
   | "balanceOfBatch"
-  | "convertPrice"
   | "isApprovedForAll"
-  | "leasingPrice"
+  | "lendingPrice"
   | "listingPrice"
   | "owner"
   | "renounceOwnership"
@@ -88,55 +88,40 @@ export type BookStoreContractMethodNames =
   | "uri"
   | "getUri"
   | "setListingPrice"
-  | "setLeasingPrice"
+  | "setLendingPrice"
   | "setSharingPrice"
-  | "isListed"
-  | "isLeased"
   | "getAllRealOwnerOfTokenId"
   | "getBalanceOfOwnerBook"
   | "getNftBook"
-  | "getListedBook"
-  | "getListedBookById"
   | "isTokenURIExist"
   | "mintBook"
+  | "getSecretKey"
+  | "isBookReadableByUser"
   | "isOwnerOfToken"
   | "getOwnedNFTBooks"
   | "getOwnedListedBooks"
-  | "getOwnedPurchasedBooks"
-  | "getOwnedLeasingBooks"
-  | "getOwnedBorrowedBooks"
+  | "getOwnedLendingBooks"
   | "getAmountUnUsedBook"
   | "getAmountOfAllTypeBooksUntradeable"
   | "sellBooks"
-  | "leaseBooks"
+  | "lendBooks"
   | "updateBookFromSale"
   | "updateBookFromRenting"
-  | "getAllBooksOnSale"
-  | "getAllBooksOnLeasing"
   | "buyBooks"
   | "borrowBooks"
-  | "getAllBorrowedBooks"
   | "requestExtendTimeOfBorrowedBooks"
   | "updateRequestOfBorrowedBooks"
   | "doAcceptRequest"
   | "transferForSendedRequest"
-  | "getAllOwnedRequestsOnExtending"
-  | "getAllOwnedResponsesOnExtending"
   | "recallBorrowedBooks"
   | "recallAllBorrowedBooks"
-  | "getIdBorrowedBook"
   | "shareBooks"
-  | "getAllBooksOnSharing"
-  | "getAllOwnedBooksOnSharing"
-  | "getAllSharedBook"
-  | "getAllOwnedSharedBook"
   | "updateBooksOnSharing"
   | "takeBooksOnSharing"
   | "recallSharedBooks"
   | "recallAllSharedBooks"
   | "recallBooksOnSharing"
-  | "recallAllBooksOnSharing"
-  | "convertBookOnSharingToBorrowedBook";
+  | "recallAllBooksOnSharing";
 export interface ApprovalForAllEventEmittedResponse {
   account: string;
   operator: string;
@@ -177,25 +162,19 @@ export interface NftbookResponse {
   quantity: BigNumber;
   2: BigNumber;
 }
-export interface ListedbookResponse {
+export interface BooksellingResponse {
   tokenId: BigNumber;
   0: BigNumber;
   seller: string;
   1: string;
-  price: BigNumber;
-  2: BigNumber;
-  amount: BigNumber;
-  3: BigNumber;
-}
-export interface PurchasedbookResponse {
-  listedId: BigNumber;
-  0: BigNumber;
   buyer: string;
-  1: string;
+  2: string;
+  price: BigNumber;
+  3: BigNumber;
   amount: BigNumber;
-  2: BigNumber;
+  4: BigNumber;
 }
-export interface LeasebookResponse {
+export interface LendbookResponse {
   tokenId: BigNumber;
   0: BigNumber;
   renter: string;
@@ -204,64 +183,6 @@ export interface LeasebookResponse {
   2: BigNumber;
   amount: BigNumber;
   3: BigNumber;
-}
-export interface BorrowedbookResponse {
-  tokenId: BigNumber;
-  0: BigNumber;
-  renter: string;
-  1: string;
-  borrower: string;
-  2: string;
-  price: BigNumber;
-  3: BigNumber;
-  amount: BigNumber;
-  4: BigNumber;
-  startTime: BigNumber;
-  5: BigNumber;
-  endTime: BigNumber;
-  6: BigNumber;
-}
-export interface RequestResponse {
-  id: BigNumber;
-  0: BigNumber;
-  time: BigNumber;
-  1: BigNumber;
-  amount: BigNumber;
-  2: BigNumber;
-  sender: string;
-  3: string;
-  isAccept: boolean;
-  4: boolean;
-}
-export interface ResponseResponse {
-  id: BigNumber;
-  0: BigNumber;
-  time: BigNumber;
-  1: BigNumber;
-  amount: BigNumber;
-  2: BigNumber;
-  sender: string;
-  3: string;
-}
-export interface BooksharingResponse {
-  tokenId: BigNumber;
-  0: BigNumber;
-  fromRenter: string;
-  1: string;
-  sharer: string;
-  2: string;
-  sharedPer: string;
-  3: string;
-  priceOfBB: BigNumber;
-  4: BigNumber;
-  price: BigNumber;
-  5: BigNumber;
-  amount: BigNumber;
-  6: BigNumber;
-  startTime: BigNumber;
-  7: BigNumber;
-  endTime: BigNumber;
-  8: BigNumber;
 }
 export interface BookStoreContract {
   /**
@@ -269,16 +190,16 @@ export interface BookStoreContract {
    * Constant: false
    * StateMutability: nonpayable
    * Type: constructor
-   * @param listedBookStorage Type: address, Indexed: false
-   * @param purchasedBookStorage Type: address, Indexed: false
+   * @param bookSellingStorage Type: address, Indexed: false
    * @param bookTemporary Type: address, Indexed: false
    * @param listRealOwners Type: address, Indexed: false
+   * @param secretKeyStorage Type: address, Indexed: false
    */
   "new"(
-    listedBookStorage: string,
-    purchasedBookStorage: string,
+    bookSellingStorage: string,
     bookTemporary: string,
     listRealOwners: string,
+    secretKeyStorage: string,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
@@ -312,13 +233,6 @@ export interface BookStoreContract {
    * Constant: true
    * StateMutability: view
    * Type: function
-   */
-  convertPrice(overrides?: ContractCallOverrides): Promise<BigNumber>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
    * @param account Type: address, Indexed: false
    * @param operator Type: address, Indexed: false
    */
@@ -333,7 +247,7 @@ export interface BookStoreContract {
    * StateMutability: view
    * Type: function
    */
-  leasingPrice(overrides?: ContractCallOverrides): Promise<BigNumber>;
+  lendingPrice(overrides?: ContractCallOverrides): Promise<BigNumber>;
   /**
    * Payable: false
    * Constant: true
@@ -477,7 +391,7 @@ export interface BookStoreContract {
    * Type: function
    * @param newPrice Type: uint256, Indexed: false
    */
-  setLeasingPrice(
+  setLendingPrice(
     newPrice: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
@@ -492,32 +406,6 @@ export interface BookStoreContract {
     newPrice: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param tokenId Type: uint256, Indexed: false
-   * @param seller Type: address, Indexed: false
-   */
-  isListed(
-    tokenId: BigNumberish,
-    seller: string,
-    overrides?: ContractCallOverrides
-  ): Promise<boolean>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param tokenId Type: uint256, Indexed: false
-   * @param renter Type: address, Indexed: false
-   */
-  isLeased(
-    tokenId: BigNumberish,
-    renter: string,
-    overrides?: ContractCallOverrides
-  ): Promise<boolean>;
   /**
    * Payable: false
    * Constant: true
@@ -556,30 +444,6 @@ export interface BookStoreContract {
    * Constant: true
    * StateMutability: view
    * Type: function
-   * @param tokenId Type: uint256, Indexed: false
-   * @param seller Type: address, Indexed: false
-   */
-  getListedBook(
-    tokenId: BigNumberish,
-    seller: string,
-    overrides?: ContractCallOverrides
-  ): Promise<ListedbookResponse>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param idListedBook Type: uint256, Indexed: false
-   */
-  getListedBookById(
-    idListedBook: BigNumberish,
-    overrides?: ContractCallOverrides
-  ): Promise<ListedbookResponse>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
    * @param tokenURI Type: string, Indexed: false
    */
   isTokenURIExist(
@@ -593,12 +457,38 @@ export interface BookStoreContract {
    * Type: function
    * @param tokenURI Type: string, Indexed: false
    * @param quantity Type: uint256, Indexed: false
+   * @param privateKey Type: string, Indexed: false
+   * @param iv Type: string, Indexed: false
    */
   mintBook(
     tokenURI: string,
     quantity: BigNumberish,
+    privateKey: string,
+    iv: string,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
+  /**
+   * Payable: true
+   * Constant: false
+   * StateMutability: payable
+   * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   */
+  getSecretKey(
+    tokenId: BigNumberish,
+    overrides?: ContractTransactionOverrides
+  ): Promise<ContractTransaction>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param tokenId Type: uint256, Indexed: false
+   */
+  isBookReadableByUser(
+    tokenId: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<boolean>;
   /**
    * Payable: false
    * Constant: true
@@ -629,34 +519,16 @@ export interface BookStoreContract {
    */
   getOwnedListedBooks(
     overrides?: ContractCallOverrides
-  ): Promise<ListedbookResponse[]>;
+  ): Promise<BooksellingResponse[]>;
   /**
    * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
    */
-  getOwnedPurchasedBooks(
+  getOwnedLendingBooks(
     overrides?: ContractCallOverrides
-  ): Promise<PurchasedbookResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getOwnedLeasingBooks(
-    overrides?: ContractCallOverrides
-  ): Promise<LeasebookResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getOwnedBorrowedBooks(
-    overrides?: ContractCallOverrides
-  ): Promise<BorrowedbookResponse[]>;
+  ): Promise<LendbookResponse[]>;
   /**
    * Payable: false
    * Constant: true
@@ -703,7 +575,7 @@ export interface BookStoreContract {
    * @param price Type: uint256, Indexed: false
    * @param amount Type: uint256, Indexed: false
    */
-  leaseBooks(
+  lendBooks(
     tokenId: BigNumberish,
     price: BigNumberish,
     amount: BigNumberish,
@@ -744,24 +616,6 @@ export interface BookStoreContract {
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllBooksOnSale(
-    overrides?: ContractCallOverrides
-  ): Promise<ListedbookResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllBooksOnLeasing(
-    overrides?: ContractCallOverrides
-  ): Promise<LeasebookResponse[]>;
-  /**
    * Payable: true
    * Constant: false
    * StateMutability: payable
@@ -795,15 +649,6 @@ export interface BookStoreContract {
     rentalDuration: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllBorrowedBooks(
-    overrides?: ContractCallOverrides
-  ): Promise<BorrowedbookResponse[]>;
   /**
    * Payable: false
    * Constant: false
@@ -878,24 +723,6 @@ export interface BookStoreContract {
   ): Promise<ContractTransaction>;
   /**
    * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllOwnedRequestsOnExtending(
-    overrides?: ContractCallOverrides
-  ): Promise<RequestResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllOwnedResponsesOnExtending(
-    overrides?: ContractCallOverrides
-  ): Promise<ResponseResponse[]>;
-  /**
-   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
@@ -915,25 +742,6 @@ export interface BookStoreContract {
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param tokenId Type: uint256, Indexed: false
-   * @param renter Type: address, Indexed: false
-   * @param borrower Type: address, Indexed: false
-   * @param startTime Type: uint256, Indexed: false
-   * @param endTime Type: uint256, Indexed: false
-   */
-  getIdBorrowedBook(
-    tokenId: BigNumberish,
-    renter: string,
-    borrower: string,
-    startTime: BigNumberish,
-    endTime: BigNumberish,
-    overrides?: ContractCallOverrides
-  ): Promise<BigNumber>;
-  /**
    * Payable: true
    * Constant: false
    * StateMutability: payable
@@ -948,42 +756,6 @@ export interface BookStoreContract {
     amount: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllBooksOnSharing(
-    overrides?: ContractCallOverrides
-  ): Promise<BooksharingResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllOwnedBooksOnSharing(
-    overrides?: ContractCallOverrides
-  ): Promise<BooksharingResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllSharedBook(
-    overrides?: ContractCallOverrides
-  ): Promise<BooksharingResponse[]>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   */
-  getAllOwnedSharedBook(
-    overrides?: ContractCallOverrides
-  ): Promise<BooksharingResponse[]>;
   /**
    * Payable: false
    * Constant: false
@@ -1005,11 +777,9 @@ export interface BookStoreContract {
    * StateMutability: payable
    * Type: function
    * @param idBooksOnSharing Type: uint256, Indexed: false
-   * @param amount Type: uint256, Indexed: false
    */
   takeBooksOnSharing(
     idBooksOnSharing: BigNumberish,
-    amount: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
@@ -1050,19 +820,6 @@ export interface BookStoreContract {
    * Type: function
    */
   recallAllBooksOnSharing(
-    overrides?: ContractTransactionOverrides
-  ): Promise<ContractTransaction>;
-  /**
-   * Payable: true
-   * Constant: false
-   * StateMutability: payable
-   * Type: function
-   * @param idBooksOnSharing Type: uint256, Indexed: false
-   * @param amount Type: uint256, Indexed: false
-   */
-  convertBookOnSharingToBorrowedBook(
-    idBooksOnSharing: BigNumberish,
-    amount: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
 }

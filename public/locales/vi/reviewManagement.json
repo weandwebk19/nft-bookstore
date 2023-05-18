@@ -1,0 +1,19 @@
+{
+  "titlePage": "Đánh giá của độc giả - NFT Bookstore",
+  "containerTitle": "Đánh giá của độc giả",
+  "button_cancel": "Hủy",
+  "button_reply": "Gửi phản hồi",
+  "button_editReply": "Lưu thay đổi",
+  "tooltip_reply": "Gửi phản hồi",
+  "tooltip_editReply": "Chỉnh sửa phản hồi",
+  "dialogTitle": "Gửi phản hồi",
+  "filter": "Lọc theo",
+  "all": "Tất cả",
+  "replied": "Đã phản hồi",
+  "notReplied": "Chưa phản hồi",
+  "id": "ID",
+  "bookInfo": "Thông tin sách",
+  "buyer": "Người mua",
+  "review": "Đánh giá",
+  "action": "Hành động"
+}

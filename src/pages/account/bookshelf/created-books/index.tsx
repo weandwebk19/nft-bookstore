@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
 import axios from "axios";
@@ -11,7 +11,7 @@ import withAuth from "@/components/HOC/withAuth";
 import { useCreatedBooks } from "@/components/hooks/web3";
 import {
   EditButton,
-  LeaseButton,
+  LendButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -19,6 +19,8 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { StyledButton } from "@/styles/components/Button";
+import { FilterField } from "@/types/filter";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const CreatedBooks = () => {
@@ -35,8 +37,8 @@ const CreatedBooks = () => {
     }
   ];
 
-  const { nfts } = useCreatedBooks();
   const router = useRouter();
+  const { nfts } = useCreatedBooks(router.query as FilterField);
   const createdBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
@@ -44,7 +46,11 @@ const CreatedBooks = () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
       if (res.data.success === true) {
         const bookId = res.data.data;
-        router.push(`/books/${bookId}`);
+        // router.push(`/books/${bookId}`);
+        router.push({
+          pathname: "/books/[bookId]",
+          query: { bookId }
+        });
       }
     })();
   };
@@ -58,9 +64,17 @@ const CreatedBooks = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Stack sx={{ pt: 3 }}>
-        <Box sx={{ mb: 3 }}>
+        <Stack direction="row" justifyContent="space-between" sx={{ mb: 3 }}>
           <BreadCrumbs breadCrumbs={breadCrumbs} />
-        </Box>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              router.push("/review-management");
+            }}
+          >
+            Reviews Management
+          </Button>
+        </Stack>
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9} lg={9}>
@@ -81,24 +95,21 @@ const CreatedBooks = () => {
                   <Grid
                     container
                     spacing={3}
-                    columns={{ xs: 4, sm: 8, md: 12, lg: 12 }}
+                    columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
                     {createdBooks!.map((book) => {
                       return (
                         <Grid
                           item
                           key={book.tokenId}
-                          xs={2}
-                          sm={8}
-                          md={12}
+                          xs={4}
+                          sm={4}
+                          md={6}
                           lg={6}
                         >
                           <ActionableBookItem
                             status="isCreated"
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             owner={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
@@ -111,8 +122,6 @@ const CreatedBooks = () => {
                               >
                                 <SellButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   owner={book?.author}
                                   amountTradeable={book?.amountTradeable!}
                                 />
@@ -129,9 +138,10 @@ const CreatedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3} lg={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar
+              data={createdBooks}
+              pathname="/bookshelf/created-books"
+            />
           </Grid>
         </Grid>
       </Stack>
@@ -147,7 +157,8 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "createdBooks"
+        "createdBooks",
+        "bookButtons"
       ]))
     }
   };

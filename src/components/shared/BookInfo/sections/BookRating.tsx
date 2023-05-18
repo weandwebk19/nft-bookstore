@@ -1,21 +1,42 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+
+import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import StarIcon from "@mui/icons-material/Star";
 
-import { bookComments } from "@/mocks";
-import { StyledLinearProgress } from "@/styles/components/LinearProgress";
+import axios from "axios";
+import { useRouter } from "next/router";
 
-import { Comment } from "../../Comment";
+import { bookComments, comments } from "@/mocks";
+import { StyledButton } from "@/styles/components/Button";
+import { StyledLinearProgress } from "@/styles/components/LinearProgress";
+import { ReviewInfo } from "@/types/reviews";
+
+import { Comment, NestedComment } from "../../Comment";
+import { FallbackNode } from "../../FallbackNode";
 import { StaticRating } from "../../Rating";
 
-interface BookRatingProp {
-  bookId: string;
-}
-const BookRating = ({ bookId }: BookRatingProp) => {
+const BookRating = () => {
   // search book by its id to get its comments and ratings
 
   const theme = useTheme();
+  const router = useRouter();
+  const { bookId } = router.query;
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      if (bookId) {
+        const reviewsRes = await axios.get(`/api/books/${bookId}/reviews`);
+        if (reviewsRes.data.success === true) {
+          setReviews(reviewsRes.data.data);
+        }
+      }
+    })();
+  }, [bookId]);
+
+  console.log(reviews);
 
   return (
     <Box component="section">
@@ -81,17 +102,39 @@ const BookRating = ({ bookId }: BookRatingProp) => {
             <Typography variant="h2">4.9</Typography>
           </Box>
         </Stack>
-        {bookComments.map((comment) => (
-          <Box key={comment.id}>
-            <Comment
-              avatar={comment.avatar}
-              username={comment.username}
-              date={comment.date}
-              rating={comment.rating}
-              comment={comment.comment}
-            />
-          </Box>
-        ))}
+        <Stack alignItems="center" spacing={2}>
+          <Typography variant="h5">What do you think?</Typography>
+          <StyledButton
+            onClick={() => {
+              router.push(`/books/${bookId}/review`);
+            }}
+          >
+            Write a review
+          </StyledButton>
+        </Stack>
+        <Divider />
+        <Typography variant="h6">Community Reviews</Typography>
+
+        <Paper>
+          {reviews.length > 0 ? (
+            reviews.map((review: ReviewInfo) => {
+              return (
+                <NestedComment
+                  key={review.id}
+                  id={review.id}
+                  user={review.userId}
+                  // authorAvatar={review?.authorAvatar}
+                  rating={review?.rating}
+                  content={review.review}
+                  avatar={""}
+                  reply={review.reply}
+                />
+              );
+            })
+          ) : (
+            <FallbackNode>No reviews yet</FallbackNode>
+          )}
+        </Paper>
       </Stack>
     </Box>
   );

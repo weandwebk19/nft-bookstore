@@ -11,9 +11,8 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useOwnedNfts } from "@/components/hooks/web3";
 import {
-  LeaseButton,
-  RatingButton,
   ReadButton,
+  ReviewButton,
   SellButton
 } from "@/components/shared/BookButton";
 import { ActionableBookItem } from "@/components/shared/BookItem";
@@ -21,6 +20,8 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { FilterField } from "@/types/filter";
+import { NftBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const OwnedBooks = () => {
@@ -37,8 +38,8 @@ const OwnedBooks = () => {
     }
   ];
 
-  const { nfts } = useOwnedNfts();
   const router = useRouter();
+  const { nfts } = useOwnedNfts(router.query as FilterField);
   const ownedBooks = nfts.data;
 
   const handleBookClick = (tokenId: number | string) => {
@@ -86,22 +87,19 @@ const OwnedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {ownedBooks!.map((book) => {
+                    {ownedBooks!.map((book: NftBook) => {
                       return (
                         <Grid
                           item
                           key={book.tokenId}
                           xs={4}
-                          sm={8}
+                          sm={4}
                           md={6}
-                          lg={12}
+                          lg={6}
                         >
                           <ActionableBookItem
                             status="isOwned"
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
                             owner={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
@@ -109,14 +107,11 @@ const OwnedBooks = () => {
                             amountTradeable={book?.amountTradeable}
                             buttons={
                               <>
-                                <RatingButton
+                                <ReviewButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   author={book?.author}
-                                  amountTradeable={book?.amountTradeable!}
                                 />
-                                <ReadButton bookFile={book?.meta.bookFile} />
+                                <ReadButton tokenId={book?.tokenId} />
                               </>
                             }
                           />
@@ -129,9 +124,7 @@ const OwnedBooks = () => {
             </ContentPaper>
           </Grid>
           <Grid item xs={4} sm={8} md={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar data={ownedBooks} pathname="/bookshelf/owned-books" />
           </Grid>
         </Grid>
       </Stack>
@@ -147,7 +140,8 @@ export async function getStaticProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "filter",
-        "ownedBooks"
+        "ownedBooks",
+        "bookButtons"
       ]))
     }
   };

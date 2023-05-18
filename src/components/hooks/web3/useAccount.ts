@@ -8,7 +8,6 @@ type UseAccountResponse = {
   connect: () => void;
   isLoading: boolean;
   isInstalled: boolean;
-  switchAccount: () => void;
 };
 
 type AccountHookFactory = CryptoHookFactory<string, UseAccountResponse>;
@@ -61,21 +60,6 @@ export const hookFactory: AccountHookFactory =
       }
     };
 
-    const switchAccount = async () => {
-      try {
-        ethereum?.request({
-          method: "wallet_requestPermissions",
-          params: [
-            {
-              eth_accounts: {}
-            }
-          ]
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
     return {
       ...swr,
       data,
@@ -83,7 +67,6 @@ export const hookFactory: AccountHookFactory =
       isLoading: isLoading as boolean,
       isInstalled: ethereum?.isMetaMask || false,
       mutate,
-      connect,
-      switchAccount
+      connect
     };
   };

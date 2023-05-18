@@ -17,7 +17,7 @@ export default async function handler(
 
       // Check if the user is exists
       const countUsers = await db.collection("users").count({
-        wallet_address: walletAddress.toLowerCase()
+        wallet_address: walletAddress
       });
       // Check if the book is exists
       const countBooks = await db.collection("books").count({
@@ -31,7 +31,7 @@ export default async function handler(
         );
         const newWatchlist = await db.collection("watchlists").insertOne({
           token_id: tokenId,
-          wallet_address: walletAddress.toLowerCase()
+          wallet_address: walletAddress
         });
 
         return res.json({

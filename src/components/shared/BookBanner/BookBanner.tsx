@@ -6,15 +6,12 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import styles from "@styles/BookBanner.module.scss";
 
-import { NftBook } from "@/types/nftBook";
+import { useMetadata } from "@/components/hooks/web3";
 
 type BookBannerProps = {
-  tokenId?: number;
-  title: string;
+  tokenId: number;
   author: string;
   authorName?: string;
-  bookCover: string;
-  fileType: string;
   description?: string;
   price?: number;
   onClick: () => void;
@@ -24,11 +21,8 @@ type BookBannerProps = {
 
 const BookBanner = ({
   tokenId,
-  title,
   author,
   authorName,
-  bookCover,
-  fileType,
   description,
   price,
   genres,
@@ -36,6 +30,7 @@ const BookBanner = ({
   onClick
 }: BookBannerProps) => {
   // const countDown = "7D:06:25:45";
+  const { metadata } = useMetadata(tokenId);
 
   return (
     <Box sx={{ cursor: "pointer" }} onClick={onClick}>
@@ -44,7 +39,7 @@ const BookBanner = ({
         sx={{
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
-          backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(${bookCover})`
+          backgroundImage: `linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5)), url(${metadata?.data?.bookCover})`
         }}
         container
         columns={{ xs: 4, sm: 8, md: 12 }}
@@ -52,7 +47,7 @@ const BookBanner = ({
         <Grid item xs={4} sm={4} md={7}>
           <Box sx={{ display: "inline-block", mb: 3 }}>
             <Typography variant="h2" className={styles["book-banner__title"]}>
-              {title}
+              {metadata?.data?.title}
             </Typography>
           </Box>
           <Typography variant="h5">{author}</Typography>
@@ -64,7 +59,7 @@ const BookBanner = ({
           >
             <Stack direction="row" spacing={1}>
               <InsertDriveFileOutlinedIcon />
-              <Typography>{fileType}</Typography>
+              <Typography>{metadata?.data?.fileType}</Typography>
             </Stack>
             {/* {meta.attributes?.map((stat, i) => (
               <Stack key={i} direction="row" spacing={1}>
@@ -124,7 +119,7 @@ const BookBanner = ({
               sx={{ textAlign: "end" }}
               className={styles["book-banner__open"]}
             >
-              {isListed ? "Openning" : "Closed"}
+              {isListing ? "Openning" : "Closed"}
             </Typography>
           </Box> */}
         </Grid>

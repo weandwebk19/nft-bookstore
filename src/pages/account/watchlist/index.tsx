@@ -20,8 +20,14 @@ import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 const Watchlist = () => {
   const { t } = useTranslation("watchlist");
   const { account } = useAccount();
-  const { ethereum, contract } = useWeb3();
+  const {
+    bookStoreContract,
+    bookSellingContract,
+    bookRentingContract,
+    bookSharingContract
+  } = useWeb3();
   const [rows, setRows] = useState<WatchlistRowData[]>([]);
+  console.log("rows", rows);
 
   // Mock value
   // const rows = [
@@ -50,14 +56,18 @@ const Watchlist = () => {
         try {
           for (let i = 0; i < watchList.length; i++) {
             const item = watchList[i];
-            const tokenURI = await contract!.getUri(item.tokenId);
+            const tokenURI = await bookStoreContract!.getUri(item.tokenId);
             const metaRes = await (
               await axios.get(`/api/pinata/metadata?nftUri=${tokenURI}`)
             ).data;
-            let meta = null;
+
             if (metaRes.success === true) {
-              meta = metaRes.data;
+              const meta = metaRes.data;
               if (meta?.author) {
+                const isListing = await bookSellingContract!.isListing(
+                  item.tokenId,
+                  meta?.author
+                );
                 const userRes = await axios.get(
                   `/api/users/wallet/${meta?.author}`
                 );
@@ -67,7 +77,8 @@ const Watchlist = () => {
                     tokenId: item?.tokenId,
                     bookCover: meta?.bookCover,
                     title: meta?.title,
-                    author: userRes.data.data.fullname
+                    author: userRes.data.data.fullname,
+                    status: isListing ? "Listings" : "Waiting for open"
                   });
                 }
               }
@@ -80,7 +91,7 @@ const Watchlist = () => {
 
       setRows(rows);
     })();
-  }, [account.data]);
+  }, [account.data, bookStoreContract]);
 
   return (
     <>

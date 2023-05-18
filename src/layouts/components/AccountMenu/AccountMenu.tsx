@@ -20,7 +20,9 @@ import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlin
 import CollectionsBookmarkOutlinedIcon from "@mui/icons-material/CollectionsBookmarkOutlined";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
+import PaidOutlinedIcon from "@mui/icons-material/PaidOutlined";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
 import SwitchAccountOutlinedIcon from "@mui/icons-material/SwitchAccountOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
@@ -39,18 +41,20 @@ import { truncate } from "@/utils/truncate";
 
 interface AccountMenuProps {
   account?: string;
+  userName?: string;
+  avatar?: string;
   open: boolean;
   onClose(...args: unknown[]): unknown;
-  switchAccount(...args: unknown[]): unknown;
   disconnect(...args: unknown[]): unknown;
   isAuthor: boolean;
 }
 
 const AccountMenu = ({
   account,
+  userName,
+  avatar,
   open,
   onClose,
-  switchAccount,
   disconnect,
   isAuthor
 }: AccountMenuProps) => {
@@ -65,6 +69,13 @@ const AccountMenu = ({
         router.push("/account/profile");
       }
     },
+    // {
+    //   icon: <PermIdentityOutlinedIcon color="primary" fontSize="small" />,
+    //   content: t("My Profile 2") as string,
+    //   onClick: () => {
+    //     router.push("/account/profile2");
+    //   }
+    // },
     // {
     //   icon: <BookmarkBorderOutlinedIcon color="primary" fontSize="small" />,
     //   content: t("navbar:favorites") as string,
@@ -89,10 +100,17 @@ const AccountMenu = ({
       }
     },
     {
-      icon: <SwitchAccountOutlinedIcon color="primary" fontSize="small" />,
-      content: t("navbar:switchAccount") as string,
+      icon: <MailOutlineIcon color="primary" fontSize="small" />,
+      content: t("navbar:mailBox") as string,
       onClick: () => {
-        switchAccount();
+        router.push("/account/mailbox");
+      }
+    },
+    {
+      icon: <PaidOutlinedIcon color="primary" fontSize="small" />,
+      content: t("navbar:transactionHistory") as string,
+      onClick: () => {
+        router.push("/account/transaction-history");
       }
     },
     {
@@ -155,7 +173,7 @@ const AccountMenu = ({
                 }}
               >
                 <Avatar
-                  alt="Tho Le"
+                  alt="{userName}"
                   src=""
                   sx={{
                     width: 56,
@@ -169,7 +187,7 @@ const AccountMenu = ({
                   }}
                 >
                   <Typography variant="subtitle2">User name</Typography>
-                  <Typography>Tho Le</Typography>
+                  <Typography>{userName}</Typography>
                 </Stack>
               </Stack>
               <Divider orientation="vertical" variant="middle" flexItem />
@@ -181,8 +199,8 @@ const AccountMenu = ({
                   }}
                 >
                   <Avatar
-                    alt="Tho Le"
-                    src=""
+                    alt={userName}
+                    src={avatar}
                     sx={{
                       width: 56,
                       height: 56,

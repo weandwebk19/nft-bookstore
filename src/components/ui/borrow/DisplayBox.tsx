@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { Box, Grid, Stack, Typography } from "@mui/material";
 
-import { useAllLeasingBooks } from "@hooks/web3";
+import { useAllLendingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
 import { ContentPaper } from "@shared/ContentPaper";
 import axios from "axios";
@@ -17,13 +17,16 @@ import RentButton from "@/components/shared/BookButton/RentButton";
 import { OwnableBookItem } from "@/components/shared/BookItem";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
+import { FilterField } from "@/types/filter";
+import { LendBookCore } from "@/types/nftBook";
 
 const DisplayBox: FunctionComponent = () => {
   const { t } = useTranslation("borrowBooks");
 
   const router = useRouter();
+  const query = router.query;
 
-  const { nfts } = useAllLeasingBooks();
+  const { nfts } = useAllLendingBooks(query as FilterField);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -60,7 +63,7 @@ const DisplayBox: FunctionComponent = () => {
                   `buttons` prop, and it must be pass some prop of a SINGLE book such as: 
                   title, bookCover, author,... */}
 
-                    {nfts?.data?.map((book) => {
+                    {nfts?.data?.map((book: LendBookCore) => {
                       return (
                         <Grid
                           item
@@ -73,21 +76,15 @@ const DisplayBox: FunctionComponent = () => {
                           <OwnableBookItem
                             price={book?.price}
                             tokenId={book?.tokenId}
-                            bookCover={book?.meta.bookCover}
-                            title={book?.meta.title}
-                            fileType={book?.meta.fileType}
-                            author={book?.meta.author}
+                            author={book?.renter}
                             onClick={handleBookClick}
                             buttons={
                               <>
                                 <RentButton
                                   tokenId={book?.tokenId}
-                                  title={book?.meta.title}
-                                  bookCover={book?.meta.bookCover}
                                   renter={book?.renter}
                                   price={book?.price}
                                   supplyAmount={book?.amount}
-                                  borrowBooks={nfts?.borrowBooks}
                                 />
                                 <AddToWatchlistButton
                                   isLastInButtonGroup
@@ -107,9 +104,7 @@ const DisplayBox: FunctionComponent = () => {
         </Grid>
         <Grid item xs={4} sm={3} md={3}>
           <Stack spacing={3}>
-            <ContentPaper title="Filter">
-              <FilterBar />
-            </ContentPaper>
+            <FilterBar data={nfts?.data} pathname="/borrow" />
           </Stack>
         </Grid>
       </Grid>

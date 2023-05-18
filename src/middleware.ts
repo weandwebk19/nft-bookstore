@@ -25,5 +25,5 @@ export { default } from "next-auth/middleware";
 // }
 
 export const config = {
-  matcher: ["/account/bookshelf/:path*", "/author/:path*"]
+  matcher: ["/account/bookshelf/:path*", "/books/create"]
 };
