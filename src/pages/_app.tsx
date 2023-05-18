@@ -94,8 +94,8 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
 
   return (
     <Box ref={app}>
-      <Web3Provider>
-        <WagmiConfig client={client}>
+      <WagmiConfig client={client}>
+        <Web3Provider>
           <SessionProvider session={pageProps.session} refetchInterval={0}>
             <MyThemeContextProvider>
               <CssBaseline />
@@ -141,8 +141,8 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
               </AnimatePresence>
             </MyThemeContextProvider>
           </SessionProvider>
-        </WagmiConfig>
-      </Web3Provider>
+        </Web3Provider>
+      </WagmiConfig>
     </Box>
   );
 }

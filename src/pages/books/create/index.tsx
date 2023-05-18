@@ -291,13 +291,14 @@ const CreateBook = () => {
   };
 
   const handleError = async (err: any) => {
-    // await deleteFileOnCloud();
-    toast.error(err.message, {
+    console.error(err);
+    await deleteFileOnCloud();
+    toast.error(err.message.substr(0, 65), {
       position: toast.POSITION.TOP_CENTER
     });
-    // setTimeout(() => {
-    //   window.location.reload();
-    // }, 3000);
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   };
 
   const uploadBookSample = async (file: File) => {

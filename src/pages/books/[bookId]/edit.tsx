@@ -103,7 +103,7 @@ const EditBook = () => {
   }, []);
 
   const handleError = async (err: any) => {
-    toast.error(err.message, {
+    toast.error(err.message.substr(0, 65), {
       position: toast.POSITION.TOP_CENTER
     });
     setTimeout(() => {
