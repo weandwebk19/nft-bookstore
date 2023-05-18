@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const keys = require("./keys.json");
 module.exports = {
@@ -24,14 +23,13 @@ module.exports = {
   compilers: {
     solc: {
       version: "0.8.17",
-      // Setting để tối ưu hóa khi compile contract
       settings: {
         optimizer: {
           enabled: true,
           runs: 50
         }
       },
-      disableSmtChecker: true // Tắt chuỗi revert
+      disableSmtChecker: true
     }
   }
 };
