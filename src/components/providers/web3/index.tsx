@@ -66,6 +66,28 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
   useEffect(() => {
     async function initWeb3() {
       try {
+        const { ethereum } = window;
+        const metamaskProvider = ethereum?.providers?.find(
+          (p: any) => p.isMetaMask
+        );
+        const coinbaseProvider = ethereum?.providers?.find(
+          (p: any) => p.isCoinbaseWallet
+        );
+
+        if (
+          metamaskProvider &&
+          typeof ethereum.setSelectedProvider === "function"
+        ) {
+          ethereum.setSelectedProvider(metamaskProvider);
+        }
+
+        if (
+          coinbaseProvider &&
+          typeof ethereum.setSelectedProvider === "function"
+        ) {
+          ethereum.setSelectedProvider(coinbaseProvider);
+        }
+
         const provider = new ethers.providers.Web3Provider(
           window.ethereum as any
         );
