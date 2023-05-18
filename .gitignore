@@ -30,6 +30,7 @@ yarn-error.log*
 .env
 /env
 .env.development
+.env.production
 
 # vercel
 .vercel
@@ -42,9 +43,6 @@ next-env.d.ts
 .history
 
 .vscode/
-
-# dependencies
-public/contracts/
 
 .vscode/
 yarn.lock
