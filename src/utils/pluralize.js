@@ -1,4 +1,6 @@
-const pluralize = (count, noun, suffix = "s") =>
-  `${count} ${noun}${count !== 1 && count !== 0 ? suffix : ""}`;
+const pluralize = (count, noun, locale = "en", suffix = "s") =>
+  `${count} ${noun}${
+    locale === "vi" ? "" : count !== 1 && count !== 0 ? suffix : ""
+  }`;
 
 export default pluralize;

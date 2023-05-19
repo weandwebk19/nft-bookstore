@@ -139,7 +139,9 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
             alignItems="center"
           >
             <Box>
-              <Typography>{pluralize(data?.length, t("result"))}</Typography>
+              <Typography>
+                {pluralize(data?.length, t("result"), router.locale)}
+              </Typography>
             </Box>
             {!(Object.keys(router.query).length === 0) && (
               <Tooltip title={t("clearAllFilter")}>

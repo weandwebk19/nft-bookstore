@@ -1,3 +1,3 @@
 export default function namespaceDefaultLanguage() {
-  return ["common", "navbar", "footer"];
+  return ["common", "navbar", "footer", "button"];
 }

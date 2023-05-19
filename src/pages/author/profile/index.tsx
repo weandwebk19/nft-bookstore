@@ -70,7 +70,7 @@ const defaultValues = {
 };
 
 const Profile = () => {
-  const { t } = useTranslation("profile");
+  const { t } = useTranslation("authorProfile");
   const userInfo = useUserInfo();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -564,7 +564,7 @@ export async function getStaticProps({ locale }: any) {
     props: {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
-        "profile"
+        "authorProfile"
       ]))
     }
   };

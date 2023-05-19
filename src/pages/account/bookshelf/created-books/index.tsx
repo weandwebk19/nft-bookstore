@@ -78,7 +78,7 @@ const CreatedBooks = () => {
 
         <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
           <Grid item xs={4} sm={8} md={9} lg={9}>
-            <ContentPaper title="Created books">
+            <ContentPaper title={t("createdBooksTitle")}>
               {(() => {
                 if (nfts.isLoading) {
                   return (
