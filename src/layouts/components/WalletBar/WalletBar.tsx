@@ -47,6 +47,7 @@ interface WalletBarProps {
   disconnect(...args: unknown[]): unknown;
   isConnected: boolean;
   isAuthor: boolean;
+  createList: ListItemProps[];
 }
 
 const WalletBar = ({
@@ -58,7 +59,8 @@ const WalletBar = ({
   handleLogin,
   disconnect,
   isConnected,
-  isAuthor
+  isAuthor,
+  createList
 }: WalletBarProps) => {
   const { t } = useTranslation();
   const { data, status } = useSession();
@@ -70,24 +72,24 @@ const WalletBar = ({
   );
   const openWalletCard = Boolean(anchorWalletCard);
 
-  const createList: ListItemProps[] = [
-    {
-      type: "button",
-      icon: null,
-      content: "Create Listing",
-      onClick: () => handleCreateListingClick(),
-      disabled: false,
-      subList: []
-    },
-    {
-      type: "button",
-      icon: null,
-      content: "Create Rental",
-      onClick: () => handleCreateRentalClick(),
-      disabled: false,
-      subList: []
-    }
-  ];
+  // const createList: ListItemProps[] = [
+  //   {
+  //     type: "button",
+  //     icon: null,
+  //     content: "Create Listing",
+  //     onClick: () => handleCreateListingClick(),
+  //     disabled: false,
+  //     subList: []
+  //   },
+  //   {
+  //     type: "button",
+  //     icon: null,
+  //     content: "Create Rental",
+  //     onClick: () => handleCreateRentalClick(),
+  //     disabled: false,
+  //     subList: []
+  //   }
+  // ];
 
   const [anchorAccountMenu, setAnchorAccountMenu] = useState<Element | null>(
     null

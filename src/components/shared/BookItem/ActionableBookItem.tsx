@@ -224,12 +224,6 @@ const ActionableBookItem = ({
                 <Typography variant="label">{renterName}</Typography>
               </Stack>
             )}
-            {status === "isBorrowed" && (
-              <Stack>
-                <Typography variant="subtitle2">Borrowed from:</Typography>
-                <Typography variant="label">{renterName}</Typography>
-              </Stack>
-            )}
             {status === "isShared" && (
               <Stack>
                 <Typography variant="subtitle2">Shared by:</Typography>
