@@ -5,6 +5,7 @@ import { Button, Tooltip } from "@mui/material";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 
 import { useAccount } from "@/components/hooks/web3";
 
@@ -19,8 +20,11 @@ const AddToWatchlistButton = ({
   isLastInButtonGroup = false,
   tokenId
 }: AddToWatchlistButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const { account } = useAccount();
   const [isWatched, setIsWatched] = useState<boolean>();
+
   const handleAddToWatchlist = async () => {
     try {
       if (account.data) {
@@ -72,7 +76,11 @@ const AddToWatchlistButton = ({
   }, [tokenId, account.data]);
 
   return (
-    <Tooltip title={isWatched ? "Remove from watchlist" : "Add to watchlist"}>
+    <Tooltip
+      title={
+        isWatched ? t("removeFromWatchlistTitle") : t("addToWatchlistTitle")
+      }
+    >
       <Button
         onClick={isWatched ? handleRemoveFromWatchlist : handleAddToWatchlist}
         size="small"

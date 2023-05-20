@@ -202,7 +202,7 @@ const RevokeLendingButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} {t2("unlistText1") as string}
+                      {borrower} {t2("textUnlist1") as string}
                     </Typography>
                     <Typography>
                       {countDown} {t2("left") as string}

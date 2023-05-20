@@ -3,8 +3,12 @@
   "sharingBooksTitle": "Sharing books",
   "sharedOutBooksTitle": "Shared out books",
   "emptyMessage": "You haven't share any books!",
-  "emptyMessage__sharedOutBooks": "No books have been borrowed yet",
+  "emptyMessage__sharedOutBooks": "No books have been shared yet!",
   "loadingMessage": "Putting books on the shelves...",
   "breadcrumbs_bookshelf": "Bookshelf",
-  "breadcrumbs_sharingBooks": "Sharing books"
+  "breadcrumbs_sharingBooks": "Sharing books",
+  "dialogTitle1": "Revoke all",
+  "dialogTitle2": "Cancel Share",
+  "dialogTitle3": "Revoke",
+  "message": "Are you sure to revoke all the books?"
 }

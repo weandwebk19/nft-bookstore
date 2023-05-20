@@ -133,7 +133,7 @@ const RevokeButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} {t("unlistText3") as string}
+                      {borrower} {t("textRevoke2") as string}
                     </Typography>
                     <Typography>
                       {countDown} {t("left") as string}

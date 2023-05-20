@@ -7,7 +7,6 @@ import {
   Box,
   Button,
   Divider,
-  Grid,
   Stack,
   Step,
   StepLabel,
@@ -19,17 +18,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { TextFieldController } from "@/components/shared/FormController";
-import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
-import { NftBookMeta } from "@/types/nftBook";
 
 import Step1 from "../../ui/publishing/steps/Step1";
 import Step2 from "../../ui/publishing/steps/Step2";
@@ -43,15 +40,6 @@ interface BuyButtonProps {
   supplyAmount: number;
 }
 
-const schema = yup
-  .object({
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
-  })
-  .required();
-
 const defaultValues = {
   amount: 1
 };
@@ -62,6 +50,8 @@ const BuyButton = ({
   price,
   supplyAmount
 }: BuyButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const router = useRouter();
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
@@ -73,7 +63,16 @@ const BuyButton = ({
 
   const [activeStep, setActiveStep] = useState(0);
 
-  const steps = ["Balance checking", "Confirm purchase"];
+  const steps = [t("stepBuy1") as string, t("stepBuy2") as string];
+
+  const schema = yup
+    .object({
+      amount: yup
+        .number()
+        .min(1, t("textErrorBuy1") as string)
+        .typeError(t("textErrorBuy2") as string)
+    })
+    .required();
 
   const getStepContent = () => {
     switch (activeStep) {
@@ -122,16 +121,16 @@ const BuyButton = ({
       try {
         // Handle errors
         if (amount > supplyAmount) {
-          return toast.error(`Amount must be less than ${supplyAmount}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
-        } else if (account.data == seller) {
           return toast.error(
-            "You are not allowed to buy the book published by yourself.",
+            `${t("textErrorBuy3") as string} ${supplyAmount}.`,
             {
               position: toast.POSITION.TOP_CENTER
             }
           );
+        } else if (account.data == seller) {
+          return toast.error(t("textErrorBuy4") as string, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
 
         const tx = await bookStoreContract?.buyBooks(tokenId, seller, amount, {
@@ -139,9 +138,9 @@ const BuyButton = ({
         });
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Processing transaction",
-          success: "Nft Book is yours! Go to Profile page",
-          error: "Processing error"
+          pending: t("pendingBuy") as string,
+          success: t("successBuy") as string,
+          error: t("errorBuy") as string
         });
 
         if (receipt) {
@@ -249,11 +248,11 @@ const BuyButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Buy now
+        {t("buyNowBtn") as string}
       </Button>
 
       <Dialog
-        title="Buy book"
+        title={t("buyNowTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
@@ -332,14 +331,14 @@ const BuyButton = ({
                 {activeStep === steps.length ? (
                   <>
                     <Typography sx={{ mt: 2, mb: 1 }}>
-                      Successfully purchased! Checkout your new book...
+                      {t("textBuyNow1") as string}
                     </Typography>
                     <StyledButton
                       onClick={() => {
                         router.push("/account/bookshelf/owned-books");
                       }}
                     >
-                      My owned books
+                      {t("myOwnedBooksBtn") as string}
                     </StyledButton>
                   </>
                 ) : (
@@ -358,7 +357,7 @@ const BuyButton = ({
                         onClick={handleBack}
                         sx={{ mr: 1 }}
                       >
-                        Back
+                        {t("backBtn") as string}
                       </Button>
                       {activeStep === steps.length - 1 ? (
                         <Button
@@ -366,7 +365,7 @@ const BuyButton = ({
                           color="primary"
                           onClick={handleSubmit(onSubmit)}
                         >
-                          Confirm purchase
+                          {t("confirmPurchaseBtn") as string}
                         </Button>
                       ) : (
                         <Button
@@ -374,7 +373,7 @@ const BuyButton = ({
                           color="primary"
                           onClick={handleNext}
                         >
-                          Next
+                          {t("nextBtn") as string}
                         </Button>
                       )}
                     </Box>

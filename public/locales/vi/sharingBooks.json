@@ -1,9 +1,14 @@
 {
   "titlePage": "Sách đang chia sẻ - NFT Bookstore",
   "sharingBooksTitle": "Sách đang chia sẻ",
+  "sharedOutBooksTitle": "Sách đã có người chia sẻ",
   "emptyMessage": "Bạn chưa chia sẻ quyển sách nào!",
-  "emptyMessage__lentOutBooks": "Chưa có quyển sách nào được thuê!",
+  "emptyMessage__sharedOutBooks": "Chưa có quyển sách nào chia sẻ!",
   "loadingMessage": "Đang đặt sách lên kệ...",
   "breadcrumbs_bookshelf": "Kệ sách",
-  "breadcrumbs_sharingBooks": "Sách đang chia sẻ"
+  "breadcrumbs_sharingBooks": "Sách đang chia sẻ",
+  "dialogTitle1": "Thu hồi toàn bộ",
+  "dialogTitle2": "Hủy chia sẻ",
+  "dialogTitle3": "Thu hồi",
+  "message": "Bạn có chắc muốn thu hồi toàn bộ sách?"
 }
