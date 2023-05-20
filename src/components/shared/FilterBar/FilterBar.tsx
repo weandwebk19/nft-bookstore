@@ -139,7 +139,9 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
             alignItems="center"
           >
             <Box>
-              <Typography>{pluralize(data?.length, t("result"))}</Typography>
+              <Typography>
+                {pluralize(data?.length, t("result"), router.locale)}
+              </Typography>
             </Box>
             {!(Object.keys(router.query).length === 0) && (
               <Tooltip title={t("clearAllFilter")}>
@@ -184,7 +186,8 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
                 sx={{
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
+                  height: 264
                 }}
               >
                 <CircularProgress />

@@ -15,6 +15,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
@@ -68,6 +69,9 @@ const RevokeSharingButton = ({
   tokenId,
   buttonName = "Cancel Share"
 }: RevokeSharingButtonProps) => {
+  const { t } = useTranslation("lendingBooks");
+  const { t: t2 } = useTranslation("bookButtons");
+
   const [sharerName, setSharerName] = useState();
   const { provider, bookSharingContract, bookTemporaryContract } = useWeb3();
   const { account } = useAccount();
@@ -172,12 +176,12 @@ const RevokeSharingButton = ({
         sx={{ width: "100%" }}
         onClick={handleRevokeDiaglogClick}
       >
-        Cancel Share
+        {t2("cancelShareBtn") as string}
       </Button>
 
       {!isEnded && (
         <Dialog
-          title={buttonName}
+          title={t("dialogTitle5") as string}
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
@@ -192,7 +196,9 @@ const RevokeSharingButton = ({
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{sharerName}</Typography>
-                <Typography>Amount: {amount}</Typography>
+                <Typography>
+                  {t2("amount") as string}: {amount}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -205,10 +211,11 @@ const RevokeSharingButton = ({
                 {sharedPer && !isEnded && (
                   <>
                     <Typography>
-                      {sharedPer} is in a rental term duration. Are you sure you
-                      want to revoke this?
+                      {sharedPer} {t2("unlistText3") as string}
                     </Typography>
-                    <Typography>{countDown} left</Typography>
+                    <Typography>
+                      {countDown} {t2("left") as string}
+                    </Typography>
                   </>
                 )}
               </Stack>
@@ -218,10 +225,10 @@ const RevokeSharingButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  No
+                  {t2("noBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Yes
+                  {t2("yesBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>
