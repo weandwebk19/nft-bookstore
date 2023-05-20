@@ -186,7 +186,8 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
                 sx={{
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
+                  height: 264
                 }}
               >
                 <CircularProgress />

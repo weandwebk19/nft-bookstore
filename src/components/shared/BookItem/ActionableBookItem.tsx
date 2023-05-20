@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   Box,
-  Chip,
   Divider,
-  Grid,
   Skeleton,
   Stack,
   Tooltip,
@@ -19,6 +17,7 @@ import TripOriginIcon from "@mui/icons-material/TripOrigin";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useAccount } from "wagmi";
 
 import { useMetadata } from "@/components/hooks/web3";
@@ -71,6 +70,8 @@ const ActionableBookItem = ({
   sharer,
   sharedPerson
 }: ActionableBookItemProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const account = useAccount();
 
   const theme = useTheme();
@@ -220,33 +221,43 @@ const ActionableBookItem = ({
             )}
             {status === "isBorrowed" && (
               <Stack>
-                <Typography variant="subtitle2">Borrowed from:</Typography>
+                <Typography variant="subtitle2">
+                  {t("borrowedFrom") as string}:
+                </Typography>
                 <Typography variant="label">{renterName}</Typography>
               </Stack>
             )}
             {status === "isBorrowed" && (
               <Stack>
-                <Typography variant="subtitle2">Borrowed from:</Typography>
+                <Typography variant="subtitle2">
+                  {t("borrowedFrom") as string}:
+                </Typography>
                 <Typography variant="label">{renterName}</Typography>
               </Stack>
             )}
             {status === "isShared" && (
               <Stack>
-                <Typography variant="subtitle2">Shared by:</Typography>
+                <Typography variant="subtitle2">
+                  {t("sharedBy") as string}:
+                </Typography>
                 <Typography variant="label">{sharerName}</Typography>
               </Stack>
             )}
             {status === "isLending" && borrower && (
               <Tooltip title={borrower}>
                 <Stack>
-                  <Typography variant="subtitle2">Borrowed by:</Typography>
+                  <Typography variant="subtitle2">
+                    {t("borrowedBy") as string}:
+                  </Typography>
                   <Typography variant="label">{borrowerName}</Typography>
                 </Stack>
               </Tooltip>
             )}
             {status === "isSharing" && (
               <Stack>
-                <Typography variant="subtitle2">Shared to:</Typography>
+                <Typography variant="subtitle2">
+                  {t("sharedTo") as string}:
+                </Typography>
                 <Typography variant="label">{sharedPersonName}</Typography>
               </Stack>
             )}
@@ -261,7 +272,7 @@ const ActionableBookItem = ({
               status !== "isListing" && (
                 <NumericContainer
                   icon={<TripOriginIcon fontSize="inherit" color="action" />}
-                  label="Orig. Supply:"
+                  label={`${t("origSupply") as string}:`}
                   amount={quantity}
                 />
               )}
@@ -270,7 +281,7 @@ const ActionableBookItem = ({
               (status === "isOwned" && (
                 <NumericContainer
                   icon={<TripOriginIcon fontSize="inherit" color="action" />}
-                  label="Orig. Supply:"
+                  label={`${t("origSupply") as string}:`}
                   amount={quantity}
                 />
               ))}
@@ -281,7 +292,7 @@ const ActionableBookItem = ({
               status === "isListing") && (
               <NumericContainer
                 icon={<InventoryIcon fontSize="inherit" color="action" />}
-                label="Inventory:"
+                label={`${t("inventory") as string}:`}
                 amount={amount}
               />
             )}
@@ -290,16 +301,20 @@ const ActionableBookItem = ({
               status === "isSharing" ||
               (status === "isLending" && borrower)) && (
               <Stack>
-                <Typography variant="subtitle2">Return in:</Typography>
+                <Typography variant="subtitle2">
+                  {t("returnIn") as string}:
+                </Typography>
                 <Typography variant="label">
-                  {countDown !== "0D:0:0:0" ? countDown : "Ended"}
+                  {countDown !== "0D:0:0:0"
+                    ? countDown
+                    : (t("ended") as string)}
                 </Typography>
               </Stack>
             )}
             {status === "isOwned" && (
               <NumericContainer
                 icon={<InventoryIcon fontSize="inherit" color="action" />}
-                label="Inventory:"
+                label={`${t("inventory") as string}:`}
                 amount={amountOwned}
               />
             )}
@@ -307,7 +322,9 @@ const ActionableBookItem = ({
               status !== "isOwned" &&
               status !== "isPurchased" && (
                 <Stack>
-                  <Typography variant="subtitle2">Price:</Typography>
+                  <Typography variant="subtitle2">
+                    {t("price") as string}:
+                  </Typography>
                   <Typography
                     variant="label"
                     color={`${theme.palette.success.main}`}
@@ -322,7 +339,7 @@ const ActionableBookItem = ({
               <NumericContainer
                 variant="outlined"
                 icon={<SellOutlinedIcon fontSize="inherit" color="action" />}
-                label="Tradeable:"
+                label={`${t("tradeable") as string}:`}
                 amount={amountTradeable}
               />
             )}

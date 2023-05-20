@@ -8,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
@@ -52,6 +53,9 @@ const RevokeLendingButton = ({
   renter,
   tokenId
 }: RevokeLendingButtonProps) => {
+  const { t } = useTranslation("lendingBooks");
+  const { t: t2 } = useTranslation("bookButtons");
+
   const [renterName, setRenterName] = useState();
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
@@ -163,12 +167,12 @@ const RevokeLendingButton = ({
         sx={{ width: "100%" }}
         onClick={handleRevokeDiaglogClick}
       >
-        Cancel Lend
+        {t2("cancelLendBtn") as string}
       </Button>
 
       {!isEnded && (
         <Dialog
-          title="Cancel Lend"
+          title={t("dialogTitle2") as string}
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
@@ -183,7 +187,9 @@ const RevokeLendingButton = ({
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
-                <Typography>Amount: {amount}</Typography>
+                <Typography>
+                  {t2("amount") as string}: {amount}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -196,10 +202,11 @@ const RevokeLendingButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} is in a rental term duration. Are you sure you
-                      want to cacel lending this book?
+                      {borrower} {t2("unlistText1") as string}
                     </Typography>
-                    <Typography>{countDown} left</Typography>
+                    <Typography>
+                      {countDown} {t2("left") as string}
+                    </Typography>
                   </>
                 )}
               </Stack>
@@ -209,10 +216,10 @@ const RevokeLendingButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  No
+                  {t2("noBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Yes
+                  {t2("yesBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

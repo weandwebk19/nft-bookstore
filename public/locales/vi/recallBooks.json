@@ -5,8 +5,8 @@
   "loadingMessage": "Đang đặt sách lên kệ...",
   "breadcrumbs_bookshelf": "Kệ sách",
   "breadcrumbs_revokeBooks": "Sách trả lại",
-  "dialogTitle": "Lấy lại toàn bộ",
-  "message": "Bạn có chắc muốn lấy lại toàn bộ sách?",
+  "dialogTitle": "Thu hồi toàn bộ",
+  "message": "Bạn có chắc muốn thu hồi toàn bộ sách?",
   "button_cancel": "Hủy",
-  "button_revoke": "Lấy lại"
+  "button_revoke": "Thu hồi"
 }

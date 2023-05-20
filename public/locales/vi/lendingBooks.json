@@ -8,10 +8,14 @@
   "button_ownedBooks": "Sách đã sở hữu",
   "breadcrumbs_bookshelf": "Kệ sách",
   "breadcrumbs_lendingBooks": "Sách cho thuê",
-  "dialogTitle": "Lấy lại toàn bộ",
-  "message": "Bạn có chắc muốn lấy lại toàn bộ sách?",
+  "dialogTitle": "Thu hồi toàn bộ",
+  "dialogTitle2": "Hủy cho thuê",
+  "dialogTitle3": "Thu hồi",
+  "dialogTitle4": "Hủy niêm yết",
+  "dialogTitle5": "Hủy chia sẻ",
+  "message": "Bạn có chắc muốn thu hồi toàn bộ sách?",
   "button_cancel": "Hủy",
-  "button_revoke": "Lấy lại",
+  "button_revoke": "Thu hồi",
   "button_yes": "Đồng ý",
   "button_no": "Không"
 }

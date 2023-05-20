@@ -12,6 +12,8 @@ import { StyledButton } from "@/styles/components/Button";
 
 const RevokeAllSharedOutButton = () => {
   const { t } = useTranslation("lendingBooks");
+  const { t: t2 } = useTranslation("bookButtons");
+
   const { provider, bookStoreContract } = useWeb3();
 
   const [anchorRevokeButton, setAnchorRevokeButton] = useState<Element | null>(
@@ -74,7 +76,7 @@ const RevokeAllSharedOutButton = () => {
         customVariant="secondary"
         onClick={(e) => handleOpenRevokeDialogClick(e)}
       >
-        Revoke All
+        {t2("revokeAllBtn") as string}
       </StyledButton>
       <Dialog
         title={t("dialogTitle") as string}

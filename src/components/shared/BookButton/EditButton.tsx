@@ -1,15 +1,16 @@
 import { Button } from "@mui/material";
 
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-
-import { StyledButton } from "@/styles/components/Button";
 
 interface EditButtonProps {
   tokenId: string | number;
 }
 
 const EditButton = ({ tokenId }: EditButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const router = useRouter();
 
   const handleEditBookClick = (tokenId: number | string) => {
@@ -29,7 +30,7 @@ const EditButton = ({ tokenId }: EditButtonProps) => {
       sx={{ width: "100%" }}
       onClick={() => handleEditBookClick(tokenId)}
     >
-      Edit
+      {t("editBtn") as string}
     </Button>
   );
 };
