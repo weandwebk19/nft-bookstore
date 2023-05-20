@@ -9,7 +9,6 @@ import Paper from "@mui/material/Paper";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/Form.module.scss";
 import axios from "axios";
-import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -18,15 +17,11 @@ import * as yup from "yup";
 
 import withAuth from "@/components/HOC/withAuth";
 import withAuthor from "@/components/HOC/withAuthor";
-import { useGenres, useLanguages } from "@/components/hooks/api";
-import { useUserInfo } from "@/components/hooks/api/useUserInfo";
-import { useAccount, useBookDetail, useNetwork } from "@/components/hooks/web3";
-import { useWeb3 } from "@/components/providers/web3";
+import { useBookDetail } from "@/components/hooks/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
   AutoCompleteController,
-  MultipleSelectController,
   TextAreaController,
   TextFieldController
 } from "@/components/shared/FormController";

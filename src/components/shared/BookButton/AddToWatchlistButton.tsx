@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Button, Tooltip } from "@mui/material";
 
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderOutlinedIcon from "@mui/icons-material/BookmarkBorderOutlined";
 
 import axios from "axios";
@@ -88,9 +89,13 @@ const AddToWatchlistButton = ({
             borderTopRightRadius: 0
           })
         }}
-        variant={isWatched ? "contained" : "outlined"}
+        variant="outlined"
       >
-        <BookmarkBorderOutlinedIcon fontSize="small" />
+        {isWatched ? (
+          <BookmarkIcon fontSize="small" />
+        ) : (
+          <BookmarkBorderOutlinedIcon fontSize="small" />
+        )}
       </Button>
     </Tooltip>
   );
