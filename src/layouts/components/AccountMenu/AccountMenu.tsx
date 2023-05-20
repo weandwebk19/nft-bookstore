@@ -33,6 +33,7 @@ import { signOut } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import PropTypes from "prop-types";
+import { useAccount, useConnect } from "wagmi";
 
 import images from "@/assets/images";
 import { useUserInfo } from "@/components/hooks/api/useUserInfo";
@@ -58,6 +59,8 @@ const AccountMenu = ({
   disconnect,
   isAuthor
 }: AccountMenuProps) => {
+  const { connector } = useAccount();
+
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -158,7 +161,7 @@ const AccountMenu = ({
             spacing={3}
           >
             <Stack
-              direction="row"
+              spacing={2}
               justifyContent="space-between"
               sx={{
                 border: "1px solid ",
@@ -168,19 +171,11 @@ const AccountMenu = ({
             >
               <Stack
                 alignItems="center"
+                justifyContent="space-between"
                 sx={{
                   flexDirection: { xs: "column", md: "row" }
                 }}
               >
-                <Avatar
-                  alt="{userName}"
-                  src=""
-                  sx={{
-                    width: 56,
-                    height: 56,
-                    mr: { xs: 0, md: 2 }
-                  }}
-                />
                 <Stack
                   sx={{
                     textAlign: { xs: "center", md: "start" }
@@ -189,56 +184,70 @@ const AccountMenu = ({
                   <Typography variant="subtitle2">User name</Typography>
                   <Typography>{userName}</Typography>
                 </Stack>
-              </Stack>
-              <Divider orientation="vertical" variant="middle" flexItem />
-              <Box>
-                <Stack
-                  alignItems="center"
+                <Avatar
+                  alt={userName}
+                  src={avatar}
                   sx={{
-                    flexDirection: { xs: "column", md: "row" }
+                    width: 56,
+                    height: 56
+                  }}
+                />
+              </Stack>
+
+              <Stack
+                alignItems="center"
+                sx={{
+                  flexDirection: { xs: "column", md: "row" }
+                }}
+              >
+                <Stack
+                  sx={{
+                    textAlign: { xs: "center", md: "start" }
                   }}
                 >
-                  <Avatar
-                    alt={userName}
-                    src={avatar}
-                    sx={{
-                      width: 56,
-                      height: 56,
-                      mr: { xs: 0, md: 2 }
-                    }}
-                  />
-                  <Stack
-                    sx={{
-                      textAlign: { xs: "center", md: "start" }
-                    }}
-                  >
-                    <Typography variant="subtitle2">Wallet</Typography>
-                    <Typography>Metamask</Typography>
-                  </Stack>
+                  <Typography variant="subtitle2" gutterBottom>
+                    Wallet
+                  </Typography>
+                  <Typography>{connector?.name}</Typography>
                 </Stack>
-              </Box>
-            </Stack>
-            <Stack direction="row" justifyContent="space-between">
-              <Stack direction="row" alignItems="center">
-                <Avatar sx={{ mr: 1 }} />
-                <Link href="#" underline="hover">
-                  {truncate(account, 12, -4)}
-                </Link>
               </Stack>
-              <Tooltip title="Copy address">
-                <IconButton>
-                  <ContentCopyIcon color="primary" fontSize="small" />
-                </IconButton>
-              </Tooltip>
+
+              <Stack
+                sx={{
+                  textAlign: { xs: "center", md: "start" }
+                }}
+              >
+                <Typography variant="subtitle2">Address</Typography>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Link href="#" underline="hover">
+                    {truncate(account, 12, -4)}
+                  </Link>
+                  <Tooltip title="Copy address">
+                    <IconButton>
+                      <ContentCopyIcon color="primary" fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Stack>
             </Stack>
-            <StyledButton customVariant="secondary">
-              <OpenInNewOutlinedIcon
-                color="primary"
-                fontSize="small"
-                sx={{ mr: 1 }}
-              />
-              <Typography>Etherscan</Typography>
-            </StyledButton>
+
+            <Link
+              href={`https://etherscan.io/address/${account}`}
+              target="_blank"
+            >
+              <StyledButton customVariant="secondary" sx={{ width: "100%" }}>
+                <OpenInNewOutlinedIcon
+                  color="primary"
+                  fontSize="small"
+                  sx={{ mr: 1 }}
+                />
+                <Typography>Etherscan</Typography>
+              </StyledButton>
+            </Link>
           </Stack>
         </Grid>
         <Grid item xs={4} md={6}>

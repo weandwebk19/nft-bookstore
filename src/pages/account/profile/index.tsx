@@ -79,10 +79,7 @@ const Profile = () => {
   const schema = yup
     .object({
       fullname: yup.string().required(t("textError1") as string),
-      email: yup
-        .string()
-        .required(t("textError2") as string)
-        .email(t("textError3") as string),
+      email: yup.string().email(t("textError3") as string),
       bio: yup.string(),
       website: yup.string(),
       walletAddress: yup.string(),
@@ -366,7 +363,7 @@ const Profile = () => {
                           </FormGroup>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <FormGroup label={t("email") as string} required>
+                          <FormGroup label={t("email") as string}>
                             <TextFieldController name="email" />
                           </FormGroup>
                         </Grid>

@@ -420,7 +420,7 @@ const NavBar = () => {
     session
       ? {
           type: "button",
-          icon: <Avatar alt="Remy Sharp" src="" />,
+          icon: <Avatar alt={userInfo?.fullname} src={userInfo?.avatar} />,
           content: `${truncate(address ? address : "", 6, -4)}`,
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleAccountMenuClick(e);

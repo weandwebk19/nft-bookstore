@@ -171,7 +171,7 @@ const WalletBar = ({
           )}
           <Tooltip title={t("navbar:toolTip_accountMenu")}>
             <IconButton onClick={handleAccountMenuClick}>
-              <Avatar alt="Remy Sharp" src="" />
+              <Avatar alt={userName} src={avatar} />
             </IconButton>
           </Tooltip>
         </Stack>
