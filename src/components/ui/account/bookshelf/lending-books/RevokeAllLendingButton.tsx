@@ -18,6 +18,7 @@ interface CancelAllLendingButtonProps {
 
 const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
   const { t } = useTranslation("lendingBooks");
+  const { t: t2 } = useTranslation("bookButtons");
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
 
@@ -97,7 +98,7 @@ const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
         customVariant="secondary"
         onClick={(e) => handleOpenRevokeDialogClick(e)}
       >
-        Cancel All
+        {t2("cancelAllBtn") as string}
       </StyledButton>
       <Dialog
         title={t("dialogTitle") as string}

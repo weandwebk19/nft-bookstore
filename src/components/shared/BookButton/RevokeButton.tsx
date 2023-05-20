@@ -5,6 +5,7 @@ import { Box, Grid, Stack, Typography } from "@mui/material";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
@@ -36,6 +37,8 @@ const RevokeButton = ({
   handleRevoke,
   buttonName = "Revoke"
 }: RevokeButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const [renterName, setRenterName] = useState();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
@@ -95,12 +98,12 @@ const RevokeButton = ({
         onClick={handleRevokeDiaglogClick}
         customVariant={isEnded ? "primary" : "secondary"}
       >
-        {buttonName}
+        {t("revoke") as string}
       </StyledButton>
 
       {!isEnded && (
         <Dialog
-          title={buttonName}
+          title={t("revokeTitle") as string}
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
@@ -115,7 +118,9 @@ const RevokeButton = ({
                 />
                 <Typography variant="h5">{title}</Typography>
                 <Typography>{renterName}</Typography>
-                <Typography>Amount: {amount}</Typography>
+                <Typography>
+                  {t("amount") as string}: {amount}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -128,10 +133,11 @@ const RevokeButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} is in a rental term duration. Are you sure you
-                      want to revoke this?
+                      {borrower} {t("unlistText3") as string}
                     </Typography>
-                    <Typography>{countDown} left</Typography>
+                    <Typography>
+                      {countDown} {t("left") as string}
+                    </Typography>
                   </>
                 )}
               </Stack>
@@ -141,10 +147,10 @@ const RevokeButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Revoke
+                  {t("revokeBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>
