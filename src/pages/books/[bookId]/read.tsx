@@ -50,7 +50,7 @@ async function decryptPdfFile(
   // URL.revokeObjectURL(link.href);
 }
 
-const SUPPORT_FILE_TYPE = ["epub", "pdf"]
+const SUPPORT_FILE_TYPE = ["epub", "pdf"];
 const ReadBook = () => {
   const [tokenId, setTokenId] = useState();
   const [linkPdf, setLinkPdf] = useState<string>();
@@ -84,31 +84,37 @@ const ReadBook = () => {
           headers: {
             Accept: "application/pdf application/epub+zip"
           }
-        }).then(async function (response) {
-          const cipherText = new Uint8Array(response.data);
-          if (tokenId) {
-            const secrectKey = (await bookStoreContract!.getSecretKey(
-              tokenId
-            )) as unknown as string[];
-            if (secrectKey.length === 2) {
-              const privateKey = await Crypto.generateKey(secrectKey[1]);
-              const iv = convertHexStringToUint8Array(secrectKey[0]);
-              const link = (await decryptPdfFile(
-                cipherText,
-                privateKey,
-                iv
-              )) as string;
-              if (SUPPORT_FILE_TYPE.includes(metaDataType)) {
-                setFileType(metaDataType);
-                if (metaDataType === "pdf") {
-                  setLinkPdf(link);
-                } else {
-                  setLinkEpub(link);
+        })
+          .then(async function (response) {
+            const cipherText = new Uint8Array(response.data);
+            if (tokenId) {
+              const secrectKey = (await bookStoreContract!.getSecretKey(
+                tokenId
+              )) as unknown as string[];
+              if (secrectKey.length === 2) {
+                const privateKey = await Crypto.generateKey(secrectKey[1]);
+                const iv = convertHexStringToUint8Array(secrectKey[0]);
+                const link = (await decryptPdfFile(
+                  cipherText,
+                  privateKey,
+                  iv
+                )) as string;
+                if (SUPPORT_FILE_TYPE.includes(metaDataType)) {
+                  setFileType(metaDataType);
+                  if (metaDataType === "pdf") {
+                    setLinkPdf(link);
+                  } else {
+                    setLinkEpub(link);
+                  }
                 }
               }
             }
-          }
-        });
+          })
+          .catch((err) => {
+            if (err.code === "ERR_NETWORK") {
+              window.alert("Disable your adblock and try again!");
+            }
+          });
       }
       setDecrypting(false);
     })();
