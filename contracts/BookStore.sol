@@ -223,8 +223,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return newTokenId;
   }
 
-  function getSecretKey(uint tokenId) 
-    public view returns (string[] memory) {
+  function getSecretKey(uint tokenId) public view returns (string[] memory) {
     // Need check is readable?
     if (!isBookReadableByUser(tokenId)) {
       revert Error.NoReadingPermissionError(tokenId);
@@ -469,6 +468,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
       msg.sender,
       msg.value
     );
+
     _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
     payable(renter).transfer(totalPrice);
   }
