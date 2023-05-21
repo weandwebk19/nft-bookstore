@@ -51,7 +51,8 @@ export async function getStaticProps({ locale }: any) {
         ...namespaceDefaultLanguage(),
         "filter",
         "fallback",
-        "borrowBooks"
+        "borrowBooks",
+        "bookButtons"
       ]))
     }
   };

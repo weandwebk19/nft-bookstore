@@ -7,7 +7,6 @@ import {
   Box,
   Button,
   Divider,
-  Grid,
   Stack,
   Step,
   StepLabel,
@@ -19,14 +18,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { InputController } from "@/components/shared/FormController";
-import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistory } from "@/components/utils";
 import { getGasFee } from "@/components/utils/getGasFee";
@@ -45,15 +43,6 @@ interface TakeButtonProps {
   supplyAmount: number;
 }
 
-const schema = yup
-  .object({
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
-  })
-  .required();
-
 const defaultValues = {
   amount: 1
 };
@@ -67,6 +56,8 @@ const TakeButton = ({
   price,
   supplyAmount
 }: TakeButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const router = useRouter();
   const [sharerName, setSharerName] = useState();
   const { provider, bookStoreContract, bookSharingContract } = useWeb3();
@@ -78,7 +69,16 @@ const TakeButton = ({
 
   const [activeStep, setActiveStep] = useState(0);
 
-  const steps = ["Balance checking", "Confirm purchase"];
+  const steps = [t("stepTake1") as string, t("stepTake2") as string];
+
+  const schema = yup
+    .object({
+      amount: yup
+        .number()
+        .min(1, t("textErrorTake1") as string)
+        .typeError(t("textErrorTake2") as string)
+    })
+    .required();
 
   const getStepContent = () => {
     switch (activeStep) {
@@ -128,12 +128,9 @@ const TakeButton = ({
       try {
         // Handle errors
         if (account.data == sharer || account.data == fromRenter) {
-          return toast.error(
-            "You are not allowed to take the book shared or lent by yourself.",
-            {
-              position: toast.POSITION.TOP_CENTER
-            }
-          );
+          return toast.error(t("textErrorTake4") as string, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
 
         const idBooksOnSharing = await bookSharingContract!.getIdBookOnSharing(
@@ -152,9 +149,9 @@ const TakeButton = ({
         );
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Processing transaction",
-          success: "Nft Book is yours! Go to Profile page",
-          error: "Processing error"
+          pending: t("pendingTake") as string,
+          success: t("successTake") as string,
+          error: t("errorTake") as string
         });
 
         if (receipt) {
@@ -256,11 +253,11 @@ const TakeButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Take now
+        {t("takeNowBtn") as string}
       </Button>
 
       <Dialog
-        title="Take book on share"
+        title={t("takeNowTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
@@ -339,14 +336,14 @@ const TakeButton = ({
                 {activeStep === steps.length ? (
                   <>
                     <Typography sx={{ mt: 2, mb: 1 }}>
-                      Successfully purchased! Checkout your new book...
+                      {t("textTakeNow1") as string}
                     </Typography>
                     <StyledButton
                       onClick={() => {
                         router.push("/account/bookshelf/owned-books");
                       }}
                     >
-                      My owned books
+                      {t("myOwnedBooksBtn") as string}
                     </StyledButton>
                   </>
                 ) : (
@@ -365,7 +362,7 @@ const TakeButton = ({
                         onClick={handleBack}
                         sx={{ mr: 1 }}
                       >
-                        Back
+                        {t("backBtn") as string}
                       </Button>
                       {activeStep === steps.length - 1 ? (
                         <Button
@@ -373,7 +370,7 @@ const TakeButton = ({
                           color="primary"
                           onClick={handleSubmit(onSubmit)}
                         >
-                          Confirm purchase
+                          {t("confirmPurchaseBtn") as string}
                         </Button>
                       ) : (
                         <Button
@@ -381,7 +378,7 @@ const TakeButton = ({
                           color="primary"
                           onClick={handleNext}
                         >
-                          Next
+                          {t("nextBtn") as string}
                         </Button>
                       )}
                     </Box>

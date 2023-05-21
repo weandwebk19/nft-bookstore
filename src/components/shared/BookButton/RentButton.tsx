@@ -7,7 +7,6 @@ import {
   Box,
   Button,
   Divider,
-  Grid,
   Stack,
   Step,
   StepLabel,
@@ -19,14 +18,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { TextFieldController } from "@/components/shared/FormController";
-import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistory } from "@/components/utils";
 import { getGasFee } from "@/components/utils/getGasFee";
@@ -43,19 +41,6 @@ interface RentButtonProps {
   supplyAmount: number;
 }
 
-const schema = yup
-  .object({
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number"),
-    rentalDays: yup
-      .number()
-      .min(1, `The day must be higher than 0.`)
-      .typeError("Rental days must be a number")
-  })
-  .required();
-
 const defaultValues = {
   amount: 1,
   rentalDays: 7
@@ -67,6 +52,8 @@ const RentButton = ({
   price,
   supplyAmount
 }: RentButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const router = useRouter();
   const [renterName, setAuthorName] = useState();
   const { provider, bookStoreContract } = useWeb3();
@@ -78,7 +65,20 @@ const RentButton = ({
 
   const [activeStep, setActiveStep] = useState(0);
 
-  const steps = ["Balance checking", "Confirm purchase"];
+  const steps = [t("stepRent1") as string, t("stepRent2") as string];
+
+  const schema = yup
+    .object({
+      amount: yup
+        .number()
+        .min(0, t("textErrorRent1") as string)
+        .typeError(t("textErrorRent2") as string),
+      rentalDays: yup
+        .number()
+        .min(0, t("textErrorRent3") as string)
+        .typeError(t("textErrorRent4") as string)
+    })
+    .required();
 
   const getStepContent = () => {
     switch (activeStep) {
@@ -128,20 +128,20 @@ const RentButton = ({
       try {
         // Handle errors
         if (rentalDuration < 604800) {
-          return toast.error("Minimum borrow book period is 7 days", {
+          return toast.error(t("textErrorRent5") as string, {
             position: toast.POSITION.TOP_CENTER
           });
         } else if (amount > supplyAmount) {
-          return toast.error(`Amount must be less than ${supplyAmount}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
-        } else if (account.data == renter) {
           return toast.error(
-            "You are not allowed to borrow the book lent by yourself.",
+            `${t("textErrorRent6") as string} ${supplyAmount}.`,
             {
               position: toast.POSITION.TOP_CENTER
             }
           );
+        } else if (account.data == renter) {
+          return toast.error(t("textErrorRent7") as string, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
 
         const value = ((price * amount * rentalDuration) / 604800).toFixed(3);
@@ -157,9 +157,9 @@ const RentButton = ({
         );
 
         const receipt = await toast.promise(tx!.wait(), {
-          pending: "Processing transaction",
-          success: "Nft is yours! Go to Profile page",
-          error: "Processing error"
+          pending: t("pendingRent") as string,
+          success: t("successRent") as string,
+          error: t("errorRent") as string
         });
 
         if (receipt) {
@@ -275,11 +275,11 @@ const RentButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Rent now
+        {t("rentNowBtn") as string}
       </Button>
 
       <Dialog
-        title="Rent book"
+        title={t("rentNowTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
@@ -316,14 +316,14 @@ const RentButton = ({
                 {activeStep === steps.length ? (
                   <>
                     <Typography sx={{ mt: 2, mb: 1 }}>
-                      Successfully rented!
+                      {t("textRentNow1") as string}
                     </Typography>
                     <StyledButton
                       onClick={() => {
                         router.push("/account/bookshelf/owned-books");
                       }}
                     >
-                      My borrowed books
+                      {t("myBorrowedBooksBtn") as string}
                     </StyledButton>
                   </>
                 ) : (
@@ -342,7 +342,7 @@ const RentButton = ({
                         onClick={handleBack}
                         sx={{ mr: 1 }}
                       >
-                        Back
+                        {t("backBtn") as string}
                       </Button>
                       {activeStep === steps.length - 1 ? (
                         <Button
@@ -350,7 +350,7 @@ const RentButton = ({
                           color="primary"
                           onClick={handleSubmit(onSubmit)}
                         >
-                          Confirm purchase
+                          {t("confirmPurchaseBtn") as string}
                         </Button>
                       ) : (
                         <Button
@@ -358,7 +358,7 @@ const RentButton = ({
                           color="primary"
                           onClick={handleNext}
                         >
-                          Next
+                          {t("nextBtn") as string}
                         </Button>
                       )}
                     </Box>

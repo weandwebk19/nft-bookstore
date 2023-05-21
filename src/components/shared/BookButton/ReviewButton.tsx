@@ -3,20 +3,19 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Button, Divider, Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
-import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import {
   RatingController,
-  TextAreaController,
-  TextFieldController
+  TextAreaController
 } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
@@ -43,6 +42,8 @@ const defaultValues = {
 };
 
 const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const [authorName, setAuthorName] = useState();
   const [reviews, setReviews] = useState<any>();
   const { metadata } = useMetadata(tokenId);
@@ -83,7 +84,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
       };
       const reviewRes = await axios.post(`/api/reviews/create`, newReview);
       if (reviewRes.data.success === true) {
-        toast.success("Review book successfully.");
+        toast.success(t("textReview1") as string);
         setReviews(newReview);
       } else {
         toast.error(`${reviewRes.data.message}.`, {
@@ -104,7 +105,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
       reviewInfo: review
     });
     if (res.data.success === true) {
-      toast.success("Update review successfully.");
+      toast.success(t("textReview2") as string);
     } else {
       toast.error(`${res.data.message}.`, {
         position: toast.POSITION.TOP_CENTER
@@ -180,10 +181,14 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
         sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        {reviews ? "reviewed" : "review"}
+        {reviews ? t("reviewedBtn") : t("reviewBtn")}
       </Button>
 
-      <Dialog title="Review" open={openBookCard} onClose={handleBookCardClose}>
+      <Dialog
+        title={t("reviewTitle") as string}
+        open={openBookCard}
+        onClose={handleBookCardClose}
+      >
         <FormProvider {...methods}>
           <Stack spacing={3} sx={{ overflowX: "hidden" }}>
             <Stack
@@ -207,8 +212,8 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
               <ContentGroup
                 title={
                   reviews
-                    ? "You can edit your review"
-                    : "Leave your rating here"
+                    ? (t("textReview3") as string)
+                    : (t("textReview4") as string)
                 }
               >
                 {/* Waiting for your signing... */}
@@ -227,7 +232,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
                       defaultValue={reviews?.rating}
                     />
                   </Box>
-                  <FormGroup label="Review">
+                  <FormGroup label={t("reviewTitle") as string}>
                     <TextAreaController
                       name="review"
                       maxCharacters={8000}
@@ -242,15 +247,15 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn")}
                 </StyledButton>
                 {reviews ? (
                   <StyledButton onClick={handleSubmit(onEditSubmit)}>
-                    Edit review
+                    {t("editReviewBtn")}
                   </StyledButton>
                 ) : (
                   <StyledButton onClick={handleSubmit(onSubmit)}>
-                    Send review
+                    {t("sendReviewBtn")}
                   </StyledButton>
                 )}
               </Box>
