@@ -74,6 +74,8 @@ const LendingBooks = () => {
     })();
   };
 
+  console.log(lendingBooks);
+
   return (
     <>
       <Head>

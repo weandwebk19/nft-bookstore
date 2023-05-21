@@ -101,30 +101,29 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
               <CssBaseline />
               {/* <Cursor /> */}
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={router.route}
-                  initial="initialState"
-                  animate="animateState"
-                  exit="exitState"
-                  className="base-page-size"
-                  transition={{ duration: 0.2 }}
-                  variants={{
-                    initialState: {
-                      opacity: 0,
-                      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
-                    },
-                    animateState: {
-                      opacity: 1,
-                      clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
-                    },
-                    exitState: {
-                      clipPath: "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
-                    }
-                  }}
-                >
-                  <Portal>
-                    <Loading />
-
+                <Portal>
+                  <Loading />
+                  <motion.div
+                    key={router.route}
+                    initial="initialState"
+                    animate="animateState"
+                    exit="exitState"
+                    className="base-page-size"
+                    transition={{ duration: 0.2 }}
+                    variants={{
+                      initialState: {
+                        opacity: 0,
+                        clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
+                      },
+                      animateState: {
+                        opacity: 1,
+                        clipPath: "polygon(0 0, 100% 0, 100% 100%, 0% 100%)"
+                      },
+                      exitState: {
+                        clipPath: "polygon(50% 0, 50% 0, 50% 100%, 50% 100%)"
+                      }
+                    }}
+                  >
                     {Component.PageLayout ? (
                       <Component.PageLayout>
                         <Component {...pageProps} />
@@ -134,10 +133,9 @@ function App({ Component, pageProps }: ComponentWithPageLayout) {
                         <Component {...pageProps} />
                       </DefaultLayout>
                     )}
-
-                    <ScrollButton />
-                  </Portal>
-                </motion.div>
+                  </motion.div>
+                  <ScrollButton />
+                </Portal>
               </AnimatePresence>
             </MyThemeContextProvider>
           </SessionProvider>

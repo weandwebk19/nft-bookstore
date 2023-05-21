@@ -216,71 +216,93 @@ const ActionableBookItem = ({
               {metadata.data?.title}
             </Typography>
 
-            {status !== "isCreated" && (
-              <Typography variant="body2">{ownerName}</Typography>
-            )}
+            <Stack spacing={1} mb={2}>
+              {status !== "isCreated" && (
+                <Typography variant="body2">{ownerName}</Typography>
+              )}
 
-            {status === "isBorrowed" && (
-              <Stack>
-                <Typography variant="subtitle2">
-                  {t("borrowedFrom") as string}:
-                </Typography>
-                <Typography variant="label">{renterName}</Typography>
-              </Stack>
-            )}
-            {status === "isShared" && (
-              <Stack>
-                <Typography variant="subtitle2">
-                  {t("sharedBy") as string}:
-                </Typography>
-                <Typography variant="label">{sharerName}</Typography>
-              </Stack>
-            )}
-            {status === "isLending" && borrower && (
-              <Tooltip title={borrower}>
+              {status === "isBorrowed" && (
                 <Stack>
                   <Typography variant="subtitle2">
-                    {t("borrowedBy") as string}:
+                    {t("borrowedFrom") as string}:
                   </Typography>
-                  <Typography variant="label">{borrowerName}</Typography>
+                  <Typography variant="label">{renterName}</Typography>
                 </Stack>
-              </Tooltip>
-            )}
-            {status === "isSharing" && (
-              <Stack>
-                <Typography variant="subtitle2">
-                  {t("sharedTo") as string}:
-                </Typography>
-                <Typography variant="label">{sharedPersonName}</Typography>
-              </Stack>
-            )}
+              )}
+              {status === "isShared" && (
+                <Stack>
+                  <Typography variant="subtitle2">
+                    {t("sharedBy") as string}:
+                  </Typography>
+                  <Typography variant="label">{sharerName}</Typography>
+                </Stack>
+              )}
+              {status === "isLending" && renter && (
+                <Tooltip title={renter}>
+                  <Stack>
+                    <Typography variant="subtitle2">
+                      {t("borrowedFrom") as string}:
+                    </Typography>
+                    <Typography variant="label">{renterName}</Typography>
+                  </Stack>
+                </Tooltip>
+              )}
+              {status === "isLending" && borrower && (
+                <Tooltip title={borrower}>
+                  <Stack>
+                    <Typography variant="subtitle2">
+                      {t("borrowedBy") as string}:
+                    </Typography>
+                    <Typography variant="label">{borrowerName}</Typography>
+                  </Stack>
+                </Tooltip>
+              )}
+              {status === "isSharing" && renter && (
+                <Stack>
+                  <Typography variant="subtitle2">
+                    {t("borrowedFrom") as string}:
+                  </Typography>
+                  <Typography variant="label">{renterName}</Typography>
+                </Stack>
+              )}
+              {status === "isSharing" && sharedPerson && (
+                <Stack>
+                  <Typography variant="subtitle2">
+                    {t("sharedTo") as string}:
+                  </Typography>
+                  <Typography variant="label">{sharedPersonName}</Typography>
+                </Stack>
+              )}
+            </Stack>
           </Stack>
 
           <Divider />
 
           <Stack spacing={2} mt={2}>
-            {status !== "isCreated" &&
+            {/* {status !== "isCreated" &&
               status !== "isOwned" &&
               status !== "isPurchased" &&
-              status !== "isListing" && (
+              status !== "isShared" &&
+              status !== "isListing" &&
+              status !== "isSharing" && (
                 <NumericContainer
                   icon={<TripOriginIcon fontSize="inherit" color="action" />}
                   label={`${t("origSupply") as string}:`}
                   amount={quantity}
                 />
-              )}
+              )} */}
 
-            {status === "isCreated" ||
-              (status === "isOwned" && (
-                <NumericContainer
-                  icon={<TripOriginIcon fontSize="inherit" color="action" />}
-                  label={`${t("origSupply") as string}:`}
-                  amount={quantity}
-                />
-              ))}
+            {(status === "isCreated" || status === "isOwned") && (
+              <NumericContainer
+                icon={<TripOriginIcon fontSize="inherit" color="action" />}
+                label={`${t("origSupply") as string}:`}
+                amount={quantity}
+              />
+            )}
             {(status === "isPurchased" ||
               status === "isLending" ||
               status === "isBorrowed" ||
+              status === "isShared" ||
               status === "isSharing" ||
               status === "isListing") && (
               <NumericContainer
