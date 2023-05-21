@@ -11,7 +11,7 @@ import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 
 const RevokeAllSharedOutButton = () => {
-  const { t } = useTranslation("lendingBooks");
+  const { t } = useTranslation("sharingBooks");
   const { t: t2 } = useTranslation("bookButtons");
 
   const { provider, bookStoreContract } = useWeb3();
@@ -79,7 +79,7 @@ const RevokeAllSharedOutButton = () => {
         {t2("revokeAllBtn") as string}
       </StyledButton>
       <Dialog
-        title={t("dialogTitle") as string}
+        title={t("dialogTitle1") as string}
         open={openRevokeDialog}
         onClose={handleRevokeClose}
       >
@@ -90,10 +90,10 @@ const RevokeAllSharedOutButton = () => {
               customVariant="secondary"
               onClick={(e) => handleCancelClick(e)}
             >
-              {t("button_cancel")}
+              {t2("cancelBtn") as string}
             </StyledButton>
             <StyledButton onClick={(e) => handleRevokeClick(e)}>
-              {t("button_revoke")}
+              {t2("revokeBtn") as string}
             </StyledButton>
           </Stack>
         </Stack>

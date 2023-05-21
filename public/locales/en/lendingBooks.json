@@ -11,8 +11,6 @@
   "dialogTitle": "Revoke all",
   "dialogTitle2": "Cancel Lend",
   "dialogTitle3": "Revoke",
-  "dialogTitle4": "Unlist",
-  "dialogTitle5": "Cancel Share",
   "message": "Are you sure to revoke all the books?",
   "button_cancel": "Cancel",
   "button_revoke": "Revoke",

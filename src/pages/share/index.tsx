@@ -49,10 +49,10 @@ export async function getStaticProps({ locale }: any) {
     props: {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
-
         "filter",
         "fallback",
-        "shareBooks"
+        "shareBooks",
+        "bookButtons"
       ]))
     }
   };

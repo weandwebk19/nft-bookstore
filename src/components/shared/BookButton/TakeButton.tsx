@@ -19,16 +19,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
-import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import {
-  InputController,
-  NumericStepperController
-} from "@/components/shared/FormController";
+import { NumericStepperController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistory } from "@/components/utils";
@@ -45,15 +42,6 @@ interface TakeButtonProps {
   supplyAmount: number;
 }
 
-const schema = yup
-  .object({
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
-  })
-  .required();
-
 const defaultValues = {
   amount: 1
 };
@@ -67,7 +55,8 @@ const TakeButton = ({
   price,
   supplyAmount
 }: TakeButtonProps) => {
-  const router = useRouter();
+  const { t } = useTranslation("bookButtons");
+
   const [sharerName, setSharerName] = useState();
   const { provider, bookStoreContract, bookSharingContract } = useWeb3();
   const { account } = useAccount();
@@ -75,6 +64,15 @@ const TakeButton = ({
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
+
+  const schema = yup
+    .object({
+      amount: yup
+        .number()
+        .min(1, t("textErrorTake1") as string)
+        .typeError(t("textErrorTake2") as string)
+    })
+    .required();
 
   const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorBookCard(e.currentTarget);
@@ -108,12 +106,9 @@ const TakeButton = ({
       try {
         // Handle errors
         if (account.data == sharer || account.data == fromRenter) {
-          return toast.error(
-            "You are not allowed to take the book shared or lent by yourself.",
-            {
-              position: toast.POSITION.TOP_CENTER
-            }
-          );
+          return toast.error(t("textErrorTake4") as string, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
 
         const idBooksOnSharing = await bookSharingContract!.getIdBookOnSharing(
@@ -132,9 +127,9 @@ const TakeButton = ({
         );
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Processing transaction",
-          success: "Nft Book is yours! Go to Profile page",
-          error: "Processing error"
+          pending: t("pendingTake") as string,
+          success: t("successTake") as string,
+          error: t("errorTake") as string
         });
 
         if (receipt) {
@@ -236,11 +231,11 @@ const TakeButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Take now
+        {t("takeNowBtn") as string}
       </Button>
 
       <Dialog
-        title="Take book on share"
+        title={t("takeNowTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
@@ -276,9 +271,11 @@ const TakeButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Amount" required>
+                <FormGroup label={t("amount") as string} required>
                   <NumericStepperController name="amount" />
-                  <Typography>{supplyAmount} left</Typography>
+                  <Typography>
+                    {supplyAmount} {t("left") as string}
+                  </Typography>
                 </FormGroup>
               </Stack>
               <Divider />
@@ -287,7 +284,7 @@ const TakeButton = ({
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography>Total:</Typography>
+                <Typography>{t("total") as string}:</Typography>
                 <Typography variant="h6">{totalPayment} ETH</Typography>
               </Stack>
               <Typography
@@ -295,7 +292,7 @@ const TakeButton = ({
                 variant="caption"
                 sx={{ textAlign: "end" }}
               >
-                Gas fee not included
+                {t("gasFee") as string}
               </Typography>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <StyledButton
@@ -303,10 +300,10 @@ const TakeButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Confirm purchase
+                  {t("confirmPurchaseBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

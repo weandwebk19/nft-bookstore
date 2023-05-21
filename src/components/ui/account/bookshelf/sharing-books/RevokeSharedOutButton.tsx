@@ -39,7 +39,7 @@ const RevokeSharedOutButton = ({
   tokenId,
   buttonName = "Revoke"
 }: RevokeSharedOutButtonProps) => {
-  const { t } = useTranslation("lendingBooks");
+  const { t } = useTranslation("sharingBooks");
   const { t: t2 } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
@@ -198,7 +198,7 @@ const RevokeSharedOutButton = ({
                 {sharer && !isEnded && (
                   <>
                     <Typography>
-                      {sharer} {t2("unlistText2") as string}
+                      {sharer} {t2("textRevoke1") as string}
                     </Typography>
                     <Typography>
                       {countDown} {t2("left") as string}

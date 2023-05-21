@@ -3,16 +3,18 @@ import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import { useMetadata } from "@/components/hooks/web3";
-import { StyledButton } from "@/styles/components/Button";
 
 interface ReadButtonProps {
   tokenId: number;
 }
 
 const ReadButton = ({ tokenId }: ReadButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const router = useRouter();
   const { metadata } = useMetadata(tokenId);
   const bookFile = metadata.data?.bookFile;
@@ -44,7 +46,7 @@ const ReadButton = ({ tokenId }: ReadButtonProps) => {
       sx={{ width: "100%" }}
       onClick={(e) => handleReadBookClick()}
     >
-      Read
+      {t("readBtn") as string}
     </Button>
   );
 };
