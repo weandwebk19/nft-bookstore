@@ -174,15 +174,17 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
 
   return (
     <>
-      <Button
-        variant={reviews ? "outlined" : "contained"}
-        color="secondary"
-        size="small"
-        sx={{ width: "100%" }}
-        onClick={handleBookCardClick}
-      >
-        {reviews ? t("reviewedBtn") : t("reviewBtn")}
-      </Button>
+      {account.data !== author && (
+        <Button
+          variant={reviews ? "outlined" : "contained"}
+          color="secondary"
+          size="small"
+          sx={{ width: "100%" }}
+          onClick={handleBookCardClick}
+        >
+          {reviews ? t("reviewedBtn") : t("reviewBtn")}
+        </Button>
+      )}
 
       <Dialog
         title={t("reviewTitle") as string}

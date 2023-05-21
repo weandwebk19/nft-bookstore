@@ -219,14 +219,7 @@ const ActionableBookItem = ({
             {status !== "isCreated" && (
               <Typography variant="body2">{ownerName}</Typography>
             )}
-            {status === "isBorrowed" && (
-              <Stack>
-                <Typography variant="subtitle2">
-                  {t("borrowedFrom") as string}:
-                </Typography>
-                <Typography variant="label">{renterName}</Typography>
-              </Stack>
-            )}
+
             {status === "isBorrowed" && (
               <Stack>
                 <Typography variant="subtitle2">

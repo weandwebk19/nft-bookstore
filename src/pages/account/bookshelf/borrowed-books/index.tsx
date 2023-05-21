@@ -121,7 +121,7 @@ const BorrowedBooks = () => {
                               <Grid
                                 container
                                 columns={{ xs: 2, sm: 2 }}
-                                spacing={1}
+                                spacing={2}
                               >
                                 <Grid item xs={1} sm={1}>
                                   <ShareButton

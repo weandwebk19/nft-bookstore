@@ -3,23 +3,13 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import {
-  Box,
-  Button,
-  Divider,
-  Stack,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography
-} from "@mui/material";
+import { Box, Button, Divider, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
@@ -28,10 +18,10 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
 
-import Step1 from "../../ui/publishing/steps/Step1";
-import Step2 from "../../ui/publishing/steps/Step2";
 import { createTransactionHistory } from "../../utils";
 import { getGasFee } from "../../utils/getGasFee";
+import { NumericStepperController } from "../FormController";
+import { FormGroup } from "../FormGroup";
 
 interface BuyButtonProps {
   tokenId: number;
@@ -52,7 +42,6 @@ const BuyButton = ({
 }: BuyButtonProps) => {
   const { t } = useTranslation("bookButtons");
 
-  const router = useRouter();
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const [sellerName, setSellerName] = useState();
@@ -60,10 +49,6 @@ const BuyButton = ({
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
-
-  const [activeStep, setActiveStep] = useState(0);
-
-  const steps = [t("stepBuy1") as string, t("stepBuy2") as string];
 
   const schema = yup
     .object({
@@ -73,25 +58,6 @@ const BuyButton = ({
         .typeError(t("textErrorBuy2") as string)
     })
     .required();
-
-  const getStepContent = () => {
-    switch (activeStep) {
-      case 0:
-        return <Step1 />;
-      case 1:
-        return <Step2 supplyAmount={supplyAmount} />;
-      default:
-        return null;
-    }
-  };
-
-  const handleNext = async () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
 
   const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorBookCard(e.currentTarget);
@@ -108,7 +74,15 @@ const BuyButton = ({
     mode: "all"
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, watch } = methods;
+
+  const currentAmount = watch("amount");
+  const [totalPayment, setTotalPayment] = useState<number>(0);
+
+  useEffect(() => {
+    const total = currentAmount * price;
+    setTotalPayment(total);
+  }, [currentAmount, price]);
 
   const buyBooks = useCallback(
     async (
@@ -257,131 +231,74 @@ const BuyButton = ({
         onClose={handleBookCardClose}
       >
         <FormProvider {...methods}>
-          {/* <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
-            <Grid item md={4}>
-              <Stack>
-                <Box
-                  component="img"
+          <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
+            <Grid item md={4} xs={4}>
+              <Stack sx={{ alignItems: { xs: "center", md: "start" } }}>
+                <Image
+                  src={metadata?.data?.bookCover}
+                  alt={metadata?.data?.title}
+                  sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
-                  src={bookCover}
-                  alt={title}
-                  sx={{ width: "100%" }}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata?.data?.title}</Typography>
                 <Typography>{sellerName}</Typography>
+                <Typography variant="h4">{price} ETH</Typography>
               </Stack>
             </Grid>
-            <Grid item md={8}>
+
+            <Grid
+              item
+              md={8}
+              xs={4}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
+            >
               <Stack
                 spacing={3}
                 sx={{
                   mb: 5
                 }}
               >
-                <FormGroup label="Listing price" required>
-                  <TextFieldController name="price" type="number" />
-                </FormGroup>
-                <FormGroup label="Amount" required>
-                  <TextFieldController name="amount" type="number" />
+                <FormGroup label={t("amount") as string} required>
+                  <NumericStepperController name="amount" />
+                  <Typography>
+                    {supplyAmount} {t("left") as string}
+                  </Typography>
                 </FormGroup>
               </Stack>
+              <Divider />
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography>{t("total") as string}:</Typography>
+                <Typography variant="h6">{totalPayment} ETH</Typography>
+              </Stack>
+              <Typography
+                gutterBottom
+                variant="caption"
+                sx={{ textAlign: "end" }}
+              >
+                {t("gasFee") as string}
+              </Typography>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start selling
+                  {t("confirmPurchaseBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>
-          </Grid> */}
-          <Stack spacing={3}>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1, sm: 2, md: 4 }}
-            >
-              <Image
-                src={metadata?.data?.bookCover}
-                alt={metadata?.data?.title}
-                sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-                className={styles["book-item__book-cover"]}
-              />
-              <Box>
-                <Typography variant="h5">{metadata?.data?.title}</Typography>
-                <Typography>{sellerName}</Typography>
-                <Typography variant="h4">{price} ETH</Typography>
-              </Box>
-            </Stack>
-            <Divider />
-            <Stack flexGrow={1}>
-              <Stepper activeStep={activeStep}>
-                {steps.map((label) => {
-                  return (
-                    <Step key={label}>
-                      <StepLabel>{label}</StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-              <div style={{ minHeight: "50%" }}>
-                {activeStep === steps.length ? (
-                  <>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                      {t("textBuyNow1") as string}
-                    </Typography>
-                    <StyledButton
-                      onClick={() => {
-                        router.push("/account/bookshelf/owned-books");
-                      }}
-                    >
-                      {t("myOwnedBooksBtn") as string}
-                    </StyledButton>
-                  </>
-                ) : (
-                  <>
-                    <Box my={2} sx={{ minHeight: "25vh" }}>
-                      {getStepContent()}
-                    </Box>
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      style={{ paddingTop: "5vh" }}
-                    >
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ mr: 1 }}
-                      >
-                        {t("backBtn") as string}
-                      </Button>
-                      {activeStep === steps.length - 1 ? (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleSubmit(onSubmit)}
-                        >
-                          {t("confirmPurchaseBtn") as string}
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleNext}
-                        >
-                          {t("nextBtn") as string}
-                        </Button>
-                      )}
-                    </Box>
-                  </>
-                )}
-              </div>
-            </Stack>
-          </Stack>
+          </Grid>
         </FormProvider>
         <ToastContainer />
       </Dialog>
