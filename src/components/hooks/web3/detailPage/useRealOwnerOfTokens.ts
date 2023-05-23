@@ -36,9 +36,9 @@ export const hookFactory: RealOwnerOfTokensHookFactory =
               const tokenId = tokenRes.data.data;
               const nfts = [] as BookSellingCore[];
               const coreNfts =
-                await bookStoreContract!.getAllRealOwnerOfTokenId(tokenId);
+                await bookStoreContract?.getAllRealOwnerOfTokenId(tokenId);
 
-              for (let i = 0; i < coreNfts.length; i++) {
+              for (let i = 0; i < coreNfts?.length; i++) {
                 try {
                   const item = coreNfts[i];
                   const listedBook = await bookSellingContract!.getListedBook(
@@ -51,7 +51,7 @@ export const hookFactory: RealOwnerOfTokensHookFactory =
                     listedBook.seller !=
                       "0x0000000000000000000000000000000000000000" &&
                     listedBook.seller != account.data
-                  )
+                  ) {
                     nfts.push({
                       tokenId: listedBook.tokenId.toNumber(),
                       seller: listedBook.seller,
@@ -61,6 +61,7 @@ export const hookFactory: RealOwnerOfTokensHookFactory =
                       ),
                       amount: listedBook.amount.toNumber()
                     });
+                  }
                 } catch (err) {
                   console.log(err);
                 }

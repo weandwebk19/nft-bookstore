@@ -34,10 +34,10 @@ export const hookFactory: RandomBooksHookFactory =
       ],
       async () => {
         const listedBooks = [] as BookSellingCore[];
-        const coreListedBooks = await bookSellingContract!.getAllListedBooks();
+        const coreListedBooks = await bookSellingContract?.getAllListedBooks();
 
         let count = 0;
-        while (count < 6 && count < coreListedBooks.length) {
+        while (coreListedBooks && count < 6 && count < coreListedBooks.length) {
           try {
             const randomIndex = Math.floor(
               Math.random() * coreListedBooks.length
@@ -55,8 +55,8 @@ export const hookFactory: RandomBooksHookFactory =
               listedBook.seller !== account.data
             ) {
               listedBooks.push(listedBook);
-              count++;
             }
+            count++;
           } catch (e) {}
         }
 

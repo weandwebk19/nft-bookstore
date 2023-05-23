@@ -75,19 +75,18 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         const borrowedBook = await bookRentingContract?.getBorrowedBookFromId(
           idBorrowedBook
         );
-        const totalPrice = (
+        const totalPrice =
           (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
             amount *
             time) /
-          604800
-        ).toFixed(3);
+          604800;
 
         const tx = await bookStoreContract?.transferForSendedRequest(
           idBorrowedBook,
           renter,
           true,
           {
-            value: ethers.utils.parseEther(totalPrice)
+            value: ethers.utils.parseEther(totalPrice.toString())
           }
         );
 
@@ -150,14 +149,14 @@ export default function ResponseTable({ data }: ResponseTableProps) {
           await createTransactionHistoryForBorrower(
             account.data!,
             renter,
-            totalPrice,
+            totalPrice.toString(),
             gasFee,
             receipt.transactionHash
           );
           await createTransactionHistoryForRenter(
             account.data!,
             renter,
-            totalPrice,
+            totalPrice.toString(),
             receipt.transactionHash
           );
         }

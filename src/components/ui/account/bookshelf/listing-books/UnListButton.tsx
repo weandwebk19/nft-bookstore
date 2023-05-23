@@ -79,7 +79,7 @@ const UnListButton = ({
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Cancel Lend NftBook successfully",
+        success: "Cancel listing NftBook successfully",
         error: "Oops! There's a problem with lending cancel process!"
       });
 

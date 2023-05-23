@@ -1,6 +1,6 @@
 import { ethers } from "ethersv5";
 
-export const getGasFee = async (provider: any, receipt: any) => {
+export const getGasFee: any = async (provider: any, receipt: any) => {
   // Get the gas used from the transaction receipt
   const gasUsed = receipt.gasUsed;
   // Get the gas price from the transaction object

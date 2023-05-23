@@ -184,7 +184,7 @@ const BookInfo = () => {
             <Typography variant="h5" gutterBottom>
               {t("recommended")}
             </Typography>
-            {/* <BookList /> */}
+            <BookList />
           </Box>
         </Grid>
       </Grid>

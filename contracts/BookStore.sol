@@ -465,8 +465,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
       price,
       startTime,
       endTime,
-      msg.sender,
-      msg.value
+      msg.sender
     );
 
     _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
@@ -560,9 +559,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
     );
 
     if (totalPrice > 0) {
-      if (msg.value != totalPrice) {
-        revert Error.InvalidPriceError(msg.value);
-      }
+      // if (msg.value != totalPrice) {
+      //   revert Error.InvalidPriceError(msg.value);
+      // }
       payable(renter).transfer(totalPrice);
     }
   }

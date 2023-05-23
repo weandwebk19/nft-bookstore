@@ -84,8 +84,8 @@ const ReadBook = () => {
 
   useEffect(() => {
     (async () => {
-      setDecrypting(true);
       if (bookFileUrl) {
+        setDecrypting(true);
         const dataFile = axios({
           method: "get",
           url: bookFileUrl,
@@ -118,11 +118,13 @@ const ReadBook = () => {
                 }
               }
             }
+            setDecrypting(false);
           })
           .catch((err) => {
             if (err.code === "ERR_NETWORK") {
               window.alert("Disable your adblock and try again!");
             }
+            setDecrypting(false);
           });
       }
     })();
