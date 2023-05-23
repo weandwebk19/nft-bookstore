@@ -24,6 +24,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
+import withAuth from "@/components/HOC/withAuth";
 import { useNftBookMeta } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { ZenLayout } from "@/layouts/ZenLayout";
@@ -268,6 +269,7 @@ const ReadBook = () => {
                 }}
               >
                 <ReactReader
+                  loadingView={<CircularProgress />}
                   location={location}
                   locationChanged={locationChanged}
                   url={linkEpub}

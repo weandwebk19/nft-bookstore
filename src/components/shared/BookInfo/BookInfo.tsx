@@ -106,7 +106,7 @@ const BookInfo = () => {
             <Grid
               item
               xs={1}
-              md={6}
+              md={9}
               sx={{
                 borderRight: {
                   md: `1px solid ${theme.palette.primary.main}`,
@@ -132,7 +132,7 @@ const BookInfo = () => {
             <Grid
               item
               xs={1}
-              md={3}
+              md={9}
               sx={{
                 borderRight: {
                   md: `1px solid ${theme.palette.primary.main}`,

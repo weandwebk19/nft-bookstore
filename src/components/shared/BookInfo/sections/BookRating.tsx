@@ -141,6 +141,7 @@ const BookRating = () => {
                   content={review.review}
                   avatar={""}
                   reply={review.reply}
+                  date={review.createdAt}
                 />
               );
             })

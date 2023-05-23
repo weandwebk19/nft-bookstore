@@ -117,16 +117,27 @@ const CreatedBooks = () => {
                             amountTradeable={book?.amountTradeable}
                             buttons={
                               <Stack
-                                direction={{ xs: "column", sm: "row" }}
                                 spacing={{ xs: 2, sm: 2, md: 3 }}
                                 sx={{ width: "100%" }}
                               >
-                                <SellButton
-                                  tokenId={book?.tokenId}
-                                  owner={book?.author}
-                                  amountTradeable={book?.amountTradeable!}
-                                />
                                 <EditButton tokenId={book?.tokenId} />
+
+                                <Stack
+                                  direction={{ xs: "column", sm: "row" }}
+                                  spacing={{ xs: 2, sm: 2, md: 3 }}
+                                  sx={{ width: "100%" }}
+                                >
+                                  <SellButton
+                                    tokenId={book?.tokenId}
+                                    owner={book?.author}
+                                    amountTradeable={book?.amountTradeable!}
+                                  />
+                                  <LendButton
+                                    tokenId={book?.tokenId}
+                                    owner={book?.author}
+                                    amountTradeable={book?.amountTradeable!}
+                                  />
+                                </Stack>
                               </Stack>
                             }
                           />
