@@ -9,6 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
@@ -28,25 +29,14 @@ interface LendButtonProps {
   amountTradeable: number;
 }
 
-const schema = yup
-  .object({
-    price: yup
-      .number()
-      .min(0, `The price must be higher than 0.`)
-      .typeError("Price must be a number"),
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
-  })
-  .required();
-
 const defaultValues = {
   price: 0,
   amount: 1
 };
 
 const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const [ownerName, setOwnerName] = useState();
   const { provider, bookStoreContract } = useWeb3();
   const { metadata } = useMetadata(tokenId);
@@ -54,6 +44,19 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
+
+  const schema = yup
+    .object({
+      price: yup
+        .number()
+        .min(0, t("textErrorLend1") as string)
+        .typeError(t("textErrorLend2") as string),
+      amount: yup
+        .number()
+        .min(1, t("textErrorLend3") as string)
+        .typeError(t("textErrorLend4") as string)
+    })
+    .required();
 
   const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorBookCard(e.currentTarget);
@@ -82,9 +85,12 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
       try {
         // handle errors
         if (amount > amountTradeable) {
-          return toast.error(`Amount must be less than ${amountTradeable}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
+          return toast.error(
+            `${t("textErrorLend5") as string} ${amountTradeable}.`,
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
         }
 
         const lendingPrice = await bookStoreContract!.lendingPrice();
@@ -98,9 +104,9 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
         );
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Lend NftBook Token",
-          success: "NftBook is successfully lent out!",
-          error: "Oops! There's a problem with lending process!"
+          pending: t("pendingLend") as string,
+          success: t("successLend") as string,
+          error: t("errorLend") as string
         });
 
         if (receipt) {
@@ -175,11 +181,11 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
         sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        Lend
+        {t("lendBtn") as string}
       </Button>
 
       <Dialog
-        title="Open for lend"
+        title={t("lendTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
@@ -195,7 +201,9 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{ownerName}</Typography>{" "}
-                <Typography>{amountTradeable} left</Typography>
+                <Typography>
+                  {amountTradeable} {t("left") as string}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -205,10 +213,10 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
                   mb: 5
                 }}
               >
-                <FormGroup label="Lending price/day" required>
+                <FormGroup label={t("lendingPrice") as string} required>
                   <TextFieldController name="price" type="number" />
                 </FormGroup>
-                <FormGroup label="Amount" required>
+                <FormGroup label={t("amount") as string} required>
                   <TextFieldController name="amount" type="number" />
                 </FormGroup>
               </Stack>
@@ -218,10 +226,10 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Lend out
+                  {t("lendOutBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

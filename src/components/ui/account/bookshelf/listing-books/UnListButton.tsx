@@ -198,7 +198,7 @@ const UnListButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} {t2("unlistText1") as string}
+                      {borrower} {t2("textUnlist1") as string}
                     </Typography>
                   </>
                 )}

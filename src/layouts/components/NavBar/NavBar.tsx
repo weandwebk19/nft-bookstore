@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 import {
   Avatar,
@@ -33,13 +32,11 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { SiweMessage } from "siwe";
 import {
-  useConnect,
   useDisconnect,
   useNetwork,
   useSignMessage,
   useAccount as useWagmiAccount
 } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
 
 import { useUserInfo } from "@/components/hooks/api/useUserInfo";
 import { useLocalStorage } from "@/components/hooks/common";
@@ -423,8 +420,8 @@ const NavBar = () => {
     session
       ? {
           type: "button",
-          icon: <Avatar alt="Remy Sharp" src="" />,
-          content: address,
+          icon: <Avatar alt={userInfo?.fullname} src={userInfo?.avatar} />,
+          content: `${truncate(address ? address : "", 6, -4)}`,
           onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
             handleAccountMenuClick(e);
           },
@@ -640,6 +637,7 @@ const NavBar = () => {
                   handleLogin={handleLogin}
                   isConnected={isConnected}
                   isAuthor={isAuthor}
+                  createList={createList}
                 />
                 <AccountMenu
                   account={wagmiAddress}

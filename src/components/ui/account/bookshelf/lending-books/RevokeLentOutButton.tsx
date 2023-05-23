@@ -194,7 +194,7 @@ const RevokeLentOutButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} {t2("unlistText3") as string}
+                      {borrower} {t2("textRevoke2") as string}
                     </Typography>
                     <Typography>
                       {countDown} {t2("left") as string}

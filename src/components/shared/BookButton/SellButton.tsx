@@ -48,12 +48,12 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
     .object({
       price: yup
         .number()
-        .min(0, t("textError1") as string)
-        .typeError(t("textError2") as string),
+        .min(0, t("textErrorSell1") as string)
+        .typeError(t("textErrorSell2") as string),
       amount: yup
         .number()
-        .min(1, t("textError3") as string)
-        .typeError(t("textError4") as string)
+        .min(1, t("textErrorSell3") as string)
+        .typeError(t("textErrorSell4") as string)
     })
     .required();
 
@@ -104,7 +104,7 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
         // handle errors
         if (amount > amountTradeable) {
           return toast.error(
-            `${t("textError5") as string} ${amountTradeable}.`,
+            `${t("textErrorSell5") as string} ${amountTradeable}.`,
             {
               position: toast.POSITION.TOP_CENTER
             }

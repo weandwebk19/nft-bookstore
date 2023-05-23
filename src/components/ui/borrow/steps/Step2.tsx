@@ -1,36 +1,36 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import {
-  NumericStepperController,
-  TextAreaController,
-  TextFieldController
-} from "@shared/FormController";
+import { NumericStepperController } from "@shared/FormController";
 import { useTranslation } from "next-i18next";
 
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import { FormGroup } from "@/components/shared/FormGroup";
-import { StyledButton } from "@/styles/components/Button";
 
 type Step2Props = {
   supplyAmount: number | undefined;
 };
 const Step2 = ({ supplyAmount }: Step2Props) => {
+  const { t } = useTranslation("bookButtons");
+
   const isSuccess = true;
   const theme = useTheme();
+
   return (
-    <ContentGroup title="Confirm purchase">
+    <ContentGroup title={t("stepRentTitle2") as string}>
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={{ xs: 1, sm: 2, md: 4 }}
       >
         <Box sx={{ width: "100%" }}>
-          <FormGroup label="Amount" required>
+          <FormGroup label={t("amount") as string} required>
             <NumericStepperController name="amount" />
           </FormGroup>
-          <Typography>{supplyAmount} left</Typography>
+          <Typography>
+            {supplyAmount} {t("left") as string}
+          </Typography>
         </Box>
-        <FormGroup label="Number of rental days" required>
+        <FormGroup label={t("rentalDays") as string} required>
           <NumericStepperController name="rentalDays" />
         </FormGroup>
       </Stack>
@@ -38,7 +38,7 @@ const Step2 = ({ supplyAmount }: Step2Props) => {
       {!isSuccess && (
         <>
           <Typography color={`${theme.palette.error.main}`}>
-            Failed, please make sure your balance is enough to make a transfer!
+            {t("textRentNow2") as string}
           </Typography>
         </>
       )}

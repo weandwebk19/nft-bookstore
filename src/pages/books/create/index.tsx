@@ -702,13 +702,13 @@ const CreateBook = () => {
                           >
                             {t("messageFinish2") as string}
                           </StyledButton>
-                          <StyledButton
+                          {/* <StyledButton
                             onClick={() => {
                               router.push("/books/create");
                             }}
                           >
                             {t("messageFinish3") as string}
-                          </StyledButton>
+                          </StyledButton> */}
                         </Stack>
                       </Box>
                     );

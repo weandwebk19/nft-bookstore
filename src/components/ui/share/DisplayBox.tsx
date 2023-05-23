@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { FunctionComponent } from "react";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, Stack, Typography } from "@mui/material";
 
 import { useAllSharingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
@@ -46,7 +46,14 @@ const DisplayBox: FunctionComponent = () => {
               {(() => {
                 if (nfts.isLoading) {
                   return (
-                    <Typography>{t("loadingMessage") as string}</Typography>
+                    <Stack
+                      spacing={2}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <CircularProgress />
+                      <Typography>{t("loadingMessage") as string}</Typography>
+                    </Stack>
                   );
                 } else if (nfts?.data?.length === 0 || nfts.error) {
                   return <FallbackNode />;

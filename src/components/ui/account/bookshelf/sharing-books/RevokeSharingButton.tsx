@@ -69,7 +69,7 @@ const RevokeSharingButton = ({
   tokenId,
   buttonName = "Cancel Share"
 }: RevokeSharingButtonProps) => {
-  const { t } = useTranslation("lendingBooks");
+  const { t } = useTranslation("sharingBooks");
   const { t: t2 } = useTranslation("bookButtons");
 
   const [sharerName, setSharerName] = useState();
@@ -181,7 +181,7 @@ const RevokeSharingButton = ({
 
       {!isEnded && (
         <Dialog
-          title={t("dialogTitle5") as string}
+          title={t("dialogTitle2") as string}
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
@@ -211,7 +211,7 @@ const RevokeSharingButton = ({
                 {sharedPer && !isEnded && (
                   <>
                     <Typography>
-                      {sharedPer} {t2("unlistText3") as string}
+                      {sharedPer} {t2("textRevoke2") as string}
                     </Typography>
                     <Typography>
                       {countDown} {t2("left") as string}

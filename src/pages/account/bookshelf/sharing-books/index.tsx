@@ -54,6 +54,7 @@ const SharingBooks = () => {
   const { nfts: sharedNfts } = useOwnedSharedOutBooks(
     router.query as FilterField
   );
+
   const sharedBooks = sharedNfts.data as BookSharing[];
 
   const [nowTime, setNowTime] = useState<number>(0);
@@ -72,6 +73,8 @@ const SharingBooks = () => {
       }
     })();
   };
+
+  console.log(sharedBooks);
 
   return (
     <>
@@ -195,6 +198,10 @@ const SharingBooks = () => {
                               tokenId={book?.tokenId}
                               amount={book?.amount}
                               onClick={handleBookClick}
+                              countDown={secondsToDhms(book?.endTime - nowTime)}
+                              price={book?.price}
+                              renter={book?.fromRenter}
+                              sharedPerson={book?.sharedPer}
                               buttons={
                                 <>
                                   <RevokeSharedOutButton

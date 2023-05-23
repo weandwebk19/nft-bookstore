@@ -19,6 +19,9 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 import axios from "axios";
 import { Rendition } from "epubjs";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Head from "next/head";
 import { useRouter } from "next/router";
 
 import { useNftBookMeta } from "@/components/hooks/web3";
@@ -28,6 +31,7 @@ import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
 import { StyledButton } from "@/styles/components/Button";
 import { convertHexStringToUint8Array } from "@/utils/convert";
 import { Crypto } from "@/utils/crypto";
+import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 // let LINK_EPUB =
 //   "https://altmshfkgudtjr.github.io/react-epub-viewer/files/Alices%20Adventures%20in%20Wonderland.epub";
@@ -52,6 +56,8 @@ async function decryptPdfFile(
 
 const SUPPORT_FILE_TYPE = ["epub", "pdf"];
 const ReadBook = () => {
+  const { t } = useTranslation("readBook");
+
   const [tokenId, setTokenId] = useState();
   const [linkPdf, setLinkPdf] = useState<string>();
   const [linkEpub, setLinkEpub] = useState<string>();
@@ -73,6 +79,9 @@ const ReadBook = () => {
   const [decrypting, setDecrypting] = useState(false);
   const bookFileUrl = nftBookMeta.data?.bookFile; // Url of file on pinata
   const metaDataType = nftBookMeta.data?.fileType;
+
+  const title = nftBookMeta.data?.title + " - NFT Bookstore";
+
   useEffect(() => {
     (async () => {
       setDecrypting(true);
@@ -116,7 +125,6 @@ const ReadBook = () => {
             }
           });
       }
-      setDecrypting(false);
     })();
   }, [bookFileUrl, bookStoreContract, tokenId, metaDataType]);
 
@@ -160,11 +168,11 @@ const ReadBook = () => {
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
   /*To Prevent right click on screen*/
-  // useEffect(() => {
-  //   document.addEventListener("contextmenu", (event) => {
-  //     event.preventDefault();
-  //   });
-  // }, []);
+  useEffect(() => {
+    document.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+    });
+  }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handlePageNavigate);
@@ -220,89 +228,117 @@ const ReadBook = () => {
   }
 
   return (
-    <Stack>
-      <Button
-        variant="outlined"
-        size="small"
-        startIcon={<KeyboardBackspaceIcon />}
-        sx={{ mb: 3 }}
-        onClick={() => {
-          router.push("/account/bookshelf");
-        }}
-      >
-        My bookshelf
-      </Button>
-
-      {decrypting && (
-        <Stack spacing={2} justifyContent="center" alignItems="center">
-          <CircularProgress />
-          <Typography>Decrypting your book...</Typography>
-        </Stack>
-      )}
-
-      {/* Render epub file into browser view */}
-      {fileType === "epub" && linkEpub && (
-        <Box
-          sx={{
-            width: 600,
-            height: "88vh"
+    <>
+      <Head>
+        <title>{title}</title>
+        <meta name="description" content="The world's first NFT Bookstore" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Stack>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<KeyboardBackspaceIcon />}
+          sx={{ mb: 3 }}
+          onClick={() => {
+            router.push("/account/bookshelf");
           }}
         >
-          <ReactReader
-            location={location}
-            locationChanged={locationChanged}
-            url={linkEpub}
-            swipeable
-            getRendition={(rendition) => (renditionRef.current = rendition)}
-            tocChanged={(toc) => (tocRef.current = toc)}
-            epubInitOptions={{
-              openAs: "epub"
-            }}
-          />
-          <PageIndicator page={page as string} />
-        </Box>
-      )}
+          My bookshelf
+        </Button>
 
-      {/* Render pdf file into browser view */}
-      {fileType === "pdf" && linkPdf && (
-        <Box
-          sx={{ position: "relative" }}
-          onKeyPress={(event) => {
-            switch (event.key) {
-              case "ArrowLeft":
-                previousPage();
-                break;
-              case "ArrowRight":
-                alert("woe");
-                nextPage();
-                break;
-            }
-          }}
-        >
-          <Document file={linkPdf} onLoadSuccess={onDocumentLoadSuccess}>
-            <Page pageNumber={pageNumber} renderAnnotationLayer={false} />
-          </Document>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <IconButton disabled={pageNumber <= 1} onClick={previousPage}>
-              <ChevronLeftIcon />
-            </IconButton>
-            <Typography sx={{ textAlign: "center", mt: 3 }}>
-              {pageNumber || (numPages ? 1 : "--")} / {numPages || "--"}
-            </Typography>
-            <IconButton disabled={pageNumber >= numPages} onClick={nextPage}>
-              <ChevronRightIcon />
-            </IconButton>
+        {decrypting && (
+          <Stack spacing={2} justifyContent="center" alignItems="center">
+            <CircularProgress />
+            <Typography>Decrypting your book...</Typography>
           </Stack>
-        </Box>
-      )}
-    </Stack>
+        )}
+
+        {!decrypting && (
+          <div className="text-scanning-disabled">
+            {/* Render epub file into browser view */}
+            {fileType === "epub" && linkEpub && (
+              <Box
+                sx={{
+                  width: 600,
+                  height: "88vh"
+                }}
+              >
+                <ReactReader
+                  location={location}
+                  locationChanged={locationChanged}
+                  url={linkEpub}
+                  swipeable
+                  getRendition={(rendition) =>
+                    (renditionRef.current = rendition)
+                  }
+                  tocChanged={(toc) => (tocRef.current = toc)}
+                  epubInitOptions={{
+                    openAs: "epub"
+                  }}
+                />
+                <PageIndicator page={page as string} />
+              </Box>
+            )}
+
+            {/* Render pdf file into browser view */}
+            {fileType === "pdf" && linkPdf && (
+              <Box
+                sx={{ position: "relative" }}
+                onKeyPress={(event) => {
+                  switch (event.key) {
+                    case "ArrowLeft":
+                      previousPage();
+                      break;
+                    case "ArrowRight":
+                      alert("woe");
+                      nextPage();
+                      break;
+                  }
+                }}
+              >
+                <Document file={linkPdf} onLoadSuccess={onDocumentLoadSuccess}>
+                  <Page pageNumber={pageNumber} renderAnnotationLayer={false} />
+                </Document>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <IconButton disabled={pageNumber <= 1} onClick={previousPage}>
+                    <ChevronLeftIcon />
+                  </IconButton>
+                  <Typography sx={{ textAlign: "center", mt: 3 }}>
+                    {pageNumber || (numPages ? 1 : "--")} / {numPages || "--"}
+                  </Typography>
+                  <IconButton
+                    disabled={pageNumber >= numPages}
+                    onClick={nextPage}
+                  >
+                    <ChevronRightIcon />
+                  </IconButton>
+                </Stack>
+              </Box>
+            )}
+          </div>
+        )}
+      </Stack>
+    </>
   );
 };
 
 ReadBook.PageLayout = ZenLayout;
 
 export default ReadBook;
+
+export async function getServerSideProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, [
+        ...namespaceDefaultLanguage(),
+        "readBook"
+      ]))
+    }
+  };
+}
