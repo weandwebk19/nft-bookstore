@@ -24,6 +24,8 @@ const BookRating = () => {
   const router = useRouter();
   const { bookId } = router.query;
   const [reviews, setReviews] = useState([]);
+  const [ratings, setRatings] = useState(new Array<number>(5).fill(0));
+  const [ratingAvg, setRatingAvg] = useState();
 
   useEffect(() => {
     (async () => {
@@ -36,7 +38,18 @@ const BookRating = () => {
     })();
   }, [bookId]);
 
-  // console.log(reviews);
+  useEffect(() => {
+    let ratings = new Array<number>(5).fill(0);
+    reviews?.forEach((review: any) => {
+      ratings[review.rating - 1] += 1;
+    });
+    setRatings(ratings);
+    let sum: number = 0;
+    ratings.forEach((rating: number) => {
+      sum += rating;
+    });
+    setRatingAvg((sum / 5).toFixed(2));
+  }, [reviews]);
 
   return (
     <Box component="section">
@@ -55,35 +68,35 @@ const BookRating = () => {
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={10}
+                  value={ratings[0]}
                   icon={StaticRating(1)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={20}
+                  value={ratings[1]}
                   icon={StaticRating(2)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={60}
+                  value={ratings[2]}
                   icon={StaticRating(3)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={50}
+                  value={ratings[3]}
                   icon={StaticRating(4)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={90}
+                  value={ratings[4]}
                   icon={StaticRating(5)}
                 />
               </Box>
@@ -99,7 +112,7 @@ const BookRating = () => {
               border: `1px solid ${theme.palette.primary.main}`
             }}
           >
-            <Typography variant="h2">4.9</Typography>
+            <Typography variant="h2">{ratingAvg}</Typography>
           </Box>
         </Stack>
         {/* <Stack alignItems="center" spacing={2}>

@@ -113,7 +113,7 @@ const RentButton = ({
           });
         }
 
-        const value = ((price * amount * rentalDuration) / 604800).toFixed(3);
+        const value = (price * amount * rentalDuration) / 604800;
         const tx = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,
@@ -184,14 +184,14 @@ const RentButton = ({
           await createTransactionHistoryForBorrower(
             account.data!,
             renter,
-            value,
+            value.toString(),
             gasFee,
             receipt.transactionHash
           );
           await createTransactionHistoryForRenter(
             account.data!,
             renter,
-            value,
+            value.toString(),
             receipt.transactionHash
           );
         }

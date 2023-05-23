@@ -500,8 +500,7 @@ contract BookRentingStorage is ExtendTime {
     uint256 price,
     uint startTime,
     uint endTime,
-    address borrower,
-    uint256 value
+    address borrower
   ) public payable returns (uint256) {
     uint idLendBook = getIdLendBook(tokenId, renter);
     if (idLendBook == 0) {
@@ -509,9 +508,9 @@ contract BookRentingStorage is ExtendTime {
     }
     uint totalPrice = (amount * price * (endTime - startTime)) / 604800;
 
-    if (value != totalPrice) {
-      revert Error.InvalidValueError(value);
-    }
+    // if (value != totalPrice) {
+    //   revert Error.InvalidValueError(value);
+    // }
 
     LendBook memory lendBook = getLendBook(tokenId, renter);
 
