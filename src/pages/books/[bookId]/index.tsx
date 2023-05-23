@@ -12,6 +12,7 @@ export async function getServerSideProps({ locale }: any) {
       ...(await serverSideTranslations(locale, [
         ...namespaceDefaultLanguage(),
         "bookDetail",
+        "bookButtons",
         "fallback"
       ]))
     }

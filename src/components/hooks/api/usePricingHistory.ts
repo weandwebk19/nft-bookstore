@@ -1,3 +1,5 @@
+import { Bar } from "react-chartjs-2";
+
 import { PricingHistories } from "@/types/pricingHistories";
 
 import { useFetchData } from "./useFetchData";
@@ -9,6 +11,7 @@ export const usePricingHistory = (bookId: string, category: string) => {
 
   const pricingHistories = data as PricingHistories[];
   let pricingHistory = data;
+  let calculatedPricingHistory;
   if (pricingHistories) {
     let highest = 0;
     let lowest = 0;
@@ -27,13 +30,16 @@ export const usePricingHistory = (bookId: string, category: string) => {
       sum += pricing.price;
     });
 
-    pricingHistory = {
+    calculatedPricingHistory = {
       highest,
       lowest,
       lastest,
-      average: (sum / pricingHistories.length).toFixed(2)
+      average: (sum / pricingHistories.length).toFixed(2),
+      pricingHistory: []
     };
+
+    calculatedPricingHistory.pricingHistory = pricingHistory;
   }
 
-  return { data: pricingHistory, isLoading, error };
+  return { data: calculatedPricingHistory, isLoading, error };
 };

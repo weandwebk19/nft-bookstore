@@ -36,7 +36,7 @@ const BookRating = () => {
     })();
   }, [bookId]);
 
-  console.log(reviews);
+  // console.log(reviews);
 
   return (
     <Box component="section">
@@ -102,7 +102,7 @@ const BookRating = () => {
             <Typography variant="h2">4.9</Typography>
           </Box>
         </Stack>
-        <Stack alignItems="center" spacing={2}>
+        {/* <Stack alignItems="center" spacing={2}>
           <Typography variant="h5">What do you think?</Typography>
           <StyledButton
             onClick={() => {
@@ -111,7 +111,7 @@ const BookRating = () => {
           >
             Write a review
           </StyledButton>
-        </Stack>
+        </Stack> */}
         <Divider />
         <Typography variant="h6">Community Reviews</Typography>
 
@@ -128,6 +128,7 @@ const BookRating = () => {
                   content={review.review}
                   avatar={""}
                   reply={review.reply}
+                  date={review.createdAt}
                 />
               );
             })
