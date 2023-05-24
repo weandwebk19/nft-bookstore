@@ -40,7 +40,8 @@ const RevokeAllSharingButton = () => {
           provider,
           receipt,
           NaN,
-          "Revoke all sharing book"
+          "Revoke all sharing book",
+          "Thu hồi tất cả sách đang chia sẻ"
         );
       }
     } catch (e: any) {

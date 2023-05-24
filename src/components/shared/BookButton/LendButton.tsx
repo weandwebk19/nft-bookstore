@@ -125,10 +125,14 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
             totalFee,
             balanceInEther,
             "Lend book",
+            "Cho thuê sách",
             receipt.transactionHash,
             receipt.from,
             receipt.to,
-            `Gas fee = ${gasFee} ETH, lending fee = ${lendingPriceNumber} ETH, total fee = ${
+            `Gas fee = ${gasFee} ETH, Lending fee = ${lendingPriceNumber} ETH, Total = ${
+              0 - totalFee
+            } ETH`,
+            `Phí gas = ${gasFee} ETH, Phí liệt kê = ${lendingPriceNumber} ETH, Tổng cộng = ${
               0 - totalFee
             } ETH`
           );

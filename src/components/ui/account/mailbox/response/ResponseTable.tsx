@@ -116,12 +116,16 @@ export default function ResponseTable({ data }: ResponseTableProps) {
               totalFee,
               balanceInEther,
               "Extend borrow book",
+              "Gia hạn mượn sách",
               transactionHash,
               borrowerAddress,
               renterAddress,
               `Gas fee = ${gasFee} ETH, Extend fee = ${parseFloat(
                 totalPrice
-              )} ETH, total price = ${-totalFee} ETH`
+              )} ETH, Total price = ${-totalFee} ETH`,
+              `Phí gas = ${gasFee} ETH, Phí gia hạn = ${parseFloat(
+                totalPrice
+              )} ETH, Tổng cộng = ${-totalFee} ETH`
             );
           };
 
@@ -138,11 +142,13 @@ export default function ResponseTable({ data }: ResponseTableProps) {
               NaN,
               parseFloat(totalPrice),
               balanceInEther,
-              "From extend borrow book",
+              "Reader extend borrow book",
+              "Độc giả gia hạn mượn sách",
               transactionHash,
               renterAddress,
               borrowerAddress,
-              `Total price received = ${parseFloat(totalPrice)} ETH`
+              `Total price received = ${parseFloat(totalPrice)} ETH`,
+              `Tổng tiền đã nhận = ${parseFloat(totalPrice)} ETH`
             );
           };
 

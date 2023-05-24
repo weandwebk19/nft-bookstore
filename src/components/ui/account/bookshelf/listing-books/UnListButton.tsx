@@ -88,7 +88,8 @@ const UnListButton = ({
           provider,
           receipt,
           tokenId,
-          "Unlist listing book"
+          "Unlist listing book",
+          "Hủy bán sách"
         );
       }
     } catch (e: any) {

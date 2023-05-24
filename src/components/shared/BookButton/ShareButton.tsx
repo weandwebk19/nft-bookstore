@@ -149,10 +149,14 @@ const ShareButton = ({
             totalFee,
             balanceInEther,
             "Share book",
+            "Chia sẻ sách",
             receipt.transactionHash,
             receipt.from,
             receipt.to,
             `Gas fee = ${gasFee} ETH, sharing fee = ${sharingPriceNumber} ETH, total fee = ${
+              0 - totalFee
+            } ETH`,
+            `Phí gas = ${gasFee} ETH, Phí liệt kê = ${sharingPriceNumber} ETH, Tổng cộng = ${
               0 - totalFee
             } ETH`
           );

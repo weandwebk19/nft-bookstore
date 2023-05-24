@@ -152,10 +152,12 @@ const TakeButton = ({
               totalFee,
               balanceInEther,
               "Take book on share",
+              "Độc giả nhận sách chia sẻ",
               transactionHash,
               sharedPerAddress,
               sharerAddress,
-              `Gas fee = ${gasFee} ETH, take book fee = ${price} ETH, total price = ${-totalFee} ETH`
+              `Gas fee = ${gasFee} ETH, take book fee = ${price} ETH, total price = ${-totalFee} ETH`,
+              `Phí gas = ${gasFee} ETH, Giá nhận sách = ${price} ETH, Tổng cộng = ${-totalFee} ETH`
             );
           };
 
@@ -172,11 +174,13 @@ const TakeButton = ({
               tokenId,
               price,
               balanceInEther,
-              "From share book",
+              "Reader take sharing book",
+              "Độc giả nhận sách",
               transactionHash,
               sharerAddress,
               sharedPerAddress,
-              `Total price received = ${price} ETH`
+              `Total price received = ${price} ETH`,
+              `Tổng tiền nhận = ${price} ETH`
             );
           };
 

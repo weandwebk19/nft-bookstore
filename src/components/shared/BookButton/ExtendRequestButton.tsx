@@ -176,7 +176,8 @@ const ExtendRequestButton = ({
             provider,
             receipt,
             tokenId,
-            "Request extend borrowed book"
+            "Request extend borrowed book",
+            "Yêu cầu gia hạn sách đang mượn"
           );
         }
       } catch (error: any) {
