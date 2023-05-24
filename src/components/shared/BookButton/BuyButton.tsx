@@ -138,12 +138,16 @@ const BuyButton = ({
               totalFee,
               balanceInEther,
               "Buy book",
+              "Mua sách",
               transactionHash,
               buyerAddress,
               sellerAddress,
               `Gas fee = ${gasFee} ETH, book fee = ${
                 price * amount
-              } ETH, total price =  = ${0 - totalFee} ETH`
+              } ETH, total price =  = ${0 - totalFee} ETH`,
+              `Phí gas = ${gasFee} ETH, Giá quyển sách = ${
+                price * amount
+              } ETH, Tổng cộng =  = ${0 - totalFee} ETH`
             );
           };
 
@@ -161,11 +165,13 @@ const BuyButton = ({
               tokenId,
               price * amount,
               balanceInEther,
-              "From buy book",
+              "Reader buy book",
+              "Độc giả mua sách",
               transactionHash,
               sellerAddress,
               buyerAddress,
-              `Total price received = ${price * amount} ETH`
+              `Total price received = ${price * amount} ETH`,
+              `Tổng tiền nhận = ${price * amount} ETH`
             );
           };
 

@@ -7,7 +7,8 @@ export const createTransactionHistoryOnlyGasFee = async (
   provider: any,
   receipt: any,
   tokenId: number,
-  transactionName: string
+  transactionName: string,
+  transactionNameVi: string
 ) => {
   // Create Transaction History
   const gasFee = await getGasFee(provider, receipt);
@@ -20,9 +21,11 @@ export const createTransactionHistoryOnlyGasFee = async (
     0 - parseFloat(gasFee),
     balanceInEther,
     transactionName,
+    transactionNameVi,
     receipt.transactionHash,
     receipt.from,
     receipt.to,
-    `Gas fee = ${gasFee} ETH`
+    `Gas fee = ${gasFee} ETH`,
+    `Phí gas = ${gasFee} ETH`
   );
 };

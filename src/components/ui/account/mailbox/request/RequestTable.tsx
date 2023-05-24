@@ -81,7 +81,8 @@ export default function RequestTable({ data }: RequestTableProps) {
             provider,
             receipt,
             NaN,
-            "Accept request extend borrow book"
+            "Accept request extend borrow book",
+            "Chấp nhận yêu cầu gia hạn sách"
           );
         }
       } catch (err: any) {
@@ -113,7 +114,8 @@ export default function RequestTable({ data }: RequestTableProps) {
             provider,
             receipt,
             NaN,
-            "Refuse request extend borrow book"
+            "Refuse request extend borrow book",
+            "Chấp nhận yêu cầu gia hạn sách"
           );
         }
       } catch (err: any) {

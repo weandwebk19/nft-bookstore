@@ -143,10 +143,14 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
             totalFee,
             balanceInEther,
             "Sell book",
+            "Bán sách",
             receipt.transactionHash,
             receipt.from,
             receipt.to,
             `Gas fee = ${gasFee} ETH, listing fee =  ${listingPriceNumber} ETH, total fee = ${
+              0 - totalFee
+            } ETH`,
+            `Phí gas= ${gasFee} ETH, Phí liệt kê =  ${listingPriceNumber} ETH, Tổng cộng = ${
               0 - totalFee
             } ETH`
           );

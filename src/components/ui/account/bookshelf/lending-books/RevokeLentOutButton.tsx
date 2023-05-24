@@ -93,7 +93,8 @@ const RevokeLentOutButton = ({
           provider,
           receipt,
           tokenId,
-          "Revoke lent out book"
+          "Revoke lent out book",
+          "Thu hồi sách đã cho thuê"
         );
       }
     } catch (e: any) {

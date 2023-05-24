@@ -25,7 +25,7 @@ const BookRating = () => {
   const { bookId } = router.query;
   const [reviews, setReviews] = useState([]);
   const [ratings, setRatings] = useState(new Array<number>(5).fill(0));
-  const [ratingAvg, setRatingAvg] = useState();
+  const [ratingAvg, setRatingAvg] = useState<string>();
 
   useEffect(() => {
     (async () => {

@@ -520,10 +520,12 @@ const CreateBook = () => {
       totalFee,
       balanceInEther,
       "Mint book",
+      "Tạo sách",
       receipt.transactionHash,
       receipt.from,
       receipt.to,
-      `Gas fee = ${gasFee} ETH, listing fee = ${listingPriceNumber} ETH, total fee = ${-totalFee} ETH`
+      `Gas fee = ${gasFee} ETH, Listing fee = ${listingPriceNumber} ETH, Total fee = ${-totalFee} ETH`,
+      `Phí gas = ${gasFee} ETH, Phí liệt kê = ${listingPriceNumber} ETH, Tổng cộng = ${-totalFee} ETH`
     );
   };
 

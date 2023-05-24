@@ -151,12 +151,16 @@ const RentButton = ({
               totalFee,
               balanceInEther,
               "Borrow book",
+              "Mượn sách",
               transactionHash,
               borrowerAddress,
               renterAddress,
               `Gas fee = ${gasFee} ETH, borrow fee = ${parseFloat(
                 value
-              )} ETH, total price = ${-totalFee} ETH`
+              )} ETH, total price = ${-totalFee} ETH`,
+              `Phí gas = ${gasFee} ETH, Giá mượn sách = ${parseFloat(
+                value
+              )} ETH, Tổng cộng = ${-totalFee} ETH`
             );
           };
 
@@ -173,11 +177,13 @@ const RentButton = ({
               tokenId,
               parseFloat(value),
               balanceInEther,
-              "From borrow book",
+              "Reader borrow book",
+              "Độc giả mượn sách",
               transactionHash,
               renterAddress,
               borrowerAddress,
-              `Total price received = ${parseFloat(value)} ETH`
+              `Total price received = ${parseFloat(value)} ETH`,
+              `Tổng tiền nhận = ${parseFloat(value)} ETH`
             );
           };
 
