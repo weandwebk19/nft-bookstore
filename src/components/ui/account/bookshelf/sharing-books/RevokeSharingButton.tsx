@@ -115,7 +115,8 @@ const RevokeSharingButton = ({
           provider,
           receipt,
           tokenId,
-          "Revoke sharing book"
+          "Revoke sharing book",
+          "Thu hồi sách đang chia sẻ"
         );
       }
       console.log(receipt);

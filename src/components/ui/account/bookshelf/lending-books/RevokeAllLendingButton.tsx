@@ -59,7 +59,8 @@ const RevokeAllLendingButton = ({ allBooks }: CancelAllLendingButtonProps) => {
               provider,
               receipt,
               book.tokenId,
-              "Revoke all lending book"
+              "Revoke all lending book",
+              "Thu hồi tất cả sách đang cho thuê"
             );
           }
           return receipt;

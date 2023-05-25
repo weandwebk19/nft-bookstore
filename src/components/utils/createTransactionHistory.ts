@@ -5,20 +5,24 @@ export const createTransactionHistory = async (
   amount: number,
   currentBalance: string,
   transactionName: string,
+  transactionNameVi: string,
   transactionHash: string,
   fromAddress: string,
   toAddress: string,
-  detail: string
+  detail: string,
+  detailVi: string
 ) => {
   const res = await axios.post("/api/transactionHistories/create", {
     tokenId,
     amount,
     currentBalance,
     transactionName,
+    transactionNameVi,
     transactionHash,
     fromAddress,
     toAddress,
     detail,
+    detailVi,
     timestamp: new Date()
   });
 

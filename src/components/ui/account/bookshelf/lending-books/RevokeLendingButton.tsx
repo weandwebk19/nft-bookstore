@@ -92,7 +92,8 @@ const RevokeLendingButton = ({
           provider,
           receipt,
           tokenId,
-          "Revoke lending book"
+          "Revoke lending book",
+          "Thu hồi sách đang cho thuê"
         );
       }
     } catch (e: any) {

@@ -97,7 +97,8 @@ const RevokeSharedOutButton = ({
           provider,
           receipt,
           tokenId,
-          "Revoke shared out book"
+          "Revoke shared out book",
+          "Thu hồi sách đã chia sẻ"
         );
       }
     } catch (e: any) {

@@ -38,7 +38,8 @@ const RevokeAllLentOutButton = () => {
           provider,
           receipt,
           NaN,
-          "Revoke all lent out book"
+          "Revoke all lent out book",
+          "Thu hồi tất cả sách đã cho thuê"
         );
       }
     } catch (e: any) {
