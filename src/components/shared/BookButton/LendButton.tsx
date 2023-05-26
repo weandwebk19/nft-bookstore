@@ -18,6 +18,7 @@ import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
@@ -156,9 +157,26 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
     [account.data]
   );
 
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Lend",
+          "Cho thuê",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
+  );
+
   const onSubmit = async (data: any) => {
     await lendBooks(tokenId, data.price, data.amount, amountTradeable);
     await createPricingHistoryCallback(tokenId, data.price);
+    await createBookHistoryCallback(tokenId, data.price, data.amount);
   };
 
   useEffect(() => {
