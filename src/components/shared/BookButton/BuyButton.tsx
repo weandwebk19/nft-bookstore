@@ -16,6 +16,7 @@ import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { StyledButton } from "@/styles/components/Button";
 
 import { createTransactionHistory } from "../../utils";
@@ -191,6 +192,8 @@ const BuyButton = ({
             receipt.transactionHash
           );
         }
+
+        await createBookHistoryCallback(tokenId, price, amount);
       } catch (e: any) {
         console.error(e);
         toast.error(`${e.message.substr(0, 65)}.`, {
@@ -199,6 +202,22 @@ const BuyButton = ({
       }
     },
     [account.data, bookStoreContract, provider]
+  );
+
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Buy",
+          "Mua",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
   );
 
   const onSubmit = async (data: any) => {

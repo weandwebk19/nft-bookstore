@@ -18,6 +18,7 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { StyledButton } from "@/styles/components/Button";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
@@ -174,9 +175,26 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
     [account.data]
   );
 
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Sell",
+          "Bán",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
+  );
+
   const onSubmit = async (data: any) => {
     await sellBooks(tokenId, data.price, data.amount, amountTradeable);
     await createPricingHistoryCallback(tokenId, data.price);
+    await createBookHistoryCallback(tokenId, data.price, data.amount);
   };
 
   useEffect(() => {

@@ -48,7 +48,15 @@ const BookRating = () => {
     ratings.forEach((rating: number) => {
       sum += rating;
     });
-    setRatingAvg((sum / 5).toFixed(2));
+    const avg = (
+      (ratings[0] * 1 +
+        ratings[1] * 2 +
+        ratings[2] * 3 +
+        ratings[3] * 4 +
+        ratings[4] * 5) /
+      sum
+    ).toFixed(1);
+    setRatingAvg(avg != "NaN" ? avg : "");
   }, [reviews]);
 
   return (

@@ -4,7 +4,11 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import { useBookInfo, usePricingHistory } from "@/components/hooks/api";
+import {
+  useBookHistories,
+  useBookInfo,
+  usePricingHistory
+} from "@/components/hooks/api";
 import {
   BookBriefing,
   BookDetail,
@@ -23,6 +27,8 @@ const BookInfo = () => {
   const { bookId } = router.query;
   const bookInfo = useBookInfo(bookId as string);
   const theme = useTheme();
+  // const bookHistories = useBookHistories(bookId as string);
+  // console.log("bookHistories", bookHistories);
 
   // const isOpenForPurchase = false;
   // const [isPublishedState, setIsPublishedState] = useState(false);
