@@ -13,6 +13,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useTheme } from "@mui/material/styles";
 
 import styles from "@styles/Form.module.scss";
+import { useRouter } from "next/router";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -28,6 +29,7 @@ const MenuProps = {
 
 interface MultipleSelectChipProps {
   items: any[] | null;
+  itemsName: string;
   value: any;
   error?: boolean;
   helperText?: string;
@@ -38,6 +40,7 @@ interface MultipleSelectChipProps {
 
 export default function MultipleSelectChip({
   items,
+  itemsName,
   value,
   error,
   helperText,
@@ -45,7 +48,13 @@ export default function MultipleSelectChip({
   itemName = "name",
   itemValue = "_id"
 }: MultipleSelectChipProps) {
+  const { locale } = useRouter();
+
   const theme = useTheme();
+
+  const labelName =
+    itemsName === "genres" && locale === "vi" ? "vi_name" : itemName;
+
   return (
     <FormControl sx={{ width: "100%" }}>
       <Stack>
@@ -63,7 +72,7 @@ export default function MultipleSelectChip({
                   key={value}
                   label={
                     items?.filter((item) => item[itemValue] === value)?.[0][
-                      itemName
+                      labelName
                     ]
                   }
                 />
@@ -74,7 +83,7 @@ export default function MultipleSelectChip({
         >
           {items?.map((item) => (
             <MenuItem key={item[itemValue]} value={item[itemValue]}>
-              {item[itemName]}
+              {item[labelName]}
             </MenuItem>
           ))}
         </Select>
