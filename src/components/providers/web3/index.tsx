@@ -70,22 +70,12 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
         const metamaskProvider = ethereum?.providers?.find(
           (p: any) => p.isMetaMask
         );
-        const coinbaseProvider = ethereum?.providers?.find(
-          (p: any) => p.isCoinbaseWallet
-        );
 
         if (
           metamaskProvider &&
           typeof ethereum.setSelectedProvider === "function"
         ) {
           ethereum.setSelectedProvider(metamaskProvider);
-        }
-
-        if (
-          coinbaseProvider &&
-          typeof ethereum.setSelectedProvider === "function"
-        ) {
-          ethereum.setSelectedProvider(coinbaseProvider);
         }
 
         const provider = new ethers.providers.Web3Provider(

@@ -3,10 +3,12 @@ export type TransactionHistoriesNoId = {
   amount: number;
   currentBalance: number;
   transactionName: string;
+  transactionNameVi: string;
   transactionHash: string;
   fromAddress: string;
   toAddress: string;
   detail: string;
+  detailVi: string;
   timestamp: Date;
 };
 

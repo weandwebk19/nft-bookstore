@@ -19,6 +19,7 @@ import { NumericStepperController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistory } from "@/components/utils";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
@@ -201,6 +202,8 @@ const RentButton = ({
             receipt.transactionHash
           );
         }
+
+        await createBookHistoryCallback(tokenId, price, amount);
       } catch (e: any) {
         console.error(e.message);
         toast.error(`${e.message.substr(0, 65)}.`, {
@@ -209,6 +212,22 @@ const RentButton = ({
       }
     },
     [account.data, bookStoreContract, provider]
+  );
+
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Borrow",
+          "Mượn",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
   );
 
   useEffect(() => {
