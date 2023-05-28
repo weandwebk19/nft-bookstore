@@ -81,6 +81,7 @@ interface FilterBarProps {
 const FilterBar = ({ data, pathname }: FilterBarProps) => {
   const { t } = useTranslation("filter");
   const router = useRouter();
+  const currLang = router.locale;
 
   const genres = useGenres();
   const languages = useLanguages();
@@ -195,7 +196,11 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
             )}
             {genres.error &&
               "Oops! There was a problem loading genres \n Try refresh the page."}
-            <TreeViewController name="genre" items={genres.data} />
+            <TreeViewController
+              name="genre"
+              items={genres.data}
+              itemName={currLang === "en" ? "name" : "vi_name"}
+            />
           </FormGroup>
           <FormGroup label={t("searchBook") as string}>
             <TextFieldController name="title" />
