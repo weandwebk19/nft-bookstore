@@ -29,6 +29,7 @@ import { NumericStepperController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistory } from "@/components/utils";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
@@ -208,8 +209,25 @@ const TakeButton = ({
     [account.data, bookSharingContract, bookStoreContract, provider]
   );
 
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Take",
+          "Nhận",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
+  );
+
   const onSubmit = async (data: any) => {
     await takeBooks(tokenId, price, fromRenter, sharer, startTime, endTime);
+    await createBookHistoryCallback(tokenId, price, 1);
   };
 
   useEffect(() => {

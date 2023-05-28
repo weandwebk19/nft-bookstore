@@ -17,6 +17,7 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
@@ -180,6 +181,22 @@ const ShareButton = ({
     [account.data]
   );
 
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Share",
+          "Chia sẻ",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
+  );
+
   const onSubmit = async (data: any) => {
     await shareBooks(
       tokenId,
@@ -192,6 +209,7 @@ const ShareButton = ({
       endTime
     );
     await createPricingHistoryCallback(tokenId, data.price);
+    await createBookHistoryCallback(tokenId, data.price, data.amount);
   };
 
   useEffect(() => {
