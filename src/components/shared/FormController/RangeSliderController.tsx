@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { isFloat } from "@/utils/isFloat";
@@ -18,7 +18,9 @@ const RangeSliderController = ({
   step = 1,
   ...rest
 }: RangeSliderControllerProps) => {
-  const { control, setValue } = useFormContext();
+  const { control, setValue, watch } = useFormContext();
+
+  const watchPriceRange = watch(rest.name);
 
   const [priceRange, setPriceRange] = useState<number[]>([min, max]);
 
@@ -56,6 +58,10 @@ const RangeSliderController = ({
     },
     [priceRange]
   );
+
+  useEffect(() => {
+    setPriceRange([...watchPriceRange]);
+  }, [watchPriceRange]);
 
   return (
     <Controller

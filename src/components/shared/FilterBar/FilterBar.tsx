@@ -99,20 +99,12 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
     const newQueryString = { ...router.query, ...data };
     const queryString = querystring.stringify(newQueryString);
     const url = `?${queryString}`;
-    console.log("data:", data);
-    console.log("router.query:", router.query);
-    console.log("newQueryString:", newQueryString);
-    console.log("queryString:", queryString);
-    // router.push(url);
+    router.push(url);
   };
 
   const handleReset = () => {
-    console.log("ĐẶT LẠI");
     reset(defaultValues);
   };
-
-  console.log("++++ getValues():", getValues());
-  console.log("data:", data);
 
   const handleResetGenres = () => {
     setValue("genre", [], { shouldValidate: true });

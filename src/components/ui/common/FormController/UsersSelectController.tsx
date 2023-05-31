@@ -17,7 +17,7 @@ const UsersSelectController = ({
   itemValue = "value",
   ...rest
 }: UsersSelectControllerProps) => {
-  const { control, setValue, getValues, watch } = useFormContext();
+  const { control, setValue, watch } = useFormContext();
 
   const watchInputValue = watch(rest.name);
 
