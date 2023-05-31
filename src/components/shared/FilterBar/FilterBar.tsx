@@ -103,7 +103,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
     console.log("router.query:", router.query);
     console.log("newQueryString:", newQueryString);
     console.log("queryString:", queryString);
-    router.push(url);
+    // router.push(url);
   };
 
   const handleReset = () => {
@@ -111,7 +111,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
     reset(defaultValues);
   };
 
-  console.log("getValues():", getValues());
+  console.log("++++ getValues():", getValues());
   console.log("data:", data);
 
   const handleResetGenres = () => {

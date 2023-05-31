@@ -17,7 +17,9 @@ const UsersSelectController = ({
   itemValue = "value",
   ...rest
 }: UsersSelectControllerProps) => {
-  const { control, setValue } = useFormContext();
+  const { control, setValue, getValues, watch } = useFormContext();
+
+  const watchInputValue = watch(rest.name);
 
   const [selectedItem, setSelectedItem] = useState<any>();
   const [inputValue, setInputValue] = useState("");
@@ -50,6 +52,14 @@ const UsersSelectController = ({
     setInputValue("");
     setValue(rest.name, "");
   };
+
+  useEffect(() => {
+    if (!watchInputValue) {
+      setSelectedItem(null);
+      setInputValue(watchInputValue);
+      setListItems([]);
+    }
+  }, [watchInputValue]);
 
   // useEffect(() => {
   //   setValue(rest.name, inputValue);

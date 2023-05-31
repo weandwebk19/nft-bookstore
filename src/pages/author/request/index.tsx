@@ -156,7 +156,6 @@ const AuthorRequest = () => {
     reset
   } = methods;
   const watchPicture = watch("picture");
-  console.log("watchPicture", watchPicture);
 
   const handleRemoveImage = useCallback(async () => {
     setValue("picture", "");
