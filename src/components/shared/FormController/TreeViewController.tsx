@@ -6,18 +6,20 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 
 import { TreeView } from "@mui/lab";
 import nestify from "@utils/nestify";
-import { useRouter } from "next/router";
 
 import { TreeItem } from "../TreeItem";
 
 interface TreeViewControllerProps {
   name: string;
   items: any[] | null;
+  itemName?: string;
 }
 
-const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
-  const { locale } = useRouter();
-
+const TreeViewController = ({
+  items,
+  itemName = "name",
+  ...rest
+}: TreeViewControllerProps) => {
   const { control, setValue, getValues } = useFormContext();
 
   const [nestedItems, setNestedItems] = useState<any[]>([]);
@@ -64,7 +66,7 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
           }
         }
       } else {
-        let foundNestItem: any = nestedItems?.find(
+        let foundNestItem = nestedItems?.find(
           (item) => item._id === nodeId && item?.children?.length > 0
         );
 
@@ -113,9 +115,7 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
               <TreeItem
                 key={parentItem._id}
                 nodeId={parentItem._id}
-                labelText={
-                  locale === "en" ? parentItem.name : parentItem.vi_name
-                }
+                labelText={parentItem[itemName]}
                 formName={rest.name}
                 setValue={setValue}
                 getValues={getValues}
@@ -126,11 +126,7 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
                     <TreeItem
                       key={childrenItem._id}
                       nodeId={childrenItem._id}
-                      labelText={
-                        locale === "en"
-                          ? childrenItem.name
-                          : childrenItem.vi_name
-                      }
+                      labelText={childrenItem[itemName]}
                       formName={rest.name}
                       setValue={setValue}
                       getValues={getValues}

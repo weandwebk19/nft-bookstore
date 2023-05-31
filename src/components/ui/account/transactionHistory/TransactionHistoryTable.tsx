@@ -12,6 +12,7 @@ import {
   GridTreeNodeWithRender
 } from "@mui/x-data-grid";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import { DataGrid } from "@/components/shared/DataGrid";
 import { Dialog } from "@/components/shared/Dialog";
@@ -26,6 +27,8 @@ export default function TransactionHistoryTable({
   data
 }: TransactionHistoryTableProps) {
   const { t } = useTranslation("transactionHistory");
+
+  const { locale } = useRouter();
 
   const [targetItem, setTargetItem] = React.useState<any>([]);
 
@@ -52,7 +55,12 @@ export default function TransactionHistoryTable({
       field: "transactionName",
       headerName: t("method") as string,
       width: 120,
-      renderCell: (params) => <Typography>{params.value}</Typography>
+      renderCell: (params) => {
+        let value =
+          locale === "en" ? params.value : params?.row?.transactionNameVi;
+
+        return <Typography>{value}</Typography>;
+      }
     },
     {
       field: "transactionHash",
@@ -115,7 +123,8 @@ export default function TransactionHistoryTable({
       width: 60,
       sortable: false,
       renderCell: (params) => {
-        let detail = params.value.split(", ");
+        let value = locale === "en" ? params.value : params?.row?.detailVi;
+        let detail = value.split(", ");
 
         detail = detail.map((item: string) => {
           const value = item.split(" = ");

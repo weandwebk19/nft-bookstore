@@ -9,7 +9,9 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  Pagination,
   Stack,
+  TextField,
   Typography
 } from "@mui/material";
 
@@ -27,6 +29,7 @@ import { useRouter } from "next/router";
 import withAuth from "@/components/HOC/withAuth";
 import { useNftBookMeta } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
+import { InputController } from "@/components/shared/FormController";
 import { ZenLayout } from "@/layouts/ZenLayout";
 import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
 import { StyledButton } from "@/styles/components/Button";
@@ -69,6 +72,7 @@ const ReadBook = () => {
 
   const [numPages, setNumPages] = useState(2);
   const [pageNumber, setPageNumber] = useState(1);
+  const [inputedPage, setInputedPage] = useState(1);
 
   const renditionRef = useRef<Rendition | null>(null);
   const tocRef = useRef<IToc | null>(null);
@@ -170,12 +174,25 @@ const ReadBook = () => {
 
   pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-  /*To Prevent right click on screen*/
-  useEffect(() => {
-    document.addEventListener("contextmenu", (event) => {
-      event.preventDefault();
-    });
-  }, []);
+  // /*To Prevent right click on screen*/
+  // useEffect(() => {
+  //   document.addEventListener("contextmenu", (event) => {
+  //     event.preventDefault();
+  //   });
+  // }, []);
+
+  // /*To Prevent F12*/
+  // useEffect(() => {
+  //   document.onkeydown = (event) => {
+  //     if (event.key == "F12") {
+  //       // Prevent F12
+  //       return false;
+  //     } else if (event.ctrlKey && event.shiftKey && event.key == "i") {
+  //       // Prevent Ctrl+Shift+I
+  //       return false;
+  //     }
+  //   };
+  // }, []);
 
   useEffect(() => {
     document.addEventListener("keydown", handlePageNavigate);
@@ -183,6 +200,14 @@ const ReadBook = () => {
       document.removeEventListener("keydown", handlePageNavigate);
     };
   }, [numPages]);
+
+  const pageBlurHandler = (event: any, pageNumber: number) => {
+    setPageNumber(pageNumber);
+  };
+
+  const pageChangeHandler = (event: any, pageNumber = 1) => {
+    setPageNumber(parseInt(event.target.textContent));
+  };
 
   const handlePageNavigate = (event: KeyboardEvent) => {
     if (!event.repeat) {
@@ -198,19 +223,6 @@ const ReadBook = () => {
       }
     }
   };
-
-  /*To Prevent F12*/
-  useEffect(() => {
-    document.onkeydown = (event) => {
-      if (event.key == "F12") {
-        // Prevent F12
-        return false;
-      } else if (event.ctrlKey && event.shiftKey && event.key == "i") {
-        // Prevent Ctrl+Shift+I
-        return false;
-      }
-    };
-  }, []);
 
   /*When document gets loaded successfully*/
   function onDocumentLoadSuccess({ numPages }: any) {
@@ -248,13 +260,13 @@ const ReadBook = () => {
             router.push("/account/bookshelf");
           }}
         >
-          My bookshelf
+          {t("myBookshelf")}
         </Button>
 
         {decrypting && (
           <Stack spacing={2} justifyContent="center" alignItems="center">
             <CircularProgress />
-            <Typography>Decrypting your book...</Typography>
+            <Typography>{t("loadingMessage")}</Typography>
           </Stack>
         )}
 
@@ -322,6 +334,43 @@ const ReadBook = () => {
                   >
                     <ChevronRightIcon />
                   </IconButton>
+                </Stack>
+                <Stack spacing={1}>
+                  <Pagination
+                    sx={{ display: "flex", justifyContent: "center" }}
+                    count={numPages}
+                    shape="rounded"
+                    page={pageNumber}
+                    onChange={(event, pageNumber) =>
+                      pageChangeHandler(event, pageNumber)
+                    }
+                    hideNextButton
+                    hidePrevButton
+                  />
+                  <TextField
+                    type="number"
+                    id="outlined-basic"
+                    label={t("pageSelection")}
+                    variant="outlined"
+                    onBlur={(event) =>
+                      pageBlurHandler(event, parseInt(event.target.value))
+                    }
+                    onKeyUp={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        const target = event.target as
+                          | HTMLInputElement
+                          | HTMLTextAreaElement;
+                        target.blur();
+                      }
+                    }}
+                    InputProps={{
+                      inputProps: {
+                        max: numPages,
+                        min: 1
+                      }
+                    }}
+                  />
                 </Stack>
               </Box>
             )}

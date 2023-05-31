@@ -10,10 +10,14 @@ export const usePricingHistory = (bookId: string, category: string) => {
   );
 
   const pricingHistories = data as PricingHistories[];
-  if (pricingHistories && pricingHistories.length > 0) {
-    let highest = pricingHistories[0].price;
-    let lowest = pricingHistories[0].price;
-    const lastest = pricingHistories[pricingHistories.length - 1]?.price;
+  let pricingHistory = data;
+  let calculatedPricingHistory;
+  if (pricingHistories) {
+    let highest = 0;
+    let lowest = 0;
+    const lastest = pricingHistories
+      ? pricingHistories[pricingHistories.length - 1]?.price
+      : 0;
     let sum = 0;
 
     pricingHistories?.forEach((pricing: PricingHistories) => {
@@ -26,7 +30,7 @@ export const usePricingHistory = (bookId: string, category: string) => {
       sum += pricing.price;
     });
 
-    const pricingHistory = {
+    calculatedPricingHistory = {
       highest,
       lowest,
       lastest,
@@ -34,8 +38,8 @@ export const usePricingHistory = (bookId: string, category: string) => {
       pricingHistory: []
     };
 
-    return { data: pricingHistory, isLoading, error };
+    calculatedPricingHistory.pricingHistory = pricingHistory;
   }
 
-  return { data: null, isLoading, error };
+  return { data: calculatedPricingHistory, isLoading, error };
 };

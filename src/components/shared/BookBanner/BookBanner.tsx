@@ -49,8 +49,6 @@ const BookBanner = ({
     })();
   }, [tokenId]);
 
-  console.log(bookInfo);
-
   return (
     <Box sx={{ cursor: "pointer" }} onClick={onClick}>
       <Grid
