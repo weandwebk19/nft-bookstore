@@ -37,9 +37,10 @@ type ActionableBookItemStatus =
 
 interface ActionableBookItemProps {
   tokenId: number;
-  owner?: string; // !!! 'author' should ALWAYS be display !!!  => /// In some cases, we can use seller instead
+  author?: string; // !!! 'author' should ALWAYS be display !!!  => /// In some cases, we can use seller instead
   onClick: (tokenId: number) => void;
   buttons?: React.ReactNode;
+  seller?: string;
   renter?: string;
   borrower?: string;
   status?: ActionableBookItemStatus;
@@ -55,9 +56,10 @@ interface ActionableBookItemProps {
 
 const ActionableBookItem = ({
   tokenId,
-  owner,
+  author,
   onClick,
   buttons,
+  seller,
   renter,
   borrower,
   status,
@@ -75,7 +77,8 @@ const ActionableBookItem = ({
   const account = useAccount();
 
   const theme = useTheme();
-  const [ownerName, setOwnerName] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [sellerName, setSellerName] = useState("");
   const [sharerName, setSharerName] = useState("");
   const [renterName, setRenterName] = useState("");
   const [sharedPersonName, setSharedPersonName] = useState("");
@@ -86,18 +89,34 @@ const ActionableBookItem = ({
   useEffect(() => {
     (async () => {
       try {
-        if (owner) {
-          const userRes = await axios.get(`/api/users/wallet/${owner}`);
+        if (author) {
+          const userRes = await axios.get(`/api/authors/wallet/${author}`);
 
           if (userRes.data.success === true) {
-            setOwnerName(userRes.data.data.fullname);
+            setAuthorName(userRes.data.data.pseudonym);
           }
         }
       } catch (err) {
         console.log(err);
       }
     })();
-  }, [owner]);
+  }, [author]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (seller) {
+          const userRes = await axios.get(`/api/users/wallet/${seller}`);
+
+          if (userRes.data.success === true) {
+            setSellerName(userRes.data.data.fullname);
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [seller]);
 
   useEffect(() => {
     (async () => {
@@ -218,8 +237,18 @@ const ActionableBookItem = ({
 
             <Stack spacing={1} mb={2}>
               {status !== "isCreated" && (
-                <Typography variant="body2">{ownerName}</Typography>
+                <Typography variant="body2">{authorName}</Typography>
               )}
+
+              {status === "isListing" ||
+                (status === "isPurchased" && (
+                  <Stack>
+                    <Typography variant="subtitle2">
+                      {t("soldBy") as string}:
+                    </Typography>
+                    <Typography variant="label">{sellerName}</Typography>
+                  </Stack>
+                ))}
 
               {status === "isBorrowed" && (
                 <Stack>

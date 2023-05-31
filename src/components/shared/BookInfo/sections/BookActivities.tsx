@@ -4,30 +4,18 @@ import { Box, Paper, Stack, Typography } from "@mui/material";
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
+import { useBookHistories } from "@/components/hooks/api";
 import { truncate } from "@/utils/truncate";
+
+import { FallbackNode } from "../../FallbackNode";
 
 const BookActivities = () => {
   const { t } = useTranslation("bookDetail");
-
-  const mockData = [
-    {
-      id: 1,
-      event: "Transfer",
-      price: "",
-      fromAddress: "0xs56fr16c2xfs6dcf2vds12c",
-      toAddres: "0x56scf66d6g6d2xfd251gc2đx25cd2fcx",
-      date: "20-05-2023"
-    },
-    {
-      id: 2,
-      event: "Sale",
-      price: "3.95 ETH",
-      fromAddress: "0xs56fr16c2xfs6dcf2vds12c",
-      toAddress: "0x56scf66d6g6d2xfd251gc2đx25cd2fcx",
-      date: "20-05-2023"
-    }
-  ];
+  const router = useRouter();
+  const query = router.query;
+  const bookHistories = useBookHistories(query.bookId as string);
 
   const columns: GridColDef[] = [
     {
@@ -35,14 +23,20 @@ const BookActivities = () => {
       headerName: t("event") as string,
       width: 120,
       renderCell: (params) => {
-        console.log(params);
-
         return <Typography>{params.value}</Typography>;
       }
     },
     {
       field: "price",
       headerName: t("price") as string,
+      width: 100,
+      renderCell: (params) => {
+        return <Typography>{params.value}</Typography>;
+      }
+    },
+    {
+      field: "amount",
+      headerName: t("Amount") as string,
       width: 100,
       renderCell: (params) => {
         return <Typography>{params.value}</Typography>;
@@ -61,19 +55,7 @@ const BookActivities = () => {
       }
     },
     {
-      field: "toAddress",
-      headerName: t("to") as string,
-      flex: 1,
-      minWidth: 200,
-      sortable: false,
-      renderCell: (params) => {
-        if (params?.value) {
-          return <Typography>{truncate(params.value, 12, -4)}</Typography>;
-        }
-      }
-    },
-    {
-      field: "date",
+      field: "timestamp",
       headerName: t("date") as string,
       width: 180,
       renderCell: (params) => (
@@ -92,13 +74,22 @@ const BookActivities = () => {
         {t("bookActivities")}
       </Typography>
       <Paper>
-        <Box sx={{ height: 400, width: "100%" }}>
-          <DataGrid
-            getRowId={(row: any) => row.id}
-            columns={columns}
-            rows={mockData!}
-          />
-        </Box>
+        {(() => {
+          if (bookHistories.isLoading) {
+            return <Typography>{t("loadingMessage") as string}</Typography>;
+          } else if (bookHistories?.data?.length === 0 || bookHistories.error) {
+            return <FallbackNode />;
+          }
+          return (
+            <Box sx={{ height: 400, width: "100%" }}>
+              <DataGrid
+                getRowId={(row: any) => row.id}
+                columns={columns}
+                rows={bookHistories.data}
+              />
+            </Box>
+          );
+        })()}
         <ToastContainer />
       </Paper>
     </Stack>

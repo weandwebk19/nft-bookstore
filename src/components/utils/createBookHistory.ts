@@ -4,7 +4,7 @@ export const createBookHistory = async (
   tokenId: number,
   event: string,
   eventVi: string,
-  buyer: string,
+  fromAddress: string,
   price: number,
   amount: number
 ) => {
@@ -12,7 +12,7 @@ export const createBookHistory = async (
     tokenId,
     event,
     eventVi,
-    buyer,
+    fromAddress,
     price,
     amount,
     timestamp: new Date()
