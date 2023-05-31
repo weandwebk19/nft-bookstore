@@ -81,11 +81,11 @@ const BookBriefing = () => {
       try {
         if (nftBookMeta.data) {
           const userRes = await axios.get(
-            `/api/users/wallet/${nftBookMeta.data.author}`
+            `/api/authors/wallet/${nftBookMeta.data.author}`
           );
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setAuthorName(userRes.data.data.pseudonym);
           }
         }
       } catch (err) {

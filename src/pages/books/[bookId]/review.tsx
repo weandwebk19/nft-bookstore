@@ -109,10 +109,10 @@ const ReviewButton = ({
     (async () => {
       try {
         if (author) {
-          const userRes = await axios.get(`/api/users/wallet/${author}`);
+          const userRes = await axios.get(`/api/authors/wallet/${author}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setAuthorName(userRes.data.data.pseudonym);
           }
         }
       } catch (err) {
