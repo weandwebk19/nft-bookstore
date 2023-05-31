@@ -9,12 +9,14 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
   GridColDef,
   GridRenderCellParams,
+  GridToolbarContainer,
   GridTreeNodeWithRender
 } from "@mui/x-data-grid";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
 import { DataGrid } from "@/components/shared/DataGrid";
+import { ExportButton } from "@/components/shared/DataGrid/ExportButton";
 import { Dialog } from "@/components/shared/Dialog";
 import { TransactionHistories } from "@/types/transactionHistories";
 import { truncate } from "@/utils/truncate";
@@ -143,9 +145,25 @@ export default function TransactionHistoryTable({
     }
   ];
 
+  function CustomToolbar(props: any) {
+    return (
+      <GridToolbarContainer {...props}>
+        <ExportButton />
+      </GridToolbarContainer>
+    );
+  }
+
+  console.log(data);
+
   return (
     <Stack spacing={3}>
-      <DataGrid getRowId={(row: any) => row.id} columns={columns} rows={data} />
+      <DataGrid
+        getRowId={(row: any) => row.id}
+        columns={columns}
+        rows={data}
+        components={{ Toolbar: CustomToolbar }}
+        // slots={{ toolbar: GridToolbar }}
+      />
       <Dialog
         title={t("dialogTitleInfo") as string}
         open={openInfoDialog}

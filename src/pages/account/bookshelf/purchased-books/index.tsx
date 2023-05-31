@@ -100,7 +100,7 @@ const PurchasedBooks = () => {
                           <ActionableBookItem
                             status="isPurchased"
                             tokenId={book?.tokenId}
-                            owner={book?.seller}
+                            seller={book?.seller}
                             onClick={handleBookClick}
                             amount={book?.amount}
                             amountTradeable={book?.amountTradeable}

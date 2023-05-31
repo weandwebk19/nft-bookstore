@@ -15,9 +15,17 @@ interface DataGridProps {
   columns: GridColDef[];
   rows: any[];
   getRowId?: (row: any) => any;
+  components?: any;
+  config?: any;
 }
 
-const DataGrid = ({ columns, rows, getRowId }: DataGridProps) => {
+const DataGrid = ({
+  columns,
+  rows,
+  getRowId,
+  components,
+  config
+}: DataGridProps) => {
   const theme = useTheme();
   const { locale } = useRouter();
 
@@ -74,6 +82,7 @@ const DataGrid = ({ columns, rows, getRowId }: DataGridProps) => {
         disableRowSelectionOnClick
         getRowHeight={() => "auto"}
         localeText={localeText}
+        components={components}
       />
     </Box>
   );
