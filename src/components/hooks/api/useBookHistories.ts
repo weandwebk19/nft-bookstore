@@ -6,7 +6,6 @@ export const useBookHistories = (bookId: string) => {
     [bookId ? `/api/books/${bookId}/book-histories` : null, bookId],
     async () => {
       const res = await axios.get(`/api/books/${bookId}/book-histories`);
-      console.log("res", res);
       return res.data.data;
     }
   );

@@ -45,7 +45,6 @@ const OwnedBooks = () => {
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
@@ -100,7 +99,7 @@ const OwnedBooks = () => {
                           <ActionableBookItem
                             status="isOwned"
                             tokenId={book?.tokenId}
-                            owner={book?.author}
+                            author={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
                             amountOwned={book?.amountOwned}

@@ -180,7 +180,7 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
       if (account.data) {
         await createBookHistory(
           tokenId,
-          "Sell",
+          "Sale",
           "Bán",
           account.data,
           price,

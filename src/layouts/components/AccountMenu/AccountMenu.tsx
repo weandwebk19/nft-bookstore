@@ -120,8 +120,12 @@ const AccountMenu = ({
       icon: <LogoutOutlinedIcon color="primary" fontSize="small" />,
       content: t("navbar:disconnect") as string,
       onClick: () => {
+        window.ethereum = null;
         disconnect();
         signOut({ redirect: false });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     }
   ];

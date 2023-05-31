@@ -96,16 +96,14 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
 
   useEffect(() => {
     (async () => {
-      console.log("bookDetail", bookDetail);
-
       try {
         if (bookDetail && bookDetail?.nftCore) {
           const userRes = await axios.get(
-            `/api/users/wallet/${bookDetail.nftCore?.author}`
+            `/api/authors/wallet/${bookDetail.nftCore?.author}`
           );
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setAuthorName(userRes.data.data.pseudonym);
           }
         }
       } catch (err) {
