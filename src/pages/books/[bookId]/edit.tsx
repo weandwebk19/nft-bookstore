@@ -60,13 +60,13 @@ const EditBook = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const schema = yup.object({
-    description: yup.string().required(t("textError2") as string),
+    description: yup.string().required(t("textError3") as string),
     externalLink: yup.string(),
     totalPages: yup
       .number()
-      .typeError(t("textError20") as string)
-      .min(0, `${t("textError16") as string}`)
-      .required(t("textError17") as string),
+      .typeError(t("textError4") as string)
+      .min(0, `${t("textError5") as string}`)
+      .required(t("textError6") as string),
     keywords: yup.array().of(yup.string()),
     genres: yup
       .array()

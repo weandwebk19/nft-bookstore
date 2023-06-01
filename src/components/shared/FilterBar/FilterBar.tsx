@@ -68,7 +68,7 @@ const defaultValues = {
   genre: [],
   title: "",
   author: "",
-  rating: 3,
+  rating: 0,
   language: "",
   priceRange: [MIN_PRICE, MAX_PRICE]
 };
@@ -93,13 +93,17 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
     mode: "all"
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, setValue, reset, getValues } = methods;
 
   const onSubmit = (data: any) => {
     const newQueryString = { ...router.query, ...data };
     const queryString = querystring.stringify(newQueryString);
     const url = `?${queryString}`;
     router.push(url);
+  };
+
+  const handleReset = () => {
+    reset(defaultValues);
   };
 
   const handleResetGenres = () => {
@@ -235,13 +239,18 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
               itemValue="name"
             />
           </FormGroup>
-          <StyledButton
-            customVariant="primary"
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-          >
-            {t("apply") as string}
-          </StyledButton>
+          <Stack direction="column" spacing={2}>
+            <StyledButton customVariant="secondary" onClick={handleReset}>
+              {t("reset") as string}
+            </StyledButton>
+            <StyledButton
+              customVariant="primary"
+              type="submit"
+              onClick={handleSubmit(onSubmit)}
+            >
+              {t("apply") as string}
+            </StyledButton>
+          </Stack>
         </Stack>
       </FormProvider>
     </ContentPaper>

@@ -26,6 +26,7 @@ const MultipleSelectController = ({
       }) => (
         <MultipleSelectChip
           items={items}
+          itemsName={rest.name}
           value={value}
           onChange={onChange}
           helperText={invalid ? error?.message : ""}
