@@ -111,7 +111,7 @@ const CreatedBooks = () => {
                           <ActionableBookItem
                             status="isCreated"
                             tokenId={book?.tokenId}
-                            owner={book?.author}
+                            author={book?.author}
                             onClick={handleBookClick}
                             quantity={book?.quantity}
                             amountTradeable={book?.amountTradeable}

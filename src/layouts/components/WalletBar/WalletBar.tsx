@@ -182,10 +182,15 @@ const WalletBar = ({
           open={openAccountMenu}
           onClose={handleAccountMenuClose}
           disconnect={() => {
+            window.ethereum = null;
             disconnect();
             signOut({
               redirect: false
             });
+
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           }}
           isAuthor={isAuthor}
         />
@@ -304,6 +309,7 @@ const WalletBar = ({
                       disabled={!connector.ready}
                       onClick={() => {
                         if (!isConnected) {
+                          // window.ethereum = null;
                           connect({ connector });
                         } else {
                           handleLogin();

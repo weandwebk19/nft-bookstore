@@ -12,5 +12,6 @@
   "scrollToTop": "Cuộn lên đầu trang",
   "dropFileHere": "Thả file ở đây ...",
   "dragAndDrop1": "Kéo & thả file ở đây",
-  "dragAndDrop2": " hoặc click để chọn file"
+  "dragAndDrop2": " hoặc click để chọn file",
+  "dataNotFound": "Không tìm thấy dữ liệu"
 }

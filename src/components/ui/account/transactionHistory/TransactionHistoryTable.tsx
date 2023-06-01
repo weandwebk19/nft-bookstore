@@ -9,11 +9,14 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
   GridColDef,
   GridRenderCellParams,
+  GridToolbarContainer,
   GridTreeNodeWithRender
 } from "@mui/x-data-grid";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 import { DataGrid } from "@/components/shared/DataGrid";
+import { ExportButton } from "@/components/shared/DataGrid/ExportButton";
 import { Dialog } from "@/components/shared/Dialog";
 import { TransactionHistories } from "@/types/transactionHistories";
 import { truncate } from "@/utils/truncate";
@@ -26,6 +29,8 @@ export default function TransactionHistoryTable({
   data
 }: TransactionHistoryTableProps) {
   const { t } = useTranslation("transactionHistory");
+
+  const { locale } = useRouter();
 
   const [targetItem, setTargetItem] = React.useState<any>([]);
 
@@ -52,7 +57,12 @@ export default function TransactionHistoryTable({
       field: "transactionName",
       headerName: t("method") as string,
       width: 120,
-      renderCell: (params) => <Typography>{params.value}</Typography>
+      renderCell: (params) => {
+        let value =
+          locale === "en" ? params.value : params?.row?.transactionNameVi;
+
+        return <Typography>{value}</Typography>;
+      }
     },
     {
       field: "transactionHash",
@@ -115,7 +125,8 @@ export default function TransactionHistoryTable({
       width: 60,
       sortable: false,
       renderCell: (params) => {
-        let detail = params.value.split(", ");
+        let value = locale === "en" ? params.value : params?.row?.detailVi;
+        let detail = value.split(", ");
 
         detail = detail.map((item: string) => {
           const value = item.split(" = ");
@@ -134,9 +145,25 @@ export default function TransactionHistoryTable({
     }
   ];
 
+  function CustomToolbar(props: any) {
+    return (
+      <GridToolbarContainer {...props}>
+        <ExportButton />
+      </GridToolbarContainer>
+    );
+  }
+
+  console.log(data);
+
   return (
     <Stack spacing={3}>
-      <DataGrid getRowId={(row: any) => row.id} columns={columns} rows={data} />
+      <DataGrid
+        getRowId={(row: any) => row.id}
+        columns={columns}
+        rows={data}
+        components={{ Toolbar: CustomToolbar }}
+        // slots={{ toolbar: GridToolbar }}
+      />
       <Dialog
         title={t("dialogTitleInfo") as string}
         open={openInfoDialog}

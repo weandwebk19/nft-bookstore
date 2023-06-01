@@ -38,7 +38,6 @@ const DisplayBox: FunctionComponent = () => {
 
   // should be replaced with the newest book that has been published
   const firstBook = listedBooks?.data?.[0];
-  console.log(firstBook);
 
   return (
     <Box>

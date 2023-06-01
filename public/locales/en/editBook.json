@@ -14,5 +14,9 @@
   "reset": "Reset",
   "saveChanges": "Save changes",
   "textError1": "Please enter your book genres",
-  "textError2": "Please enter your book languages"
+  "textError2": "Please enter your book languages",
+  "textError3": "Please enter your book description",
+  "textError4": "Please enter the pages of your book as numeric value",
+  "textError5": "The total pages must be greater than or equal 0",
+  "textError6": "Please enter the page number of your book"
 }
