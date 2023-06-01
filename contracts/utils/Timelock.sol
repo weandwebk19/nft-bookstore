@@ -16,8 +16,7 @@ contract TimeLock {
 
     event Cancel(bytes32 indexed txId);
 
-    uint public constant DELAY_TRANSACTION = 1200; // 30 minutes
-    uint public constant MIN_DELAY = 604800 - DELAY_TRANSACTION; // 1 weeks
+    uint public constant MIN_DELAY = 604800; // 1 weeks
 
     // tx id => queued
     mapping(bytes32 => bool) private queued;
@@ -95,7 +94,7 @@ contract TimeLock {
         string memory _func,
         bytes memory _data,
         uint _timestamp
-    ) public returns(bool) {
+    ) public view returns(bool) {
         bytes32 txId = getTxId(_owner, _value, _func, _data, _timestamp);
 
         if (!queued[txId]) {
@@ -108,13 +107,12 @@ contract TimeLock {
             return false;
         }
 
-        queued[txId] = false;
+        // queued[txId] = false;
         return true;
     }
 
     function cancel(bytes32 _txId) public {
         if (!queued[_txId]) {
-            require(false, "Check log1");
             revert Error.NotQueuedError(_txId);
         }
 
