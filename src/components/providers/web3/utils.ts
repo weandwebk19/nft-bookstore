@@ -5,7 +5,7 @@ import { Contract, ethers, providers } from "ethers";
 
 declare global {
   interface Window {
-    ethereum?: MetaMaskInpageProvider;
+    ethereum?: any;
   }
 }
 

@@ -7,9 +7,16 @@ import images from "@/assets/images";
 interface ContentContainerProps {
   titles?: string[];
   children: React.ReactNode;
+  button?: JSX.Element;
+  width?: number;
 }
 
-const ContentContainer = ({ titles, children }: ContentContainerProps) => {
+const ContentContainer = ({
+  titles,
+  children,
+  button,
+  width
+}: ContentContainerProps) => {
   return (
     <Stack
       spacing={8}
@@ -21,7 +28,17 @@ const ContentContainer = ({ titles, children }: ContentContainerProps) => {
       }}
       className={styles["content__container"]}
     >
-      <Box component="section" sx={{ marginTop: "100px" }}>
+      <Box
+        component="section"
+        sx={{
+          marginTop: "100px",
+          width: width ? width : "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column"
+        }}
+      >
         <Box sx={{ textAlign: "center", position: "relative", mb: 8 }}>
           {titles?.map((title) => (
             <Typography variant="h2" key={title}>
@@ -38,6 +55,7 @@ const ContentContainer = ({ titles, children }: ContentContainerProps) => {
             }}
           />
         </Box>
+        {button && <Box sx={{ width: "100%", textAlign: "end" }}>{button}</Box>}
       </Box>
       {children}
     </Stack>

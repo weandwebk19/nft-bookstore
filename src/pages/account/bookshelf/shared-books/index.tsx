@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { Box, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/material";
 
@@ -18,6 +20,7 @@ import { FilterBar } from "@/components/shared/FilterBar";
 import { FilterField } from "@/types/filter";
 import { BookSharing } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
+import { secondsToDhms } from "@/utils/secondsToDhms";
 
 const SharedBooks = () => {
   const { t } = useTranslation("sharedBooks");
@@ -36,6 +39,12 @@ const SharedBooks = () => {
   const router = useRouter();
   const { nfts } = useOwnedSharedBooks(router.query as FilterField);
   const sharedBooks = nfts.data as BookSharing[];
+  const [nowTime, setNowTime] = useState<number>(0);
+
+  useEffect(() => {
+    const seconds = new Date().getTime() / 1000;
+    setNowTime(seconds);
+  }, []);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -96,6 +105,9 @@ const SharedBooks = () => {
                             tokenId={book?.tokenId}
                             sharer={book?.sharer}
                             onClick={handleBookClick}
+                            price={book?.price}
+                            countDown={secondsToDhms(book?.endTime - nowTime)}
+                            amount={book?.amount}
                             buttons={
                               <>
                                 <ReviewButton

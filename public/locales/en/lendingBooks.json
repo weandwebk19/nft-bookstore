@@ -9,6 +9,8 @@
   "breadcrumbs_bookshelf": "Bookshelf",
   "breadcrumbs_lendingBooks": "Lending books",
   "dialogTitle": "Revoke all",
+  "dialogTitle2": "Cancel Lend",
+  "dialogTitle3": "Revoke",
   "message": "Are you sure to revoke all the books?",
   "button_cancel": "Cancel",
   "button_revoke": "Revoke",

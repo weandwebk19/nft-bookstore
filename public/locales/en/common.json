@@ -11,5 +11,6 @@
   "scrollToTop": "Scroll to top",
   "dropFileHere": "Drop the files here ...",
   "dragAndDrop1": "Drag 'n' drop a file here",
-  "dragAndDrop2": " or click to select file"
+  "dragAndDrop2": " or click to select file",
+  "dataNotFound": "Data Not Found"
 }

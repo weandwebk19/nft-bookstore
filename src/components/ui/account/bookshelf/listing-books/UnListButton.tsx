@@ -7,6 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
@@ -49,6 +50,8 @@ const UnListButton = ({
   seller,
   tokenId
 }: UnListButtonProps) => {
+  const { t: t2 } = useTranslation("bookButtons");
+
   const [sellerName, setSellerName] = useState();
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
@@ -76,7 +79,7 @@ const UnListButton = ({
 
       const receipt: any = await toast.promise(tx!.wait(), {
         pending: "Pending.",
-        success: "Cancel Lend NftBook successfully",
+        success: "Cancel listing NftBook successfully",
         error: "Oops! There's a problem with lending cancel process!"
       });
 
@@ -85,7 +88,8 @@ const UnListButton = ({
           provider,
           receipt,
           tokenId,
-          "Unlist listing book"
+          "Unlist listing book",
+          "Hủy bán sách"
         );
       }
     } catch (e: any) {
@@ -160,16 +164,15 @@ const UnListButton = ({
         sx={{ width: "100%" }}
         onClick={handleRevokeDiaglogClick}
       >
-        Unlist
+        {t2("unlistBtn") as string}
       </Button>
 
       {!isEnded && (
         <Dialog
-          title="Unlist"
+          title={t2("unlistTitle") as string}
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
-          renter
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
               <Stack>
@@ -181,7 +184,9 @@ const UnListButton = ({
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{sellerName}</Typography>
-                <Typography>Amount: {amount}</Typography>
+                <Typography>
+                  {t2("amount") as string}: {amount}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -194,8 +199,7 @@ const UnListButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} is in a rental term duration. Are you sure you
-                      want to cacel lending this book?
+                      {borrower} {t2("textUnlist1") as string}
                     </Typography>
                   </>
                 )}
@@ -206,10 +210,10 @@ const UnListButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  No
+                  {t2("noBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Yes
+                  {t2("yesBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

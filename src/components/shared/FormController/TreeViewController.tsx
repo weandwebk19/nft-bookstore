@@ -12,9 +12,14 @@ import { TreeItem } from "../TreeItem";
 interface TreeViewControllerProps {
   name: string;
   items: any[] | null;
+  itemName?: string;
 }
 
-const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
+const TreeViewController = ({
+  items,
+  itemName = "name",
+  ...rest
+}: TreeViewControllerProps) => {
   const { control, setValue, getValues } = useFormContext();
 
   const [nestedItems, setNestedItems] = useState<any[]>([]);
@@ -110,7 +115,7 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
               <TreeItem
                 key={parentItem._id}
                 nodeId={parentItem._id}
-                labelText={parentItem.name}
+                labelText={parentItem[itemName]}
                 formName={rest.name}
                 setValue={setValue}
                 getValues={getValues}
@@ -121,7 +126,7 @@ const TreeViewController = ({ items, ...rest }: TreeViewControllerProps) => {
                     <TreeItem
                       key={childrenItem._id}
                       nodeId={childrenItem._id}
-                      labelText={childrenItem.name}
+                      labelText={childrenItem[itemName]}
                       formName={rest.name}
                       setValue={setValue}
                       getValues={getValues}

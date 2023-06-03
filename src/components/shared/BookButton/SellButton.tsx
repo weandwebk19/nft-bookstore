@@ -18,6 +18,7 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { StyledButton } from "@/styles/components/Button";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
@@ -29,19 +30,6 @@ interface SellButtonProps {
   tokenId: number;
   amountTradeable: number;
 }
-
-const schema = yup
-  .object({
-    price: yup
-      .number()
-      .min(0, `The price must be higher than 0.`)
-      .typeError("Price must be a number"),
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
-  })
-  .required();
 
 const defaultValues = {
   price: 0,
@@ -56,6 +44,19 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
   const { metadata } = useMetadata(tokenId);
   const { account } = useAccount();
   const [bookId, setBookId] = useState();
+
+  const schema = yup
+    .object({
+      price: yup
+        .number()
+        .min(0, t("textErrorSell1") as string)
+        .typeError(t("textErrorSell2") as string),
+      amount: yup
+        .number()
+        .min(1, t("textErrorSell3") as string)
+        .typeError(t("textErrorSell4") as string)
+    })
+    .required();
 
   useEffect(() => {
     (async () => {
@@ -103,9 +104,12 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
       try {
         // handle errors
         if (amount > amountTradeable) {
-          return toast.error(`Amount must be less than ${amountTradeable}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
+          return toast.error(
+            `${t("textErrorSell5") as string} ${amountTradeable}.`,
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
         }
 
         const listingPrice = await bookStoreContract!.listingPrice();
@@ -119,9 +123,9 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
         );
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Sell NftBook Token",
-          success: "NftBook is successfully put on sale",
-          error: "Oops! There's a problem with listing process!"
+          pending: t("pendingSell") as string,
+          success: t("successSell") as string,
+          error: t("errorSell") as string
         });
 
         if (receipt) {
@@ -140,10 +144,14 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
             totalFee,
             balanceInEther,
             "Sell book",
+            "Bán sách",
             receipt.transactionHash,
             receipt.from,
             receipt.to,
             `Gas fee = ${gasFee} ETH, listing fee =  ${listingPriceNumber} ETH, total fee = ${
+              0 - totalFee
+            } ETH`,
+            `Phí gas= ${gasFee} ETH, Phí liệt kê =  ${listingPriceNumber} ETH, Tổng cộng = ${
               0 - totalFee
             } ETH`
           );
@@ -167,9 +175,26 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
     [account.data]
   );
 
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Sale",
+          "Bán",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
+  );
+
   const onSubmit = async (data: any) => {
     await sellBooks(tokenId, data.price, data.amount, amountTradeable);
     await createPricingHistoryCallback(tokenId, data.price);
+    await createBookHistoryCallback(tokenId, data.price, data.amount);
   };
 
   useEffect(() => {
@@ -196,10 +221,14 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
         sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        Sell
+        {t("sellBtn") as string}
       </Button>
 
-      <Dialog title="Sell" open={openBookCard} onClose={handleBookCardClose}>
+      <Dialog
+        title={t("sellTitle") as string}
+        open={openBookCard}
+        onClose={handleBookCardClose}
+      >
         <FormProvider {...methods}>
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
@@ -212,7 +241,9 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{ownerName}</Typography>
-                <Typography>{amountTradeable} left</Typography>
+                <Typography>
+                  {amountTradeable} {t("left") as string}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -256,10 +287,10 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
                     </Stack>
                   </Stack>
                 )}
-                <FormGroup label="Listing price" required>
+                <FormGroup label={t("listingPrice") as string} required>
                   <TextFieldController name="price" type="number" />
                 </FormGroup>
-                <FormGroup label="Amount" required>
+                <FormGroup label={t("amount") as string} required>
                   <TextFieldController name="amount" type="number" />
                 </FormGroup>
               </Stack>
@@ -269,10 +300,10 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start selling
+                  {t("startSellingBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

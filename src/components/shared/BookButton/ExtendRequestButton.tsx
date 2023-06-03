@@ -19,6 +19,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
@@ -50,19 +51,6 @@ interface ExtendRequestButtonProps {
   supplyAmount: number;
 }
 
-const schema = yup
-  .object({
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number"),
-    extendDays: yup
-      .number()
-      .min(1, `The day must be higher than 0.`)
-      .typeError("Rental days must be a number")
-  })
-  .required();
-
 const defaultValues = {
   amount: 1,
   extendDays: 7
@@ -75,6 +63,8 @@ const ExtendRequestButton = ({
   endTime,
   supplyAmount
 }: ExtendRequestButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const [renterName, setRenterName] = useState();
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
@@ -86,6 +76,19 @@ const ExtendRequestButton = ({
   const [activeStep, setActiveStep] = useState(0);
 
   const steps = ["Balance checking", "Confirm purchase"];
+
+  const schema = yup
+    .object({
+      amount: yup
+        .number()
+        .min(1, t("textErrorExtend1") as string)
+        .typeError(t("textErrorExtend2") as string),
+      extendDays: yup
+        .number()
+        .min(1, t("textErrorExtend3") as string)
+        .typeError(t("textErrorExtend4") as string)
+    })
+    .required();
 
   const getStepContent = () => {
     switch (activeStep) {
@@ -135,22 +138,22 @@ const ExtendRequestButton = ({
       try {
         // Handle errors
         if (extendedTime < 604800) {
-          return toast.error(`Extend time must be greater than 7 days.`, {
+          return toast.error(t("textErrorExtend5") as string, {
             position: toast.POSITION.TOP_CENTER
           });
         }
         if (extendedAmount > supplyAmount) {
-          return toast.error(`Amount must be less than ${supplyAmount}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
-        }
-        if (account.data == renter) {
           return toast.error(
-            "You are not allowed to extend the book borrowed by yourself.",
+            `${t("textErrorExtend6") as string} ${supplyAmount}.`,
             {
               position: toast.POSITION.TOP_CENTER
             }
           );
+        }
+        if (account.data == renter) {
+          return toast.error(t("textErrorExtend7") as string, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
 
         const tx = await bookStoreContract?.requestExtendTimeOfBorrowedBooks(
@@ -163,9 +166,9 @@ const ExtendRequestButton = ({
         );
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Processing transaction",
-          success: "Request extend successfully.",
-          error: "Processing error"
+          pending: t("pendingExtend") as string,
+          success: t("successExtend") as string,
+          error: t("errorExtend") as string
         });
 
         if (receipt) {
@@ -173,7 +176,8 @@ const ExtendRequestButton = ({
             provider,
             receipt,
             tokenId,
-            "Request extend borrowed book"
+            "Request extend borrowed book",
+            "Yêu cầu gia hạn sách đang mượn"
           );
         }
       } catch (error: any) {
@@ -226,11 +230,11 @@ const ExtendRequestButton = ({
         sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        Extend
+        {t("extendBtn") as string}
       </Button>
 
       <Dialog
-        title="Make an Extension Request"
+        title={t("extendTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
@@ -246,7 +250,9 @@ const ExtendRequestButton = ({
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
-                <Typography>{supplyAmount} left</Typography>
+                <Typography>
+                  {supplyAmount} {t("left") as string}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -256,10 +262,10 @@ const ExtendRequestButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Amount" required>
+                <FormGroup label={t("amount") as string} required>
                   <TextFieldController name="amount" type="number" />
                 </FormGroup>
-                <FormGroup label="Extend for (day)" required>
+                <FormGroup label={t("extendDays") as string} required>
                   <NumericStepperController name="extendDays" />
                 </FormGroup>
               </Stack>
@@ -269,10 +275,10 @@ const ExtendRequestButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Request extend
+                  {t("requestExtendBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

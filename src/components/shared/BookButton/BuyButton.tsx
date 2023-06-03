@@ -3,38 +3,26 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  Stack,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography
-} from "@mui/material";
+import { Box, Button, Divider, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
-import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { TextFieldController } from "@/components/shared/FormController";
-import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { StyledButton } from "@/styles/components/Button";
-import { NftBookMeta } from "@/types/nftBook";
 
-import Step1 from "../../ui/publishing/steps/Step1";
-import Step2 from "../../ui/publishing/steps/Step2";
 import { createTransactionHistory } from "../../utils";
 import { getGasFee } from "../../utils/getGasFee";
+import { NumericStepperController } from "../FormController";
+import { FormGroup } from "../FormGroup";
 
 interface BuyButtonProps {
   tokenId: number;
@@ -42,15 +30,6 @@ interface BuyButtonProps {
   price: number;
   supplyAmount: number;
 }
-
-const schema = yup
-  .object({
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
-  })
-  .required();
 
 const defaultValues = {
   amount: 1
@@ -62,7 +41,8 @@ const BuyButton = ({
   price,
   supplyAmount
 }: BuyButtonProps) => {
-  const router = useRouter();
+  const { t } = useTranslation("bookButtons");
+
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const [sellerName, setSellerName] = useState();
@@ -71,28 +51,14 @@ const BuyButton = ({
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
 
-  const [activeStep, setActiveStep] = useState(0);
-
-  const steps = ["Balance checking", "Confirm purchase"];
-
-  const getStepContent = () => {
-    switch (activeStep) {
-      case 0:
-        return <Step1 />;
-      case 1:
-        return <Step2 supplyAmount={supplyAmount} />;
-      default:
-        return null;
-    }
-  };
-
-  const handleNext = async () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  const schema = yup
+    .object({
+      amount: yup
+        .number()
+        .min(1, t("textErrorBuy1") as string)
+        .typeError(t("textErrorBuy2") as string)
+    })
+    .required();
 
   const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorBookCard(e.currentTarget);
@@ -109,7 +75,15 @@ const BuyButton = ({
     mode: "all"
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, watch } = methods;
+
+  const currentAmount = watch("amount");
+  const [totalPayment, setTotalPayment] = useState<number>(0);
+
+  useEffect(() => {
+    const total = currentAmount * price;
+    setTotalPayment(total);
+  }, [currentAmount, price]);
 
   const buyBooks = useCallback(
     async (
@@ -122,16 +96,16 @@ const BuyButton = ({
       try {
         // Handle errors
         if (amount > supplyAmount) {
-          return toast.error(`Amount must be less than ${supplyAmount}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
-        } else if (account.data == seller) {
           return toast.error(
-            "You are not allowed to buy the book published by yourself.",
+            `${t("textErrorBuy3") as string} ${supplyAmount}.`,
             {
               position: toast.POSITION.TOP_CENTER
             }
           );
+        } else if (account.data == seller) {
+          return toast.error(t("textErrorBuy4") as string, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
 
         const tx = await bookStoreContract?.buyBooks(tokenId, seller, amount, {
@@ -139,9 +113,9 @@ const BuyButton = ({
         });
 
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Processing transaction",
-          success: "Nft Book is yours! Go to Profile page",
-          error: "Processing error"
+          pending: t("pendingBuy") as string,
+          success: t("successBuy") as string,
+          error: t("errorBuy") as string
         });
 
         if (receipt) {
@@ -165,12 +139,16 @@ const BuyButton = ({
               totalFee,
               balanceInEther,
               "Buy book",
+              "Mua sách",
               transactionHash,
               buyerAddress,
               sellerAddress,
               `Gas fee = ${gasFee} ETH, book fee = ${
                 price * amount
-              } ETH, total price =  = ${0 - totalFee} ETH`
+              } ETH, total price =  = ${0 - totalFee} ETH`,
+              `Phí gas = ${gasFee} ETH, Giá quyển sách = ${
+                price * amount
+              } ETH, Tổng cộng =  = ${0 - totalFee} ETH`
             );
           };
 
@@ -188,11 +166,13 @@ const BuyButton = ({
               tokenId,
               price * amount,
               balanceInEther,
-              "From buy book",
+              "Reader buy book",
+              "Độc giả mua sách",
               transactionHash,
               sellerAddress,
               buyerAddress,
-              `Total price received = ${price * amount} ETH`
+              `Total price received = ${price * amount} ETH`,
+              `Tổng tiền nhận = ${price * amount} ETH`
             );
           };
 
@@ -212,6 +192,8 @@ const BuyButton = ({
             receipt.transactionHash
           );
         }
+
+        await createBookHistoryCallback(tokenId, price, amount);
       } catch (e: any) {
         console.error(e);
         toast.error(`${e.message.substr(0, 65)}.`, {
@@ -220,6 +202,22 @@ const BuyButton = ({
       }
     },
     [account.data, bookStoreContract, provider]
+  );
+
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Buy",
+          "Mua",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
   );
 
   const onSubmit = async (data: any) => {
@@ -249,140 +247,83 @@ const BuyButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Buy now
+        {t("buyNowBtn") as string}
       </Button>
 
       <Dialog
-        title="Buy book"
+        title={t("buyNowTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
         <FormProvider {...methods}>
-          {/* <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
-            <Grid item md={4}>
-              <Stack>
-                <Box
-                  component="img"
+          <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
+            <Grid item md={4} xs={4}>
+              <Stack sx={{ alignItems: { xs: "center", md: "start" } }}>
+                <Image
+                  src={metadata?.data?.bookCover}
+                  alt={metadata?.data?.title}
+                  sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
                   className={styles["book-item__book-cover"]}
-                  src={bookCover}
-                  alt={title}
-                  sx={{ width: "100%" }}
                 />
-                <Typography variant="h5">{title}</Typography>
+                <Typography variant="h5">{metadata?.data?.title}</Typography>
                 <Typography>{sellerName}</Typography>
+                <Typography variant="h4">{price} ETH</Typography>
               </Stack>
             </Grid>
-            <Grid item md={8}>
+
+            <Grid
+              item
+              md={8}
+              xs={4}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
+            >
               <Stack
                 spacing={3}
                 sx={{
                   mb: 5
                 }}
               >
-                <FormGroup label="Listing price" required>
-                  <TextFieldController name="price" type="number" />
-                </FormGroup>
-                <FormGroup label="Amount" required>
-                  <TextFieldController name="amount" type="number" />
+                <FormGroup label={t("amount") as string} required>
+                  <NumericStepperController name="amount" />
+                  <Typography>
+                    {supplyAmount} {t("left") as string}
+                  </Typography>
                 </FormGroup>
               </Stack>
+              <Divider />
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography>{t("total") as string}:</Typography>
+                <Typography variant="h6">{totalPayment} ETH</Typography>
+              </Stack>
+              <Typography
+                gutterBottom
+                variant="caption"
+                sx={{ textAlign: "end" }}
+              >
+                {t("gasFee") as string}
+              </Typography>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start selling
+                  {t("confirmPurchaseBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>
-          </Grid> */}
-          <Stack spacing={3}>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1, sm: 2, md: 4 }}
-            >
-              <Image
-                src={metadata?.data?.bookCover}
-                alt={metadata?.data?.title}
-                sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-                className={styles["book-item__book-cover"]}
-              />
-              <Box>
-                <Typography variant="h5">{metadata?.data?.title}</Typography>
-                <Typography>{sellerName}</Typography>
-                <Typography variant="h4">{price} ETH</Typography>
-              </Box>
-            </Stack>
-            <Divider />
-            <Stack flexGrow={1}>
-              <Stepper activeStep={activeStep}>
-                {steps.map((label) => {
-                  return (
-                    <Step key={label}>
-                      <StepLabel>{label}</StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-              <div style={{ minHeight: "50%" }}>
-                {activeStep === steps.length ? (
-                  <>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                      Successfully purchased! Checkout your new book...
-                    </Typography>
-                    <StyledButton
-                      onClick={() => {
-                        router.push("/account/bookshelf/owned-books");
-                      }}
-                    >
-                      My owned books
-                    </StyledButton>
-                  </>
-                ) : (
-                  <>
-                    <Box my={2} sx={{ minHeight: "25vh" }}>
-                      {getStepContent()}
-                    </Box>
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      style={{ paddingTop: "5vh" }}
-                    >
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ mr: 1 }}
-                      >
-                        Back
-                      </Button>
-                      {activeStep === steps.length - 1 ? (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleSubmit(onSubmit)}
-                        >
-                          Confirm purchase
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleNext}
-                        >
-                          Next
-                        </Button>
-                      )}
-                    </Box>
-                  </>
-                )}
-              </div>
-            </Stack>
-          </Stack>
+          </Grid>
         </FormProvider>
         <ToastContainer />
       </Dialog>

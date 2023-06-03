@@ -19,6 +19,7 @@ interface CommentProps {
   content: string;
   rating?: number;
   reply?: string;
+  date: string | Date;
 }
 
 const NestedComments = ({
@@ -27,7 +28,8 @@ const NestedComments = ({
   avatar,
   content,
   rating,
-  reply
+  reply,
+  date
 }: CommentProps) => {
   const theme = useTheme();
 
@@ -76,6 +78,7 @@ const NestedComments = ({
             showNestedComments={showNestedComments}
             onShowNestedComment={handleNestedCommentsToggle}
             hasChildren={reply ? true : false}
+            date={date}
           />
         </Box>
         <Collapse in={showNestedComments} timeout="auto" unmountOnExit>

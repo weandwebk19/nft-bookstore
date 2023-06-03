@@ -156,7 +156,6 @@ const AuthorRequest = () => {
     reset
   } = methods;
   const watchPicture = watch("picture");
-  console.log("watchPicture", watchPicture);
 
   const handleRemoveImage = useCallback(async () => {
     setValue("picture", "");
@@ -353,7 +352,10 @@ const AuthorRequest = () => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <FormGroup label={t("email") as string} required>
-                            <TextFieldController name="email" />
+                            <TextFieldController
+                              name="email"
+                              readOnly={isLoading}
+                            />
                           </FormGroup>
                         </Grid>
                         <Grid item xs={12} sm={6}>

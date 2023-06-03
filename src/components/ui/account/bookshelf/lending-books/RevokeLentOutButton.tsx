@@ -5,6 +5,7 @@ import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
@@ -36,6 +37,9 @@ const RevokeLentOutButton = ({
   endTime,
   buttonName = "Revoke"
 }: RevokeLentOutButtonProps) => {
+  const { t } = useTranslation("lendingBooks");
+  const { t: t2 } = useTranslation("bookButtons");
+
   const [renterName, setRenterName] = useState();
   const { provider, bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
@@ -89,7 +93,8 @@ const RevokeLentOutButton = ({
           provider,
           receipt,
           tokenId,
-          "Revoke lent out book"
+          "Revoke lent out book",
+          "Thu hồi sách đã cho thuê"
         );
       }
     } catch (e: any) {
@@ -155,12 +160,12 @@ const RevokeLentOutButton = ({
         sx={{ width: "100%" }}
         onClick={handleRevokeDiaglogClick}
       >
-        {buttonName}
+        {t2("revokeBtn") as string}
       </Button>
 
       {!isEnded && (
         <Dialog
-          title={buttonName}
+          title={t("dialogTitle3") as string}
           open={openRevokeDiaglog}
           onClose={handleRevokeDiaglogClose}
         >
@@ -175,7 +180,9 @@ const RevokeLentOutButton = ({
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
-                <Typography>Amount: {amount}</Typography>
+                <Typography>
+                  {t2("amount") as string}: {amount}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -188,10 +195,11 @@ const RevokeLentOutButton = ({
                 {borrower && !isEnded && (
                   <>
                     <Typography>
-                      {borrower} is in a rental term duration. Are you sure you
-                      want to revoke this?
+                      {borrower} {t2("textRevoke2") as string}
                     </Typography>
-                    <Typography>{countDown} left</Typography>
+                    <Typography>
+                      {countDown} {t2("left") as string}
+                    </Typography>
                   </>
                 )}
               </Stack>
@@ -201,10 +209,10 @@ const RevokeLentOutButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleRevokeDiaglogClose}
                 >
-                  Cancel
+                  {t2("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={() => handleRevokeClick()}>
-                  Revoke
+                  {t2("revokeBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

@@ -1,6 +1,6 @@
 import { FunctionComponent, useEffect, useState } from "react";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, Stack, Typography } from "@mui/material";
 
 import { usePublishingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
@@ -49,13 +49,7 @@ const DisplayBox: FunctionComponent = () => {
               <BookBanner
                 tokenId={firstBook?.tokenId}
                 author={firstBook?.seller}
-                //  description={firstBook?.info.description}
-                //  price={firstBook?.price}
-                //  genres={}
-                //  languages={}
-                onClick={() => {
-                  alert(book.meta.title);
-                }}
+                onClick={() => handleBookClick(firstBook?.tokenId)}
               />
             )}
 
@@ -67,7 +61,14 @@ const DisplayBox: FunctionComponent = () => {
               {(() => {
                 if (listedBooks.isLoading) {
                   return (
-                    <Typography>{t("loadingMessage") as string}</Typography>
+                    <Stack
+                      spacing={2}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <CircularProgress />
+                      <Typography>{t("loadingMessage") as string}</Typography>
+                    </Stack>
                   );
                 } else if (
                   listedBooks?.data?.length === 0 ||

@@ -57,7 +57,6 @@ const BorrowedBooks = () => {
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
@@ -118,7 +117,11 @@ const BorrowedBooks = () => {
                             amount={book?.amount}
                             countDown={secondsToDhms(book?.endTime - nowTime)}
                             buttons={
-                              <Grid container columns={{ xs: 2, sm: 2 }}>
+                              <Grid
+                                container
+                                columns={{ xs: 2, sm: 2 }}
+                                spacing={2}
+                              >
                                 <Grid item xs={1} sm={1}>
                                   <ShareButton
                                     tokenId={book?.tokenId}

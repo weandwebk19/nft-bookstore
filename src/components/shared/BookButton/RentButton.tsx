@@ -3,38 +3,26 @@ import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  Stack,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography
-} from "@mui/material";
+import { Box, Button, Divider, Grid, Stack, Typography } from "@mui/material";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
-import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
-import { TextFieldController } from "@/components/shared/FormController";
+import { NumericStepperController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistory } from "@/components/utils";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
-
-import Step1 from "../../ui/borrow/steps/Step1";
-import Step2 from "../../ui/borrow/steps/Step2";
 
 interface RentButtonProps {
   tokenId: number;
@@ -42,19 +30,6 @@ interface RentButtonProps {
   price: number;
   supplyAmount: number;
 }
-
-const schema = yup
-  .object({
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number"),
-    rentalDays: yup
-      .number()
-      .min(1, `The day must be higher than 0.`)
-      .typeError("Rental days must be a number")
-  })
-  .required();
 
 const defaultValues = {
   amount: 1,
@@ -67,8 +42,9 @@ const RentButton = ({
   price,
   supplyAmount
 }: RentButtonProps) => {
-  const router = useRouter();
-  const [renterName, setAuthorName] = useState();
+  const { t } = useTranslation("bookButtons");
+
+  const [renterName, setRenterName] = useState();
   const { provider, bookStoreContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
@@ -76,28 +52,18 @@ const RentButton = ({
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
 
-  const [activeStep, setActiveStep] = useState(0);
-
-  const steps = ["Balance checking", "Confirm purchase"];
-
-  const getStepContent = () => {
-    switch (activeStep) {
-      case 0:
-        return <Step1 />;
-      case 1:
-        return <Step2 supplyAmount={supplyAmount} />;
-      default:
-        return null;
-    }
-  };
-
-  const handleNext = async () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  const schema = yup
+    .object({
+      amount: yup
+        .number()
+        .min(0, t("textErrorRent1") as string)
+        .typeError(t("textErrorRent2") as string),
+      rentalDays: yup
+        .number()
+        .min(0, t("textErrorRent3") as string)
+        .typeError(t("textErrorRent4") as string)
+    })
+    .required();
 
   const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorBookCard(e.currentTarget);
@@ -114,7 +80,11 @@ const RentButton = ({
     mode: "all"
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, watch, getValues } = methods;
+
+  const currentAmount = watch("amount");
+  const currentRentalDays = watch("rentalDays");
+  const [totalPayment, setTotalPayment] = useState<number>(0);
 
   const borrowBooks = useCallback(
     async (
@@ -128,23 +98,23 @@ const RentButton = ({
       try {
         // Handle errors
         if (rentalDuration < 604800) {
-          return toast.error("Minimum borrow book period is 7 days", {
+          return toast.error(t("textErrorRent5") as string, {
             position: toast.POSITION.TOP_CENTER
           });
         } else if (amount > supplyAmount) {
-          return toast.error(`Amount must be less than ${supplyAmount}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
-        } else if (account.data == renter) {
           return toast.error(
-            "You are not allowed to borrow the book lent by yourself.",
+            `${t("textErrorRent6") as string} ${supplyAmount}.`,
             {
               position: toast.POSITION.TOP_CENTER
             }
           );
+        } else if (account.data == renter) {
+          return toast.error(t("textErrorRent7") as string, {
+            position: toast.POSITION.TOP_CENTER
+          });
         }
 
-        const value = ((price * amount * rentalDuration) / 604800).toFixed(3);
+        const value = (price * amount * rentalDuration) / 604800;
         const tx = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,
@@ -157,9 +127,9 @@ const RentButton = ({
         );
 
         const receipt = await toast.promise(tx!.wait(), {
-          pending: "Processing transaction",
-          success: "Nft is yours! Go to Profile page",
-          error: "Processing error"
+          pending: t("pendingRent") as string,
+          success: t("successRent") as string,
+          error: t("errorRent") as string
         });
 
         if (receipt) {
@@ -182,12 +152,16 @@ const RentButton = ({
               totalFee,
               balanceInEther,
               "Borrow book",
+              "Mượn sách",
               transactionHash,
               borrowerAddress,
               renterAddress,
               `Gas fee = ${gasFee} ETH, borrow fee = ${parseFloat(
                 value
-              )} ETH, total price = ${-totalFee} ETH`
+              )} ETH, total price = ${-totalFee} ETH`,
+              `Phí gas = ${gasFee} ETH, Giá mượn sách = ${parseFloat(
+                value
+              )} ETH, Tổng cộng = ${-totalFee} ETH`
             );
           };
 
@@ -204,28 +178,32 @@ const RentButton = ({
               tokenId,
               parseFloat(value),
               balanceInEther,
-              "From borrow book",
+              "Reader borrow book",
+              "Độc giả mượn sách",
               transactionHash,
               renterAddress,
               borrowerAddress,
-              `Total price received = ${parseFloat(value)} ETH`
+              `Total price received = ${parseFloat(value)} ETH`,
+              `Tổng tiền nhận = ${parseFloat(value)} ETH`
             );
           };
 
           await createTransactionHistoryForBorrower(
             account.data!,
             renter,
-            value,
+            value.toString(),
             gasFee,
             receipt.transactionHash
           );
           await createTransactionHistoryForRenter(
             account.data!,
             renter,
-            value,
+            value.toString(),
             receipt.transactionHash
           );
         }
+
+        await createBookHistoryCallback(tokenId, price, amount);
       } catch (e: any) {
         console.error(e.message);
         toast.error(`${e.message.substr(0, 65)}.`, {
@@ -235,6 +213,27 @@ const RentButton = ({
     },
     [account.data, bookStoreContract, provider]
   );
+
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Borrow",
+          "Mượn",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
+  );
+
+  useEffect(() => {
+    const total = currentAmount * currentRentalDays * price;
+    setTotalPayment(total);
+  }, [currentAmount, currentRentalDays, price]);
 
   const onSubmit = async (data: any) => {
     try {
@@ -259,7 +258,7 @@ const RentButton = ({
           const userRes = await axios.get(`/api/users/wallet/${renter}`);
 
           if (userRes.data.success === true) {
-            setAuthorName(userRes.data.data.fullname);
+            setRenterName(userRes.data.data.fullname);
           }
         }
       } catch (err) {
@@ -275,98 +274,93 @@ const RentButton = ({
         sx={{ flexGrow: 1, borderTopLeftRadius: 0 }}
         onClick={handleBookCardClick}
       >
-        Rent now
+        {t("rentNowBtn") as string}
       </Button>
 
       <Dialog
-        title="Rent book"
+        title={t("rentNowTitle") as string}
         open={openBookCard}
         onClose={handleBookCardClose}
       >
         <FormProvider {...methods}>
-          <Stack spacing={3}>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1, sm: 2, md: 4 }}
-            >
-              <Image
-                src={metadata.data?.bookCover}
-                alt={metadata.data?.title}
-                sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
-                className={styles["book-item__book-cover"]}
-              />
-              <Box>
-                <Typography variant="h5">{metadata.data?.title}</Typography>
+          <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
+            <Grid item md={4} xs={4}>
+              <Stack sx={{ alignItems: { xs: "center", md: "start" } }}>
+                <Image
+                  src={metadata?.data?.bookCover}
+                  alt={metadata?.data?.title}
+                  sx={{ flexShrink: 0, aspectRatio: "2 / 3", width: "100px" }}
+                  className={styles["book-item__book-cover"]}
+                />
+                <Typography variant="h5">{metadata?.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
                 <Typography variant="h4">{price} ETH</Typography>
-              </Box>
-            </Stack>
-            <Divider />
-            <Stack flexGrow={1}>
-              <Stepper activeStep={activeStep}>
-                {steps.map((label) => {
-                  return (
-                    <Step key={label}>
-                      <StepLabel>{label}</StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-              <div style={{ minHeight: "50%" }}>
-                {activeStep === steps.length ? (
-                  <>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                      Successfully rented!
+              </Stack>
+            </Grid>
+
+            <Grid
+              item
+              md={8}
+              xs={4}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
+            >
+              <Stack
+                spacing={3}
+                sx={{
+                  mb: 5
+                }}
+              >
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  spacing={{ xs: 1, sm: 2, md: 4 }}
+                >
+                  <Box sx={{ width: "100%" }}>
+                    <FormGroup label={t("amount") as string} required>
+                      <NumericStepperController name="amount" />
+                    </FormGroup>
+                    <Typography>
+                      {supplyAmount} {t("left") as string}
                     </Typography>
-                    <StyledButton
-                      onClick={() => {
-                        router.push("/account/bookshelf/owned-books");
-                      }}
-                    >
-                      My borrowed books
-                    </StyledButton>
-                  </>
-                ) : (
-                  <>
-                    <Box my={2} sx={{ minHeight: "25vh" }}>
-                      {getStepContent()}
-                    </Box>
-                    <Box
-                      display="flex"
-                      justifyContent="center"
-                      style={{ paddingTop: "5vh" }}
-                    >
-                      <Button
-                        color="inherit"
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        sx={{ mr: 1 }}
-                      >
-                        Back
-                      </Button>
-                      {activeStep === steps.length - 1 ? (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleSubmit(onSubmit)}
-                        >
-                          Confirm purchase
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleNext}
-                        >
-                          Next
-                        </Button>
-                      )}
-                    </Box>
-                  </>
-                )}
-              </div>
-            </Stack>
-          </Stack>
+                  </Box>
+                  <FormGroup label={t("rentalDays") as string} required>
+                    <NumericStepperController name="rentalDays" />
+                  </FormGroup>
+                </Stack>
+              </Stack>
+              <Divider />
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography>{t("total") as string}:</Typography>
+                <Typography variant="h6">{totalPayment} ETH</Typography>
+              </Stack>
+              <Typography
+                gutterBottom
+                variant="caption"
+                sx={{ textAlign: "end" }}
+              >
+                {t("gasFee") as string}
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <StyledButton
+                  customVariant="secondary"
+                  sx={{ mr: 2 }}
+                  onClick={handleBookCardClose}
+                >
+                  {t("cancelBtn") as string}
+                </StyledButton>
+                <StyledButton onClick={handleSubmit(onSubmit)}>
+                  {t("confirmPurchaseBtn") as string}
+                </StyledButton>
+              </Box>
+            </Grid>
+          </Grid>
         </FormProvider>
         <ToastContainer />
       </Dialog>

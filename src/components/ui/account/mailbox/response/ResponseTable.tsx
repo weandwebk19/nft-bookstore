@@ -75,19 +75,18 @@ export default function ResponseTable({ data }: ResponseTableProps) {
         const borrowedBook = await bookRentingContract?.getBorrowedBookFromId(
           idBorrowedBook
         );
-        const totalPrice = (
+        const totalPrice =
           (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
             amount *
             time) /
-          604800
-        ).toFixed(3);
+          604800;
 
         const tx = await bookStoreContract?.transferForSendedRequest(
           idBorrowedBook,
           renter,
           true,
           {
-            value: ethers.utils.parseEther(totalPrice)
+            value: ethers.utils.parseEther(totalPrice.toString())
           }
         );
 
@@ -117,12 +116,16 @@ export default function ResponseTable({ data }: ResponseTableProps) {
               totalFee,
               balanceInEther,
               "Extend borrow book",
+              "Gia hạn mượn sách",
               transactionHash,
               borrowerAddress,
               renterAddress,
               `Gas fee = ${gasFee} ETH, Extend fee = ${parseFloat(
                 totalPrice
-              )} ETH, total price = ${-totalFee} ETH`
+              )} ETH, Total price = ${-totalFee} ETH`,
+              `Phí gas = ${gasFee} ETH, Phí gia hạn = ${parseFloat(
+                totalPrice
+              )} ETH, Tổng cộng = ${-totalFee} ETH`
             );
           };
 
@@ -139,25 +142,27 @@ export default function ResponseTable({ data }: ResponseTableProps) {
               NaN,
               parseFloat(totalPrice),
               balanceInEther,
-              "From extend borrow book",
+              "Reader extend borrow book",
+              "Độc giả gia hạn mượn sách",
               transactionHash,
               renterAddress,
               borrowerAddress,
-              `Total price received = ${parseFloat(totalPrice)} ETH`
+              `Total price received = ${parseFloat(totalPrice)} ETH`,
+              `Tổng tiền đã nhận = ${parseFloat(totalPrice)} ETH`
             );
           };
 
           await createTransactionHistoryForBorrower(
             account.data!,
             renter,
-            totalPrice,
+            totalPrice.toString(),
             gasFee,
             receipt.transactionHash
           );
           await createTransactionHistoryForRenter(
             account.data!,
             renter,
-            totalPrice,
+            totalPrice.toString(),
             receipt.transactionHash
           );
         }

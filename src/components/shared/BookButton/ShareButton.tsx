@@ -9,6 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/BookItem.module.scss";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useTranslation } from "next-i18next";
 import * as yup from "yup";
 
 import { useAccount, useMetadata } from "@/components/hooks/web3";
@@ -16,6 +17,7 @@ import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
+import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
@@ -31,19 +33,6 @@ interface ShareButtonProps {
   borrowedAmount: number;
 }
 
-const schema = yup
-  .object({
-    price: yup
-      .number()
-      .min(0, `The price must be higher than 0.`)
-      .typeError("Price must be a number"),
-    amount: yup
-      .number()
-      .min(1, `The price must be higher than 0.`)
-      .typeError("Amount must be a number")
-  })
-  .required();
-
 const defaultValues = {
   price: 0,
   amount: 1
@@ -57,6 +46,8 @@ const ShareButton = ({
   tokenId,
   borrowedAmount
 }: ShareButtonProps) => {
+  const { t } = useTranslation("bookButtons");
+
   const [renterName, setRenterName] = useState();
   const { provider, bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
@@ -64,6 +55,19 @@ const ShareButton = ({
 
   const [anchorBookCard, setAnchorBookCard] = useState<Element | null>(null);
   const openBookCard = Boolean(anchorBookCard);
+
+  const schema = yup
+    .object({
+      price: yup
+        .number()
+        .min(0, t("textErrorShare1") as string)
+        .typeError(t("textErrorShare2") as string),
+      amount: yup
+        .number()
+        .min(1, t("textErrorShare3") as string)
+        .typeError(t("textErrorShare4") as string)
+    })
+    .required();
 
   const handleBookCardClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorBookCard(e.currentTarget);
@@ -96,11 +100,14 @@ const ShareButton = ({
       try {
         // handle errors
         if (amount > borrowedAmount) {
-          return toast.error(`Amount must be less than ${borrowedAmount}.`, {
-            position: toast.POSITION.TOP_CENTER
-          });
+          return toast.error(
+            `${t("textErrorShare5") as string} ${borrowedAmount}.`,
+            {
+              position: toast.POSITION.TOP_CENTER
+            }
+          );
         } else if (Math.floor(new Date().getTime() / 1000) >= endTime) {
-          return toast.error("Borrowing time has expired", {
+          return toast.error(t("textErrorShare6") as string, {
             position: toast.POSITION.TOP_CENTER
           });
         }
@@ -122,9 +129,9 @@ const ShareButton = ({
           }
         );
         const receipt: any = await toast.promise(tx!.wait(), {
-          pending: "Sharing NftBook Token",
-          success: "Share book successfully",
-          error: "There's an error in sharing process!"
+          pending: t("pendingShare") as string,
+          success: t("successShare") as string,
+          error: t("errorShare") as string
         });
 
         if (receipt) {
@@ -143,10 +150,14 @@ const ShareButton = ({
             totalFee,
             balanceInEther,
             "Share book",
+            "Chia sẻ sách",
             receipt.transactionHash,
             receipt.from,
             receipt.to,
             `Gas fee = ${gasFee} ETH, sharing fee = ${sharingPriceNumber} ETH, total fee = ${
+              0 - totalFee
+            } ETH`,
+            `Phí gas = ${gasFee} ETH, Phí liệt kê = ${sharingPriceNumber} ETH, Tổng cộng = ${
               0 - totalFee
             } ETH`
           );
@@ -170,6 +181,22 @@ const ShareButton = ({
     [account.data]
   );
 
+  const createBookHistoryCallback = useCallback(
+    async (tokenId: number, price: number, amount: number) => {
+      if (account.data) {
+        await createBookHistory(
+          tokenId,
+          "Share",
+          "Chia sẻ",
+          account.data,
+          price,
+          amount
+        );
+      }
+    },
+    [account.data]
+  );
+
   const onSubmit = async (data: any) => {
     await shareBooks(
       tokenId,
@@ -182,6 +209,7 @@ const ShareButton = ({
       endTime
     );
     await createPricingHistoryCallback(tokenId, data.price);
+    await createBookHistoryCallback(tokenId, data.price, data.amount);
   };
 
   useEffect(() => {
@@ -208,10 +236,14 @@ const ShareButton = ({
         sx={{ width: "100%" }}
         onClick={handleBookCardClick}
       >
-        Share
+        {t("shareBtn") as string}
       </Button>
 
-      <Dialog title="Share" open={openBookCard} onClose={handleBookCardClose}>
+      <Dialog
+        title={t("shareTitle") as string}
+        open={openBookCard}
+        onClose={handleBookCardClose}
+      >
         <FormProvider {...methods}>
           <Grid container columns={{ xs: 4, sm: 8, md: 12 }} spacing={3}>
             <Grid item md={4}>
@@ -224,7 +256,9 @@ const ShareButton = ({
                 />
                 <Typography variant="h5">{metadata.data?.title}</Typography>
                 <Typography>{renterName}</Typography>
-                <Typography>{borrowedAmount} left</Typography>
+                <Typography>
+                  {borrowedAmount} {t("left") as string}
+                </Typography>
               </Stack>
             </Grid>
             <Grid item md={8}>
@@ -234,10 +268,10 @@ const ShareButton = ({
                   mb: 5
                 }}
               >
-                <FormGroup label="Price" required>
+                <FormGroup label={t("price") as string} required>
                   <TextFieldController name="price" type="number" />
                 </FormGroup>
-                <FormGroup label="Amount" required>
+                <FormGroup label={t("amount") as string} required>
                   <TextFieldController name="amount" type="number" />
                 </FormGroup>
               </Stack>
@@ -247,10 +281,10 @@ const ShareButton = ({
                   sx={{ mr: 2 }}
                   onClick={handleBookCardClose}
                 >
-                  Cancel
+                  {t("cancelBtn") as string}
                 </StyledButton>
                 <StyledButton onClick={handleSubmit(onSubmit)}>
-                  Start sharing
+                  {t("startSharingBtn") as string}
                 </StyledButton>
               </Box>
             </Grid>

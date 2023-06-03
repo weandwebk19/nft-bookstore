@@ -1,12 +1,17 @@
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+
+import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
 
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 import styles from "@styles/BookBanner.module.scss";
+import axios from "axios";
 
+import { useBookInfo } from "@/components/hooks/api";
 import { useMetadata } from "@/components/hooks/web3";
+import { truncate } from "@/utils/truncate";
 
 type BookBannerProps = {
   tokenId: number;
@@ -31,6 +36,18 @@ const BookBanner = ({
 }: BookBannerProps) => {
   // const countDown = "7D:06:25:45";
   const { metadata } = useMetadata(tokenId);
+  const [bookId, setBookId] = useState<string>();
+  const bookInfo = useBookInfo(bookId as string)?.data;
+
+  useEffect(() => {
+    (async () => {
+      const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
+      if (res.data.success === true) {
+        const bookId = res.data.data;
+        setBookId(bookId);
+      }
+    })();
+  }, [tokenId]);
 
   return (
     <Box sx={{ cursor: "pointer" }} onClick={onClick}>
@@ -45,12 +62,17 @@ const BookBanner = ({
         columns={{ xs: 4, sm: 8, md: 12 }}
       >
         <Grid item xs={4} sm={4} md={7}>
-          <Box sx={{ display: "inline-block", mb: 3 }}>
+          <Box
+            sx={{
+              display: "inline-block",
+              mb: 3
+            }}
+          >
             <Typography variant="h2" className={styles["book-banner__title"]}>
               {metadata?.data?.title}
             </Typography>
           </Box>
-          <Typography variant="h5">{author}</Typography>
+          <Typography variant="h5">{truncate(author, 6, -4)}</Typography>
           <Stack
             direction="row"
             spacing={2}
@@ -79,12 +101,31 @@ const BookBanner = ({
             ))} */}
           </Stack>
           <Typography paragraph className="text-limit text-limit--5">
-            {description}
+            {bookInfo?.description}
           </Typography>
           <Typography>
-            <b>
-              <u>Genres:</u>
-            </b>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <b>
+                <u>Genres:</u>
+              </b>
+              <Stack
+                direction="row"
+                spacing={1}
+                divider={
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{
+                      borderColor: "wheat"
+                    }}
+                  />
+                }
+              >
+                {bookInfo?.genres.map((genre: string) => (
+                  <Typography key={genre}>{genre}</Typography>
+                ))}
+              </Stack>
+            </Stack>
           </Typography>
           <Stack>
             {genres?.slice(0, 3).map((genre) => (

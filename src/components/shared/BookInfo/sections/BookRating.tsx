@@ -24,6 +24,8 @@ const BookRating = () => {
   const router = useRouter();
   const { bookId } = router.query;
   const [reviews, setReviews] = useState([]);
+  const [ratings, setRatings] = useState(new Array<number>(5).fill(0));
+  const [ratingAvg, setRatingAvg] = useState<string>();
 
   useEffect(() => {
     (async () => {
@@ -36,7 +38,26 @@ const BookRating = () => {
     })();
   }, [bookId]);
 
-  console.log(reviews);
+  useEffect(() => {
+    let ratings = new Array<number>(5).fill(0);
+    reviews?.forEach((review: any) => {
+      ratings[review.rating - 1] += 1;
+    });
+    setRatings(ratings);
+    let sum: number = 0;
+    ratings.forEach((rating: number) => {
+      sum += rating;
+    });
+    const avg = (
+      (ratings[0] * 1 +
+        ratings[1] * 2 +
+        ratings[2] * 3 +
+        ratings[3] * 4 +
+        ratings[4] * 5) /
+      sum
+    ).toFixed(1);
+    setRatingAvg(avg != "NaN" ? avg : "");
+  }, [reviews]);
 
   return (
     <Box component="section">
@@ -55,35 +76,35 @@ const BookRating = () => {
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={10}
+                  value={ratings[0]}
                   icon={StaticRating(1)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={20}
+                  value={ratings[1]}
                   icon={StaticRating(2)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={60}
+                  value={ratings[2]}
                   icon={StaticRating(3)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={50}
+                  value={ratings[3]}
                   icon={StaticRating(4)}
                 />
               </Box>
               <Box sx={{ width: "100%" }}>
                 <StyledLinearProgress
                   variant="determinate"
-                  value={90}
+                  value={ratings[4]}
                   icon={StaticRating(5)}
                 />
               </Box>
@@ -99,10 +120,10 @@ const BookRating = () => {
               border: `1px solid ${theme.palette.primary.main}`
             }}
           >
-            <Typography variant="h2">4.9</Typography>
+            <Typography variant="h2">{ratingAvg}</Typography>
           </Box>
         </Stack>
-        <Stack alignItems="center" spacing={2}>
+        {/* <Stack alignItems="center" spacing={2}>
           <Typography variant="h5">What do you think?</Typography>
           <StyledButton
             onClick={() => {
@@ -111,7 +132,7 @@ const BookRating = () => {
           >
             Write a review
           </StyledButton>
-        </Stack>
+        </Stack> */}
         <Divider />
         <Typography variant="h6">Community Reviews</Typography>
 
@@ -128,6 +149,7 @@ const BookRating = () => {
                   content={review.review}
                   avatar={""}
                   reply={review.reply}
+                  date={review.createdAt}
                 />
               );
             })

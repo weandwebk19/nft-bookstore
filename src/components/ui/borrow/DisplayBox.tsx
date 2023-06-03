@@ -3,7 +3,7 @@ import { FunctionComponent } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, CircularProgress, Grid, Stack, Typography } from "@mui/material";
 
 import { useAllLendingBooks } from "@hooks/web3";
 import { BookBanner } from "@shared/BookBanner";
@@ -31,7 +31,6 @@ const DisplayBox: FunctionComponent = () => {
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
       const res = await axios.get(`/api/books/token/${tokenId}/bookId`);
-      console.log("res", res);
       if (res.data.success === true) {
         const bookId = res.data.data;
         router.push(`/books/${bookId}`);
@@ -48,7 +47,14 @@ const DisplayBox: FunctionComponent = () => {
               {(() => {
                 if (nfts.isLoading) {
                   return (
-                    <Typography>{t("loadingMessage") as string}</Typography>
+                    <Stack
+                      spacing={2}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <CircularProgress />
+                      <Typography>{t("loadingMessage") as string}</Typography>
+                    </Stack>
                   );
                 } else if (nfts?.data?.length === 0 || nfts.error) {
                   return <FallbackNode />;

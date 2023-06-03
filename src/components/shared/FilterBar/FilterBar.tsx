@@ -68,7 +68,7 @@ const defaultValues = {
   genre: [],
   title: "",
   author: "",
-  rating: 3,
+  rating: 0,
   language: "",
   priceRange: [MIN_PRICE, MAX_PRICE]
 };
@@ -81,6 +81,7 @@ interface FilterBarProps {
 const FilterBar = ({ data, pathname }: FilterBarProps) => {
   const { t } = useTranslation("filter");
   const router = useRouter();
+  const currLang = router.locale;
 
   const genres = useGenres();
   const languages = useLanguages();
@@ -92,13 +93,17 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
     mode: "all"
   });
 
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, setValue, reset, getValues } = methods;
 
   const onSubmit = (data: any) => {
     const newQueryString = { ...router.query, ...data };
     const queryString = querystring.stringify(newQueryString);
     const url = `?${queryString}`;
     router.push(url);
+  };
+
+  const handleReset = () => {
+    reset(defaultValues);
   };
 
   const handleResetGenres = () => {
@@ -139,7 +144,9 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
             alignItems="center"
           >
             <Box>
-              <Typography>{pluralize(data?.length, t("result"))}</Typography>
+              <Typography>
+                {pluralize(data?.length, t("result"), router.locale)}
+              </Typography>
             </Box>
             {!(Object.keys(router.query).length === 0) && (
               <Tooltip title={t("clearAllFilter")}>
@@ -184,7 +191,8 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
                 sx={{
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
+                  height: 264
                 }}
               >
                 <CircularProgress />
@@ -192,7 +200,11 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
             )}
             {genres.error &&
               "Oops! There was a problem loading genres \n Try refresh the page."}
-            <TreeViewController name="genre" items={genres.data} />
+            <TreeViewController
+              name="genre"
+              items={genres.data}
+              itemName={currLang === "en" ? "name" : "vi_name"}
+            />
           </FormGroup>
           <FormGroup label={t("searchBook") as string}>
             <TextFieldController name="title" />
@@ -227,13 +239,18 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
               itemValue="name"
             />
           </FormGroup>
-          <StyledButton
-            customVariant="primary"
-            type="submit"
-            onClick={handleSubmit(onSubmit)}
-          >
-            {t("apply") as string}
-          </StyledButton>
+          <Stack direction="column" spacing={2}>
+            <StyledButton customVariant="secondary" onClick={handleReset}>
+              {t("reset") as string}
+            </StyledButton>
+            <StyledButton
+              customVariant="primary"
+              type="submit"
+              onClick={handleSubmit(onSubmit)}
+            >
+              {t("apply") as string}
+            </StyledButton>
+          </Stack>
         </Stack>
       </FormProvider>
     </ContentPaper>

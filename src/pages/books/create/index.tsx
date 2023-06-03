@@ -291,13 +291,14 @@ const CreateBook = () => {
   };
 
   const handleError = async (err: any) => {
-    // await deleteFileOnCloud();
-    toast.error(err.message, {
+    console.error(err);
+    await deleteFileOnCloud();
+    toast.error(err.message.substr(0, 65), {
       position: toast.POSITION.TOP_CENTER
     });
-    // setTimeout(() => {
-    //   window.location.reload();
-    // }, 3000);
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   };
 
   const uploadBookSample = async (file: File) => {
@@ -519,10 +520,12 @@ const CreateBook = () => {
       totalFee,
       balanceInEther,
       "Mint book",
+      "Tạo sách",
       receipt.transactionHash,
       receipt.from,
       receipt.to,
-      `Gas fee = ${gasFee} ETH, listing fee = ${listingPriceNumber} ETH, total fee = ${-totalFee} ETH`
+      `Gas fee = ${gasFee} ETH, Listing fee = ${listingPriceNumber} ETH, Total fee = ${-totalFee} ETH`,
+      `Phí gas = ${gasFee} ETH, Phí liệt kê = ${listingPriceNumber} ETH, Tổng cộng = ${-totalFee} ETH`
     );
   };
 
@@ -701,13 +704,13 @@ const CreateBook = () => {
                           >
                             {t("messageFinish2") as string}
                           </StyledButton>
-                          <StyledButton
+                          {/* <StyledButton
                             onClick={() => {
                               router.push("/books/create");
                             }}
                           >
                             {t("messageFinish3") as string}
-                          </StyledButton>
+                          </StyledButton> */}
                         </Stack>
                       </Box>
                     );

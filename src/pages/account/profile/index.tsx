@@ -25,16 +25,14 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import cloudinary from "cloudinary";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import * as yup from "yup";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useUserInfo } from "@/components/hooks/api/useUserInfo";
-import { useAccount } from "@/components/hooks/web3";
-import { useWeb3 } from "@/components/providers/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
@@ -73,16 +71,15 @@ const Profile = () => {
   const { t } = useTranslation("profile");
   const userInfo = useUserInfo();
 
+  const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(false);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
 
   const schema = yup
     .object({
       fullname: yup.string().required(t("textError1") as string),
-      email: yup
-        .string()
-        .required(t("textError2") as string)
-        .email(t("textError3") as string),
+      email: yup.string().email(t("textError3") as string),
       bio: yup.string(),
       website: yup.string(),
       walletAddress: yup.string(),
@@ -136,14 +133,14 @@ const Profile = () => {
 
   const handleRemoveImage = useCallback(async () => {
     setValue("avatar", "");
-  }, []);
+  }, [setValue]);
 
   const handleCancel = useCallback(async () => {
     reset((formValues) => ({
       ...defaultValues,
       walletAddress: formValues.walletAddress
     }));
-  }, []);
+  }, [reset]);
 
   const onSubmit = useCallback(
     (data: any) => {
@@ -185,7 +182,7 @@ const Profile = () => {
         }
       })();
     },
-    [userInfo.data]
+    [userInfo.data, t]
   );
 
   useEffect(() => {
@@ -207,7 +204,7 @@ const Profile = () => {
       "instagram",
       userInfo.data?.instagram ? userInfo.data?.instagram : ""
     );
-  }, [userInfo.data]);
+  }, [userInfo.data, setValue]);
 
   return (
     <>
@@ -219,7 +216,23 @@ const Profile = () => {
       </Head>
       <main>
         <Box sx={{ pt: 6 }}>
-          <ContentContainer titles={[t("titleContent1") as string]}>
+          <ContentContainer
+            titles={[t("titleContent1") as string]}
+            width={720}
+            button={
+              userInfo.data?.isAuthor && (
+                <StyledButton
+                  customVariant="secondary"
+                  onClick={() => {
+                    router.push("/author/profile");
+                  }}
+                  disabled={isLoading}
+                >
+                  {t("authorProfileBtn") as string}
+                </StyledButton>
+              )
+            }
+          >
             <Box sx={{ flexGrow: 1, width: "100%", maxWidth: "720px" }}>
               <Box sx={{ my: 2 }}>
                 <Typography
@@ -366,8 +379,11 @@ const Profile = () => {
                           </FormGroup>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <FormGroup label={t("email") as string} required>
-                            <TextFieldController name="email" />
+                          <FormGroup label={t("email") as string}>
+                            <TextFieldController
+                              name="email"
+                              readOnly={isLoading}
+                            />
                           </FormGroup>
                         </Grid>
                         <Grid item xs={12}>

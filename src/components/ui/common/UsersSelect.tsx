@@ -17,6 +17,8 @@ import {
 // import Grow from "@mui/material/Grow";
 import CancelIcon from "@mui/icons-material/Cancel";
 
+import { useTranslation } from "next-i18next";
+
 import { useComponentVisible } from "@/components/hooks/common";
 import { truncate } from "@/utils/truncate";
 
@@ -50,6 +52,8 @@ const UsersSelect = ({
   onResetClick,
   inputValue
 }: UsersSelectProps) => {
+  const { t } = useTranslation("common");
+
   const { ref, isComponentVisible, setIsComponentVisible } =
     useComponentVisible(false);
 
@@ -83,38 +87,57 @@ const UsersSelect = ({
             }}
           >
             <List>
-              {data?.map((item, i) => {
-                return (
-                  <ListItem key={item?._id || i}>
-                    <ListItemButton
-                      selected={selectedItem?._id === item?._id}
-                      onClick={(e) => {
-                        onSelectClick(e, item);
-                      }}
-                    >
-                      <ListItemAvatar>
-                        <Avatar alt={item?.[itemValue]} src={item?.avatar} />
-                      </ListItemAvatar>
-                      <ListItemText
-                        id={item?.[itemName]}
-                        primary={
-                          <Typography variant="label">
-                            {item?.[itemName]}
-                          </Typography>
-                        }
-                        secondary={
-                          <Typography
-                            variant="caption"
-                            className="text-limit text-limit--1"
-                          >
-                            {truncate(item?.[itemSubname], 6, -4)}
-                          </Typography>
-                        }
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
+              {data &&
+                data?.length > 0 &&
+                data?.map((item, i) => {
+                  return (
+                    <ListItem key={item?._id || i}>
+                      <ListItemButton
+                        selected={selectedItem?._id === item?._id}
+                        onClick={(e) => {
+                          onSelectClick(e, item);
+                        }}
+                      >
+                        <ListItemAvatar>
+                          {/* <Avatar alt={item?.[itemValue]} src={item?.avatar} /> */}
+                          <Avatar
+                            alt={item?.[itemValue]}
+                            src={item?.picture?.secureUrl}
+                          />
+                        </ListItemAvatar>
+                        <ListItemText
+                          id={item?.[itemName]}
+                          primary={
+                            <Typography variant="label">
+                              {item?.[itemName]}
+                            </Typography>
+                          }
+                          secondary={
+                            <Typography
+                              variant="caption"
+                              className="text-limit text-limit--1"
+                            >
+                              {truncate(item?.[itemSubname], 6, -4)}
+                            </Typography>
+                          }
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              {data && data?.length <= 0 && (
+                <ListItem>
+                  <ListItemButton selected={true} disabled={true}>
+                    <ListItemText
+                      primary={
+                        <Typography variant="label">
+                          {t("dataNotFound") as string}
+                        </Typography>
+                      }
+                    />
+                  </ListItemButton>
+                </ListItem>
+              )}
             </List>
           </Paper>
         </Grow>

@@ -98,18 +98,11 @@ export default function Home() {
               />
               <StyledButton
                 onClick={() => {
-                  router.push("/author/request2");
+                  router.push("/author/request");
                 }}
               >
                 {t("becomeAnAuthor") as string}
               </StyledButton>
-              {/* <StyledButton
-                onClick={() => {
-                  router.push("/author/request2");
-                }}
-              >
-                {t("becomeAnAuthor2") as string}
-              </StyledButton> */}
             </Box>
           </Box>
         </Stack>

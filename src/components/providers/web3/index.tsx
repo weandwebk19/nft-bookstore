@@ -66,6 +66,18 @@ const Web3Provider: FunctionComponent<Web3ProviderProps> = ({ children }) => {
   useEffect(() => {
     async function initWeb3() {
       try {
+        const { ethereum } = window;
+        const metamaskProvider = ethereum?.providers?.find(
+          (p: any) => p.isMetaMask
+        );
+
+        if (
+          metamaskProvider &&
+          typeof ethereum.setSelectedProvider === "function"
+        ) {
+          ethereum.setSelectedProvider(metamaskProvider);
+        }
+
         const provider = new ethers.providers.Web3Provider(
           window.ethereum as any
         );

@@ -223,8 +223,7 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return newTokenId;
   }
 
-  function getSecretKey(uint tokenId) 
-    public view returns (string[] memory) {
+  function getSecretKey(uint tokenId) public view returns (string[] memory) {
     // Need check is readable?
     if (!isBookReadableByUser(tokenId)) {
       revert Error.NoReadingPermissionError(tokenId);
@@ -466,9 +465,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
       price,
       startTime,
       endTime,
-      msg.sender,
-      msg.value
+      msg.sender
     );
+
     _safeTransferFrom(renter, msg.sender, tokenId, amount, "");
     payable(renter).transfer(totalPrice);
   }
@@ -560,9 +559,9 @@ contract BookStore is ERC1155URIStorage, Ownable {
     );
 
     if (totalPrice > 0) {
-      if (msg.value != totalPrice) {
-        revert Error.InvalidPriceError(msg.value);
-      }
+      // if (msg.value != totalPrice) {
+      //   revert Error.InvalidPriceError(msg.value);
+      // }
       payable(renter).transfer(totalPrice);
     }
   }
@@ -587,25 +586,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     }
     emit RecallBookResult(false);
     return false;
-  }
-
-  // Return total of borrowed books which is recalled, if total equal 0,
-  // you do not have any recallable books. Needed automate this function with Chainlink
-  function recallAllBorrowedBooks() public returns (uint) {
-    uint total = 0;
-    if (address(0) != msg.sender) {
-      uint length = _bookRentingStorage.getTotalBorrowedBooksOnBorrowing();
-      if (length > 0) {
-        for (uint i = 1; i <= length; i++) {
-          BookRentingStorage.BorrowedBook memory book = _bookRentingStorage
-            .getBorrowedBookFromId(i);
-          if (book.renter == msg.sender && recallBorrowedBooks(i)) {
-            total++;
-          }
-        }
-      }
-    }
-    return total;
   }
 
   function shareBooks(
@@ -753,23 +733,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return false;
   }
 
-  function recallAllSharedBooks() public returns (uint) {
-    uint total = 0;
-    if (address(0) != msg.sender) {
-      uint length = _bookSharingStorage.getTotalSharedBooks();
-      if (length > 0) {
-        for (uint i = 1; i <= length; i++) {
-          BookSharingStorage.BookSharing memory book = _bookSharingStorage
-            .getSharedBooks(i);
-          if (book.fromRenter == msg.sender && recallSharedBooks(i)) {
-            total++;
-          }
-        }
-      }
-    }
-    return total;
-  }
-
   function recallBooksOnSharing(uint idBooksOnSharing) public returns (bool) {
     BookSharingStorage.BookSharing memory book = _bookSharingStorage
       .getBooksOnSharing(idBooksOnSharing);
@@ -787,22 +750,5 @@ contract BookStore is ERC1155URIStorage, Ownable {
       return res;
     }
     return false;
-  }
-
-  function recallAllBooksOnSharing() public returns (uint) {
-    uint total = 0;
-    if (address(0) != msg.sender) {
-      uint length = _bookSharingStorage.getTotalBooksOnSharing();
-      if (length > 0) {
-        for (uint i = 1; i <= length; i++) {
-          BookSharingStorage.BookSharing memory book = _bookSharingStorage
-            .getBooksOnSharing(i);
-          if (book.fromRenter == msg.sender && recallBooksOnSharing(i)) {
-            total++;
-          }
-        }
-      }
-    }
-    return total;
   }
 }

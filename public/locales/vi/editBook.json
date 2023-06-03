@@ -14,5 +14,9 @@
   "reset": "Hoàn tác",
   "saveChanges": "Lưu nhưng thay đổi",
   "textError1": "Vui lòng chọn thể loại sách",
-  "textError2": "Vui lòng chọn ngôn ngữ sách"
+  "textError2": "Vui lòng chọn ngôn ngữ sách",
+  "textError3": "Vui lòng nhập mô tả sách",
+  "textError4": "Vui lòng nhập số trang sách dưới dạng giá trị số",
+  "textError5": "Số trang phải lớn hơn hoặc bằng 0",
+  "textError6": "Vui lòng nhập số trang của cuốn sách"
 }

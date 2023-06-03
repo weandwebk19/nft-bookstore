@@ -1,0 +1,19 @@
+{
+  "titlePage": "Author Profile - NFT Bookstore",
+  "titleContent1": "Author Profile",
+  "titlePhoto": "The author's photo",
+  "titleInfo": "Author information",
+  "titleSocial": "Social link",
+  "required": "Required",
+  "pseudonym": "Pseudonym",
+  "about": "More about you",
+  "email": "Email",
+  "phoneNumber": "Phone Number",
+  "website": "Website",
+  "walletAddress": "Wallet address",
+  "socialMedia": "Social media",
+  "authorBook": "Author's book",
+  "noInformationYet": "No information yet",
+  "emptyMessage": "You haven't own any books!",
+  "loadingMessage": "Putting books on the shelves..."
+}

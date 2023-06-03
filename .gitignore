@@ -44,6 +44,9 @@ next-env.d.ts
 
 .vscode/
 
+#dependency
+/public/contracts
+
 .vscode/
 yarn.lock
 keys.json

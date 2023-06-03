@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   Avatar,
@@ -23,7 +23,7 @@ import { ReadMore } from "../ReadMore";
 interface CommentProps {
   avatar?: string;
   username: string;
-  date?: string | Date;
+  date: string | Date;
   rating?: number;
   comment?: string;
   canComment?: boolean;
@@ -46,6 +46,7 @@ const Comment = ({
 }: CommentProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [reviewDate, setReviewDate] = React.useState<string>("");
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -53,6 +54,11 @@ const Comment = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    const d = new Date(date);
+    setReviewDate(d.toDateString());
+  }, []);
 
   return (
     <Stack direction="row" p={2} spacing={2}>
@@ -77,7 +83,7 @@ const Comment = ({
               <ReadMore>{comment}</ReadMore>
             </Box>
             <Stack direction="row" spacing={3} alignItems="center">
-              <Typography variant="body2">{date as string}</Typography>
+              <Typography variant="body2">{reviewDate}</Typography>
               {/* <Button
                 size="small"
                 variant="text"

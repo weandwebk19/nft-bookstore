@@ -62,7 +62,8 @@ export function withSessionAPI(handler: any) {
 const url =
   process.env.NODE_ENV === "production"
     ? process.env.INFURA_SEPOLIA_URL
-    : "http://127.0.0.1:7545";
+    : // : "http://127.0.0.1:7545";
+      "http://192.168.71.2:7545";
 
 export const addressCheckMiddleware = async (
   req: NextApiRequest & { session: any },

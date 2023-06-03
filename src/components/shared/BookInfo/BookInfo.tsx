@@ -4,7 +4,11 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import { useBookInfo, usePricingHistory } from "@/components/hooks/api";
+import {
+  useBookHistories,
+  useBookInfo,
+  usePricingHistory
+} from "@/components/hooks/api";
 import {
   BookBriefing,
   BookDetail,
@@ -14,6 +18,7 @@ import { BookList } from "@/components/shared/BookList";
 import { ReadMore } from "@/components/shared/ReadMore";
 
 import { FallbackNode } from "../FallbackNode";
+import BookActivities from "./sections/BookActivities";
 import BookListing from "./sections/BookListing";
 import BookPricingHistory from "./sections/BookPricingHistory";
 
@@ -23,6 +28,8 @@ const BookInfo = () => {
   const { bookId } = router.query;
   const bookInfo = useBookInfo(bookId as string);
   const theme = useTheme();
+  // const bookHistories = useBookHistories(bookId as string);
+  // console.log("bookHistories", bookHistories);
 
   // const isOpenForPurchase = false;
   // const [isPublishedState, setIsPublishedState] = useState(false);
@@ -106,7 +113,7 @@ const BookInfo = () => {
             <Grid
               item
               xs={1}
-              md={6}
+              md={9}
               sx={{
                 borderRight: {
                   md: `1px solid ${theme.palette.primary.main}`,
@@ -132,7 +139,7 @@ const BookInfo = () => {
             <Grid
               item
               xs={1}
-              md={3}
+              md={9}
               sx={{
                 borderRight: {
                   md: `1px solid ${theme.palette.primary.main}`,
@@ -154,6 +161,32 @@ const BookInfo = () => {
               p={3}
             >
               <BookPricingHistory />
+            </Grid>
+            <Grid
+              item
+              xs={1}
+              md={9}
+              sx={{
+                borderRight: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                borderBottom: {
+                  md: `1px solid ${theme.palette.primary.main}`,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                borderLeft: {
+                  md: 0,
+                  sm: 0,
+                  xs: `1px solid ${theme.palette.primary.main}`
+                },
+                width: "100%"
+              }}
+              p={3}
+            >
+              <BookActivities />
             </Grid>
           </Grid>
           <BookListing />
@@ -184,7 +217,7 @@ const BookInfo = () => {
             <Typography variant="h5" gutterBottom>
               {t("recommended")}
             </Typography>
-            {/* <BookList /> */}
+            <BookList />
           </Box>
         </Grid>
       </Grid>

@@ -9,7 +9,6 @@ import Paper from "@mui/material/Paper";
 import { yupResolver } from "@hookform/resolvers/yup";
 import styles from "@styles/Form.module.scss";
 import axios from "axios";
-import { ethers } from "ethers";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -18,15 +17,11 @@ import * as yup from "yup";
 
 import withAuth from "@/components/HOC/withAuth";
 import withAuthor from "@/components/HOC/withAuthor";
-import { useGenres, useLanguages } from "@/components/hooks/api";
-import { useUserInfo } from "@/components/hooks/api/useUserInfo";
-import { useAccount, useBookDetail, useNetwork } from "@/components/hooks/web3";
-import { useWeb3 } from "@/components/providers/web3";
+import { useBookDetail } from "@/components/hooks/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
   AutoCompleteController,
-  MultipleSelectController,
   TextAreaController,
   TextFieldController
 } from "@/components/shared/FormController";
@@ -65,13 +60,13 @@ const EditBook = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const schema = yup.object({
-    description: yup.string().required(t("textError2") as string),
+    description: yup.string().required(t("textError3") as string),
     externalLink: yup.string(),
     totalPages: yup
       .number()
-      .typeError(t("textError20") as string)
-      .min(0, `${t("textError16") as string}`)
-      .required(t("textError17") as string),
+      .typeError(t("textError4") as string)
+      .min(0, `${t("textError5") as string}`)
+      .required(t("textError6") as string),
     keywords: yup.array().of(yup.string()),
     genres: yup
       .array()
@@ -103,7 +98,7 @@ const EditBook = () => {
   }, []);
 
   const handleError = async (err: any) => {
-    toast.error(err.message, {
+    toast.error(err.message.substr(0, 65), {
       position: toast.POSITION.TOP_CENTER
     });
     setTimeout(() => {
