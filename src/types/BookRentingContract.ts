@@ -572,7 +572,6 @@ export interface BookRentingContract {
    * @param startTime Type: uint256, Indexed: false
    * @param endTime Type: uint256, Indexed: false
    * @param borrower Type: address, Indexed: false
-   * @param value Type: uint256, Indexed: false
    */
   borrowBooks(
     tokenId: BigNumberish,
@@ -582,7 +581,6 @@ export interface BookRentingContract {
     startTime: BigNumberish,
     endTime: BigNumberish,
     borrower: string,
-    value: BigNumberish,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { EthersContractContextV5 } from "ethereum-abi-types-generator";
 import {
   BytesLike as Arrayish,
@@ -59,6 +58,7 @@ export type BookStoreContractEvents =
   | "ApprovalForAll"
   | "NFTBookCreated"
   | "OwnershipTransferred"
+  | "RecallBookResult"
   | "TransferBatch"
   | "TransferSingle"
   | "URI";
@@ -66,6 +66,7 @@ export interface BookStoreContractEventsContext {
   ApprovalForAll(...parameters: any): EventFilter;
   NFTBookCreated(...parameters: any): EventFilter;
   OwnershipTransferred(...parameters: any): EventFilter;
+  RecallBookResult(...parameters: any): EventFilter;
   TransferBatch(...parameters: any): EventFilter;
   TransferSingle(...parameters: any): EventFilter;
   URI(...parameters: any): EventFilter;
@@ -135,6 +136,9 @@ export interface NFTBookCreatedEventEmittedResponse {
 export interface OwnershipTransferredEventEmittedResponse {
   previousOwner: string;
   newOwner: string;
+}
+export interface RecallBookResultEventEmittedResponse {
+  isSuccess: boolean;
 }
 export interface TransferBatchEventEmittedResponse {
   operator: string;
@@ -468,16 +472,16 @@ export interface BookStoreContract {
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
-   * Payable: true
-   * Constant: false
-   * StateMutability: payable
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
    * Type: function
    * @param tokenId Type: uint256, Indexed: false
    */
   getSecretKey(
     tokenId: BigNumberish,
-    overrides?: ContractTransactionOverrides
-  ): Promise<ContractTransaction>;
+    overrides?: ContractCallOverrides
+  ): Promise<string[]>;
   /**
    * Payable: false
    * Constant: true

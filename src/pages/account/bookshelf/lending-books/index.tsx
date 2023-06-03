@@ -24,8 +24,6 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import RevokeAllLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLendingButton";
-import RevokeAllLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLentOutButton";
 import RevokeLendingButton from "@/components/ui/account/bookshelf/lending-books/RevokeLendingButton";
 import RevokeLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeLentOutButton";
 import { FilterField } from "@/types/filter";
@@ -93,10 +91,7 @@ const LendingBooks = () => {
           <Grid item xs={4} sm={8} md={9}>
             <Stack spacing={3}>
               {/* Lease books that have not been borrowed by anyone */}
-              <ContentPaper
-                title={t("lendingBooksTitle")}
-                button={<RevokeAllLendingButton allBooks={lendingBooks} />}
-              >
+              <ContentPaper title={t("lendingBooksTitle")}>
                 {(() => {
                   if (lendNfts.isLoading) {
                     return (
@@ -163,10 +158,7 @@ const LendingBooks = () => {
               </ContentPaper>
 
               {/* Lease books that have been borrowed by others */}
-              <ContentPaper
-                title={t("lentOutBooksTitle")}
-                button={<RevokeAllLentOutButton />}
-              >
+              <ContentPaper title={t("lentOutBooksTitle")}>
                 {(() => {
                   if (lentOutNfts.isLoading) {
                     return (

@@ -357,7 +357,7 @@ const Profile = () => {
                                       <ActionableBookItem
                                         status="isOwned"
                                         tokenId={book?.tokenId}
-                                        owner={book?.author}
+                                        author={book?.author}
                                         onClick={handleBookClick}
                                         quantity={book?.quantity}
                                         amountOwned={book?.amountOwned}

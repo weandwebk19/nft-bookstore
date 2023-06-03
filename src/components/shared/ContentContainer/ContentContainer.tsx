@@ -3,7 +3,6 @@ import { Box, Stack, Typography } from "@mui/material";
 import styles from "@styles/ContentContainer.module.scss";
 
 import images from "@/assets/images";
-import RevokeAllLentOutButton from "@/components/ui/account/bookshelf/lending-books/RevokeAllLentOutButton";
 
 interface ContentContainerProps {
   titles?: string[];
