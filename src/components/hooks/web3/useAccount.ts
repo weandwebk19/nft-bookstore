@@ -53,11 +53,11 @@ export const hookFactory: AccountHookFactory =
     };
 
     const connect = async () => {
-      try {
-        ethereum?.request({ method: "eth_requestAccounts" });
-      } catch (e) {
-        console.error(e);
-      }
+      // try {
+      //   ethereum?.request({ method: "eth_requestAccounts" });
+      // } catch (e) {
+      //   console.error(e);
+      // }
     };
 
     return {
