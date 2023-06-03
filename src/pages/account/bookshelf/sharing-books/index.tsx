@@ -22,8 +22,6 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import RevokeAllSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeAllSharedOutButton";
-import RevokeAllSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeAllSharingButton";
 import RevokeSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharedOutButton";
 import RevokeSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharingButton";
 import { FilterField } from "@/types/filter";
@@ -93,10 +91,7 @@ const SharingBooks = () => {
           <Grid item xs={4} sm={8} md={9}>
             <Stack spacing={3}>
               {/* Shared books that have not been borrowed by anyone */}
-              <ContentPaper
-                title={t("sharingBooksTitle")}
-                button={<RevokeAllSharingButton />}
-              >
+              <ContentPaper title={t("sharingBooksTitle")}>
                 {(() => {
                   if (sharingNfts.isLoading) {
                     return (
@@ -159,10 +154,7 @@ const SharingBooks = () => {
               </ContentPaper>
 
               {/* Shared books that have been borrowed by others */}
-              <ContentPaper
-                title={t("sharedOutBooksTitle")}
-                button={<RevokeAllSharedOutButton />}
-              >
+              <ContentPaper title={t("sharedOutBooksTitle")}>
                 {(() => {
                   if (sharedNfts.isLoading) {
                     return (

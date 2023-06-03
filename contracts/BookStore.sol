@@ -588,25 +588,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return false;
   }
 
-  // Return total of borrowed books which is recalled, if total equal 0,
-  // you do not have any recallable books. Needed automate this function with Chainlink
-  function recallAllBorrowedBooks() public returns (uint) {
-    uint total = 0;
-    if (address(0) != msg.sender) {
-      uint length = _bookRentingStorage.getTotalBorrowedBooksOnBorrowing();
-      if (length > 0) {
-        for (uint i = 1; i <= length; i++) {
-          BookRentingStorage.BorrowedBook memory book = _bookRentingStorage
-            .getBorrowedBookFromId(i);
-          if (book.renter == msg.sender && recallBorrowedBooks(i)) {
-            total++;
-          }
-        }
-      }
-    }
-    return total;
-  }
-
   function shareBooks(
     uint256 idBorrowedBook,
     uint price,
@@ -752,23 +733,6 @@ contract BookStore is ERC1155URIStorage, Ownable {
     return false;
   }
 
-  function recallAllSharedBooks() public returns (uint) {
-    uint total = 0;
-    if (address(0) != msg.sender) {
-      uint length = _bookSharingStorage.getTotalSharedBooks();
-      if (length > 0) {
-        for (uint i = 1; i <= length; i++) {
-          BookSharingStorage.BookSharing memory book = _bookSharingStorage
-            .getSharedBooks(i);
-          if (book.fromRenter == msg.sender && recallSharedBooks(i)) {
-            total++;
-          }
-        }
-      }
-    }
-    return total;
-  }
-
   function recallBooksOnSharing(uint idBooksOnSharing) public returns (bool) {
     BookSharingStorage.BookSharing memory book = _bookSharingStorage
       .getBooksOnSharing(idBooksOnSharing);
@@ -786,22 +750,5 @@ contract BookStore is ERC1155URIStorage, Ownable {
       return res;
     }
     return false;
-  }
-
-  function recallAllBooksOnSharing() public returns (uint) {
-    uint total = 0;
-    if (address(0) != msg.sender) {
-      uint length = _bookSharingStorage.getTotalBooksOnSharing();
-      if (length > 0) {
-        for (uint i = 1; i <= length; i++) {
-          BookSharingStorage.BookSharing memory book = _bookSharingStorage
-            .getBooksOnSharing(i);
-          if (book.fromRenter == msg.sender && recallBooksOnSharing(i)) {
-            total++;
-          }
-        }
-      }
-    }
-    return total;
   }
 }
