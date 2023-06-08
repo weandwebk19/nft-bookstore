@@ -25,8 +25,6 @@ export default withSessionAPI(
     req: NextApiRequest & { session: IronSession },
     res: NextApiResponse
   ) => {
-    console.log("verfiy-image");
-
     if (req.method === "POST") {
       try {
         const { bytes, fileName, contentType } = req.body as FileReq;

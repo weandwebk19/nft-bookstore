@@ -52,6 +52,7 @@ interface ActionableBookItemProps {
   amount?: number;
   sharer?: string;
   sharedPerson?: string;
+  isApproved?: boolean;
 }
 
 const ActionableBookItem = ({
@@ -70,7 +71,8 @@ const ActionableBookItem = ({
   amountTradeable,
   amount,
   sharer,
-  sharedPerson
+  sharedPerson,
+  isApproved
 }: ActionableBookItemProps) => {
   const { t } = useTranslation("bookButtons");
 
@@ -400,16 +402,24 @@ const ActionableBookItem = ({
               {status !== undefined ? <Chip label={status} /> : <></>}
             </Stack> */}
 
-          {status === "isOwned" && (metadata.isLoading || !metadata) ? (
-            <Stack direction="row" spacing={0.5}>
-              <Skeleton variant="rectangular" width="50%" height={36.5} />
-              <Skeleton variant="rectangular" width="50%" height={36.5} />
-            </Stack>
-          ) : (
-            <Stack direction="row" spacing={2} mt={3}>
-              {buttons}
-            </Stack>
-          )}
+          {(() => {
+            if (status === "isOwned" && (metadata.isLoading || !metadata)) {
+              return (
+                <Stack direction="row" spacing={0.5}>
+                  <Skeleton variant="rectangular" width="50%" height={36.5} />
+                  <Skeleton variant="rectangular" width="50%" height={36.5} />
+                </Stack>
+              );
+            } else if (isApproved === true) {
+              return (
+                <Stack direction="row" spacing={2} mt={3}>
+                  {buttons}
+                </Stack>
+              );
+            } else {
+              return <div>Waiting for review...</div>;
+            }
+          })()}
         </Stack>
       </Stack>
     </Box>
