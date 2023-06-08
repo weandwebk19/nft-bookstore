@@ -40,6 +40,7 @@ export type BookInfoInDB = {
   totalPages?: number;
   keywords?: string | string[];
   userCreated?: string;
+  isApproved?: boolean;
 };
 
 export type BookInfo = {
@@ -48,6 +49,21 @@ export type BookInfo = {
   genres: string[];
   publishingTime?: Date;
 } & BookInfoInDB;
+
+export type BookBrief = {
+  tokenId: number;
+  nftUri: string; // Metadata URI
+  // bookFile: {
+  //   secure_url: string;
+  //   public_id: string;
+  // };
+  bookFile?: File;
+  bookSample: string;
+  bookCover: string;
+  title: string;
+  author: string;
+  timestamp: Date;
+};
 
 export type BookInfoForUpdate = {
   id: string;
@@ -85,6 +101,12 @@ export type NftBook = {
   amountOwned?: number;
   amountTradeable?: number;
   // meta: NftBookMeta;
+} & NftBookCore;
+
+export type CreatedBook = {
+  amountOwned?: number;
+  amountTradeable?: number;
+  isApproved?: boolean;
 } & NftBookCore;
 
 export type BookSellingCore = {
