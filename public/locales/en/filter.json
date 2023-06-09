@@ -17,5 +17,6 @@
   "reset": "Reset",
   "apply": "Apply",
   "result": "Result",
-  "clearAllFilter": "Clear all Filters"
+  "clearAllFilter": "Clear all Filters",
+  "textLoadGenre": "Oops! There was a problem loading genres. Try refresh the page."
 }
