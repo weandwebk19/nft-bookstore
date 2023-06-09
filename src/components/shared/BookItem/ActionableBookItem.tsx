@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   Box,
+  Chip,
   Divider,
   Skeleton,
   Stack,
@@ -405,7 +406,7 @@ const ActionableBookItem = ({
           {(() => {
             if (status === "isOwned" && (metadata.isLoading || !metadata)) {
               return (
-                <Stack direction="row" spacing={0.5}>
+                <Stack direction="row" spacing={0.5} mt={3}>
                   <Skeleton variant="rectangular" width="50%" height={36.5} />
                   <Skeleton variant="rectangular" width="50%" height={36.5} />
                 </Stack>
@@ -417,7 +418,18 @@ const ActionableBookItem = ({
                 </Stack>
               );
             } else {
-              return <div>Waiting for review...</div>;
+              return (
+                <Chip
+                  label={t("waitingForReview") as string}
+                  sx={{
+                    mt: 3,
+                    color: `${theme.palette.common.black}`,
+                    fontWeight: "bold",
+                    lineHeight: "20px",
+                    background: `linear-gradient(to right, ${theme.palette.common.black} 15%, ${theme.palette.common.white} 15%)`
+                  }}
+                />
+              );
             }
           })()}
         </Stack>
