@@ -411,13 +411,7 @@ const ActionableBookItem = ({
                   <Skeleton variant="rectangular" width="50%" height={36.5} />
                 </Stack>
               );
-            } else if (isApproved === true) {
-              return (
-                <Stack direction="row" spacing={2} mt={3}>
-                  {buttons}
-                </Stack>
-              );
-            } else {
+            } else if (isApproved === false) {
               return (
                 <Chip
                   label={t("waitingForReview") as string}
@@ -429,6 +423,12 @@ const ActionableBookItem = ({
                     background: `linear-gradient(to right, ${theme.palette.common.black} 15%, ${theme.palette.common.white} 15%)`
                   }}
                 />
+              );
+            } else {
+              return (
+                <Stack direction="row" spacing={2} mt={3}>
+                  {buttons}
+                </Stack>
               );
             }
           })()}

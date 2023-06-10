@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { ResponseData } from "@/types/api";
+import { toCamel } from "@/utils/nomalizer";
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,20 +14,25 @@ export default async function handler(
     const db = client.db("NftBookStore");
     const bookId: string = req.query.bookId as string;
 
-    const tokenId = await db
-      .collection("books")
-      .findOne({ _id: new ObjectId(bookId) }, { projection: { token_id: 1 } });
+    const review = await db.collection("reviews").findOne({
+      book_id: new ObjectId(bookId as string)
+    });
 
-    if (tokenId) {
+    if (review) {
       return res.json({
         success: true,
-        message: "Get tokenId successfully.",
-        data: tokenId.token_id
+        message: "Get review successfully.",
+        data: toCamel({
+          ...review,
+          _id: review._id.toString(),
+          book_id: review.book_id.toString(),
+          user_id: review.user_id.toString()
+        })
       });
     } else {
       return res.json({
         success: false,
-        message: "bookId is wrong.",
+        message: "BookId is wrong.",
         data: null
       });
     }
@@ -34,7 +40,7 @@ export default async function handler(
     return res.json({
       success: false,
       message: e.message,
-      data: e
+      data: null
     });
   }
 }
