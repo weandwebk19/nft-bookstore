@@ -49,7 +49,7 @@ const ShareButton = ({
   const { t } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
+  const { provider, bookStoreContract, bookRentingContract, bookSharingContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -120,14 +120,35 @@ const ShareButton = ({
           startTime,
           endTime
         );
-        const tx = await bookStoreContract?.shareBooks(
-          idBorrowedBook.toNumber(),
-          ethers.utils.parseEther(price.toString()),
-          amount,
-          {
-            value: sharingPrice
-          }
+        const idBookOnSharing = await bookSharingContract!.getIdBookOnSharing(
+          tokenId,
+          renter,
+          borrower,
+          startTime,
+          endTime
         );
+
+        let tx;
+        if (idBookOnSharing.toNumber() === 0) {
+          tx = await bookStoreContract?.shareBooks(
+            idBorrowedBook.toNumber(),
+            ethers.utils.parseEther(price.toString()),
+            amount,
+            {
+              value: sharingPrice
+            }
+          );
+        } else {
+          const book = await bookSharingContract!.getBooksOnSharing(
+            idBookOnSharing.toNumber()
+          );
+          const newAmount = book.amount.toNumber() + amount;
+          tx = await bookStoreContract?.updateBooksOnSharing(
+            idBookOnSharing.toNumber(),
+            ethers.utils.parseEther(price.toString()),
+            newAmount
+          );
+        }
         const receipt: any = await toast.promise(tx!.wait(), {
           pending: t("pendingShare") as string,
           success: t("successShare") as string,
@@ -169,7 +190,14 @@ const ShareButton = ({
         });
       }
     },
-    [account.data, bookRentingContract, bookStoreContract, provider]
+    [
+      account.data,
+      bookRentingContract,
+      bookStoreContract,
+      provider,
+      t,
+      bookSharingContract
+    ]
   );
 
   const createPricingHistoryCallback = useCallback(
