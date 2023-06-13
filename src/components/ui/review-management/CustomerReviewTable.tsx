@@ -351,6 +351,7 @@ export default function CustomerReviewTable({
                   </Stack>
                 </Stack>
               </FormProvider>
+              <ToastContainer />
             </Dialog>
           </>
         );
@@ -445,7 +446,6 @@ export default function CustomerReviewTable({
         columns={columns}
         rows={reformattedData}
       />
-      <ToastContainer />
     </Stack>
   );
 }
