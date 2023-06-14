@@ -49,7 +49,12 @@ const ShareButton = ({
   const { t } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { provider, bookStoreContract, bookRentingContract, bookSharingContract } = useWeb3();
+  const {
+    provider,
+    bookStoreContract,
+    bookRentingContract,
+    bookSharingContract
+  } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
