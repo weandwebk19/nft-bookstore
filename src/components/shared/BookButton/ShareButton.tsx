@@ -49,7 +49,12 @@ const ShareButton = ({
   const { t } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { provider, bookStoreContract, bookRentingContract, bookSharingContract } = useWeb3();
+  const {
+    provider,
+    bookStoreContract,
+    bookRentingContract,
+    bookSharingContract
+  } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -61,11 +66,7 @@ const ShareButton = ({
       price: yup
         .number()
         .min(0, t("textErrorShare1") as string)
-        .typeError(t("textErrorShare2") as string),
-      amount: yup
-        .number()
-        .min(1, t("textErrorShare3") as string)
-        .typeError(t("textErrorShare4") as string)
+        .typeError(t("textErrorShare2") as string)
     })
     .required();
 
@@ -229,7 +230,7 @@ const ShareButton = ({
     await shareBooks(
       tokenId,
       data.price,
-      data.amount,
+      1,
       borrowedAmount,
       renter,
       borrower,
@@ -237,7 +238,7 @@ const ShareButton = ({
       endTime
     );
     await createPricingHistoryCallback(tokenId, data.price);
-    await createBookHistoryCallback(tokenId, data.price, data.amount);
+    await createBookHistoryCallback(tokenId, data.price, 1);
   };
 
   useEffect(() => {
@@ -289,7 +290,7 @@ const ShareButton = ({
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item md={8}>
+            <Grid item md={8} sx={{ display: "flex", flexDirection: "column" }}>
               <Stack
                 spacing={3}
                 sx={{
@@ -299,11 +300,14 @@ const ShareButton = ({
                 <FormGroup label={t("price") as string} required>
                   <TextFieldController name="price" type="number" />
                 </FormGroup>
-                <FormGroup label={t("amount") as string} required>
-                  <TextFieldController name="amount" type="number" />
-                </FormGroup>
               </Stack>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "auto"
+                }}
+              >
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}

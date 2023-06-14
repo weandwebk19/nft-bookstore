@@ -93,7 +93,7 @@ const TakeButton = ({
   const { handleSubmit, watch } = methods;
 
   const currentAmount = watch("amount");
-  const [totalPayment, setTotalPayment] = useState<number>(0);
+  const [totalPayment, setTotalPayment] = useState<number>(price);
 
   const takeBooks = useCallback(
     async (
@@ -284,23 +284,9 @@ const TakeButton = ({
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between"
+                justifyContent: "flex-end"
               }}
             >
-              <Stack
-                spacing={3}
-                sx={{
-                  mb: 5
-                }}
-              >
-                <FormGroup label={t("amount") as string} required>
-                  <NumericStepperController name="amount" />
-                  <Typography>
-                    {supplyAmount} {t("left") as string}
-                  </Typography>
-                </FormGroup>
-              </Stack>
-              <Divider />
               <Stack
                 direction="row"
                 justifyContent="space-between"
@@ -316,7 +302,13 @@ const TakeButton = ({
               >
                 {t("gasFee") as string}
               </Typography>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "24px"
+                }}
+              >
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}
