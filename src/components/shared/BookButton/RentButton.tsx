@@ -23,6 +23,7 @@ import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface RentButtonProps {
   tokenId: number;
@@ -207,10 +208,7 @@ const RentButton = ({
 
         await createBookHistoryCallback(tokenId, price, amount);
       } catch (e: any) {
-        console.error(e.message);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
     [account.data, bookStoreContract, provider]

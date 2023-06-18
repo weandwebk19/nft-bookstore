@@ -295,7 +295,7 @@ const CreateBook = () => {
   const handleError = async (err: any) => {
     console.error(err);
     await deleteFileOnCloud();
-    toast.error(err.message.substr(0, 65), {
+    toast.error("An error occured while deleting file on cloud", {
       position: toast.POSITION.TOP_CENTER
     });
     setTimeout(() => {
@@ -521,7 +521,7 @@ const CreateBook = () => {
         timestamp: new Date()
       });
     } catch (e: any) {
-      toast.error(e.message, {
+      toast.error("Oops! Something went wrong!", {
         position: toast.POSITION.TOP_CENTER
       });
     }

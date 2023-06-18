@@ -24,6 +24,7 @@ import { StyledButton } from "@/styles/components/Button";
 import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { getGasFee } from "../../utils/getGasFee";
 import { Image } from "../Image";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface SellButtonProps {
   owner: string;
@@ -157,10 +158,7 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
           );
         }
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
     [account.data, bookStoreContract, provider]

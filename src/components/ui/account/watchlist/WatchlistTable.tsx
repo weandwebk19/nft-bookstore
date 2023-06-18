@@ -83,7 +83,7 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
           }
         }
       } catch (err: any) {
-        toast.error(err.message, {
+        toast.error("An error occured while removing book from watchlists", {
           position: toast.POSITION.TOP_RIGHT
         });
       }

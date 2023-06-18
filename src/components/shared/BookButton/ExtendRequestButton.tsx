@@ -42,6 +42,7 @@ import { daysToSeconds } from "@/utils/timeConvert";
 
 import Step1 from "../../ui/borrow/steps/Step1";
 import Step2 from "../../ui/borrow/steps/Step2";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface ExtendRequestButtonProps {
   tokenId: number;
@@ -206,11 +207,8 @@ const ExtendRequestButton = ({
             "Yêu cầu gia hạn sách đang mượn"
           );
         }
-      } catch (error: any) {
-        console.error(error);
-        toast.error(`${error.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+      } catch (e: any) {
+        toastErrorTransaction(e.message);
       }
     },
     [supplyAmount, account.data, bookStoreContract, provider]

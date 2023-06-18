@@ -23,6 +23,7 @@ import { StyledButton } from "@/styles/components/Button";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { Image } from "../Image";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface ShareButtonProps {
   renter: string;
@@ -185,10 +186,7 @@ const ShareButton = ({
           );
         }
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
     [
