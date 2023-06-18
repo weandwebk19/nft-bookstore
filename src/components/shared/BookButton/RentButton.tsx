@@ -36,6 +36,8 @@ const defaultValues = {
   rentalDays: 7
 };
 
+const MIN_RENTAL_DURATION = 604800;
+
 const RentButton = ({
   tokenId,
   renter,
@@ -97,7 +99,7 @@ const RentButton = ({
     ) => {
       try {
         // Handle errors
-        if (rentalDuration < 604800) {
+        if (rentalDuration < MIN_RENTAL_DURATION) {
           return toast.error(t("textErrorRent5") as string, {
             position: toast.POSITION.TOP_CENTER
           });
@@ -114,7 +116,7 @@ const RentButton = ({
           });
         }
 
-        const value = (price * amount * rentalDuration) / 604800;
+        const value = (price * amount * rentalDuration) / MIN_RENTAL_DURATION;
         const tx = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,
@@ -231,7 +233,9 @@ const RentButton = ({
   );
 
   useEffect(() => {
-    const total = currentAmount * currentRentalDays * price;
+    const currentRentalSeconds = currentRentalDays * 86400; // (s)
+    const total =
+      (currentAmount * currentRentalSeconds * price) / MIN_RENTAL_DURATION;
     setTotalPayment(total);
   }, [currentAmount, currentRentalDays, price]);
 
