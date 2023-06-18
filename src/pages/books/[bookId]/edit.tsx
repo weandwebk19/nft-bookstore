@@ -154,12 +154,10 @@ const EditBook = () => {
   useEffect(() => {
     if (bookDetail.data?.info?.genres) {
       (async () => {
-        console.log(bookDetail.data.info.genres);
         try {
           const res = await axios.get(
             `api/genres/${bookDetail.data?.info?.genres[0]}`
           );
-          console.log("res", res);
         } catch (err) {
           console.error(err);
         }

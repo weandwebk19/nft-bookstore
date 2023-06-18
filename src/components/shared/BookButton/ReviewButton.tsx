@@ -92,8 +92,6 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
         });
       }
     } catch (e: any) {
-      console.log("e", e);
-
       toast.error(`${e.message}.`, {
         position: toast.POSITION.TOP_CENTER
       });

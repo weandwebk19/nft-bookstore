@@ -119,7 +119,6 @@ const RevokeSharingButton = ({
           "Thu hồi sách đang chia sẻ"
         );
       }
-      console.log(receipt);
     } catch (e: any) {
       console.error(e);
       toast.error(`${e.message.substr(0, 65)}.`, {

@@ -66,9 +66,6 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
   ) => {
     e.preventDefault();
     setAnchorDeleteButton(null);
-
-    console.log(item.tokenId);
-    console.log(account.data);
     (async () => {
       try {
         if (account.data) {
