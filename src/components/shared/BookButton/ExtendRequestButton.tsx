@@ -66,7 +66,7 @@ const ExtendRequestButton = ({
   const { t } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { provider, bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -156,14 +156,40 @@ const ExtendRequestButton = ({
           });
         }
 
-        const tx = await bookStoreContract?.requestExtendTimeOfBorrowedBooks(
+        const idBorrowedBook = await bookRentingContract?.getIdBorrowedBook(
           tokenId,
           renter,
+          account.data!,
           startTime,
-          endTime,
-          extendedAmount,
-          extendedTime
+          endTime
         );
+
+        const isRequestExist = await bookRentingContract?.isRequestExist(
+          idBorrowedBook!.toNumber(),
+          account.data!,
+          renter
+        );
+
+        let tx;
+        if (!isRequestExist) {
+          tx = await bookStoreContract?.requestExtendTimeOfBorrowedBooks(
+            tokenId,
+            renter,
+            startTime,
+            endTime,
+            extendedAmount,
+            extendedTime
+          );
+        } else {
+          tx = await bookStoreContract?.updateRequestOfBorrowedBooks(
+            tokenId,
+            renter,
+            startTime,
+            endTime,
+            extendedAmount,
+            extendedTime
+          );
+        }
 
         const receipt: any = await toast.promise(tx!.wait(), {
           pending: t("pendingExtend") as string,
