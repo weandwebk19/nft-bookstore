@@ -32,6 +32,7 @@ import { createTransactionHistory } from "@/components/utils";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface TakeButtonProps {
   tokenId: number;
@@ -200,10 +201,7 @@ const TakeButton = ({
           );
         }
       } catch (error: any) {
-        console.error(error);
-        toast.error(`${error.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(error.message);
       }
     },
     [account.data, bookSharingContract, bookStoreContract, provider]

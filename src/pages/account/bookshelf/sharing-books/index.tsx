@@ -72,8 +72,6 @@ const SharingBooks = () => {
     })();
   };
 
-  console.log(sharedBooks);
-
   return (
     <>
       <Head>
