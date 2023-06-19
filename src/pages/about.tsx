@@ -41,9 +41,11 @@ const About = () => {
                       backgroundColor: `${theme.palette.background.paper}`
                     }}
                   >
-                    <Typography variant="h4">Huynh Van Long</Typography>
+                    <Typography variant="h4" sx={{ minHeight: "90px" }}>
+                      Huynh Van Long
+                    </Typography>
                     <Box component="img" src="" alt="" />
-                    <Typography>{t("roles")}</Typography>
+                    <Typography>{t("roles")}: Front-end Developer</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={4} sm={4} md={3}>
@@ -55,9 +57,11 @@ const About = () => {
                       backgroundColor: `${theme.palette.background.paper}`
                     }}
                   >
-                    <Typography variant="h4">Nguyen Duc Manh</Typography>
+                    <Typography variant="h4" sx={{ minHeight: "90px" }}>
+                      Nguyen Duc Manh
+                    </Typography>
                     <Box component="img" src="" alt="" />
-                    <Typography>{t("roles")}</Typography>
+                    <Typography>{t("roles")}: Back-end Developer</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={4} sm={4} md={3}>
@@ -69,9 +73,11 @@ const About = () => {
                       backgroundColor: `${theme.palette.background.paper}`
                     }}
                   >
-                    <Typography variant="h4">Nguyen Van Thinh</Typography>
+                    <Typography variant="h4" sx={{ minHeight: "90px" }}>
+                      Nguyen Van Thinh
+                    </Typography>
                     <Box component="img" src="" alt="" />
-                    <Typography>{t("roles")}</Typography>
+                    <Typography>{t("roles")}: Back-end Developer</Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={4} sm={4} md={3}>
@@ -83,9 +89,11 @@ const About = () => {
                       backgroundColor: `${theme.palette.background.paper}`
                     }}
                   >
-                    <Typography variant="h4">Le Nguyen Nhat Tho</Typography>
+                    <Typography variant="h4" sx={{ minHeight: "90px" }}>
+                      Le Nguyen Nhat Tho
+                    </Typography>
                     <Box component="img" src="" alt="" />
-                    <Typography>{t("roles")}</Typography>
+                    <Typography>{t("roles")}: Front-end Developer</Typography>
                   </Box>
                 </Grid>
               </Grid>
