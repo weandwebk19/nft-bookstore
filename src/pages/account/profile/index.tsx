@@ -288,11 +288,11 @@ const Profile = () => {
                                   }}
                                 />
                               ) : userInfo.data?.avatar ? (
-                                <Box
-                                  component="img"
+                                <Avatar
                                   src={userInfo.data?.avatar}
                                   sx={{
                                     width: "100%",
+                                    height: "auto",
                                     maxWidth: "400px",
                                     aspectRatio: "1 / 1",
                                     borderRadius: "100rem",
