@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import { IToc, ReactReader } from "react-reader";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   Box,
@@ -102,38 +104,53 @@ const ReadBook = () => {
           .then(async function (response) {
             const cipherText = new Uint8Array(response.data);
             if (tokenId) {
-              const secrectKey = (await bookStoreContract!.getSecretKey(
+              const isReadable = await bookStoreContract!.isBookReadableByUser(
                 tokenId
-              )) as unknown as string[];
-              if (secrectKey.length === 2) {
-                const privateKey = await Crypto.generateKey(secrectKey[1]);
-                const iv = convertHexStringToUint8Array(secrectKey[0]);
-                const link = (await decryptPdfFile(
-                  cipherText,
-                  privateKey,
-                  iv
-                )) as string;
-                if (SUPPORT_FILE_TYPE.includes(metaDataType)) {
-                  setFileType(metaDataType);
-                  if (metaDataType === "pdf") {
-                    setLinkPdf(link);
-                  } else {
-                    setLinkEpub(link);
+              );
+
+              if (isReadable) {
+                const secrectKey = (await bookStoreContract!.getSecretKey(
+                  tokenId
+                )) as unknown as string[];
+
+                if (secrectKey.length === 2) {
+                  const privateKey = await Crypto.generateKey(secrectKey[1]);
+                  const iv = convertHexStringToUint8Array(secrectKey[0]);
+                  const link = (await decryptPdfFile(
+                    cipherText,
+                    privateKey,
+                    iv
+                  )) as string;
+                  if (SUPPORT_FILE_TYPE.includes(metaDataType)) {
+                    setFileType(metaDataType);
+                    if (metaDataType === "pdf") {
+                      setLinkPdf(link);
+                    } else {
+                      setLinkEpub(link);
+                    }
                   }
                 }
+              } else {
+                toast.error(t("errorPermission") as string, {
+                  position: toast.POSITION.TOP_CENTER
+                });
+                setDecrypting(false);
               }
             }
+
             setDecrypting(false);
           })
           .catch((err) => {
             if (err.code === "ERR_NETWORK") {
-              window.alert("Disable your adblock and try again!");
+              toast.error(t("errorNetwork") as string, {
+                position: toast.POSITION.TOP_CENTER
+              });
             }
             setDecrypting(false);
           });
       }
     })();
-  }, [bookFileUrl, bookStoreContract, tokenId, metaDataType]);
+  }, [bookFileUrl, bookStoreContract, tokenId, metaDataType, t]);
 
   useEffect(() => {
     (async () => {
@@ -251,6 +268,7 @@ const ReadBook = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Stack>
+        <ToastContainer />
         <Button
           variant="outlined"
           size="small"

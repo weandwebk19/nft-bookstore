@@ -17,5 +17,6 @@
   "reset": "Đặt lại",
   "apply": "Lọc",
   "result": "Kết quả",
-  "clearAllFilter": "Hủy bộ lọc"
+  "clearAllFilter": "Hủy bộ lọc",
+  "textLoadGenre": "Rất tiếc! Đã xảy ra sự cố khi tải thể loại. Hãy thử làm mới trang."
 }

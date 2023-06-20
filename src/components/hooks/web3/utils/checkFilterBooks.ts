@@ -54,6 +54,18 @@ export const checkFilterBooks = async (
     isTitlesPass = false;
   }
   // TODO: rating check
+  if (queryString.rating !== "") {
+    if (bookInfoRes?.success === true) {
+      const bookInfo = bookInfoRes.data as BookInfo;
+      const reviewRes = await axios.get(`/api/reviews/book/${bookInfo.id}`);
+      if (
+        reviewRes.data.success === true &&
+        parseInt(reviewRes.data.data.rating) < parseInt(queryString.rating)
+      ) {
+        isRatingPass = false;
+      }
+    }
+  }
 
   // price check
   if (price) {

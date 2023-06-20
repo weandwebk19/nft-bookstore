@@ -14,6 +14,7 @@
   "socialMedia": "Mạng xã hội",
   "authorBook": "Sách của tác giả",
   "noInformationYet": "Chưa có thông tin",
-  "emptyMessage": "Bạn chưa sở hữu quyển sách nào!",
-  "loadingMessage": "Đang đặt sách lên kệ..."
+  "emptyMessage": "Tác giả chưa sở hữu quyển sách nào!",
+  "loadingMessage": "Đang đặt sách lên kệ...",
+  "errorProfileInvalid": "Hồ sơ địa chỉ ví của tác giả không hợp lệ."
 }

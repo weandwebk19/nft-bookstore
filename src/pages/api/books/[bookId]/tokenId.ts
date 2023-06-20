@@ -1,5 +1,4 @@
 import clientPromise from "@lib/mongodb";
-import { toCamel } from "@utils/nomalizer";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 

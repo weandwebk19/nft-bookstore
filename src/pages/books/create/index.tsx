@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,6 +18,7 @@ import Paper from "@mui/material/Paper";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Alert } from "@mui/lab";
+import { render } from "@react-email/render";
 import {
   convertArrayToHexString,
   convertHexStringToUint8Array
@@ -26,6 +27,7 @@ import getFileExtension from "@utils/getFileExtension";
 import axios from "axios";
 import cryptoRandomString from "crypto-random-string";
 import { ethers } from "ethers";
+import { sign } from "jsonwebtoken";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
@@ -49,7 +51,7 @@ import { createTransactionHistory } from "@/components/utils";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { deleteFile } from "@/pages/api/utils";
 import { StyledButton } from "@/styles/components/Button";
-import { BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
+import { BookBrief, BookInfo, NftBookMeta, PinataRes } from "@/types/nftBook";
 import { Crypto } from "@/utils/crypto";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
@@ -293,7 +295,7 @@ const CreateBook = () => {
   const handleError = async (err: any) => {
     console.error(err);
     await deleteFileOnCloud();
-    toast.error(err.message.substr(0, 65), {
+    toast.error("An error occured while deleting file on cloud", {
       position: toast.POSITION.TOP_CENTER
     });
     setTimeout(() => {
@@ -498,6 +500,33 @@ const CreateBook = () => {
     }
   };
 
+  const createRequestPublish = async (data: {
+    tokenId: number;
+    bookFile: File;
+    title: string;
+  }) => {
+    try {
+      const buffer = await data.bookFile.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+
+      const promise = axios.post("/api/books/request/create", {
+        tokenId: data.tokenId,
+        nftUri: nftURI,
+        bookFile: bytes,
+        bookFileName: data.bookFile.name,
+        bookSample: bookSampleLink,
+        bookCover: bookCoverLink,
+        title: data.title,
+        author: account.data,
+        timestamp: new Date()
+      });
+    } catch (e: any) {
+      toast.error("Oops! Something went wrong!", {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
+
   const createTransactionHistoryCallback = async (
     provider: any,
     receipt: any,
@@ -588,8 +617,8 @@ const CreateBook = () => {
               ivStr!
             );
 
-            // Upload data to database
             if (tokenId) {
+              // Upload data to database
               const detailRes = await uploadBookDetails({
                 tokenId: tokenId,
                 description: data.description,
@@ -599,8 +628,15 @@ const CreateBook = () => {
                 totalPages: data.totalPages,
                 keywords: data.keywords,
                 publishingTime: data.publishingTime,
-                userCreated: account.data
+                userCreated: account.data,
+                isApproved: false
               } as BookInfo);
+              //
+              await createRequestPublish({
+                tokenId: tokenId,
+                bookFile: data.bookFile,
+                title: data.title
+              });
               if (detailRes) {
                 setIsSigning(false);
                 setOpen(true);

@@ -153,8 +153,6 @@ export default function TransactionHistoryTable({
     );
   }
 
-  console.log(data);
-
   return (
     <Stack spacing={3}>
       <DataGrid

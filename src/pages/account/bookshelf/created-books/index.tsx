@@ -21,6 +21,7 @@ import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { StyledButton } from "@/styles/components/Button";
 import { FilterField } from "@/types/filter";
+import { CreatedBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
 const CreatedBooks = () => {
@@ -98,7 +99,7 @@ const CreatedBooks = () => {
                     spacing={3}
                     columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                   >
-                    {createdBooks!.map((book) => {
+                    {createdBooks!.map((book: CreatedBook) => {
                       return (
                         <Grid
                           item
@@ -115,6 +116,7 @@ const CreatedBooks = () => {
                             onClick={handleBookClick}
                             quantity={book?.quantity}
                             amountTradeable={book?.amountTradeable}
+                            isApproved={book?.isApproved}
                             buttons={
                               <Stack
                                 spacing={{ xs: 2, sm: 2, md: 3 }}

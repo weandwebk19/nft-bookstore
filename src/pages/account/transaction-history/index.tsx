@@ -21,7 +21,6 @@ const TransactionHistory = () => {
     account.data as string
   );
 
-  console.log(data);
   return (
     <>
       <Head>

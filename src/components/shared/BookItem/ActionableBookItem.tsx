@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
   Box,
+  Chip,
   Divider,
   Skeleton,
   Stack,
@@ -52,6 +53,7 @@ interface ActionableBookItemProps {
   amount?: number;
   sharer?: string;
   sharedPerson?: string;
+  isApproved?: boolean;
 }
 
 const ActionableBookItem = ({
@@ -70,7 +72,8 @@ const ActionableBookItem = ({
   amountTradeable,
   amount,
   sharer,
-  sharedPerson
+  sharedPerson,
+  isApproved
 }: ActionableBookItemProps) => {
   const { t } = useTranslation("bookButtons");
 
@@ -400,16 +403,35 @@ const ActionableBookItem = ({
               {status !== undefined ? <Chip label={status} /> : <></>}
             </Stack> */}
 
-          {status === "isOwned" && (metadata.isLoading || !metadata) ? (
-            <Stack direction="row" spacing={0.5}>
-              <Skeleton variant="rectangular" width="50%" height={36.5} />
-              <Skeleton variant="rectangular" width="50%" height={36.5} />
-            </Stack>
-          ) : (
-            <Stack direction="row" spacing={2} mt={3}>
-              {buttons}
-            </Stack>
-          )}
+          {(() => {
+            if (status === "isOwned" && (metadata.isLoading || !metadata)) {
+              return (
+                <Stack direction="row" spacing={0.5} mt={3}>
+                  <Skeleton variant="rectangular" width="50%" height={36.5} />
+                  <Skeleton variant="rectangular" width="50%" height={36.5} />
+                </Stack>
+              );
+            } else if (isApproved === false) {
+              return (
+                <Chip
+                  label={t("waitingForReview") as string}
+                  sx={{
+                    mt: 3,
+                    color: `${theme.palette.common.black}`,
+                    fontWeight: "bold",
+                    lineHeight: "20px",
+                    background: `linear-gradient(to right, ${theme.palette.common.black} 15%, ${theme.palette.common.white} 15%)`
+                  }}
+                />
+              );
+            } else {
+              return (
+                <Stack direction="row" spacing={2} mt={3}>
+                  {buttons}
+                </Stack>
+              );
+            }
+          })()}
         </Stack>
       </Stack>
     </Box>
