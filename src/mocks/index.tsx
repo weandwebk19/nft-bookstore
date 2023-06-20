@@ -213,3 +213,39 @@ export const bookReviews = [
     }
   }
 ];
+
+export const salesReport = [
+  {
+    id: 1,
+    avatar: "",
+    username: "eye_deer",
+    title: "The Book Thief",
+    bookCover: images.mockupBookCover2,
+    method: "Buy",
+    amount: 25,
+    price: 0.5,
+    date: Date.now().toString()
+  },
+  {
+    id: 2,
+    avatar: "",
+    username: "owwwwwl",
+    title: "The Book Thief",
+    bookCover: images.mockupBookCover2,
+    method: "Lend",
+    amount: 1,
+    price: 0.001,
+    date: Date.now().toString()
+  },
+  {
+    id: 3,
+    avatar: "",
+    username: "froggy",
+    title: "The Book Thief",
+    bookCover: images.mockupBookCover2,
+    method: "Share",
+    amount: 189,
+    price: 0.065,
+    date: Date.now().toString()
+  }
+];

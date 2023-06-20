@@ -44,7 +44,6 @@ const EnhancedSelect = ({
     item: any
   ) => {
     event.preventDefault();
-    console.log(item);
     setSelectedItem(item);
   };
 

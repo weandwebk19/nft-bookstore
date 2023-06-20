@@ -25,7 +25,6 @@ export default withSessionAPI(
     req: NextApiRequest & { session: IronSession },
     res: NextApiResponse
   ) => {
-    console.log("verify-file");
     if (req.method === "POST") {
       const { bytes, fileName, contentType } = req.body as FileReq;
 

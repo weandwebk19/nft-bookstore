@@ -1,5 +1,7 @@
 {
   "myBookshelf": "My Bookshelf",
   "loadingMessage": "Decrypting your book...",
-  "pageSelection": "Jump to page"
+  "pageSelection": "Jump to page",
+  "errorNetwork": "Disable your adblock and try again!",
+  "errorPermission": "You do not have permission to read this book."
 }

@@ -44,9 +44,7 @@ const InputComment = ({
     mode: "all"
   });
   const { handleSubmit } = methods;
-  const onSubmit = async (data: any) => {
-    console.log(data);
-  };
+  const onSubmit = async (data: any) => {};
   return (
     <Stack direction="row" p={2} spacing={2}>
       <Avatar alt={username} src={avatar} />

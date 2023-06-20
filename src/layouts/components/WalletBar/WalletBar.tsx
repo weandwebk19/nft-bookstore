@@ -23,13 +23,15 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 // import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import { List as CustomList } from "@shared/List";
 import { StyledButton } from "@styles/components/Button";
-import { getCsrfToken } from "next-auth/react";
-import { signOut, useSession } from "next-auth/react";
+import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
+import { getCsrfToken, signOut, useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import PropTypes from "prop-types";
 import { useConnect } from "wagmi";
 
 import images from "@/assets/images";
+import { useWeb3 } from "@/components/providers/web3";
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledChip } from "@/styles/components/Chip";
 import { ListItemProps } from "@/types/list";
@@ -62,15 +64,37 @@ const WalletBar = ({
   isAuthor,
   createList
 }: WalletBarProps) => {
+  const { provider, bookStoreContract } = useWeb3();
+
   const { t } = useTranslation();
   const { data, status } = useSession();
   const [address, setAddress] = useState(data?.address as string);
   const { connect, connectors, error, pendingConnector } = useConnect();
+  const [userBalance, setUserBalance] = useState<string>("0");
 
   const [anchorWalletCard, setAnchorWalletCard] = useState<Element | null>(
     null
   );
   const openWalletCard = Boolean(anchorWalletCard);
+
+  useEffect(() => {
+    (async () => {
+      let value: string = "0";
+      try {
+        if (provider && account) {
+          const res = await provider.getBalance(account);
+          const balance = ethers.BigNumber.from(res);
+          console.log(balance);
+          value = ethers.utils.formatEther(balance);
+          value = parseFloat(value).toFixed(4);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setUserBalance(value);
+      }
+    })();
+  }, [provider, account]);
 
   // const createList: ListItemProps[] = [
   //   {
@@ -158,17 +182,19 @@ const WalletBar = ({
         >
           {isAuthor ? (
             <StyledChip
-              icon={<AdjustIcon color="primary" />}
-              label={truncate(account ? account : "", 6, -4)}
+              icon={<AdjustIcon />}
+              label={`${userBalance}${String.fromCharCode(160)}ETH`}
+              variant="outlined"
               background={images.gradient1}
             />
           ) : (
             <Chip
               avatar={<AdjustIcon />}
-              label={truncate(account ? account : "", 6, -4)}
+              label={`${userBalance}${String.fromCharCode(160)}ETH`}
               variant="outlined"
             />
           )}
+
           <Tooltip title={t("navbar:toolTip_accountMenu")}>
             <IconButton onClick={handleAccountMenuClick}>
               <Avatar alt={userName} src={avatar} />

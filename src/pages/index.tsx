@@ -11,6 +11,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
+import { useUserInfo } from "@/components/hooks/api";
 import { StyledButton } from "@/styles/components/Button";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 
@@ -18,6 +19,8 @@ export default function Home() {
   const { t } = useTranslation("home");
 
   const router = useRouter();
+
+  const { data: userInfo } = useUserInfo();
 
   const imageCloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
@@ -96,13 +99,15 @@ export default function Home() {
                 }}
                 className="portrait"
               />
-              <StyledButton
-                onClick={() => {
-                  router.push("/author/request");
-                }}
-              >
-                {t("becomeAnAuthor") as string}
-              </StyledButton>
+              {!userInfo?.isAuthor && (
+                <StyledButton
+                  onClick={() => {
+                    router.push("/author/request");
+                  }}
+                >
+                  {t("becomeAnAuthor") as string}
+                </StyledButton>
+              )}
             </Box>
           </Box>
         </Stack>

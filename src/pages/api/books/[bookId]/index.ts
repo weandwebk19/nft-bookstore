@@ -50,7 +50,7 @@ export default async function handler(
         success: true,
         message: "Get bookDetail successfully.",
         data: {
-          ...toCamel({ ...bookDetail, _id: bookDetail._id }),
+          ...toCamel({ ...bookDetail, _id: bookDetail._id.toString() }),
           languages,
           genres
         }

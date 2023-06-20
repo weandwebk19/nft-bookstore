@@ -409,9 +409,6 @@ contract BookSharingStorage {
         if (idBookOnSharing == 0) {
             revert Error.InvalidIdError(idBookOnSharing);
         }
-        if (newPrice == 0) {
-            revert Error.InvalidPriceError(newPrice);
-        }
         if (newAmount == 0) {
             revert Error.InvalidAmountError(newAmount);
         }

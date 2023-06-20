@@ -42,6 +42,7 @@ import { daysToSeconds } from "@/utils/timeConvert";
 
 import Step1 from "../../ui/borrow/steps/Step1";
 import Step2 from "../../ui/borrow/steps/Step2";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface ExtendRequestButtonProps {
   tokenId: number;
@@ -66,7 +67,7 @@ const ExtendRequestButton = ({
   const { t } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { provider, bookStoreContract } = useWeb3();
+  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -156,14 +157,40 @@ const ExtendRequestButton = ({
           });
         }
 
-        const tx = await bookStoreContract?.requestExtendTimeOfBorrowedBooks(
+        const idBorrowedBook = await bookRentingContract?.getIdBorrowedBook(
           tokenId,
           renter,
+          account.data!,
           startTime,
-          endTime,
-          extendedAmount,
-          extendedTime
+          endTime
         );
+
+        const isRequestExist = await bookRentingContract?.isRequestExist(
+          idBorrowedBook!.toNumber(),
+          account.data!,
+          renter
+        );
+
+        let tx;
+        if (!isRequestExist) {
+          tx = await bookStoreContract?.requestExtendTimeOfBorrowedBooks(
+            tokenId,
+            renter,
+            startTime,
+            endTime,
+            extendedAmount,
+            extendedTime
+          );
+        } else {
+          tx = await bookStoreContract?.updateRequestOfBorrowedBooks(
+            tokenId,
+            renter,
+            startTime,
+            endTime,
+            extendedAmount,
+            extendedTime
+          );
+        }
 
         const receipt: any = await toast.promise(tx!.wait(), {
           pending: t("pendingExtend") as string,
@@ -180,11 +207,8 @@ const ExtendRequestButton = ({
             "Yêu cầu gia hạn sách đang mượn"
           );
         }
-      } catch (error: any) {
-        console.error(error);
-        toast.error(`${error.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+      } catch (e: any) {
+        toastErrorTransaction(e.message);
       }
     },
     [supplyAmount, account.data, bookStoreContract, provider]

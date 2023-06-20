@@ -23,6 +23,7 @@ import { createTransactionHistory } from "../../utils";
 import { getGasFee } from "../../utils/getGasFee";
 import { NumericStepperController } from "../FormController";
 import { FormGroup } from "../FormGroup";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface BuyButtonProps {
   tokenId: number;
@@ -195,10 +196,7 @@ const BuyButton = ({
 
         await createBookHistoryCallback(tokenId, price, amount);
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
     [account.data, bookStoreContract, provider]

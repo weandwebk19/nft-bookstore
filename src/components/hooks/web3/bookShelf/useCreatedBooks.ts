@@ -8,19 +8,12 @@ import { ethers } from "ethers";
 import useSWR from "swr";
 
 import { FilterField } from "@/types/filter";
-import { NftBook } from "@/types/nftBook";
+import { CreatedBook } from "@/types/nftBook";
 
 import { useAccount } from "..";
 import { checkFilterBooks } from "../utils/checkFilterBooks";
 
-type UseCreatedBooksResponse = {
-  // listNft: (tokenId: number, price: number) => Promise<void>;
-};
-
-type CreatedBooksHookFactory = CryptoHookFactory<
-  NftBook[],
-  UseCreatedBooksResponse
->;
+type CreatedBooksHookFactory = CryptoHookFactory<CreatedBook[]>;
 
 export type UseCreatedBooksHook = ReturnType<CreatedBooksHookFactory>;
 
@@ -35,7 +28,7 @@ export const hookFactory: CreatedBooksHookFactory =
         account.data
       ],
       async () => {
-        const nfts = [] as NftBook[];
+        const nfts = [] as CreatedBook[];
         const res = await axios.get(
           `/api/users/wallet/${account.data}/created-books`
         );
@@ -55,7 +48,8 @@ export const hookFactory: CreatedBooksHookFactory =
                   tokenId: item?.tokenId,
                   author: nftBook?.author,
                   quantity: nftBook?.quantity?.toNumber(),
-                  amountTradeable: amountTradeable.toNumber()
+                  amountTradeable: amountTradeable.toNumber(),
+                  isApproved: item.isApproved
                 });
               } else {
                 // Filter
@@ -71,7 +65,8 @@ export const hookFactory: CreatedBooksHookFactory =
                     tokenId: item?.tokenId,
                     author: nftBook?.author,
                     quantity: nftBook?.quantity?.toNumber(),
-                    amountTradeable: amountTradeable.toNumber()
+                    amountTradeable: amountTradeable.toNumber(),
+                    isApproved: item.isApproved
                   });
                 }
               }

@@ -1,0 +1,12 @@
+{
+  "titlePage": "Sales Report - NFT Bookstore",
+  "containerTitle": "Sales Report",
+  "filter": "Filter",
+  "id": "ID",
+  "bookInfo": "Book info",
+  "buyer": "Buyer",
+  "method": "Method",
+  "date": "Date",
+  "amount": "Amount",
+  "price": "Price"
+}

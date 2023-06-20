@@ -16,7 +16,7 @@ contract TimeLock {
 
     event Cancel(bytes32 indexed txId);
 
-    uint public constant MIN_DELAY = 604800; // 1 weeks
+    // uint public constant MIN_DELAY = 604800; // 1 weeks
 
     // tx id => queued
     mapping(bytes32 => bool) private queued;
@@ -51,11 +51,11 @@ contract TimeLock {
         }
         // ---|------------|-------
         //  block    block + MIN_DELAY     
-        if (
-            _timestamp < block.timestamp + MIN_DELAY 
-        ) {
-            revert Error.TimestampNotInRangeError(block.timestamp, _timestamp);
-        }
+        // if (
+        //     _timestamp < block.timestamp + MIN_DELAY
+        // ) {
+        //     revert Error.TimestampNotInRangeError(block.timestamp, _timestamp);
+        // }
 
         queued[txId] = true;
 
@@ -73,11 +73,11 @@ contract TimeLock {
     ) public returns(bool) {
         if (queued[txId]) {
 
-            if (
-                _newTimestamp < block.timestamp + MIN_DELAY 
-            ) {
-                revert Error.TimestampNotInRangeError(block.timestamp, _newTimestamp);
-            }
+            // if (
+            //     _newTimestamp < block.timestamp + MIN_DELAY 
+            // ) {
+            //     revert Error.TimestampNotInRangeError(block.timestamp, _newTimestamp);
+            // }
             queued[txId] = false;
 
             bytes32 newIdx = getTxId(_newOwner, _newvalue, _newFunc, _newData, _newTimestamp);

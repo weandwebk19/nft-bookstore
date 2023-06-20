@@ -1,0 +1,12 @@
+{
+  "titlePage": "Báo cáo doanh thu - NFT Bookstore",
+  "containerTitle": "Báo cáo doanh thu",
+  "filter": "Lọc",
+  "id": "ID",
+  "bookInfo": "Thông tin sách",
+  "buyer": "Người mua",
+  "method": "Phương thức",
+  "date": "Ngày",
+  "amount": "Số lượng",
+  "price": "Giá"
+}

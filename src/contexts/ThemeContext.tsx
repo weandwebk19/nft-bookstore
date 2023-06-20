@@ -12,7 +12,7 @@ export function useMyTheme() {
 
 const MyThemeContext = createContext("light");
 const SetMyThemeContext = createContext((value: string) => {
-  console.log("Default function:", value);
+  // console.log("Default function:", value);
 });
 
 export function useMyThemeContext() {
