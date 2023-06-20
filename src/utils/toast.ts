@@ -28,3 +28,19 @@ export function toastErrorSubmit(featureName: string | null = null) {
         position: toast.POSITION.TOP_CENTER
     });
 };
+
+export function toastRevoke(events: any) {
+    const length = events.length ? events.length : 0;
+
+    const isSuccess = events
+      ? events[length - 1].args?.isSuccess
+      : null;
+
+    if (isSuccess === true) {
+      toast.success("Revoke lent out book successfully");
+    } else {
+      toast.error(
+        "You are not allowed to revoke the book when it hasn't expired yet."
+      );
+    }
+};

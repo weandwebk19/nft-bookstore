@@ -13,7 +13,7 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
-import { toastErrorTransaction } from "@/utils/toast";
+import { toastErrorTransaction, toastRevoke } from "@/utils/toast";
 
 interface RevokeSharedOutButtonProps {
   sharer: string;
@@ -70,29 +70,8 @@ const RevokeSharedOutButton = ({
       );
 
       const tx = await bookStoreContract?.recallSharedBooks(idSharedBook);
-
-      // const receipt: any = await toast.promise(tx!.wait(), {
-      //   pending: "Pending.",
-      //   success: "Revoke share NftBook successfully",
-      //   error: "Oops! There's a problem with sharing revoke process!"
-      // });
-
       const receipt = await tx?.wait();
-
-      const isSuccess = receipt?.events
-        ? receipt?.events[0].args?.isSuccess
-        : null;
-
-      if (isSuccess === false) {
-        toast.success("Revoke shared out book successfully");
-      } else {
-        toast.error(
-          "You are not allowed to revoke the book when it hasn't expired yet."
-        );
-      }
-      //  else {
-      //   toast.error("Oops! There's a problem with revoke  process!");
-      // }
+      toastRevoke(receipt?.events);
 
       if (receipt) {
         await createTransactionHistoryOnlyGasFee(
