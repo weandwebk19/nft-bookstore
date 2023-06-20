@@ -13,6 +13,7 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface RevokeLentOutButtonProps {
   borrower: string;
@@ -98,10 +99,7 @@ const RevokeLentOutButton = ({
         );
       }
     } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message.substr(0, 65)}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorTransaction(e.message);
     }
   };
 
@@ -113,10 +111,7 @@ const RevokeLentOutButton = ({
       try {
         await handleRevokeBorrowedBooks();
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     }
   };
@@ -129,10 +124,7 @@ const RevokeLentOutButton = ({
     try {
       await handleRevokeBorrowedBooks();
     } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message.substr(0, 65)}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorTransaction(e.message);
     }
   };
 

@@ -23,6 +23,7 @@ import { ReviewInfo } from "@/types/reviews";
 
 import { ContentGroup } from "../ContentGroup";
 import { Image } from "../Image";
+import { toastErrorSubmit } from "@/utils/toast";
 
 interface ReviewButtonProps {
   author: string;
@@ -87,16 +88,12 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
         toast.success(t("textReview1") as string);
         setReviews(newReview);
       } else {
-        toast.error(`${reviewRes.data.message}.`, {
+        toast.error("Oops! Something went wrong!", {
           position: toast.POSITION.TOP_CENTER
         });
       }
     } catch (e: any) {
-      console.log("e", e);
-
-      toast.error(`${e.message}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorSubmit("review");
     }
   };
 
@@ -107,7 +104,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
     if (res.data.success === true) {
       toast.success(t("textReview2") as string);
     } else {
-      toast.error(`${res.data.message}.`, {
+      toast.error("Oops! Something went wrong!", {
         position: toast.POSITION.TOP_CENTER
       });
     }
@@ -127,9 +124,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
         setReviews(reviewRes.data.data);
       }
     } catch (e: any) {
-      toast.error(`${e.message.substr(0, 65)}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorSubmit("update review");
     }
   };
 

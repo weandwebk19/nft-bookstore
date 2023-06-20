@@ -24,6 +24,7 @@ import { StyledButton } from "@/styles/components/Button";
 import { RequestExtendRowData } from "@/types/nftBook";
 import { secondsToDhms } from "@/utils/secondsToDays";
 import { truncate } from "@/utils/truncate";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface RequestTableProps {
   data: RequestExtendRowData[];
@@ -85,10 +86,8 @@ export default function RequestTable({ data }: RequestTableProps) {
             "Chấp nhận yêu cầu gia hạn sách"
           );
         }
-      } catch (err: any) {
-        toast.error(`${err.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+      } catch (e: any) {
+        toastErrorTransaction(e.message);
       }
     },
     [bookStoreContract, provider]
@@ -118,10 +117,8 @@ export default function RequestTable({ data }: RequestTableProps) {
             "Chấp nhận yêu cầu gia hạn sách"
           );
         }
-      } catch (err: any) {
-        toast.error(`${err.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+      } catch (e: any) {
+        toastErrorTransaction(e.message);
       }
     },
     [bookStoreContract]

@@ -23,6 +23,7 @@ import { StyledButton } from "@/styles/components/Button";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { Image } from "../Image";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface ShareButtonProps {
   renter: string;
@@ -66,11 +67,7 @@ const ShareButton = ({
       price: yup
         .number()
         .min(0, t("textErrorShare1") as string)
-        .typeError(t("textErrorShare2") as string),
-      amount: yup
-        .number()
-        .min(1, t("textErrorShare3") as string)
-        .typeError(t("textErrorShare4") as string)
+        .typeError(t("textErrorShare2") as string)
     })
     .required();
 
@@ -189,10 +186,7 @@ const ShareButton = ({
           );
         }
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
     [
@@ -234,7 +228,7 @@ const ShareButton = ({
     await shareBooks(
       tokenId,
       data.price,
-      data.amount,
+      1,
       borrowedAmount,
       renter,
       borrower,
@@ -242,7 +236,7 @@ const ShareButton = ({
       endTime
     );
     await createPricingHistoryCallback(tokenId, data.price);
-    await createBookHistoryCallback(tokenId, data.price, data.amount);
+    await createBookHistoryCallback(tokenId, data.price, 1);
   };
 
   useEffect(() => {
@@ -294,7 +288,7 @@ const ShareButton = ({
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item md={8}>
+            <Grid item md={8} sx={{ display: "flex", flexDirection: "column" }}>
               <Stack
                 spacing={3}
                 sx={{
@@ -304,11 +298,14 @@ const ShareButton = ({
                 <FormGroup label={t("price") as string} required>
                   <TextFieldController name="price" type="number" />
                 </FormGroup>
-                <FormGroup label={t("amount") as string} required>
-                  <TextFieldController name="amount" type="number" />
-                </FormGroup>
               </Stack>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "auto"
+                }}
+              >
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}

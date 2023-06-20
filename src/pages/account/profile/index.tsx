@@ -33,6 +33,7 @@ import * as yup from "yup";
 
 import withAuth from "@/components/HOC/withAuth";
 import { useUserInfo } from "@/components/hooks/api/useUserInfo";
+import { useAccount } from "@/components/hooks/web3";
 import { ContentContainer } from "@/components/shared/ContentContainer";
 import { ContentGroup } from "@/components/shared/ContentGroup";
 import {
@@ -72,6 +73,8 @@ const Profile = () => {
   const userInfo = useUserInfo();
 
   const router = useRouter();
+
+  const { account } = useAccount();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isAddressCopied, setIsAddressCopied] = useState(false);
@@ -224,7 +227,7 @@ const Profile = () => {
                 <StyledButton
                   customVariant="secondary"
                   onClick={() => {
-                    router.push("/author/profile");
+                    router.push(`/author/profile/${account.data}`);
                   }}
                   disabled={isLoading}
                 >
@@ -285,11 +288,11 @@ const Profile = () => {
                                   }}
                                 />
                               ) : userInfo.data?.avatar ? (
-                                <Box
-                                  component="img"
+                                <Avatar
                                   src={userInfo.data?.avatar}
                                   sx={{
                                     width: "100%",
+                                    height: "auto",
                                     maxWidth: "400px",
                                     aspectRatio: "1 / 1",
                                     borderRadius: "100rem",

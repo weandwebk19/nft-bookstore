@@ -66,9 +66,6 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
   ) => {
     e.preventDefault();
     setAnchorDeleteButton(null);
-
-    console.log(item.tokenId);
-    console.log(account.data);
     (async () => {
       try {
         if (account.data) {
@@ -86,7 +83,7 @@ export default function WatchlistTable({ data }: WatchlistTableProps) {
           }
         }
       } catch (err: any) {
-        toast.error(err.message, {
+        toast.error("An error occured while removing book from watchlists", {
           position: toast.POSITION.TOP_RIGHT
         });
       }
