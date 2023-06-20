@@ -143,7 +143,7 @@ const RevokeSharedOutButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [fromRenter]);

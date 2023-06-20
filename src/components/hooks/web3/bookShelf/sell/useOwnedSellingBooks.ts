@@ -43,7 +43,7 @@ export const hookFactory: OwnedSellingBooksHookFactory =
                 price: parseFloat(ethers.utils.formatEther(item?.price))
               });
             } catch (err) {
-              console.log(err);
+              console.log("Something went wrong, please try again later!");
             }
           } else {
             // Filter
@@ -64,7 +64,7 @@ export const hookFactory: OwnedSellingBooksHookFactory =
                   price: parseFloat(ethers.utils.formatEther(item?.price))
                 });
               } catch (err) {
-                console.log(err);
+                console.log("Something went wrong, please try again later!");
               }
             }
           }

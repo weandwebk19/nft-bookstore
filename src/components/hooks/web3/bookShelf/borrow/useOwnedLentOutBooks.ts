@@ -48,7 +48,7 @@ export const hookFactory: OwnedLentOutBooksHookFactory =
                 endTime: item?.endTime?.toNumber()
               });
             } catch (err) {
-              console.log(err);
+              console.log("Something went wrong, please try again later!");
             }
           } else {
             // Filter
@@ -71,7 +71,7 @@ export const hookFactory: OwnedLentOutBooksHookFactory =
                   endTime: item?.endTime?.toNumber()
                 });
               } catch (err) {
-                console.log(err);
+                console.log("Something went wrong, please try again later!");
               }
             }
           }

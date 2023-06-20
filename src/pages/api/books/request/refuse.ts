@@ -55,7 +55,6 @@ export default async function handler(
       message: "Hash not true"
     });
   } catch (err: any) {
-    console.log(err);
     return res.status(400).json({
       success: false,
       message: err.message

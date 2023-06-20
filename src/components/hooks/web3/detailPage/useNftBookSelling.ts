@@ -54,7 +54,7 @@ export const hookFactory: NftBookSellingHookFactory =
                   )
                 };
               } catch (error) {
-                console.log(error);
+                console.log("Something went wrong, please try again later!");
                 return null;
               }
             } else {

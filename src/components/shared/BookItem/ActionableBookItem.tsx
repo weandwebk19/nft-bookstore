@@ -100,7 +100,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [author]);
@@ -116,7 +116,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [seller]);
@@ -132,7 +132,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [renter]);
@@ -148,7 +148,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [borrower]);
@@ -164,7 +164,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [sharer]);
@@ -180,7 +180,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [sharedPerson]);
