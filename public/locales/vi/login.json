@@ -1,0 +1,8 @@
+{
+  "login": "Đăng nhập",
+  "email": "Email",
+  "password": "Mật khẩu",
+  "username": "Tên người dùng",
+  "loginError": "Email hoặc mật khẩu không đúng!",
+  "emailError": "Email không tồn tại!"
+}
