@@ -18,12 +18,12 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 import { createTransactionHistory } from "../../utils";
 import { getGasFee } from "../../utils/getGasFee";
 import { NumericStepperController } from "../FormController";
 import { FormGroup } from "../FormGroup";
-import { toastErrorTransaction } from "@/utils/toast";
 
 interface BuyButtonProps {
   tokenId: number;

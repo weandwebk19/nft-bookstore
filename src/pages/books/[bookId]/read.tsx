@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import { IToc, ReactReader } from "react-reader";
@@ -28,13 +28,10 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-import withAuth from "@/components/HOC/withAuth";
 import { useNftBookMeta } from "@/components/hooks/web3";
 import { useWeb3 } from "@/components/providers/web3";
-import { InputController } from "@/components/shared/FormController";
 import { ZenLayout } from "@/layouts/ZenLayout";
 import PageIndicator from "@/pages/api/books/[bookId]/read/PageIndicator";
-import { StyledButton } from "@/styles/components/Button";
 import { convertHexStringToUint8Array } from "@/utils/convert";
 import { Crypto } from "@/utils/crypto";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
