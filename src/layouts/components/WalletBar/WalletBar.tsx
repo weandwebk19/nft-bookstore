@@ -84,12 +84,11 @@ const WalletBar = ({
         if (provider && account) {
           const res = await provider.getBalance(account);
           const balance = ethers.BigNumber.from(res);
-          console.log(balance);
           value = ethers.utils.formatEther(balance);
           value = parseFloat(value).toFixed(4);
         }
       } catch (err) {
-        console.error(err);
+        console.log("Something went wrong, please try again later!");
       } finally {
         setUserBalance(value);
       }

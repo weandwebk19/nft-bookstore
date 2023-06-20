@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
@@ -39,10 +40,10 @@ import {
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 import { daysToSeconds } from "@/utils/timeConvert";
-
 import Step1 from "../../ui/borrow/steps/Step1";
 import Step2 from "../../ui/borrow/steps/Step2";
 import { toastErrorTransaction } from "@/utils/toast";
+import { MIN_DURATION_TIME } from "@/utils/constants";
 
 interface ExtendRequestButtonProps {
   tokenId: number;
@@ -138,7 +139,7 @@ const ExtendRequestButton = ({
     ) => {
       try {
         // Handle errors
-        if (extendedTime < 604800) {
+        if (extendedTime < MIN_DURATION_TIME) {
           return toast.error(t("textErrorExtend5") as string, {
             position: toast.POSITION.TOP_CENTER
           });

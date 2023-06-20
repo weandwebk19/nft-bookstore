@@ -38,6 +38,8 @@ contract BookRentingStorage is ExtendTime {
     uint endTime
   );
 
+  uint MIN_TIME = 604800;
+
   TimeLock private _timelock;
 
   // Variable for Lend Books
@@ -506,7 +508,7 @@ contract BookRentingStorage is ExtendTime {
     if (idLendBook == 0) {
       revert Error.InvalidIdError(idLendBook);
     }
-    uint totalPrice = (amount * price * (endTime - startTime)) / 604800;
+    uint totalPrice = (amount * price * (endTime - startTime)) / MIN_TIME;
 
     // if (value != totalPrice) {
     //   revert Error.InvalidValueError(value);
@@ -692,7 +694,7 @@ contract BookRentingStorage is ExtendTime {
       _cancelRequest(id, borrower, renter);
       _cancelResponse(id, renter, borrower);
       uint totalPrice = (borrowedBook.price * response.amount * response.time) /
-        604800;
+        MIN_TIME;
       return totalPrice;
     }
     return 0;

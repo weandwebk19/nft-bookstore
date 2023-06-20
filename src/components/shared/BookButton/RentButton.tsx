@@ -22,6 +22,7 @@ import { createTransactionHistory } from "@/components/utils";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { MIN_DURATION_TIME } from "@/utils/constants";
 import { daysToSeconds } from "@/utils/timeConvert";
 import { toastErrorTransaction } from "@/utils/toast";
 
@@ -36,8 +37,6 @@ const defaultValues = {
   amount: 1,
   rentalDays: 7
 };
-
-const MIN_RENTAL_DURATION = 604800;
 
 const RentButton = ({
   tokenId,
@@ -100,7 +99,7 @@ const RentButton = ({
     ) => {
       try {
         // Handle errors
-        if (rentalDuration < MIN_RENTAL_DURATION) {
+        if (rentalDuration < MIN_DURATION_TIME) {
           return toast.error(t("textErrorRent5") as string, {
             position: toast.POSITION.TOP_CENTER
           });
@@ -117,7 +116,7 @@ const RentButton = ({
           });
         }
 
-        const value = (price * amount * rentalDuration) / MIN_RENTAL_DURATION;
+        const value = (price * amount * rentalDuration) / MIN_DURATION_TIME;
         const tx = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,
@@ -233,7 +232,7 @@ const RentButton = ({
   useEffect(() => {
     const currentRentalSeconds = currentRentalDays * 86400; // (s)
     const total =
-      (currentAmount * currentRentalSeconds * price) / MIN_RENTAL_DURATION;
+      (currentAmount * currentRentalSeconds * price) / MIN_DURATION_TIME;
     setTotalPayment(total);
   }, [currentAmount, currentRentalDays, price]);
 

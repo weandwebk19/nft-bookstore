@@ -55,7 +55,7 @@ const RevokeSharedOutButton = ({
   const handleRevokeSharedOut = async () => {
     try {
       // handle errors
-      if (sharer !== account.data) {
+      if (fromRenter !== account.data) {
         return toast.error("Renter address is not valid.", {
           position: toast.POSITION.TOP_CENTER
         });
@@ -83,15 +83,16 @@ const RevokeSharedOutButton = ({
         ? receipt?.events[0].args?.isSuccess
         : null;
 
-      if (isSuccess === true) {
+      if (isSuccess === false) {
         toast.success("Revoke shared out book successfully");
-      } else if (isSuccess === false) {
+      } else {
         toast.error(
           "You are not allowed to revoke the book when it hasn't expired yet."
         );
-      } else {
-        toast.error("Oops! There's a problem with revoke  process!");
       }
+      //  else {
+      //   toast.error("Oops! There's a problem with revoke  process!");
+      // }
 
       if (receipt) {
         await createTransactionHistoryOnlyGasFee(

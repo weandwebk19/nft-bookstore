@@ -34,7 +34,7 @@ export const hookFactory: OwnedSharedOutBooksHookFactory =
         const nfts = [] as BookSharing[];
         const allSharedBooks = await bookSharingContract!.getAllSharedBook();
         const coreNfts = allSharedBooks.filter((nft) => {
-          return nft.sharer == account.data;
+          return nft.fromRenter == account.data || nft.sharer == account.data;
         });
 
         for (let i = 0; i < coreNfts.length; i++) {
