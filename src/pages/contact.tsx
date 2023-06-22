@@ -48,7 +48,7 @@ export default function Contact() {
   const { handleSubmit } = methods;
 
   const onSubmit = (data: any) => {
-    console.log(data);
+    console.log("Data is submitted!");
     // handle form submission here
   };
 

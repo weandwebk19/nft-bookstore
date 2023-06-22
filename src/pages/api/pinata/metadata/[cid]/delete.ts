@@ -19,7 +19,6 @@ export default withSessionSSR(
           data: jsonRes
         });
       } catch (err) {
-        console.log("err", err);
         return res.status(422).json({
           message: "Delete successfully",
           success: true,

@@ -139,7 +139,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [author]);
@@ -162,7 +162,7 @@ const ReviewButton = ({ author, tokenId }: ReviewButtonProps) => {
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [tokenId, account.data]);

@@ -747,8 +747,10 @@ contract BookStore is ERC1155URIStorage, Ownable {
           ""
         );
       }
+      emit RecallBookResult(res);
       return res;
     }
+    emit RecallBookResult(false);
     return false;
   }
 }

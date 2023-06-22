@@ -208,7 +208,6 @@ const AuthorRequest = () => {
         handleCancel();
         setIsLoading(false);
       } catch (error: any) {
-        console.log("error:", error);
         setIsLoading(false);
       }
     })();
