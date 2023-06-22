@@ -14,6 +14,7 @@ import { Image } from "@/components/shared/Image";
 import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { toastErrorTransaction, toastRevoke } from "@/utils/toast";
+import { ADDRESS_ZERO } from "@/utils/constants";
 
 interface RevokeSharedOutButtonProps {
   sharer: string;
@@ -44,9 +45,9 @@ const RevokeSharedOutButton = ({
   const { t: t2 } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { account } = useAccount();
   const { provider, bookStoreContract, bookSharingContract } = useWeb3();
   const { metadata } = useMetadata(tokenId);
+  const { account } = useAccount();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
@@ -60,16 +61,27 @@ const RevokeSharedOutButton = ({
           position: toast.POSITION.TOP_CENTER
         });
       }
+      let tx;
+      if (sharedPer !== ADDRESS_ZERO) {
+        const idSharedBook = await bookSharingContract!.getIdSharedBook(
+          tokenId,
+          sharedPer,
+          sharer,
+          startTime,
+          endTime
+        );
+        tx = await bookStoreContract?.recallSharedBooks(idSharedBook);
+      } else {
+        const idBooksOnSharing = await bookSharingContract!.getIdBookOnSharing(
+          tokenId,
+          fromRenter,
+          sharer,
+          startTime,
+          endTime
+        );
+        tx = await bookStoreContract?.recallBooksOnSharing(idBooksOnSharing);
+      }
 
-      const idSharedBook = await bookSharingContract!.getIdSharedBook(
-        tokenId,
-        sharedPer,
-        sharer,
-        startTime,
-        endTime
-      );
-
-      const tx = await bookStoreContract?.recallSharedBooks(idSharedBook);
       const receipt = await tx?.wait();
       toastRevoke(receipt?.events);
 
@@ -131,6 +143,7 @@ const RevokeSharedOutButton = ({
   return (
     <>
       <Button
+        disabled={!isEnded}
         variant={isEnded ? "contained" : "outlined"}
         size="small"
         sx={{ width: "100%" }}

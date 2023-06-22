@@ -129,6 +129,7 @@ const RevokeLentOutButton = ({
   return (
     <>
       <Button
+        disabled={!isEnded}
         variant={isEnded ? "contained" : "outlined"}
         size="small"
         sx={{ width: "100%" }}

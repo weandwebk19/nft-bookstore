@@ -30,6 +30,7 @@ import { FilterField } from "@/types/filter";
 import { BorrowedBook, LendBook } from "@/types/nftBook";
 import namespaceDefaultLanguage from "@/utils/namespaceDefaultLanguage";
 import { secondsToDhms } from "@/utils/secondsToDhms";
+import RevokeSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharedOutButton";
 
 const LendingBooks = () => {
   const { t } = useTranslation("lendingBooks");
@@ -53,14 +54,26 @@ const LendingBooks = () => {
   const { nfts: lentOutNfts } = useOwnedLentOutBooks(
     router.query as FilterField
   );
-  const lentOutBooks = lentOutNfts.data as BorrowedBook[];
-
+    
   const [nowTime, setNowTime] = useState<number>(0);
+  const [lentOutBooks, setLentOutBooks] = useState<any>([]);
 
   useEffect(() => {
     const seconds = new Date().getTime() / 1000;
     setNowTime(seconds);
   }, []);
+
+  useEffect(() => {
+    const { 
+      borrowedBooks, 
+      bookOnSharings, 
+      sharedBooks } = lentOutNfts.data;
+    if (borrowedBooks && bookOnSharings && sharedBooks) {
+      setLentOutBooks(borrowedBooks.concat(bookOnSharings).concat(sharedBooks));
+    } else {
+      setLentOutBooks(lentOutNfts.data);
+    }
+  }, [lentOutNfts.data]);
 
   const handleBookClick = (tokenId: number | string) => {
     (async () => {
@@ -135,16 +148,6 @@ const LendingBooks = () => {
                                     />
                                   </>
                                 }
-                                // status={
-                                //   book?.endRentalDay !== undefined
-                                //     ? book?.endRentalDay > 0
-                                //       ? `${pluralize(
-                                //           book?.endRentalDay,
-                                //           "day"
-                                //         )} left`
-                                //       : "Ended" // End of lending term
-                                //     : undefined
-                                // }
                               />
                             </Grid>
                           );
@@ -178,7 +181,7 @@ const LendingBooks = () => {
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
                       <>
-                        {lentOutBooks!.map((book) => {
+                        {lentOutBooks!.map((book: any) => {
                           return (
                             <Grid
                               item
@@ -191,25 +194,40 @@ const LendingBooks = () => {
                               <ActionableBookItem
                                 status="isLending"
                                 tokenId={book?.tokenId}
-                                renter={book?.renter}
+                                renter={book?.fromRenter ? book?.fromRenter : book?.renter}
                                 onClick={handleBookClick}
-                                price={book?.price}
+                                price={book?.priceOfBB ? book?.priceOfBB : book?.price}
                                 amount={book?.amount}
-                                borrower={book?.borrower}
+                                borrower={book?.sharer ? book?.sharer : book?.borrower}
                                 countDown={secondsToDhms(
                                   book?.endTime - nowTime
                                 )}
                                 buttons={
-                                  <>
+                                  book?.fromRenter ? (
+                                    <>
+                                      <RevokeSharedOutButton
+                                        isEnded={book?.endTime < nowTime}
+                                        tokenId={book?.tokenId}
+                                        sharer={book?.sharer}
+                                        sharedPer={book?.sharedPer}
+                                        fromRenter={book?.fromRenter}
+                                        startTime={book?.startTime}
+                                        endTime={book?.endTime}
+                                        amount={book?.amount}
+                                      />
+                                    </>
+                                  ) :
+                                  (<>
                                     <RevokeLentOutButton
+                                      isEnded={book?.endTime < nowTime}
                                       tokenId={book?.tokenId}
-                                      renter={book?.renter}
-                                      borrower={book?.borrower}
+                                      renter={book?.fromRenter ? book?.fromRenter : book?.renter}
+                                      borrower={book?.sharer ? book?.sharer : book?.borrower}
                                       amount={book?.amount}
                                       startTime={book?.startTime}
                                       endTime={book?.endTime}
                                     />
-                                  </>
+                                  </>)
                                 }
                               />
                             </Grid>

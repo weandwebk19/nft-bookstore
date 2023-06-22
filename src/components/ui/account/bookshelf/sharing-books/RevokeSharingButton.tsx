@@ -166,7 +166,9 @@ const RevokeSharingButton = ({
     })();
   }, [sharer]);
 
-  return (
+  return isEnded ? (
+    <></>
+  ) : (
     <>
       <Button
         variant="outlined"

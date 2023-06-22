@@ -352,9 +352,9 @@ const ActionableBookItem = ({
                   {t("returnIn") as string}:
                 </Typography>
                 <Typography variant="label">
-                  {countDown !== "0D:0:0:0"
-                    ? countDown
-                    : (t("ended") as string)}
+                  {(countDown === "0D:0:0:0" || !countDown)
+                    ? (t("ended") as string)
+                    : countDown}
                 </Typography>
               </Stack>
             )}

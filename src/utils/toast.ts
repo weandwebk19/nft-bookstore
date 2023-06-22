@@ -31,9 +31,8 @@ export function toastErrorSubmit(featureName: string | null = null) {
 
 export function toastRevoke(events: any) {
     const length = events.length ? events.length : 0;
-
     const isSuccess = events
-      ? events[length - 1].args?.isSuccess
+      ? events[length - 1].args?.isSuccess 
       : null;
 
     if (isSuccess === true) {
