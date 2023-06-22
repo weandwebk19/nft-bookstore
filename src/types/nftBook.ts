@@ -204,6 +204,10 @@ export type RequestExtendRowData = {
   action?: any;
 } & RequestExtendCore;
 
+export type DashboardRowData = {
+  action?: any;
+} & BookBrief;
+
 export type ResponseExtendCore = {
   id: number;
   time: number;

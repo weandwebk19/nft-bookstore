@@ -48,6 +48,8 @@ export default async function handler(
         });
       }
 
+      console.log("bookBrief:", bookBrief);
+
       const buffer = Buffer.from(Object.values(bookFile));
       // send email to admin
       sendEmail({

@@ -218,6 +218,8 @@ const AuthorRequest = () => {
     setValue("walletAddress", account.data);
   }, [account.data]);
 
+  console.log("account.data:", account.data);
+
   return (
     <>
       <Head>
