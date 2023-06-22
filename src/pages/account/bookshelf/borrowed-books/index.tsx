@@ -115,6 +115,7 @@ const BorrowedBooks = () => {
                             onClick={handleBookClick}
                             price={book?.price}
                             amount={book?.amount}
+                            endTime={book?.endTime}
                             countDown={secondsToDhms(book?.endTime - nowTime)}
                             buttons={
                               <Grid

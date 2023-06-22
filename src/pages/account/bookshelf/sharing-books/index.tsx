@@ -116,6 +116,7 @@ const SharingBooks = () => {
                               tokenId={book?.tokenId}
                               amount={book?.amount}
                               price={book?.price}
+                              endTime={book?.endTime}
                               countDown={secondsToDhms(book?.endTime - nowTime)}
                               onClick={handleBookClick}
                               buttons={
@@ -170,6 +171,7 @@ const SharingBooks = () => {
                         return (
                           <Grid item key={index} xs={4} sm={4} md={6} lg={6}>
                             <ActionableBookItem
+                              endTime={book?.endTime}
                               status="isSharing"
                               tokenId={book?.tokenId}
                               amount={book?.amount}

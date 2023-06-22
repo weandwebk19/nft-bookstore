@@ -25,6 +25,7 @@ import { useMetadata } from "@/components/hooks/web3";
 
 import { Image } from "../Image";
 import { NumericContainer } from "../NumericContainer";
+import { convertTimestampToString } from "@/utils/convert";
 
 type ActionableBookItemStatus =
   | "isCreated"
@@ -52,6 +53,7 @@ interface ActionableBookItemProps {
   amountTradeable?: number;
   amount?: number;
   sharer?: string;
+  endTime?: number;
   sharedPerson?: string;
   isApproved?: boolean;
 }
@@ -72,6 +74,7 @@ const ActionableBookItem = ({
   amountTradeable,
   amount,
   sharer,
+  endTime,
   sharedPerson,
   isApproved
 }: ActionableBookItemProps) => {
@@ -352,9 +355,9 @@ const ActionableBookItem = ({
                   {t("returnIn") as string}:
                 </Typography>
                 <Typography variant="label">
-                  {(countDown === "0D:0:0:0" || !countDown)
+                  {!countDown
                     ? (t("ended") as string)
-                    : countDown}
+                    : convertTimestampToString(endTime! * 1000)}
                 </Typography>
               </Stack>
             )}

@@ -199,6 +199,7 @@ const LendingBooks = () => {
                                 price={book?.priceOfBB ? book?.priceOfBB : book?.price}
                                 amount={book?.amount}
                                 borrower={book?.sharer ? book?.sharer : book?.borrower}
+                                endTime={book?.endTime}
                                 countDown={secondsToDhms(
                                   book?.endTime - nowTime
                                 )}
