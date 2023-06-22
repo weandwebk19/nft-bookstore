@@ -106,6 +106,7 @@ const SharedBooks = () => {
                             sharer={book?.sharer}
                             onClick={handleBookClick}
                             price={book?.price}
+                            endTime={book?.endTime}
                             countDown={secondsToDhms(book?.endTime - nowTime)}
                             amount={book?.amount}
                             buttons={

@@ -20,9 +20,9 @@ const deleteImage = async (public_id: string) => {
         throw error;
       }
     })
-    .then((resp) => console.log(resp))
+    .then((resp) => console.log("Image is deleted!"))
     .catch((_err) =>
-      console.log("Something went wrong, please try again later.", _err)
+      console.log("Something went wrong, please try again later!")
     );
 };
 export default async function handler(
@@ -60,7 +60,6 @@ export default async function handler(
       message: "Hash not true"
     });
   } catch (err: any) {
-    console.log(err);
     return res.status(400).json({
       success: false,
       message: err.message

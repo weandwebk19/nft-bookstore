@@ -73,7 +73,7 @@ const BookBriefing = () => {
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [bookId]);
@@ -91,7 +91,7 @@ const BookBriefing = () => {
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [nftBookMeta.data]);

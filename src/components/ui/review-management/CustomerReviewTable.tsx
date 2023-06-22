@@ -376,10 +376,6 @@ export default function CustomerReviewTable({
 
   const { handleSubmit } = methods;
 
-  // const onSubmit = async (data: any) => {
-  //   console.log(data);
-  // };
-
   const updateReview = React.useCallback(async (review: ReviewInfo) => {
     const res = await axios.put(`/api/reviews/${review.id}/update`, {
       reviewInfo: review

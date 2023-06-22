@@ -39,7 +39,6 @@ const Loading = forwardRef<HTMLDivElement>(
             const pathWithoutLocale = url
               .split("?")[0] // get without the query string
               .substring(baseUrlWithoutLocale.length);
-            console.log("pathWithoutLocale", pathWithoutLocale);
 
             if (!url && !router.asPath) {
               setLoading(false);

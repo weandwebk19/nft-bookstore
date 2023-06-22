@@ -36,10 +36,9 @@ const AddToWatchlistButton = ({
         if (res.data.success) {
           setIsWatched(true);
         }
-        console.log(res);
       }
     } catch (err) {
-      console.log(err);
+      console.log("Something went wrong, please try again later!");
     }
   };
 
@@ -54,7 +53,7 @@ const AddToWatchlistButton = ({
         }
       }
     } catch (err) {
-      console.log(err);
+      console.log("Something went wrong, please try again later!");
     }
   };
 
@@ -70,7 +69,7 @@ const AddToWatchlistButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [tokenId, account.data]);

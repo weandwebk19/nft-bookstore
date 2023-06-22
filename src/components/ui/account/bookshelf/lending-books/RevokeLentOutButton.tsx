@@ -13,7 +13,7 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
-import { toastErrorTransaction } from "@/utils/toast";
+import { toastErrorTransaction, toastRevoke } from "@/utils/toast";
 
 interface RevokeLentOutButtonProps {
   borrower: string;
@@ -69,25 +69,7 @@ const RevokeLentOutButton = ({
       const tx = await bookStoreContract?.recallBorrowedBooks(idBorrowedBook);
 
       const receipt = await tx?.wait();
-
-      const isSuccess = receipt?.events
-        ? receipt?.events[0].args?.isSuccess
-        : null;
-
-      if (isSuccess === true) {
-        toast.success("Revoke lent out book successfully");
-      } else if (isSuccess === false) {
-        toast.error(
-          "You are not allowed to revoke the book when it hasn't expired yet."
-        );
-      } else {
-        toast.error("Oops! There's a problem with revoke  process!");
-      }
-      // const receipt: any = await toast.promise(tx!.wait(), {
-      //   pending: "Pending.",
-      //   success: "Revoke lent out book successfully",
-      //   error: "Oops! There's a problem with lent out process!"
-      // });
+      toastRevoke(receipt?.events);
 
       if (receipt) {
         await createTransactionHistoryOnlyGasFee(
@@ -139,7 +121,7 @@ const RevokeLentOutButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [renter]);
@@ -147,6 +129,7 @@ const RevokeLentOutButton = ({
   return (
     <>
       <Button
+        disabled={!isEnded}
         variant={isEnded ? "contained" : "outlined"}
         size="small"
         sx={{ width: "100%" }}

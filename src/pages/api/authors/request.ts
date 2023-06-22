@@ -42,6 +42,6 @@ export default async function handler(
       });
     }
   } catch (err) {
-    console.log(err);
+    console.log("Something went wrong, please try again later!");
   }
 }
