@@ -22,10 +22,10 @@ import { useTranslation } from "next-i18next";
 import { useAccount } from "wagmi";
 
 import { useMetadata } from "@/components/hooks/web3";
+import { convertTimestampToString } from "@/utils/convert";
 
 import { Image } from "../Image";
 import { NumericContainer } from "../NumericContainer";
-import { convertTimestampToString } from "@/utils/convert";
 
 type ActionableBookItemStatus =
   | "isCreated"

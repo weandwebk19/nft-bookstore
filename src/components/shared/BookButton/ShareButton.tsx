@@ -20,10 +20,10 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { Image } from "../Image";
-import { toastErrorTransaction } from "@/utils/toast";
 
 interface ShareButtonProps {
   renter: string;
