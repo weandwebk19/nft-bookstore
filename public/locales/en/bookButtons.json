@@ -67,7 +67,7 @@
   "extendDays": "Extend for (day)",
   "rentalDays": "Number of rental days",
   "gasFee": "Gas fee not included",
-  "waitingForReview": "Waiting for review...",
+  "waitingForReview": "Pending approval...",
   "textUnlist1": "is in a rental term duration. Are you sure you want to cancel lending this book?",
   "textRevoke1": "is in a sharing term duration. Are you sure you want to revoke this book?",
   "textRevoke2": "is in a rental term duration. Are you sure you want to revoke this book?",
