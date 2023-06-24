@@ -53,6 +53,7 @@
   "borrowedFrom": "Thuê của",
   "sharedBy": "Chia sẻ bởi",
   "borrowedBy": "Thuê bởi",
+  "soldBy": "Bán bởi",
   "sharedTo": "Chia sẻ đến",
   "origSupply": "Số lượng ban đầu",
   "inventory": "Kho hàng",
@@ -152,5 +153,6 @@
   "textErrorRent4": "Ngày thuê phải là số",
   "textErrorRent5": "Thời gian mượn sách tối thiểu là 7 ngày",
   "textErrorRent6": "Số lượng phải nhỏ hơn",
-  "textErrorRent7": "Bạn không được mượn sách do chính mình cho mượn"
+  "textErrorRent7": "Bạn không được mượn sách do chính mình cho mượn",
+  "textRejectedTransaction": "Giao dịch bị từ chối"
 }
