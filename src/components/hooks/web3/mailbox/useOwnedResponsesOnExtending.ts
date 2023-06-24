@@ -45,7 +45,7 @@ export const hookFactory: OwnedResponsesOnExtendingHookFactory =
           }
           return responses;
         } catch (err) {
-          console.log(err);
+          console.log("Something went wrong, please try again later!");
           return [];
         }
       }

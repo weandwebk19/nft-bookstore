@@ -13,7 +13,8 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
-import { toastErrorTransaction } from "@/utils/toast";
+import { toastErrorTransaction, toastRevoke } from "@/utils/toast";
+import { ADDRESS_ZERO } from "@/utils/constants";
 
 interface RevokeSharedOutButtonProps {
   sharer: string;
@@ -44,9 +45,9 @@ const RevokeSharedOutButton = ({
   const { t: t2 } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { account } = useAccount();
   const { provider, bookStoreContract, bookSharingContract } = useWeb3();
   const { metadata } = useMetadata(tokenId);
+  const { account } = useAccount();
 
   const [anchorRevokeDiaglog, setAnchorRevokeDiaglog] =
     useState<Element | null>(null);
@@ -55,43 +56,34 @@ const RevokeSharedOutButton = ({
   const handleRevokeSharedOut = async () => {
     try {
       // handle errors
-      if (sharer !== account.data) {
+      if (fromRenter !== account.data) {
         return toast.error("Renter address is not valid.", {
           position: toast.POSITION.TOP_CENTER
         });
       }
-
-      const idSharedBook = await bookSharingContract!.getIdSharedBook(
-        tokenId,
-        sharedPer,
-        sharer,
-        startTime,
-        endTime
-      );
-
-      const tx = await bookStoreContract?.recallSharedBooks(idSharedBook);
-
-      // const receipt: any = await toast.promise(tx!.wait(), {
-      //   pending: "Pending.",
-      //   success: "Revoke share NftBook successfully",
-      //   error: "Oops! There's a problem with sharing revoke process!"
-      // });
+      let tx;
+      if (sharedPer !== ADDRESS_ZERO) {
+        const idSharedBook = await bookSharingContract!.getIdSharedBook(
+          tokenId,
+          sharedPer,
+          sharer,
+          startTime,
+          endTime
+        );
+        tx = await bookStoreContract?.recallSharedBooks(idSharedBook);
+      } else {
+        const idBooksOnSharing = await bookSharingContract!.getIdBookOnSharing(
+          tokenId,
+          fromRenter,
+          sharer,
+          startTime,
+          endTime
+        );
+        tx = await bookStoreContract?.recallBooksOnSharing(idBooksOnSharing);
+      }
 
       const receipt = await tx?.wait();
-
-      const isSuccess = receipt?.events
-        ? receipt?.events[0].args?.isSuccess
-        : null;
-
-      if (isSuccess === true) {
-        toast.success("Revoke shared out book successfully");
-      } else if (isSuccess === false) {
-        toast.error(
-          "You are not allowed to revoke the book when it hasn't expired yet."
-        );
-      } else {
-        toast.error("Oops! There's a problem with revoke  process!");
-      }
+      toastRevoke(receipt?.events);
 
       if (receipt) {
         await createTransactionHistoryOnlyGasFee(
@@ -143,7 +135,7 @@ const RevokeSharedOutButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [fromRenter]);
@@ -151,6 +143,7 @@ const RevokeSharedOutButton = ({
   return (
     <>
       <Button
+        disabled={!isEnded}
         variant={isEnded ? "contained" : "outlined"}
         size="small"
         sx={{ width: "100%" }}

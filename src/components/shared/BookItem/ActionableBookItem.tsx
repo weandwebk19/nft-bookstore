@@ -25,6 +25,7 @@ import { useMetadata } from "@/components/hooks/web3";
 
 import { Image } from "../Image";
 import { NumericContainer } from "../NumericContainer";
+import { convertTimestampToString } from "@/utils/convert";
 
 type ActionableBookItemStatus =
   | "isCreated"
@@ -52,6 +53,7 @@ interface ActionableBookItemProps {
   amountTradeable?: number;
   amount?: number;
   sharer?: string;
+  endTime?: number;
   sharedPerson?: string;
   isApproved?: boolean;
 }
@@ -72,6 +74,7 @@ const ActionableBookItem = ({
   amountTradeable,
   amount,
   sharer,
+  endTime,
   sharedPerson,
   isApproved
 }: ActionableBookItemProps) => {
@@ -100,7 +103,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [author]);
@@ -116,7 +119,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [seller]);
@@ -132,7 +135,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [renter]);
@@ -148,7 +151,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [borrower]);
@@ -164,7 +167,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [sharer]);
@@ -180,7 +183,7 @@ const ActionableBookItem = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [sharedPerson]);
@@ -352,9 +355,9 @@ const ActionableBookItem = ({
                   {t("returnIn") as string}:
                 </Typography>
                 <Typography variant="label">
-                  {countDown !== "0D:0:0:0"
-                    ? countDown
-                    : (t("ended") as string)}
+                  {!countDown
+                    ? (t("ended") as string)
+                    : convertTimestampToString(endTime! * 1000)}
                 </Typography>
               </Stack>
             )}

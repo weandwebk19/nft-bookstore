@@ -161,12 +161,14 @@ const RevokeSharingButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [sharer]);
 
-  return (
+  return isEnded ? (
+    <></>
+  ) : (
     <>
       <Button
         variant="outlined"
