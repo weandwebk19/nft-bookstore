@@ -66,25 +66,30 @@ const Footer = () => {
     },
     {
       content: t("contact") as string,
-      subList: []
-    },
-    {
-      content: t("stats") as string,
       subList: [
         {
-          content: t("authorRanking") as string,
-          url: "/"
-        },
-        {
-          content: t("userRanking") as string,
-          url: "/"
-        },
-        {
-          content: t("bookRanking") as string,
-          url: "/"
+          content: t("contact2") as string,
+          url: "/contact"
         }
       ]
     }
+    // {
+    //   content: t("stats") as string,
+    //   subList: [
+    //     {
+    //       content: t("authorRanking") as string,
+    //       url: "/"
+    //     },
+    //     {
+    //       content: t("userRanking") as string,
+    //       url: "/"
+    //     },
+    //     {
+    //       content: t("bookRanking") as string,
+    //       url: "/"
+    //     }
+    //   ]
+    // }
   ];
   return (
     <Box className={styles.footer}>
