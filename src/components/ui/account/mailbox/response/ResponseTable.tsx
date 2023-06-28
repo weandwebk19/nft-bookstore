@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import * as React from "react";
 import { useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
@@ -27,6 +28,7 @@ import { ResponseExtendRowData } from "@/types/nftBook";
 import { secondsToDhms } from "@/utils/secondsToDays";
 import { truncate } from "@/utils/truncate";
 import { toastErrorTransaction } from "@/utils/toast";
+import { MIN_DURATION_TIME } from "@/utils/constants";
 
 interface ResponseTableProps {
   data: ResponseExtendRowData[];
@@ -80,7 +82,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
           (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
             amount *
             time) /
-          604800;
+            MIN_DURATION_TIME;
 
         const tx = await bookStoreContract?.transferForSendedRequest(
           idBorrowedBook,
@@ -189,7 +191,7 @@ export default function ResponseTable({ data }: ResponseTableProps) {
           (parseFloat(ethers.utils.formatEther(borrowedBook?.price!)) *
             amount *
             time) /
-          604800
+            MIN_DURATION_TIME
         ).toFixed(3);
 
         const tx = await bookStoreContract?.transferForSendedRequest(

@@ -20,11 +20,11 @@ import { TextFieldController } from "@/components/shared/FormController";
 import { FormGroup } from "@/components/shared/FormGroup";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { getGasFee } from "../../utils/getGasFee";
 import { Image } from "../Image";
-import { toastErrorTransaction } from "@/utils/toast";
 
 interface SellButtonProps {
   owner: string;
@@ -206,7 +206,7 @@ const SellButton = ({ owner, tokenId, amountTradeable }: SellButtonProps) => {
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [owner]);

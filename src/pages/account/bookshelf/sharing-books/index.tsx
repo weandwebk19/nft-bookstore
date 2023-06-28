@@ -22,7 +22,7 @@ import { BreadCrumbs } from "@/components/shared/BreadCrumbs";
 import { ContentPaper } from "@/components/shared/ContentPaper";
 import { FallbackNode } from "@/components/shared/FallbackNode";
 import { FilterBar } from "@/components/shared/FilterBar";
-import RevokeSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharedOutButton";
+// import RevokeSharedOutButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharedOutButton";
 import RevokeSharingButton from "@/components/ui/account/bookshelf/sharing-books/RevokeSharingButton";
 import { FilterField } from "@/types/filter";
 import { BookSharing } from "@/types/nftBook";
@@ -108,28 +108,22 @@ const SharingBooks = () => {
                       spacing={3}
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
-                      {sharingBooks!.map((book: BookSharing) => {
+                      {sharingBooks!.map((book: BookSharing, index: number) => {
                         return (
-                          <Grid
-                            item
-                            key={book.tokenId}
-                            xs={4}
-                            sm={8}
-                            md={6}
-                            lg={6}
-                          >
+                          <Grid item key={index} xs={4} sm={8} md={6} lg={6}>
                             <ActionableBookItem
                               status="isSharing"
                               tokenId={book?.tokenId}
                               amount={book?.amount}
                               price={book?.price}
+                              endTime={book?.endTime}
                               countDown={secondsToDhms(book?.endTime - nowTime)}
                               onClick={handleBookClick}
                               buttons={
                                 <>
                                   <RevokeSharingButton
                                     sharedPer={book?.sharedPer}
-                                    isEnded={book?.endTime - nowTime === 0}
+                                    isEnded={book?.endTime < nowTime}
                                     countDown={secondsToDhms(
                                       book?.endTime - nowTime
                                     )}
@@ -173,17 +167,11 @@ const SharingBooks = () => {
                       spacing={3}
                       columns={{ xs: 4, sm: 8, md: 12, lg: 24 }}
                     >
-                      {sharedBooks!.map((book: BookSharing) => {
+                      {sharedBooks!.map((book: BookSharing, index: number) => {
                         return (
-                          <Grid
-                            item
-                            key={book.tokenId}
-                            xs={4}
-                            sm={4}
-                            md={6}
-                            lg={6}
-                          >
+                          <Grid item key={index} xs={4} sm={4} md={6} lg={6}>
                             <ActionableBookItem
+                              endTime={book?.endTime}
                               status="isSharing"
                               tokenId={book?.tokenId}
                               amount={book?.amount}
@@ -192,19 +180,6 @@ const SharingBooks = () => {
                               price={book?.price}
                               renter={book?.fromRenter}
                               sharedPerson={book?.sharedPer}
-                              buttons={
-                                <>
-                                  <RevokeSharedOutButton
-                                    tokenId={book?.tokenId}
-                                    sharer={book?.sharer}
-                                    sharedPer={book?.sharedPer}
-                                    fromRenter={book?.fromRenter}
-                                    startTime={book?.startTime}
-                                    endTime={book?.endTime}
-                                    amount={book?.amount}
-                                  />
-                                </>
-                              }
                             />
                           </Grid>
                         );

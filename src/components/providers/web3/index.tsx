@@ -40,7 +40,7 @@ const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
       pageReload();
     }
   } catch (error) {
-    console.log(error);
+    console.log("Something went wrong, please try again later!");
   }
 };
 

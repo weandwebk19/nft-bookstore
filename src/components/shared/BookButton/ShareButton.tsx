@@ -20,10 +20,10 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { Image } from "../Image";
-import { toastErrorTransaction } from "@/utils/toast";
 
 interface ShareButtonProps {
   renter: string;
@@ -228,7 +228,7 @@ const ShareButton = ({
     await shareBooks(
       tokenId,
       data.price,
-      1,
+      Number(data.amount),
       borrowedAmount,
       renter,
       borrower,
@@ -250,7 +250,7 @@ const ShareButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [renter]);
@@ -295,6 +295,9 @@ const ShareButton = ({
                   mb: 5
                 }}
               >
+                <FormGroup label={t("amount") as string} required>
+                  <TextFieldController name="amount" type="number" />
+                </FormGroup>
                 <FormGroup label={t("price") as string} required>
                   <TextFieldController name="price" type="number" />
                 </FormGroup>

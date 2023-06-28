@@ -1,10 +1,13 @@
 import type { AuthorInfo } from "@_types/author";
 import { sendEmail } from "@lib/email";
+import clientPromise from "@lib/mongodb";
 import { render } from "@react-email/render";
 import AuthorRegistrationInitiated from "@shared/Emails/AuthorRegistrationInitiated";
 import AuthorRequestEmail from "@shared/Emails/AuthorRequestEmail";
 import { sign } from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+import { toSnake } from "@/utils/nomalizer";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,17 +15,24 @@ export default async function handler(
 ) {
   try {
     if (req.method === "POST") {
+      const client = await clientPromise;
+      const db = client.db("NftBookStore");
       const authorInfo = req.body as AuthorInfo;
 
       const hash = sign(authorInfo, process.env.JWT_AUTHOR_KEY!, {
         expiresIn: "15d"
       });
 
-      sendEmail({
-        to: process.env.SMTP_FROM_EMAIL!,
-        subject: "[NFT BookStore] - Require become author",
-        html: render(AuthorRequestEmail(authorInfo, hash))
+      // Insert author_request into database
+      db.collection("author_requests").insertOne({
+        hash: hash
       });
+
+      // sendEmail({
+      //   to: process.env.SMTP_FROM_EMAIL!,
+      //   subject: "[NFT BookStore] - Require become author",
+      //   html: render(AuthorRequestEmail(authorInfo, hash))
+      // });
 
       sendEmail({
         to: authorInfo.email,
@@ -42,6 +52,6 @@ export default async function handler(
       });
     }
   } catch (err) {
-    console.log(err);
+    console.log("Something went wrong, please try again later!");
   }
 }
