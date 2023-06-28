@@ -740,13 +740,6 @@ const CreateBook = () => {
                           >
                             {t("messageFinish2") as string}
                           </StyledButton>
-                          {/* <StyledButton
-                            onClick={() => {
-                              router.push("/books/create");
-                            }}
-                          >
-                            {t("messageFinish3") as string}
-                          </StyledButton> */}
                         </Stack>
                       </Box>
                     );
@@ -796,62 +789,6 @@ const CreateBook = () => {
                     );
                   }
                 })()}
-                {/* {activeStep === steps.length ? (
-                  <>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                      {t("messageFinish1") as string}
-                    </Typography>
-                    <StyledButton
-                      onClick={() => {
-                        router.push("/account/bookshelf/created-books");
-                      }}
-                    >
-                      {t("messageFinish2") as string}
-                    </StyledButton>
-                  </>
-                ) : (
-                  <>
-                    <FormProvider {...methods}>
-                      <form>
-                        <Box my={2} sx={{ minHeight: "25vh" }}>
-                          {getStepContent()}
-                        </Box>
-
-                        <Box
-                          display="flex"
-                          justifyContent="center"
-                          style={{ paddingTop: "5vh" }}
-                        >
-                          <Button
-                            color="inherit"
-                            disabled={activeStep === 0}
-                            onClick={handleBack}
-                            sx={{ mr: 1 }}
-                          >
-                            {t("back") as string}
-                          </Button>
-                          {activeStep === steps.length - 1 ? (
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={handleSubmit(onSubmit)}
-                            >
-                              {t("create") as string}
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={handleSubmit(onSubmit)}
-                            >
-                              {t("next") as string}
-                            </Button>
-                          )}
-                        </Box>
-                      </form>
-                    </FormProvider>
-                  </>
-                )} */}
               </div>
             </Paper>
           </Box>
