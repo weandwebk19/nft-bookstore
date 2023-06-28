@@ -53,15 +53,26 @@ export type BookInfo = {
 export type BookBrief = {
   tokenId: number;
   nftUri: string; // Metadata URI
-  // bookFile: {
-  //   secure_url: string;
-  //   public_id: string;
-  // };
   bookFile?: File;
   bookSample: string;
   bookCover: string;
   title: string;
   author: string;
+  timestamp: Date;
+};
+
+export type BookTemp = {
+  tokenId: number;
+  nftUri: string; // Metadata URI
+  bookFile: string;
+  fileType: string;
+  privateKey: string;
+  ivKey: string;
+  bookSample: string;
+  bookCover: string;
+  title: string;
+  author: string;
+  quantity: number;
   timestamp: Date;
 };
 

@@ -527,6 +527,34 @@ const CreateBook = () => {
     }
   };
 
+  const createBookTemp = async (data: {
+    tokenId: number;
+    title: string;
+    quantity: number;
+    fileType: string;
+  }) => {
+    try {
+      const promise = axios.post("/api/books/book_temp/create", {
+        tokenId: data.tokenId,
+        nftUri: nftURI,
+        bookFile: bookFileLink,
+        fileType: data.fileType,
+        bookSample: bookSampleLink,
+        bookCover: bookCoverLink,
+        privateKey: key,
+        ivKey: ivStr,
+        quantity: data.quantity,
+        title: data.title,
+        author: account.data,
+        timestamp: new Date()
+      });
+    } catch (e: any) {
+      toast.error("Oops! Something went wrong!", {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
+
   const createTransactionHistoryCallback = async (
     provider: any,
     receipt: any,
@@ -632,10 +660,16 @@ const CreateBook = () => {
                 isApproved: false
               } as BookInfo);
               //
-              await createRequestPublish({
-                tokenId: tokenId,
-                bookFile: data.bookFile,
-                title: data.title
+              // await createRequestPublish({
+              //   tokenId: tokenId,
+              //   bookFile: data.bookFile,
+              //   title: data.title
+              // });
+              await createBookTemp({
+                tokenId,
+                title: data.title,
+                fileType: data.fileType,
+                quantity: parseInt(data.quantity)
               });
               if (detailRes) {
                 setIsSigning(false);

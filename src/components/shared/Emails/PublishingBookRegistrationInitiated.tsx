@@ -10,15 +10,13 @@ import AuthorRegistrationLayout, {
   paragraphContent
 } from "./AuthorRegistrationLayout";
 
-export default function PublishingBookRegistrationInitiated(
-  bookBrief: BookBrief
-) {
+export default function PublishingBookRegistrationInitiated(author: string) {
   return (
     <AuthorRegistrationLayout preview="Publish Book Registration Initiated">
       <Section style={paragraphContent}>
         <Hr style={hr} />
         <Text style={paragraph}>
-          Hi <b>{bookBrief.author}</b>,
+          Hi <b>{author}</b>,
         </Text>
         <Text style={paragraph}>
           Thank you for publishing books on our app. You are on your way to
