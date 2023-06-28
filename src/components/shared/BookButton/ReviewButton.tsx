@@ -20,10 +20,10 @@ import {
 import { FormGroup } from "@/components/shared/FormGroup";
 import { StyledButton } from "@/styles/components/Button";
 import { ReviewInfo } from "@/types/reviews";
+import { toastErrorSubmit } from "@/utils/toast";
 
 import { ContentGroup } from "../ContentGroup";
 import { Image } from "../Image";
-import { toastErrorSubmit } from "@/utils/toast";
 
 interface ReviewButtonProps {
   author: string;
