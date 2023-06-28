@@ -13,11 +13,6 @@ const Book3D = ({
   width = "100%",
   isTilted = true
 }: Book3DProps) => {
-  // let img = new Image();
-  // img.src = bookCover;
-  // const imgHeight = img.height;
-  // console.log(imgHeight);
-
   return (
     <Box
       className="Book3D"

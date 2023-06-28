@@ -198,8 +198,7 @@ const FilterBar = ({ data, pathname }: FilterBarProps) => {
                 <CircularProgress />
               </Box>
             )}
-            {genres.error &&
-              "Oops! There was a problem loading genres \n Try refresh the page."}
+            {genres.error && t("textLoadGenre")}
             <TreeViewController
               name="genre"
               items={genres.data}

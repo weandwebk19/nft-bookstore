@@ -6,7 +6,6 @@ import { deleteFile } from "../../../utils";
 
 export default withSessionSSR(
   async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
-    console.log("Delete metadata");
     if (req.method === "DELETE") {
       try {
         const cid: string = req.query.cid as string;
@@ -20,7 +19,6 @@ export default withSessionSSR(
           data: jsonRes
         });
       } catch (err) {
-        console.log("err", err);
         return res.status(422).json({
           message: "Delete successfully",
           success: true,

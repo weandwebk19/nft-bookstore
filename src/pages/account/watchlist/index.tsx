@@ -27,8 +27,6 @@ const Watchlist = () => {
     bookSharingContract
   } = useWeb3();
   const [rows, setRows] = useState<WatchlistRowData[]>([]);
-  console.log("rows", rows);
-
   // Mock value
   // const rows = [
   //   {
@@ -85,7 +83,7 @@ const Watchlist = () => {
             }
           }
         } catch (err) {
-          console.log(err);
+          console.log("Something went wrong, please try again later!");
         }
       }
 

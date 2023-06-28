@@ -23,6 +23,7 @@ import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface LendButtonProps {
   owner: string;
@@ -139,10 +140,7 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
           );
         }
       } catch (e: any) {
-        console.log(e.message);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
     [account.data, bookStoreContract, provider]
@@ -190,7 +188,7 @@ const LendButton = ({ owner, tokenId, amountTradeable }: LendButtonProps) => {
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [owner]);

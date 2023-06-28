@@ -22,6 +22,7 @@ import {
 import { FormGroup } from "@/components/shared/FormGroup";
 import { Image } from "@/components/shared/Image";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface ReviewButtonProps {
   title: string;
@@ -98,10 +99,7 @@ const ReviewButton = ({
         error: "Oops! There's a problem with review process!"
       });
     } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message.substr(0, 65)}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorTransaction(e.message);
     }
   };
 
@@ -116,7 +114,7 @@ const ReviewButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [author]);

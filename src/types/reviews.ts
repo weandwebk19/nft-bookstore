@@ -1,5 +1,3 @@
-import { type } from "os";
-
 export type ReviewStatus = "All" | "Replied" | "Not replied";
 
 export type ReviewRowData = {

@@ -1,0 +1,8 @@
+{
+  "login": "Log in",
+  "email": "Email",
+  "password": "Password",
+  "username": "Username",
+  "loginError": "Either email or password is incorrect",
+  "emailError": "Incorrect email format"
+}

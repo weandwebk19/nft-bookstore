@@ -1,5 +1,7 @@
 {
   "myBookshelf": "Trở về kệ sách",
   "loadingMessage": "Đang giải mã sách của bạn...",
-  "pageSelection": "Lật đến trang"
+  "pageSelection": "Lật đến trang",
+  "errorNetwork": "Vui lòng tắt chương trình và thử lại!",
+  "errorPermission": "Bạn không có quyền đọc cuốn sách này."
 }

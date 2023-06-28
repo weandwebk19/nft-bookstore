@@ -7,7 +7,6 @@ import "./share/BookSharingStorage.sol";
 contract BookTemporary {
   BookRentingStorage private _bookRentingStorage;
   BookSharingStorage private _bookSharingStorage;
-  uint public convertPrice = 0.000005 ether;
 
   constructor(
     BookRentingStorage bookRentingStorage,
@@ -50,9 +49,6 @@ contract BookTemporary {
     uint idBookOnSharing,
     uint amount
   ) public payable {
-    if (msg.value != convertPrice) {
-      revert Error.InvalidPriceError(msg.value);
-    }
     BookSharingStorage.BookSharing memory booksOnSharing = _bookSharingStorage
       .getBooksOnSharing(idBookOnSharing);
 

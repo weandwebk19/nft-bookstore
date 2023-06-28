@@ -159,7 +159,7 @@ export default function CustomerReviewTable({
           }
         }
       } catch (err: any) {
-        toast.error(err.message, {
+        toast.error("An error occured while replying", {
           position: toast.POSITION.TOP_RIGHT
         });
       }
@@ -375,10 +375,6 @@ export default function CustomerReviewTable({
 
   const { handleSubmit } = methods;
 
-  // const onSubmit = async (data: any) => {
-  //   console.log(data);
-  // };
-
   const updateReview = React.useCallback(async (review: ReviewInfo) => {
     const res = await axios.put(`/api/reviews/${review.id}/update`, {
       reviewInfo: review
@@ -386,7 +382,7 @@ export default function CustomerReviewTable({
     if (res.data.success === true) {
       toast.success("Update review successfully.");
     } else {
-      toast.error(`${res.data.message.substr(0, 65)}.`, {
+      toast.error("Oops! Something went wrong!", {
         position: toast.POSITION.TOP_CENTER
       });
     }
@@ -397,7 +393,7 @@ export default function CustomerReviewTable({
     try {
       const newReview = await updateReview(review);
     } catch (e: any) {
-      toast.error(`${e.message.substr(0, 65)}.`, {
+      toast.error("An error occured while updating review", {
         position: toast.POSITION.TOP_CENTER
       });
     }

@@ -22,7 +22,9 @@ import { createTransactionHistory } from "@/components/utils";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { MIN_DURATION_TIME } from "@/utils/constants";
 import { daysToSeconds } from "@/utils/timeConvert";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface RentButtonProps {
   tokenId: number;
@@ -97,7 +99,7 @@ const RentButton = ({
     ) => {
       try {
         // Handle errors
-        if (rentalDuration < 604800) {
+        if (rentalDuration < MIN_DURATION_TIME) {
           return toast.error(t("textErrorRent5") as string, {
             position: toast.POSITION.TOP_CENTER
           });
@@ -114,7 +116,7 @@ const RentButton = ({
           });
         }
 
-        const value = (price * amount * rentalDuration) / 604800;
+        const value = (price * amount * rentalDuration) / MIN_DURATION_TIME;
         const tx = await bookStoreContract!.borrowBooks(
           tokenId,
           renter,
@@ -205,10 +207,7 @@ const RentButton = ({
 
         await createBookHistoryCallback(tokenId, price, amount);
       } catch (e: any) {
-        console.error(e.message);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
     [account.data, bookStoreContract, provider]
@@ -231,7 +230,9 @@ const RentButton = ({
   );
 
   useEffect(() => {
-    const total = currentAmount * currentRentalDays * price;
+    const currentRentalSeconds = currentRentalDays * 86400; // (s)
+    const total =
+      (currentAmount * currentRentalSeconds * price) / MIN_DURATION_TIME;
     setTotalPayment(total);
   }, [currentAmount, currentRentalDays, price]);
 
@@ -262,7 +263,7 @@ const RentButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [renter]);

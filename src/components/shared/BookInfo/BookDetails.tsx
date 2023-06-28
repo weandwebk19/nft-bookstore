@@ -85,8 +85,6 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
   const isSelled = bookDetail?.nftCore?.quantity > 0 ? false : true;
 
   const onSubmitSeller = (data: any) => {
-    console.log("data:", data);
-
     // handle set isListing is true
   };
 
@@ -107,7 +105,7 @@ const BookDetails = ({ bookDetail, onClick }: BookDetailsProps) => {
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [bookDetail]);

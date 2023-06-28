@@ -125,7 +125,7 @@ const AccountMenu = ({
         signOut({ redirect: false });
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 500);
       }
     }
   ];
@@ -231,7 +231,11 @@ const AccountMenu = ({
                     {truncate(account, 12, -4)}
                   </Link>
                   <Tooltip title="Copy address">
-                    <IconButton>
+                    <IconButton
+                      onClick={() => {
+                        navigator.clipboard.writeText(account as string);
+                      }}
+                    >
                       <ContentCopyIcon color="primary" fontSize="small" />
                     </IconButton>
                   </Tooltip>

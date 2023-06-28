@@ -32,6 +32,7 @@ import { createTransactionHistory } from "@/components/utils";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface TakeButtonProps {
   tokenId: number;
@@ -93,7 +94,7 @@ const TakeButton = ({
   const { handleSubmit, watch } = methods;
 
   const currentAmount = watch("amount");
-  const [totalPayment, setTotalPayment] = useState<number>(0);
+  const [totalPayment, setTotalPayment] = useState<number>(price);
 
   const takeBooks = useCallback(
     async (
@@ -200,10 +201,7 @@ const TakeButton = ({
           );
         }
       } catch (error: any) {
-        console.error(error);
-        toast.error(`${error.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(error.message);
       }
     },
     [account.data, bookSharingContract, bookStoreContract, provider]
@@ -241,7 +239,7 @@ const TakeButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [sharer]);
@@ -284,23 +282,9 @@ const TakeButton = ({
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between"
+                justifyContent: "flex-end"
               }}
             >
-              <Stack
-                spacing={3}
-                sx={{
-                  mb: 5
-                }}
-              >
-                <FormGroup label={t("amount") as string} required>
-                  <NumericStepperController name="amount" />
-                  <Typography>
-                    {supplyAmount} {t("left") as string}
-                  </Typography>
-                </FormGroup>
-              </Stack>
-              <Divider />
               <Stack
                 direction="row"
                 justifyContent="space-between"
@@ -316,7 +300,13 @@ const TakeButton = ({
               >
                 {t("gasFee") as string}
               </Typography>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "24px"
+                }}
+              >
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}

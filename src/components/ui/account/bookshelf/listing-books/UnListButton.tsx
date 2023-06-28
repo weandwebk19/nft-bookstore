@@ -16,6 +16,7 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface UnListButtonProps {
   borrower?: string;
@@ -93,10 +94,7 @@ const UnListButton = ({
         );
       }
     } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message.substr(0, 65)}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorTransaction(e.message);
     }
   };
 
@@ -108,10 +106,7 @@ const UnListButton = ({
       try {
         await handleCancelLending();
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     }
   };
@@ -133,10 +128,7 @@ const UnListButton = ({
     try {
       await handleCancelLending();
     } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message.substr(0, 65)}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorTransaction(e.message);
     }
   };
 
@@ -151,7 +143,7 @@ const UnListButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [seller]);

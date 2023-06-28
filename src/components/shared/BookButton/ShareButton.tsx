@@ -20,6 +20,7 @@ import { FormGroup } from "@/components/shared/FormGroup";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
 import { Image } from "../Image";
@@ -49,7 +50,12 @@ const ShareButton = ({
   const { t } = useTranslation("bookButtons");
 
   const [renterName, setRenterName] = useState();
-  const { provider, bookStoreContract, bookRentingContract } = useWeb3();
+  const {
+    provider,
+    bookStoreContract,
+    bookRentingContract,
+    bookSharingContract
+  } = useWeb3();
   const { account } = useAccount();
   const { metadata } = useMetadata(tokenId);
 
@@ -61,11 +67,7 @@ const ShareButton = ({
       price: yup
         .number()
         .min(0, t("textErrorShare1") as string)
-        .typeError(t("textErrorShare2") as string),
-      amount: yup
-        .number()
-        .min(1, t("textErrorShare3") as string)
-        .typeError(t("textErrorShare4") as string)
+        .typeError(t("textErrorShare2") as string)
     })
     .required();
 
@@ -120,14 +122,35 @@ const ShareButton = ({
           startTime,
           endTime
         );
-        const tx = await bookStoreContract?.shareBooks(
-          idBorrowedBook.toNumber(),
-          ethers.utils.parseEther(price.toString()),
-          amount,
-          {
-            value: sharingPrice
-          }
+        const idBookOnSharing = await bookSharingContract!.getIdBookOnSharing(
+          tokenId,
+          renter,
+          borrower,
+          startTime,
+          endTime
         );
+
+        let tx;
+        if (idBookOnSharing.toNumber() === 0) {
+          tx = await bookStoreContract?.shareBooks(
+            idBorrowedBook.toNumber(),
+            ethers.utils.parseEther(price.toString()),
+            amount,
+            {
+              value: sharingPrice
+            }
+          );
+        } else {
+          const book = await bookSharingContract!.getBooksOnSharing(
+            idBookOnSharing.toNumber()
+          );
+          const newAmount = book.amount.toNumber() + amount;
+          tx = await bookStoreContract?.updateBooksOnSharing(
+            idBookOnSharing.toNumber(),
+            ethers.utils.parseEther(price.toString()),
+            newAmount
+          );
+        }
         const receipt: any = await toast.promise(tx!.wait(), {
           pending: t("pendingShare") as string,
           success: t("successShare") as string,
@@ -163,13 +186,17 @@ const ShareButton = ({
           );
         }
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     },
-    [account.data, bookRentingContract, bookStoreContract, provider]
+    [
+      account.data,
+      bookRentingContract,
+      bookStoreContract,
+      provider,
+      t,
+      bookSharingContract
+    ]
   );
 
   const createPricingHistoryCallback = useCallback(
@@ -201,7 +228,7 @@ const ShareButton = ({
     await shareBooks(
       tokenId,
       data.price,
-      data.amount,
+      Number(data.amount),
       borrowedAmount,
       renter,
       borrower,
@@ -209,7 +236,7 @@ const ShareButton = ({
       endTime
     );
     await createPricingHistoryCallback(tokenId, data.price);
-    await createBookHistoryCallback(tokenId, data.price, data.amount);
+    await createBookHistoryCallback(tokenId, data.price, 1);
   };
 
   useEffect(() => {
@@ -223,7 +250,7 @@ const ShareButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [renter]);
@@ -261,21 +288,27 @@ const ShareButton = ({
                 </Typography>
               </Stack>
             </Grid>
-            <Grid item md={8}>
+            <Grid item md={8} sx={{ display: "flex", flexDirection: "column" }}>
               <Stack
                 spacing={3}
                 sx={{
                   mb: 5
                 }}
               >
-                <FormGroup label={t("price") as string} required>
-                  <TextFieldController name="price" type="number" />
-                </FormGroup>
                 <FormGroup label={t("amount") as string} required>
                   <TextFieldController name="amount" type="number" />
                 </FormGroup>
+                <FormGroup label={t("price") as string} required>
+                  <TextFieldController name="price" type="number" />
+                </FormGroup>
               </Stack>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "auto"
+                }}
+              >
                 <StyledButton
                   customVariant="secondary"
                   sx={{ mr: 2 }}

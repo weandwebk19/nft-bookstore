@@ -115,6 +115,7 @@ const BorrowedBooks = () => {
                             onClick={handleBookClick}
                             price={book?.price}
                             amount={book?.amount}
+                            endTime={book?.endTime}
                             countDown={secondsToDhms(book?.endTime - nowTime)}
                             buttons={
                               <Grid
@@ -122,16 +123,18 @@ const BorrowedBooks = () => {
                                 columns={{ xs: 2, sm: 2 }}
                                 spacing={2}
                               >
-                                <Grid item xs={1} sm={1}>
-                                  <ShareButton
-                                    tokenId={book?.tokenId}
-                                    renter={book?.renter}
-                                    borrower={book?.borrower}
-                                    startTime={book?.startTime}
-                                    endTime={book?.endTime}
-                                    borrowedAmount={book?.amount}
-                                  />
-                                </Grid>
+                                {(book?.endTime > nowTime) ?
+                                  <Grid item xs={1} sm={1}>
+                                    <ShareButton
+                                      tokenId={book?.tokenId}
+                                      renter={book?.renter}
+                                      borrower={book?.borrower}
+                                      startTime={book?.startTime}
+                                      endTime={book?.endTime}
+                                      borrowedAmount={book?.amount}
+                                    />
+                                  </Grid> : null
+                                }
                                 <Grid item xs={1} sm={1}>
                                   <ExtendRequestButton
                                     tokenId={book?.tokenId}
@@ -147,9 +150,11 @@ const BorrowedBooks = () => {
                                     author={book?.renter}
                                   />
                                 </Grid>
-                                <Grid item xs={1} sm={1}>
-                                  <ReadButton tokenId={book?.tokenId} />
-                                </Grid>
+                                {(book?.endTime > nowTime) ?
+                                  <Grid item xs={1} sm={1}>
+                                    <ReadButton tokenId={book?.tokenId} />
+                                  </Grid> : null
+                                }
                               </Grid>
                             }
                           />

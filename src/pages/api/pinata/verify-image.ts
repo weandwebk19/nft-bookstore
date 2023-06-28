@@ -25,8 +25,6 @@ export default withSessionAPI(
     req: NextApiRequest & { session: IronSession },
     res: NextApiResponse
   ) => {
-    console.log("verfiy-image");
-
     if (req.method === "POST") {
       try {
         const { bytes, fileName, contentType } = req.body as FileReq;
@@ -60,7 +58,7 @@ export default withSessionAPI(
 
         return res.status(200).send(fileRes.data);
       } catch (err: any) {
-        console.log(err.message);
+        console.log("Something went wrong, please try again later!");
       }
     } else {
       return res.status(422).send({ message: "Invalid endpoint" });

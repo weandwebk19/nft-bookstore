@@ -11,6 +11,7 @@ import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
 
 import { Image } from "../Image";
+import { toastErrorTransaction } from "@/utils/toast";
 
 interface RevokeButtonProps {
   borrower?: string;
@@ -53,10 +54,7 @@ const RevokeButton = ({
       try {
         await handleRevoke();
       } catch (e: any) {
-        console.error(e);
-        toast.error(`${e.message.substr(0, 65)}.`, {
-          position: toast.POSITION.TOP_CENTER
-        });
+        toastErrorTransaction(e.message);
       }
     }
   };
@@ -69,10 +67,7 @@ const RevokeButton = ({
     try {
       await handleRevoke();
     } catch (e: any) {
-      console.error(e);
-      toast.error(`${e.message.substr(0, 65)}.`, {
-        position: toast.POSITION.TOP_CENTER
-      });
+      toastErrorTransaction(e.message);
     }
   };
 
@@ -87,7 +82,7 @@ const RevokeButton = ({
           }
         }
       } catch (err) {
-        console.log(err);
+        console.log("Something went wrong, please try again later!");
       }
     })();
   }, [renter]);
