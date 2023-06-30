@@ -3,17 +3,14 @@ import { useEffect, useState } from "react";
 import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-import StarIcon from "@mui/icons-material/Star";
-
 import axios from "axios";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
-import { bookComments, comments } from "@/mocks";
-import { StyledButton } from "@/styles/components/Button";
 import { StyledLinearProgress } from "@/styles/components/LinearProgress";
 import { ReviewInfo } from "@/types/reviews";
 
-import { Comment, NestedComment } from "../../Comment";
+import { NestedComment } from "../../Comment";
 import { FallbackNode } from "../../FallbackNode";
 import { StaticRating } from "../../Rating";
 
@@ -23,6 +20,7 @@ const BookRating = () => {
   const theme = useTheme();
   const router = useRouter();
   const { bookId } = router.query;
+  const { t } = useTranslation("bookDetail");
   const [reviews, setReviews] = useState([]);
   const [ratings, setRatings] = useState(new Array<number>(5).fill(0));
   const [ratingAvg, setRatingAvg] = useState<string>();
@@ -63,9 +61,9 @@ const BookRating = () => {
     <Box component="section">
       <Stack spacing={3}>
         <Typography variant="h5" mb={1}>
-          Reviews & Ratings
+          {t("reviewsRating")}
         </Typography>
-        <Typography variant="label">Overview:</Typography>
+        <Typography variant="label">{t("overview")}:</Typography>
 
         <Stack
           direction={{ xs: "column", sm: "row" }}
@@ -134,7 +132,7 @@ const BookRating = () => {
           </StyledButton>
         </Stack> */}
         <Divider />
-        <Typography variant="h6">Community Reviews</Typography>
+        <Typography variant="h6">{t("communityReviews")}</Typography>
 
         <Paper>
           {reviews.length > 0 ? (
@@ -154,7 +152,7 @@ const BookRating = () => {
               );
             })
           ) : (
-            <FallbackNode>No reviews yet</FallbackNode>
+            <FallbackNode>{t("noReview")}</FallbackNode>
           )}
         </Paper>
       </Stack>

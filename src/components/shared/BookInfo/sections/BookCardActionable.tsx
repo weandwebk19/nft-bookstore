@@ -51,6 +51,7 @@ const BookCardActionable = ({
         handleNavigate(e);
       }}
       sx={{
+        cursor: "pointer",
         width: "100%",
         height: "100%",
         // backgroundColor: `${theme.palette.background.default}`,
