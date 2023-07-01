@@ -186,8 +186,8 @@ const BookBriefing = () => {
               <Typography variant="h5">{nftBookMeta.data?.title}</Typography>
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Typography>By</Typography>
-              <Link href={`/author/profile/${account.data}`}>
+              <Typography>{t("by")}</Typography>
+              <Link href={`/author/profile/${nftBookMeta.data?.author}`}>
                 <Typography variant="h6" color="secondary">
                   {authorName}
                 </Typography>
