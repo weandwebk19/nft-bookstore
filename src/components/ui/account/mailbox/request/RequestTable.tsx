@@ -23,8 +23,8 @@ import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
 import { RequestExtendRowData } from "@/types/nftBook";
 import { secondsToDhms } from "@/utils/secondsToDays";
-import { truncate } from "@/utils/truncate";
 import { toastErrorTransaction } from "@/utils/toast";
+import { truncate } from "@/utils/truncate";
 
 interface RequestTableProps {
   data: RequestExtendRowData[];

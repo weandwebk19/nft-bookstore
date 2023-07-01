@@ -13,8 +13,8 @@ import { Dialog } from "@/components/shared/Dialog";
 import { Image } from "@/components/shared/Image";
 import { createTransactionHistoryOnlyGasFee } from "@/components/utils";
 import { StyledButton } from "@/styles/components/Button";
-import { toastErrorTransaction, toastRevoke } from "@/utils/toast";
 import { ADDRESS_ZERO } from "@/utils/constants";
+import { toastErrorTransaction, toastRevoke } from "@/utils/toast";
 
 interface RevokeSharedOutButtonProps {
   sharer: string;

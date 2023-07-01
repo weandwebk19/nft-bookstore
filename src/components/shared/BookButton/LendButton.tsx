@@ -21,9 +21,9 @@ import { Image } from "@/components/shared/Image";
 import { createBookHistory } from "@/components/utils/createBookHistory";
 import { getGasFee } from "@/components/utils/getGasFee";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 import { createPricingHistory, createTransactionHistory } from "../../utils";
-import { toastErrorTransaction } from "@/utils/toast";
 
 interface LendButtonProps {
   owner: string;

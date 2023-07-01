@@ -9,9 +9,9 @@ import { useTranslation } from "next-i18next";
 
 import { Dialog } from "@/components/shared/Dialog";
 import { StyledButton } from "@/styles/components/Button";
+import { toastErrorTransaction } from "@/utils/toast";
 
 import { Image } from "../Image";
-import { toastErrorTransaction } from "@/utils/toast";
 
 interface RevokeButtonProps {
   borrower?: string;

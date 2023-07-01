@@ -8,7 +8,7 @@ interface ReadMoreProps {
   maxLines?: number;
 }
 
-const ReadMore = ({ children, maxLines = 200 }: ReadMoreProps) => {
+const ReadMore = ({ children, maxLines = 1000 }: ReadMoreProps) => {
   const theme = useTheme();
   const typeofChildren = typeof children;
 
@@ -27,7 +27,7 @@ const ReadMore = ({ children, maxLines = 200 }: ReadMoreProps) => {
             collapsedSize={maxLines}
             sx={{
               width: "100%",
-              // height: isReadMore ? "250px" : "100%",
+              height: isReadMore ? "250px" : "100%",
               overflowY: "hidden",
               position: "relative",
               "& :after": {
