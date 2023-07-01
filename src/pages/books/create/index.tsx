@@ -335,7 +335,7 @@ const CreateBook = () => {
     }
     return "";
   };
-  88;
+
   const uploadBookFile = async (file: File) => {
     let cipherText;
     if (!!file && file !== undefined) {
