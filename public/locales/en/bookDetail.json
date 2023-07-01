@@ -39,5 +39,10 @@
   "lastest": "Lastest",
   "listings": "Listings",
   "lendings": "Lendings",
-  "recommended": "You may love"
+  "recommended": "You may love",
+  "reviewsRating": "Reviews & Ratings",
+  "overview": "Overview",
+  "communityReviews": "Community reviews",
+  "noReview": "No review yet",
+  "by": "By"
 }

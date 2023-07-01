@@ -12,7 +12,7 @@
   "nftBookDetail": "Chi tiết sách NFT",
   "description": "Mô tả",
   "readMore": "Xem thêm...",
-  "showLess": "Rút ngắn",
+  "showLess": "Rút gọn",
   "bookId": "ID Sách",
   "file": "Loại tệp",
   "noPages": "Số trang",
@@ -39,5 +39,10 @@
   "lastest": "Gần đây",
   "listings": "Đang mở bán",
   "lendings": "Đang mở cho thuê",
-  "recommended": "Có thể bạn sẽ thích"
+  "recommended": "Có thể bạn sẽ thích",
+  "reviewsRating": "Nhận xét & Đánh giá",
+  "overview": "Tổng quan",
+  "communityReviews": "Nhận xét từ cộng đồng",
+  "noReview": "Chưa có nhận xét",
+  "by": "Bởi"
 }
