@@ -49,11 +49,11 @@
   </p>
 </div>
 
+![image](https://github.com/user-attachments/assets/6634b5c0-d95a-418b-8d13-dd3d83d19d33)
 
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
-  ![image](https://github.com/user-attachments/assets/6634b5c0-d95a-418b-8d13-dd3d83d19d33)
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
